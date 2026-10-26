@@ -70,3 +70,7 @@
   text-transform: none;
   letter-spacing: 0.04em;
 }
+
+/* ---------- program book: the notes are in English (Chinese interface, concert.js englishOnly) ---------- */
+.cp-en-note { margin: -6px 0 12px; font-size: 12.5px; line-height: 1.4; color: var(--text-3); }
+.cp-ch.full .cp-en-note { margin: 0 0 12px; }

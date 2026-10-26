@@ -337,10 +337,21 @@ def parse_detail(page_html):
                         if other.strip():
                             out['works'].append((other.strip(), ''))
                     continue
+                listed = _COMPOSER_LIST_RE.match(title) if not clean(name) else None
+                if listed and all(_INITIAL_NAME_RE.match(n.strip())
+                                  for n in re.sub(r'\s+u\.\s?a\.$', '', listed.group(1)).split(',')):
+                    # 'H. Purcell, G.F. Händel, A. Vivaldi u.a.: Diverse Arien …': the composers are in
+                    # the line itself, not the one of the line above
+                    out['works'].append((listed.group(1), listed.group(2)))
+                    continue
                 composer = clean(name) or composer        # an empty name repeats the previous composer
                 if composer and title:
                     out['works'].append((composer, title))
     return out
+
+
+_COMPOSER_LIST_RE = re.compile(r'^([^:,]{3,40}(?:,\s*[^:,]{3,40})+?(?:\s+u\.\s?a\.)?)\s*:\s*(\S.{2,})$')
+_INITIAL_NAME_RE = re.compile(r"^(?:[A-ZÄÖÜ]\.\s?(?:-?[A-ZÄÖÜ]\.\s?)*|[A-ZÄÖÜ][a-zäöüéèàç]+\s+)?[A-ZÄÖÜ][\wäöüéèàç’'-]+$")
 
 
 def _venue(place, fallback_city='Zürich'):

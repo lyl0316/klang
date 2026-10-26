@@ -402,8 +402,9 @@ def _program(c):
         if not isinstance(w, dict) or w.get('is_break'):
             continue
         composer, title = clean(w.get('description_short')), clean(w.get('name'))
-        if not title or re.fullmatch(r'-?\s*pause\s*-?', composer or '', re.I):
-            continue
+        if not title or re.fullmatch(r'-?\s*pause\s*-?', composer or '', re.I) or \
+                re.fullmatch(r'-?\s*pause\s*-?', title, re.I) or re.match(r'(?i)konzert(?:ende|beginn)\b', title):
+            continue                                       # the interval and the end time are not works
         out.append((composer, title))
     return out
 

@@ -341,11 +341,13 @@ function catalogues(text, composerId) {
   const t = normalize(text);
   const out = {};
   const add = (scheme, v) => (out[scheme] || (out[scheme] = new Set())).add(String(v).toLowerCase());
-  for (const m of t.matchAll(/\bopp?(?:us)?\.?\s*(\d+[a-z]?)(?:\s*(?:\/|,?\s*(?:nr|no|n[°º]?)\.?\s*)(\d{1,2})\b)?/g)) {
+  for (const m of t.matchAll(/\bopp?(?:us)?\.?\s*(\d+(?:[a-z](?![a-z]))?)(?:\s*(?:\/|,?\s*(?:nr|no|n[°º]?)\.?\s*)(\d{1,2})\b)?/g)) {
     add('op', m[1]);
     if (m[2]) add('opno', `${m[1]}/${m[2]}`);
   }
   if (/\bopp\.?\s*\d+\s*,\s*\d+/.test(t)) out.opMany = true;
+  // "op. 8/1-4", "op. 8 Nr. 1–4": several numbers of the set
+  if (/\bopp?(?:us)?\.?\s*\d+[a-z]?\s*(?:\/|,?\s*(?:nr|no|n[°º]?)s?\.?\s*)\d{1,2}\s*(?:[-–]|,|\bund\b|\bet\b|\band\b)\s*\d{1,2}\b/.test(t)) out.opRange = true;
   const schemes = [
     ['bwv', /\bbwv\s*(\d+[a-z]?)/g], ['hwv', /\bhwv\s*(\d+[a-z]?)/g], ['sz', /\bsz\.?\s*(\d+)/g], ['wwv', /\bwwv\s*(\d+)/g],
     ['hob', /\bhob\.?\s*([ivx]+[a-z]?)\s*[:.]\s*(\d+)/g], ['woo', /\bwoo\.?\s*(\d+)/g], ['rv', /\brv\.?\s*(\d+)/g],
@@ -466,6 +468,8 @@ function catalogueVerdict(feed, info) {
     if (a.size > 1 || feed.cat.range) return 'conflict'; // several works named in one line
     if (![...a].some((x) => b.has(x))) return 'conflict';
     if (scheme === 'op' && feed.cat.opno && info.cat.opno && ![...feed.cat.opno].some((x) => info.cat.opno.has(x))) return 'conflict';
+    // one number of a set ("Prélude Des-Dur op. 28 Nr. 15") is not the whole set ("24 Préludes, op. 28")
+    if (scheme === 'op' && feed.cat.opno && !info.cat.opno && !feed.cat.opRange) return 'conflict';
     verdict = 'match';
   }
   return verdict;
@@ -540,9 +544,15 @@ export function arrangerOf(title) {
   return name ? name.split(/\s+/).pop() : null;
 }
 
+// The text that names the work itself: not the piece it is written after ("«Raindrop» – Postludium (nach
+// dem Prélude Des-Dur op. 28 Nr. 15)" is a piece of its own, not Chopin's op. 28 No. 15), nor a premiere
+// mark glued to its end ("Between Trees | CH").
+const SOURCE_NOTE = /\(\s*(?:nach|after|d['’]apr[eè]s|frei nach|based on|sur (?:un|des|le) th[eè]mes?|[uü]ber (?:ein|das|den)|on (?:a|the) themes?)\b[^)]*\)/gi;
+export const ownTitle = (s) => String(s || '').replace(SOURCE_NOTE, ' ').replace(/\s*\|\s*(?:CH|UA|EA|SEA|DEA|DE|EU|WP)\s*$/, '').replace(/\s+/g, ' ').trim();
+
 export function matchWork(composerId, title) {
   if (!composerId || !title) return null;
-  const feed = describe(title, composerId);
+  const feed = describe(ownTitle(title), composerId);
   if (EXCERPT.test(withoutAliases(feed.plain, composerId))) return null;
   if (ARRANGED.test(feed.plain)) return null;
   let best = null;
@@ -633,29 +643,42 @@ function workInTitle(composerId, concertTitle) {
 //   part, excerpt, arranged, words (the title's words without catalogue numbers, for a catalogue or
 //   title key) } or null (no title, or not a work: "Werke von …", "Uraufführung", "für Streichorchester").
 
-// Page boilerplate read as a programme line (dropped by repo.js) …
-const BOILERPLATE = /^(?:programm\w*|program\w*)\s+(?:vorbehalten|subject to change|sous reserve)$|^(?:changements? de programme|sous reserve de modifications?)$|^(?:konzert\s+)?(?:mit|ohne)\s+pause$|^(?:pause|entracte|intermission|intervallo)$|^ca\.?\s*\d+\s*(?:std|stunden?|minuten|min)\b|^(?:apero|aperitif)\b|^(?:dauer|duree)\b|^(?:ca\.?\s*)?\d{1,2}[.:]\d{2}\s*(?:uhr|h)\b|^(?:anschliessend|im anschluss)\b|^(?:solo|duo|trio)[\s-]*programm$|^(?:arrangements?|visuals|live act|dj)$/;
+// Page boilerplate read as a programme line (dropped by repo.js): "- Pause -", "Konzertende ca. 21.30 Uhr",
+// "Fin vers 22h", "Pause (20 Min.)" … but never "Pausa", "Pause del silenzio", "Das Ende der Zeit" or "Entr'acte".
+const BOILERPLATE = /^(?:programm\w*|program\w*)\s+(?:vorbehalten|subject to change|sous reserve)$|^(?:changements? de programme|sous reserve de modifications?)$|^(?:konzert\s+)?(?:mit|ohne)\s+pause$|^(?:pause|entracte|intermission|intervallo)$|^ca\.?\s*\d+\s*(?:std|stunden?|minuten|min)\b|^(?:apero|aperitif)\b|^(?:dauer|duree)\b|^(?:ca\.?\s*)?\d{1,2}[.:]\d{2}\s*(?:uhr|h)\b|^(?:anschliessend|im anschluss)\b|^(?:solo|duo|trio)[\s-]*programm$|^(?:arrangements?|visuals|live act|dj)$|^(?:konzert|vorstellungs)(?:ende|beginn|dauer|schluss)\b|^(?:ende|beginn|schluss|fin|debut|fine|inizio)\s+(?:ca\.?\s*|um\s+|gegen\s+|vers\s+|env\.?\s*|alle\s+|circa\s+)?\d{1,2}\s*(?:[.:h]\s*\d{2}|h\b|uhr\b)|^fin (?:du concert|prevue)\b|^(?:pause|entracte|intermission|intervallo)\b\s*(?:[(:]|,?\s*(?:ca\b|(?:von|de)\s+\d|\d))/;
 export function isBoilerplate(title) {
-  const s = normalize(String(title || '')).replace(/[.!\s]+$/, '').replace(/\s+/g, ' ').trim();
+  const s = normalize(String(title || '')).replace(/^[\s\-–—_*•·]+|[\s\-–—_*•·.!]+$/g, '').replace(/\s+/g, ' ').trim();
   return !!s && BOILERPLATE.test(s);
 }
-// … and lines that are information, not a work (shown as text, without a work page).
-const NOT_WORK_COMPOSER = /^(?:werke|works|oeuvres|œuvres|opere|musik|music|weitere|und|and|et|sowie)\b/;
-const NOT_WORK_TITLE = /^(?:weitere|und andere|and other|other works|autres|d'autres|sowie|etc)\b|\b(?:u a|usw|etc)$|^(?:urauffuhrung|creation|world premiere|premiere|ua)$/;
+// … and lines that are information, not a work (shown as text, without a work page): a placeholder for a
+// piece not yet named ("Neues Werk, für Ensemble", "Auftragskomposition (2027)", "Œuvre à définir",
+// "Création, pour quatuor à cordes et orchestre", "NN für Video und Orchester"), "Diverse Arien", a reading,
+// a movement range ("2.–4. Satz") or a lone letter. "Neues vom Tage", "Neue Liebeslieder", "La Création du
+// monde" and "Creation Mass" are works.
+const NOT_WORK_COMPOSER = /^(?:werke|works|oeuvres|œuvres|opere|musik|music|weitere|und|and|et|sowie)\b|^(?:nn|n\.\s*n\.?)$|^sing[- ]?along\b/;
+const NOT_WORK_TITLE = /^(?:weitere|und andere|and other|other works|autres|d'autres|sowie|etc)\b|\b(?:u a|usw|etc)$|^(?:urauffuhrung|creation|world premiere|premiere|ua)$|^(?:neues werk|neues stuck|neue[sr]? (?:komposition|werk)|auftrags(?:komposition|werk)|eigenkomposition|(?:oe)?uvre a (?:definir|preciser)|programme? a (?:definir|venir|preciser)|werke? (?:fur|pour|for|per) |nn(?: |$)|n n(?: |$))|^creation (?:commande|pour|for|fur|mondiale|suisse)\b|^urauffuhrung (?:fur|pour|for)\b|\bdiverse (?:arien|lieder|werke|stucke)\b|^(?:briefe|lesung|live set)$|^(?:\d+ )+(?:satz|satze|mouvements?|movements?|mvts?)$|^[a-z]$/;
 // The scoring continued from the line before ("für Streichorchester", "pour piano et orchestre") is not
 // a work; "Für Elise", «Per questa bella mano» and "Pour le piano" are.
 const CONTINUATION = /^(?:fur|pour|for|per) (?:(?:\d+|zwei|drei|vier|funf|sechs|deux|trois|quatre|cinq|two|three|four|five|due|tre|quattro|ein|eine|einen|un|une|grosses|grosse|kleines|kleine|grand|petit|solo|gemischten|gemischter|hohe|tiefe) )?(?:streich|orchest|klavier|piano|violin|violon|viola|alto\b|bratsch|cello|violoncel|kontrabass|contrebasse|flot|flute|flaut|oboe|hautbois|klarinet|clarinet|fagott|basson|horn|cor\b|trompet|tromba|trumpet|posaun|trombone|tuba|harfe|harpe|arpa\b|harp|orgel|orgue|organ|cembalo|clavecin|harpsichord|gitarr|guitar|chitarra|akkordeon|accordeon|sopran|mezzo|alt\b|tenor|bariton|baryton|bass|stimme|singstimme|voix|voice|voce|chor|choeur|coro\b|choir|ensemble|kammer|blas|vents|wind|schlag|percuss|marimba|saxophon|cordes|strings|archi|soli\b|instrument)/;
 export function isWorkLine(p) {
-  const title = plain(p?.title);
+  const raw = String(p?.title || '');
+  const title = plain(raw);
   if (!title) return false;
+  // a detail of the line above ("— Nr. 1 in C-dur, Moderato") or a heading for the lines below
+  // ("Aus den «Liedern ohne Worte»:"; repo.js joins "Mazurkas op. 41:" with a following "Nr. 1 …, Nr. 4 …")
+  if (/^\s*[-–—]\s+\S/.test(raw) || /:\s*$/.test(raw)) return false;
   return !NOT_WORK_COMPOSER.test(normalize(String(p.composer || '').trim())) && !NOT_WORK_TITLE.test(title) && !CONTINUATION.test(title);
 }
 
 const KNOWN_SURNAMES = new Set(COMPOSER_KEYS.flatMap(([, s]) => s).concat(['strauss']));
 // German / French / English transliterations brought together: Prokofjew / Prokofiev, Moussorgski /
-// Mussorgsky, Rimski-Korsakow / Rimsky-Korsakov.
+// Mussorgsky, Rimski-Korsakow / Rimskij-Korsakow / Rimsky-Korsakov (and a few names spelt more ways than
+// the rules cover: Skrjabin / Scriabin, Glasunow / Glazunov).
 const translit = (s) => s.replace(/tsch/g, 'ch').replace(/sch/g, 'sh').replace(/tch/g, 'ch').replace(/ae/g, 'a').replace(/oe/g, 'o')
-  .replace(/ue/g, 'u').replace(/ou/g, 'u').replace(/w/g, 'v').replace(/[jy]/g, 'i').replace(/ff(?=-|$)/g, 'v').replace(/kh/g, 'k');
+  .replace(/ue/g, 'u').replace(/ou/g, 'u').replace(/w/g, 'v').replace(/[jy]/g, 'i').replace(/ff(?=-|$)/g, 'v').replace(/kh/g, 'k')
+  .replace(/ii(?=-|$)/g, 'i');
+const SURNAME_ALIAS = { skriabin: 'scriabin', skriabine: 'scriabin', scriabine: 'scriabin', glasunov: 'glazunov' };
+const surnameKey = (w) => { const t = translit(w); return SURNAME_ALIAS[t] || t; };
 
 // The composer part of a work's identity: the matched composer's id, else the listed surname
 // ("Dieter Ammann" and "Ammann" → ammann). A namesake of a composer we know keeps the initials
@@ -671,7 +694,7 @@ export function composerKey(name, composerId = null) {
   while (words.length > 1 && /^(ii|i|jr|sr|sohn|vater|fils|pere|junior|senior)$/.test(words[words.length - 1])) words.pop();
   if (!words.length) return '';
   const last = words[words.length - 1];
-  const sur = translit(last);
+  const sur = surnameKey(last);
   const firsts = words.slice(0, -1).filter((w) => !/^(van|von|de|di|da|del|della|du|le|la|des|der|den|ten|ter|y|mc)$/.test(w));
   if (KNOWN_SURNAMES.has(last.replace(/-/g, ' ')) && firsts.length) return `${firsts.map((w) => w[0]).join('')}${father ? '1' : ''}-${sur}`;
   return sur;
@@ -699,7 +722,8 @@ const CAT_SCHEMES = [
   { s: 'wwv', re: /\bwwv\.?\s*(\d+)/g, tok: (m) => `wwv${m[1]}`, label: (m) => `WWV ${m[1]}` },
   { s: 'l', only: ['debussy'], re: /\bl\.?\s*(\d{1,3})\b/g, tok: (m) => `l${m[1]}`, label: (m) => `L. ${m[1]}` },
 ];
-const OPUS = /\bop(?:us|\.)?\s*(\d+[a-z]?)(?:\s*(?:\/|,?\s*(?:nr|no|n[°º]?)\.?\s*)(\d{1,2})\b)?/g;
+// (a letter glued to the number by mistake is not part of it: "op. 125LE" is op. 125; "op. 72b" stays)
+const OPUS = /\bop(?:us|\.)?\s*(\d+(?:[a-z](?![a-z]))?)(?:\s*(?:\/|,?\s*(?:nr|no|n[°º]?)\.?\s*)(\d{1,2})\b)?/g;
 const CAT_RANGE = /\b(?:bwv|kv|hwv|rv|d|hob[^,;]*?|op\.?)\s*\d+[a-z]?\s*(?:\/\s*\d+\s*)?[-–]\s*\d+/;
 
 // → { token, label } | 'multi' (several works in one line) | null
@@ -715,7 +739,12 @@ function catalogueOf(low, composerId, comp) {
   // "op. 46-72", "opp. 46 & 72", "extraits des op. 46 et 72": several works
   if (CAT_RANGE.test(low) || /\bopp\.?\s*\d/.test(low) || /\bop\.?\s*\d+[a-z]?\s+(?:et|und|and|e|y|&)\s+(?:op\.?\s*)?\d+\b/.test(low)) return 'multi';
   if (thematic.size > 1) return 'multi';
-  if (thematic.size === 1) { const [token, label] = [...thematic][0]; return { token, label }; }
+  if (thematic.size === 1) {
+    const [token, label] = [...thematic][0];
+    // Mendelssohn by opus and MWV ("Klaviertrio Nr. 1 d-Moll op. 49 MWV Q 29"): most listings give the opus only
+    if (token.startsWith('mwv-') && ops.size === 1) { const [t2, l2] = [...ops][0]; return { token: t2, label: l2 }; }
+    return { token, label };
+  }
   if (ops.size > 1) return 'multi';
   if (ops.size === 1) { const [token, label] = [...ops][0]; return { token, label }; }
   return null;
@@ -733,6 +762,9 @@ const EXCERPTS_OF = /\b(auszuge|ausschnitte|extraits|excerpts|estratti|highlight
 const NAMES_A_PART = /\b(nr|no|n|akt|acte|act|atto|satz|mouvement|movement|movimento|teil|arie|aria|air|duett|duetto|chor|coro|choeur|introduktion|finale)\b/;
 // (a concert overture too: "«Othello» Konzertouvertüre, op. 93" is "Ouverture « Othello », op. 93")
 const OVERTURE = /\b(ouverture|overture|ouvertura|vorspiel|konzertouverture)\b/;
+// "Präludium und Fuge Nr. 2 c-Moll BWV 847 aus WTK Band I": a piece with its own BWV number, from a collection
+// of such pieces — not a part of BWV 847 ("Chaconne aus der Partita Nr. 2 d-Moll BWV 1004" is a part)
+const COLLECTION_NOTE = /\b(?:aus|from)\s+(?:dem\s+|des\s+|the\s+)?(?:wtk|wohltemperierte[ns]?\s+(?:klavier|clavier)s?|well[- ]tempered\s+clavier|clavier[- ]?ubung|klavier[- ]?ubung)\b.*$/;
 // a suite drawn from a stage work that shares its number ("Nussknacker-Suite", "Suite aus …"), not a
 // work that is itself a suite ("Symphonische Suite «Scheherazade» op. 35")
 const SUITE_OF = /(ballett|ballet|oper|opera|film|buhnen)[\s-]*suite\b|\bsuite (?:aus|from|de|du|tiree|nach|dal|dalla)\b|[a-z]-suite\b/;
@@ -861,15 +893,17 @@ export function workIdentity(p) {
   const cacheKey = `${composerId || ''}\u0001${p.composer || ''}\u0001${title}`;
   if (identityCache.has(cacheKey)) return identityCache.get(cacheKey);
   const comp = composerKey(p.composer, composerId);
-  const low = normalize(title);
-  const pl = plain(title);
+  const own = ownTitle(title) || title;
+  const low = normalize(own);
+  const pl = plain(own);
   const arranged = ARRANGED.test(pl);
   const cat = catalogueOf(low, composerId, comp);
   const one = cat && cat !== 'multi' ? cat : null;
   const without = one ? pl.replace(/\b(?:op|opus|bwv|kv|k|d|hob|rv|hwv|wab|s|lw|sz|bb|trv|mwv|woo|wq|fp|buxwv|wwv|l)\b(?: [a-z]{1,2})?(?: [ivx]+)? \d+[a-z]?\b(?: (?:nr|no|n) \d+\b)?/g, ' ') : pl;
   const excerpt = EXCERPTS_OF.test(pl);
   const ofWhole = excerpt && !!one && !arranged && !NAMES_A_PART.test(without.replace(EXCERPTS_OF, ' '));
-  const part = !ofWhole && (PART.test(plain(unquoted(low))) || PART_AFTER_CAT.test(low));
+  const partText = one && one.token.startsWith('bwv') ? low.replace(COLLECTION_NOTE, ' ') : low;
+  const part = !ofWhole && (PART.test(plain(unquoted(partText))) || PART_AFTER_CAT.test(partText));
   const form = !part && !arranged && cat !== 'multi' ? formOf(low, pl) : null;
   let by;
   let work;
@@ -895,7 +929,7 @@ export function workIdentity(p) {
 
 // ---------- search text for a programme line (Apple Music) ----------
 // "Sinfonie Nr. 6 F-Dur, Pastorale, op. 68 (Fassung …)" → search text without notes in brackets
-export const searchTitle = (s) => String(s || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/,\s*\d+\.\s*Fassung\b.*$/i, ' ').replace(/[«»“”„"]/g, ' ')
+export const searchTitle = (s) => String(s || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/\b([Oo]p\.?\s*\d+)[A-Z]{2,}\b/g, '$1').replace(/\s*\|\s*(?:CH|UA|EA|SEA|DEA|DE|EU|WP)\s*$/, '').replace(/,\s*\d+\.\s*Fassung\b.*$/i, ' ').replace(/[«»“”„"]/g, ' ')
   .replace(/\s+/g, ' ').replace(/[\s,;:–-]+$/, '').trim();
 
 // Apple's catalogue is titled in English: when the listing's German title finds nothing, a second

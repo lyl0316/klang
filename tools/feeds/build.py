@@ -258,14 +258,15 @@ def _jaccard(a, b):
     return len(a & b) / len(a | b) if a and b else 0.0
 
 
-def venue_similar(va, vb):
+def venue_similar(va, vb, same_city=True):
     qa, qb = va & _HALL_QUALIFIERS, vb & _HALL_QUALIFIERS
     if qa and qb and qa != qb:
         return False        # Grosser Saal vs Kleiner Saal
-    if va == vb:
-        return True
     small, big = (va, vb) if len(va) <= len(vb) else (vb, va)
-    if small <= _GENERIC | _HALL_QUALIFIERS:
+    vague = small <= _GENERIC | _HALL_QUALIFIERS
+    if va == vb:
+        return same_city or not vague     # "Kirche" = "Kirche" only means something in one town
+    if vague:
         return False        # just "Kirche" or "Theater": too vague to call it the same place
     if small <= big:
         return True         # "Tonhalle" vs "Tonhalle, Grosser Saal"
@@ -330,10 +331,23 @@ def title_very_similar(a, b):
     return min(len(ta), len(tb)) >= 2 and _jaccard(ta, tb) >= 0.75
 
 
-def match_strength(a, b):
-    """0 when two events (from different sources, starting within DEDUPE_MINUTES of each other)
-    are different concerts; otherwise how sure the match is (3 = similar venue, 2 = the same
-    performers, 1 = one venue name contains the other or very similar titles)."""
+def hall_part(ev):
+    """The words that name a hall inside a building: what follows the first ',' or ' – ' of the
+    venue name, without city words ('Tonhalle Zürich – Kleiner Saal' -> {'kleiner', 'saal'};
+    'Kirche St. Peter, Zürich' -> set(); 'Tonhalle Zürich' -> set())."""
+    v = str(ev.get('venueName') or '')
+    m = re.search(r',|\s[–—-]\s', v)
+    return _tokens(v[m.end():], _CITY_WORDS) if m else set()
+
+
+# the hall a listing means when it names only the building
+_MAIN_HALL = {'gross', 'grosser', 'grosse', 'grossen', 'grand', 'grande', 'musiksaal', 'konzertsaal', 'hauptbuhne',
+              'theatersaal', 'festsaal'}
+# words that don't tell two halls apart ("Grosser Saal" / "Saal")
+_HALL_FILLER = (_STOP - {'konzertsaal'}) | {'grande', 'grosse', 'grosser', 'grand'}
+
+
+def _base_strength(a, b):
     ca, cb = city_key(a.get('city')), city_key(b.get('city'))
     if ca and cb and ca != cb:
         return 0
@@ -343,7 +357,7 @@ def match_strength(a, b):
         qa, qb = va & _HALL_QUALIFIERS, vb & _HALL_QUALIFIERS
         if qa and qb and qa != qb:
             return 0                      # Grosser Saal vs Kleiner Saal
-        if venue_similar(va, vb):
+        if venue_similar(va, vb, same_city):
             return 3
         if not same_city:
             return 0
@@ -365,6 +379,35 @@ def match_strength(a, b):
     if shared_performers(a, b) >= 2:
         return 2
     return 1 if title_similar(a.get('title'), b.get('title')) else 0
+
+
+def match_strength(a, b):
+    """0 when two events (from different sources, starting within DEDUPE_MINUTES of each other)
+    are different concerts; otherwise how sure the match is (3 = similar venue, 2 = the same
+    performers, 1 = one venue name contains the other or very similar titles).
+
+    A similar venue is not enough when the listings name different halls of one building, or
+    only one of them names a hall and nothing else (cast, title) ties them together: the
+    "Tonhalle Zürich" listing of one ensemble is not the "Kleiner Saal" recital of another."""
+    s = _base_strength(a, b)
+    if not s:
+        return 0
+    shared = shared_performers(a, b)
+    ha, hb = hall_part(a), hall_part(b)
+    if bool(ha) != bool(hb) and not shared and not title_similar(a.get('title'), b.get('title')):
+        # a building vs one of its halls, nothing in common: two casts that differ, or a listing
+        # without a cast that can only mean the building's main hall, not "Hans Huber-Saal"
+        if (a.get('credits') and b.get('credits')) or not (ha or hb) & _MAIN_HALL:
+            return 0
+    fa, fb = ha - _HALL_FILLER, hb - _HALL_FILLER
+    if fa and fb and not fa & fb and shared < 2:
+        return 0                          # two named halls: Konzertsaal vs Luzerner Saal
+    if s == 1 and not shared and not venue_contains(a, b):
+        da = venue_tokens(a) - _GENERIC - _HALL_QUALIFIERS
+        db = venue_tokens(b) - _GENERIC - _HALL_QUALIFIERS
+        if da and db and not da & db:
+            return 0                      # a similar title in two places: Fraumünster vs Grossmünster
+    return s
 
 
 def same_concert(a, b):
@@ -419,7 +462,43 @@ def _credit_score(credits):
 
 
 def _program_score(program):
-    return (sum(1 for p in program or [] if p.get('title')), len(program or []))
+    """(work titles, lines): the interval or an end time ('- Pause -') is not a work."""
+    lines = [p for p in program or [] if isinstance(p, dict) and not common.is_not_work_line(p.get('composer'), p.get('title'))]
+    return (sum(1 for p in lines if p.get('title')), len(lines))
+
+
+def _translit(word):
+    """'tschaikowsky' and 'tchaikovsky' -> one spelling (as js/ics.js translit does)."""
+    w = word.replace('tsch', 'ch').replace('sch', 'sh').replace('tch', 'ch').replace('ae', 'a').replace('oe', 'o')
+    w = w.replace('ue', 'u').replace('ou', 'u').replace('w', 'v').replace('j', 'i').replace('y', 'i').replace('kh', 'k')
+    return re.sub(r'ff$', 'v', w)
+
+
+def _composer_words(composer):
+    """The telling name words of a composer line ('Pjotr Iljitsch Tschaikowsky' -> {'chaiko', 'iliich', 'piotr'}),
+    life dates and arrangers' notes left out."""
+    text = re.sub(r'\([^)]*\)', ' ', common._fold(composer))
+    return {_translit(w)[:6] for w in re.findall(r'[a-z]{4,}', text) if w not in ('arrangement', 'bearbeitung', 'nach')}
+
+
+def _composers_cover(program, other):
+    """True when every composer of ``other`` is also named in ``program`` (one name word in
+    common is enough: 'Mendelssohn' / 'Felix Mendelssohn Bartholdy')."""
+    words = set().union(*[_composer_words(p.get('composer')) for p in program or [] if isinstance(p, dict)] or [set()])
+    for p in other or []:
+        mine = _composer_words(p.get('composer')) if isinstance(p, dict) else set()
+        if mine and not mine & words:
+            return False
+    return True
+
+
+_GROUP_ROLES = {'Orchestra', 'Choir', 'Ensemble'}
+
+
+def _people(credits):
+    """The performers named as people (not orchestras, choirs or ensembles), as name keys."""
+    return {_performer_key(c.get('name')) for c in credits or []
+            if isinstance(c, dict) and c.get('role') not in _GROUP_ROLES} - {''}
 
 
 def ordered(ev):
@@ -445,8 +524,11 @@ def merge(a, b, priority, sites=None):
     for f in ('durationMin', 'city', 'venueName', 'type', 'series', 'credits', 'program', 'ticketUrl', 'url'):
         if not out.get(f) and lose.get(f):
             out[f] = lose[f]
-    # the richer cast, with specific roles where the other listing knows them
-    if lose.get('credits') and _credit_score(lose['credits']) > _credit_score(out.get('credits')):
+    # the richer cast, with specific roles where the other listing knows them; but only a cast
+    # that names every person the kept listing names (a listing not updated after a change of
+    # conductor must not bring the old one back; an ensemble may be listed by its members)
+    if lose.get('credits') and _credit_score(lose['credits']) > _credit_score(out.get('credits')) \
+            and _people(out.get('credits')) <= _people(lose['credits']):
         out['credits'] = lose['credits']
     other = win if out.get('credits') is lose.get('credits') else lose
     roles = {_name_key(c.get('name')): c.get('role') for c in other.get('credits') or [] if c.get('role') != 'Performer'}
@@ -455,8 +537,10 @@ def merge(a, b, priority, sites=None):
         out['credits'] = [dict(c, role=roles[_name_key(c.get('name'))])
                           if c.get('role') == 'Performer' and _name_key(c.get('name')) in roles else c
                           for c in out['credits']]
-    # the programme with more work titles (a listing often has composers only)
-    if lose.get('program') and _program_score(lose['program']) > _program_score(out.get('program')):
+    # the programme with more work titles (a listing often has composers only), when it names
+    # every composer of the kept one (not a programme that was changed since)
+    if lose.get('program') and _program_score(lose['program']) > _program_score(out.get('program')) \
+            and _composers_cover(lose['program'], out.get('program')):
         out['program'] = lose['program']
     # the more specific venue name
     vw, vl = _name_key(out.get('venueName')), _name_key(lose.get('venueName'))
@@ -477,9 +561,30 @@ def merge(a, b, priority, sites=None):
 _BROKEN_WORD_RE = re.compile(r'(?<=[a-zäöüéèàß])- (?!(?:und|oder|bis|et|ou|and|or|e|o)\b)(?=[a-zäöüéèà]{2})')
 
 
+# "Champagner- Lied" / "Projekt- Ensemble" (broken before a noun) -> "Champagner-Lied"
+_BROKEN_COMPOUND_RE = re.compile(r'(?<=[a-zäöüéèàß])- (?=[A-ZÄÖÜ][a-zäöüéèàß]{2})')
+
+
 def _tidy_text(s, *, words=False):
-    s = re.sub(r'\s+', ' ', unicodedata.normalize('NFC', s)).strip()
-    return _BROKEN_WORD_RE.sub('', s) if words else s
+    # also a line break that a site sends as the two characters backslash + n ('Tito Vespasiano\\n')
+    s = re.sub(r'(?:\s|\\[nrt])+', ' ', unicodedata.normalize('NFC', s)).strip()
+    return _BROKEN_COMPOUND_RE.sub('-', _BROKEN_WORD_RE.sub('', s)) if words else s
+
+
+def _tidy_program(program):
+    """Each line tidied; the interval and end-time lines dropped (also from reused events)."""
+    out = []
+    for p in program:
+        if not isinstance(p, dict):
+            out.append(p)
+            continue
+        p = {k: (_tidy_text(v, words=k == 'title') if isinstance(v, str) else v) for k, v in p.items()}
+        if isinstance(p.get('title'), str):
+            p['title'] = re.sub(r'\s*[*,;]+$', '', p['title'])
+        if common.is_not_work_line(p.get('composer'), p.get('title')) or not (p.get('composer') or p.get('title')):
+            continue
+        out.append(p)
+    return out
 
 
 def tidy_event(ev):
@@ -493,8 +598,9 @@ def tidy_event(ev):
         out['credits'] = [{k: (_tidy_text(v) if isinstance(v, str) else v) for k, v in c.items()}
                           if isinstance(c, dict) else c for c in out['credits']]
     if out.get('program'):
-        out['program'] = [{k: (_tidy_text(v, words=k == 'title') if isinstance(v, str) else v) for k, v in p.items()}
-                          if isinstance(p, dict) else p for p in out['program']]
+        out['program'] = _tidy_program(out['program'])
+        if not out['program']:
+            del out['program']
     return out
 
 
@@ -502,10 +608,12 @@ def _ts(ev):
     return common.to_zurich_datetime(ev['start']).timestamp()
 
 
-def dedupe(events, priority, sites=None):
+def dedupe(events, priority, sites=None, merges=None):
     """Remove repeated ids within a source and the same performance listed by several
     sources. ``priority`` maps source key -> int, ``sites`` source key -> SITE URL.
-    Returns (events sorted by start, merged count)."""
+    Returns (events sorted by start, merged count). When ``merges`` is a list, one record per
+    cross-source merge is appended to it: {'id' (kept), 'absorbed', 'source' (of the absorbed
+    listing), 'strength', 'minutes' (start difference)}."""
     by_id = {}
     for ev in events:
         prev = by_id.get(ev['id'])
@@ -532,10 +640,14 @@ def dedupe(events, priority, sites=None):
             absorbed.append({ev['source']})
         else:
             i = best[2]
-            (log.info if best[0] < 3 else log.debug)(
-                'merged %s into %s (%s)', ev['id'], kept[i]['id'],
-                {3: 'similar venue', 2: 'same performers', 1: 'venue/title'}[best[0]])
-            kept[i] = merge(kept[i], ev, priority, sites)
+            other = kept[i]
+            kept[i] = merge(other, ev, priority, sites)
+            gone = ev if kept[i]['id'] == other['id'] else other     # merge() keeps the higher-priority record
+            log.info('merged %s into %s (%s, %d min apart)', gone['id'], kept[i]['id'],
+                     {3: 'similar venue', 2: 'same performers', 1: 'venue/title'}[best[0]], round(-best[1] / 60))
+            if merges is not None:
+                merges.append({'id': kept[i]['id'], 'absorbed': gone['id'], 'source': gone['source'],
+                               'strength': best[0], 'minutes': round(-best[1] / 60)})
             absorbed[i].add(ev['source'])
             merged += 1
     kept.sort(key=lambda e: (_ts(e), e['title'], e['id']))
@@ -751,7 +863,8 @@ def main(argv=None):
         for ev in res.events[:max(0, args.show)]:
             print('    ' + json.dumps(ev, ensure_ascii=False))
 
-    concerts, merged = dedupe([tidy_event(ev) for ev in all_events], priority, sites)
+    merges = []
+    concerts, merged = dedupe([tidy_event(ev) for ev in all_events], priority, sites, merges)
     concerts, retyped = settle_types(concerts, kinds)
     if retyped:
         log.info('type or series set from the facts for %d concert(s)', retyped)
@@ -765,6 +878,8 @@ def main(argv=None):
         'window': {'from': today.isoformat(), 'to': last_day.isoformat()},
         'sources': entries,
         'concerts': concerts,
+        # listings merged into another source's record of the same performance (for audits)
+        'merges': sorted(merges, key=lambda m: (m['id'], m['absorbed'])),
     }
     os.makedirs(os.path.dirname(out_path) or '.', exist_ok=True)
     tmp = out_path + '.tmp'

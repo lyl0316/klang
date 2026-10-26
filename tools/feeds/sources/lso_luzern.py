@@ -229,6 +229,33 @@ _REMARK_RE = re.compile(r'(ur|erst|schweizer erst|europäische erst|deutschsprac
 _DURATION_RE = re.compile(r'dauer[^0-9]*?(\d+)\s*(?:std|h)\b\.?(?:\s*(\d+)\s*min)?|dauer[^0-9]*?(\d+)\s*min', re.I)
 
 
+# a piece of the work listed above it in the same item: 'XV Sostenuto in Des-Dur' under
+# '24 Préludes, op. 28', 'VI Juni: Barcarole' under 'Die Jahreszeiten, op. 37a', '2.–4. Satz'
+_CHILD_RE = re.compile(r'^(?:[IVXL]{1,4}\s+\S|\d+\.\s*(?:[–-]\s*\d+\.\s*)?Satz\b)')
+_CATALOGUE_RE = re.compile(r'\b(?:op\.?|opus|KV|BWV|WoO|Hob\.?|D|RV|HWV|WWV|MWV|BB|Sz\.?|TrV|L\.)\s*[A-Z]?\s*\d')
+_PARTICLES = {'van', 'von', 'de', 'da', 'di', 'du', 'la', 'le', 'del', 'della', 'der', 'den', 'ten', 'ter', 'y', 'e',
+              'des', 'dos', 'das', 'zu', 'bin', 'al', 'el', 'arr.', 'arr', 'bearb.', 'nach', 'und', 'et', 'and', '&', '/'}
+
+
+def _catalogue_spaced(text):
+    """'Siegfried-Idyll, W W V 103' -> 'WWV 103'; 'MW V N 10' -> 'MWV N 10' (letter-spaced on the page)."""
+    t = re.sub(r'\b([A-Z])\s?([A-Z])\s([A-Z])\b(?=\s*(?:[A-Z]\s*)?\d)',
+               lambda m: ''.join(m.groups()) if ''.join(m.groups()) in ('WWV', 'MWV', 'BWV', 'HWV', 'TWV') else m.group(0),
+               text)
+    return re.sub(r'\bK\s+V(?=\s*\d)', 'KV', t)
+
+
+def _is_name_label(label):
+    """A works label that names a composer ('Ludwig van Beethoven', 'Johann Strauss (Sohn)'), not
+    a heading of the programme ('Nach dem Requiem')."""
+    t = clean(label)
+    if not t or len(t) > 70 or re.search(r'\d|[«»"“”„:;!?]', t):
+        return False
+    words = t.split()
+    return len(words) <= 8 and t[0].isupper() and \
+        all(not w[:1].islower() or w in _PARTICLES for w in words)
+
+
 def _parse_page(html):
     """-> dict(credits, program, duration, ticket, info, cancelled)"""
     credits, program, duration, ticket, end_time, last_composer = [], [], None, None, None, ''
@@ -248,16 +275,26 @@ def _parse_page(html):
         composer = clean(m.group(1)) if m else ''
         composer = re.sub(r'\s*\(\s*(?:\*|geb\.\s*)?\d{3,4}[^)]*\)\s*$', '', composer).strip()
         texts = [clean(t) for t in re.findall(r'tribe-events-works__text">(.*?)</p>', item, re.S)]
+        heading = False
         if _NOTE_RE.match(composer):                   # 'Pause: ca. 25 Min.', 'Konzertende ca. 13:10 Uhr'
             texts, composer = [composer] + texts, ''
         elif _PART_RE.match(composer):                 # '1. AKT' / '2. AKT' = first / second half
             composer = ''
+        elif composer and not _is_name_label(composer):
+            heading, composer = True, ''               # 'Nach dem Requiem' / 'Im Schatten von Beethoven': a heading
         elif composer:
             last_composer = composer
+        if heading:
+            continue
         inherited = False
         if not composer and any(texts) and not any(_NOTE_RE.match(t) for t in texts):
             composer, inherited = last_composer, True  # an empty label repeats the composer above
+        parent, joined = None, set()                   # index of the work the next 'XV …' line belongs to
         for t in texts:
+            if t.strip(' _') == '':                    # '_': a separator between the works of one composer
+                parent = None
+                continue
+            t = _catalogue_spaced(t)
             d = _DURATION_RE.search(t) if not composer else None
             if d:
                 duration = int(d.group(3)) if d.group(3) else int(d.group(1)) * 60 + int(d.group(2) or 0)
@@ -266,7 +303,19 @@ def _parse_page(html):
             if m:
                 end_time = f'{int(m.group(1)):02d}:{m.group(2)}'
                 continue
-            if not t or _NOTE_RE.match(t) or _PROSE_RE.search(t) or _REMARK_RE.match(t):
+            if _CHILD_RE.match(t) and parent is not None:
+                t = re.sub(r"\s*\|\s*(?:ca\.\s*)?\d+\s*['’‘′`]?\s*(?:min\.?)?\s*$", '', t).strip()
+                c, w = program[parent]
+                if len(w) + len(t) < 280:              # 'Nocturnes, op. 62: I Nr. 1 in H-Dur', then ', II …'
+                    program[parent] = (c, f"{w}{', ' if parent in joined else ': '}{t}")
+                    joined.add(parent)
+                continue
+            if _CHILD_RE.match(t) and parent is False:
+                continue                               # a piece of a selection that is not listed as a work
+            if not t or _NOTE_RE.match(t) or _REMARK_RE.match(t):
+                continue
+            if _PROSE_RE.search(t) and not (re.match(r'(?i)auswahl aus\b', t) and _CATALOGUE_RE.search(t)):
+                parent = False                         # ('Auswahl aus Mazurkas, op. 59' is a work)
                 continue
             if re.fullmatch(r'\([^()]*\)', t):          # '(Martha Argerich, Mikhail Pletnev)': who plays it
                 continue
@@ -277,6 +326,7 @@ def _parse_page(html):
             t = re.sub(r"\s*\|\s*(?:ca\.\s*)?\d+\s*['’‘′`]?\s*(?:min\.?)?\s*(?:\([^()]*\))?\s*$", '', t).strip()
             if t:
                 program.append((composer, t))
+                parent = len(program) - 1 if _CATALOGUE_RE.search(t) and not _CHILD_RE.match(t) else None
         if composer and not inherited and not any(t for t in texts) and not _PROSE_RE.search(composer):
             program.append((composer, ''))
     m = re.search(r'tribe-events-information[^>]*>(.*?)</div>\s*</div>', html, re.S)

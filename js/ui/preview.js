@@ -15,6 +15,9 @@ import { listenLink, playAppName } from '../applemusic.js';
 import { t } from '../i18n.js';
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+// The latest preview tap anywhere: a slow lookup that finishes after a newer tap, or after its button left the
+// screen (the user went to another page), plays nothing.
+let lastTap = 0;
 
 export function previewButton({ resolve, cls = '', label = null } = {}) {
   let mine = null; // the track this button last started
@@ -41,10 +44,12 @@ export function previewButton({ resolve, cls = '', label = null } = {}) {
     e.preventDefault();
     e.stopPropagation();
     const st = previewState();
+    const tap = ++lastTap;
     if (mine && st.track === mine) { preview.toggle(); return; }
     let res;
     try { res = resolve?.(); } catch { res = null; }
     const start = (r) => {
+      if (tap !== lastTap || !btn.isConnected) return;
       if (!r?.track?.preview) { toast(t('No preview for this recording')); return; }
       mine = r.track;
       preview.play(r.track, r.queue || [r.track]);

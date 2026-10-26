@@ -921,11 +921,34 @@ def _credits(items):
     return [c for c in out if c['role'] != 'Performer' or c['name'].lower() not in named][:60]
 
 
+# A programme line that is page furniture, not a work: the interval and the expected end
+# ("- Pause -", "Konzertende ca. 21.30 Uhr", "Ende um 22 h"). Tested on the folded text without
+# leading/trailing dashes, stars and dots, so "Pausa", "Entr'acte", "Das Ende der Zeit" or "La Fin
+# du monde" stay works.
+NOT_WORK_LINE_RE = re.compile(
+    r'^(?:pause|entracte|intermission|intervallo)$'
+    r'|^(?:konzert|vorstellungs)(?:ende|beginn|dauer)\b'
+    r'|^(?:konzert\s+)?(?:mit|ohne)\s+pause$'
+    r'|^(?:ende|beginn|fin|fine)\s+(?:ca\.?\s*|um\s+|vers\s+|env\.?\s*)?\d{1,2}\s*(?:[.:h]|uhr\b)'
+    r'|^fin du concert\b'
+    r'|^(?:ca\.?\s*)?\d{1,2}[.:h]\d{2}\s*(?:uhr|h)\b')
+
+
+def is_not_work_line(composer, title) -> bool:
+    """True for a programme line that is the interval or a time note, not a work."""
+    text = title if clean(title) else composer          # a bare '- Pause -' in the composer column
+    s = re.sub(r'\s+', ' ', _fold(clean(text))).strip(' -–—*•·.!:')
+    return bool(s) and bool(NOT_WORK_LINE_RE.search(s))
+
+
 def _program(items):
     out, seen = [], set()
     for composer, title in _role_name_pairs(items, 'composer', 'title'):
         composer, title = clean(composer), clean(title)
+        title = re.sub(r'\s*[*,;]+$', '', title)        # a footnote star or a dangling comma
         if not composer and not title:
+            continue
+        if is_not_work_line(composer, title):
             continue
         key = (composer.lower(), title.lower())
         if key not in seen:

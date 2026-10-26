@@ -69,11 +69,15 @@ The output follows the JSON feed format that Klang already imports (`js/ics.js`,
       "credits": [{ "role": "Conductor", "name": "…" }, { "role": "Orchestra", "name": "Zürcher Kammerorchester" }],
       "program": [{ "composer": "Mozart", "title": "Symphonie Nr. 40 g-Moll KV 550" }],
       "ticketUrl": "https://…", "url": "https://www.zko.ch/…", "status": "scheduled" }
+  ],
+  "merges": [
+    { "id": "zko-4711", "absorbed": "tonhalle-2056001", "source": "tonhalle", "strength": 3, "minutes": 0 }
   ]
 }
 ```
 
 - **Empty fields are left out.**
+- **`merges`** lists the listings that were merged into another source's record of the same performance (see [De-duplication](#de-duplication)); Klang ignores it, it is there for audits.
 - **`type`** is one of `orchestral`, `chamber`, `recital`, `vocal-opera` or `mixed`. Leave it out when unsure: Klang guesses it on import.
 - **`ok: false` with `reused: true`** means the source failed this time, and its `count` events are from `fetchedAt`.
 
@@ -192,6 +196,14 @@ The same performance often appears twice, for example the OSR's own calendar and
   - **very similar titles**: at least two telling words, mostly the same ("Musiques sérieuses").
 - When a venue is missing, the same city plus a similar title or two shared performers is enough.
 
+Halls of one building are kept apart even when the venue names look alike:
+
+- **A building vs one of its halls:** "Tonhalle Zürich" and "Tonhalle Zürich – Kleiner Saal" are merged only when something else ties them together: a shared performer, a similar title, or one listing without a cast.
+- **Two named halls:** "KKL Luzern, Konzertsaal" and "KKL Luzern, Luzerner Saal" (or "Musiksaal" and "Hans Huber-Saal") are merged only with two or more shared performers.
+- **A similar title in two places:** "Bach Weihnachtsoratorium" at the Fraumünster and at the Grossmünster is not merged on the title alone.
+
+Every merge is logged (`merged <absorbed id> into <kept id>`) and listed in the output's `merges` array: `{"id", "absorbed", "source", "strength", "minutes"}` (strength 3 = similar venue, 2 = the same performers, 1 = venue name or title; minutes between the two starts).
+
 The record kept (its id, title and links) comes from the source with the higher priority, so a performance keeps its id from day to day:
 
 | `KIND` | Priority |
@@ -202,8 +214,8 @@ The record kept (its id, title and links) comes from the source with the higher 
 
 A module's `PRIORITY` overrides its kind. Between equal priorities, the richer record wins. It then takes the richer facts of the two:
 
-- the longer cast; a bare `Performer` role gets the other listing's instrument ("Clarinet");
-- the programme with more work titles;
+- the longer cast, if it names every person the kept listing names (a listing that was not updated after a change of conductor never brings the old conductor back); a bare `Performer` role gets the other listing's instrument ("Clarinet");
+- the programme with more work titles, if it names every composer of the kept one. The interval and the end time ("- Pause -", "Konzertende ca. 21.30 Uhr") are not works: `common.make_event` drops them, and so does the build for events reused from the previous feed;
 - the more specific venue ("Casino Bern, Grosser Saal" over "Casino Bern");
 - the ticket link on the venue's or the organiser's own domain (theirs or a ticket shop / Swiss site before an unrelated foreign site, which is usually a slip on the source site);
 - any field it lacks (duration, series, type …).

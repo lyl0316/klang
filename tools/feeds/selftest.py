@@ -488,7 +488,7 @@ class Build(unittest.TestCase):
             self.assertEqual(strict, 1)
             with open(out_path, encoding='utf-8') as f:
                 doc = json.load(f)
-        self.assertEqual(set(doc), {'generatedAt', 'generator', 'notice', 'window', 'sources', 'concerts'})
+        self.assertEqual(set(doc), {'generatedAt', 'generator', 'notice', 'window', 'sources', 'concerts', 'merges'})
         src = {s['key']: s for s in doc['sources']}
         self.assertEqual((src['good']['ok'], src['good']['count'], src['good']['reused']), (True, 1, False))
         self.assertEqual((src['broken']['ok'], src['broken']['count'], src['broken']['reused']), (False, 1, True))
@@ -621,15 +621,23 @@ class Merge(unittest.TestCase):
 
     def test_tidy_text(self):
         e = ev('x', 1, '2026-12-01T19:30:00+01:00', 'Ein Sommer- nachtstraum', venueName='Opernhaus\n Zürich',
-               credits=[('Tito Vespasiano\n', 'Mauro Peter')],
+               credits=[('Tito Vespasiano\n', 'Mauro Peter'), (r'Vitellia\n', 'Marina Rebeka')],
                program=[('Darius Milhaud', 'La Création du Monde (Kammerfas- sung)'),
-                        ('Anton Bruckner', 'Sommer- und Herbstlieder'), ('Gabriel Faure\u0301', 'Requiem')])
+                        ('Anton Bruckner', 'Sommer- und Herbstlieder'), ('Gabriel Faure\u0301', 'Requiem'),
+                        ('Johann Strauss', '«Im Feuerstrom der Reben» («Champagner- Lied»)')])
         t = build.tidy_event(e)
         self.assertEqual(t['title'], 'Ein Sommernachtstraum')
         self.assertEqual(t['venueName'], 'Opernhaus Zürich')
         self.assertEqual(t['credits'][0]['role'], 'Tito Vespasiano')
+        self.assertEqual(t['credits'][1]['role'], 'Vitellia')              # backslash + n as the site sends it
         self.assertEqual([p['title'] for p in t['program']][:2], ['La Création du Monde (Kammerfassung)', 'Sommer- und Herbstlieder'])
         self.assertEqual(t['program'][2]['composer'], 'Gabriel Fauré')            # composed accent (NFC)
+        self.assertEqual(t['program'][3]['title'], '«Im Feuerstrom der Reben» («Champagner-Lied»)')
+        # an event reused from the previous feed (not made by make_event) loses its interval lines too
+        old = dict(e, program=[{'composer': 'Ethel Smyth', 'title': '- Pause -'}, {'composer': 'X', 'title': 'Y *'},
+                               {'composer': 'Rimski-Korsakow', 'title': 'Konzertende ca. 21.30 Uhr'}])
+        self.assertEqual(build.tidy_event(old)['program'], [{'composer': 'X', 'title': 'Y'}])
+        self.assertNotIn('program', build.tidy_event(dict(e, program=[{'composer': 'A', 'title': 'Pause'}])))
 
 
 class Types(unittest.TestCase):
@@ -840,6 +848,347 @@ class TonhalleProgramme(unittest.TestCase):
         self.assertEqual(th.parse_detail(page)['works'],
                          [('Wolfgang Amadeus Mozart', 'Quintett für Klarinette und Streicher KV 581'),
                           ('Maurice Ravel', 'Klavierkonzert G-Dur')])
+
+
+class NotWorkLines(unittest.TestCase):
+    def test_interval_and_end_time(self):
+        for c, t in [('Ethel Smyth', '- Pause -'), ('X', 'PAUSE'), ('X', 'Konzertende ca. 21h.20 Uhr'),
+                     ('X', 'Konzertende ca. 21.30 Uhr'), ('- Pause -', ''), ('X', 'Ende ca. 21.30 Uhr'), ('X', 'Ohne Pause'),
+                     ('X', 'Fin du concert vers 22h'), ('X', 'Entracte'), ('X', '19.30 Uhr Konzerteinführung')]:
+            self.assertTrue(common.is_not_work_line(c, t), (c, t))
+        for c, t in [('X', 'Pausa'), ('Caroline Shaw', "Entr'acte"), ('Messiaen', 'Quatuor pour la fin du temps'),
+                     ('X', 'Das Ende der Zeit'), ('Milhaud', 'La Création du monde'), ('Beethoven', 'Für Elise'),
+                     ('Haydn', 'Sinfonie Nr. 45 «Abschied»'), ('X', 'Ende'), ('Cage', '4′33')]:
+            self.assertFalse(common.is_not_work_line(c, t), (c, t))
+        e = ev('x', 1, '2026-12-01T19:30:00+01:00', program=[
+            ('Ethel Smyth', 'Konzert für Violine, Horn und Orchester'), ('Ethel Smyth', '- Pause -'),
+            ('Juan Arroyo', 'Création, pour quatuor à cordes et orchestre*'),
+            ('Johannes Brahms', 'Fantaisies, op. 116, Intermezzi nos 2, 4 et 5,'), ('Rimski-Korsakow', 'Konzertende ca. 21.30 Uhr')])
+        self.assertEqual([p['title'] for p in e['program']],
+                         ['Konzert für Violine, Horn und Orchester', 'Création, pour quatuor à cordes et orchestre',
+                          'Fantaisies, op. 116, Intermezzi nos 2, 4 et 5'])
+
+    def test_sob_reader(self):
+        from sources import sob
+        c = {'works': [{'description_short': 'Ethel Smyth', 'name': 'Konzert für Violine, Horn und Orchester'},
+                       {'description_short': 'Ethel Smyth', 'name': '- Pause -'}, {'is_break': True, 'name': 'Pause'},
+                       {'description_short': 'Nikolai Rimski-Korsakow', 'name': 'Konzertende ca. 21.30 Uhr'},
+                       {'description_short': '- Pause -', 'name': 'x'}]}
+        self.assertEqual(sob._program(c), [('Ethel Smyth', 'Konzert für Violine, Horn und Orchester')])
+
+
+def _cast(*names, role='Performer'):
+    return [(role, n) for n in names]
+
+
+class MatchRules(unittest.TestCase):
+    T = '2027-02-02T19:30:00+01:00'
+
+    def test_building_vs_one_of_its_halls(self):
+        a = ev('zko', 1, self.T, 'Alena Baeva', city='Zürich', venueName='Tonhalle Zürich',
+               credits=_cast('Alena Baeva', 'Zürcher Kammerorchester'))
+        b = ev('tonhalle', 2, self.T, 'Kammermusik-Matinee', city='Zürich', venueName='Tonhalle Zürich – Kleiner Saal',
+               credits=_cast('Peter McGuire'))
+        self.assertFalse(build.same_concert(a, b))         # other cast, other title
+        c = ev('osr', 3, self.T, 'Cycle Beethoven', city='Basel', venueName='Stadtcasino Basel', credits=_cast('OSR'))
+        d = ev('stadtcasino_basel', 4, self.T, 'Quatuor Modigliani', city='Basel',
+               venueName='Stadtcasino Basel, Hans Huber-Saal', credits=_cast('Quatuor Modigliani'))
+        self.assertFalse(build.same_concert(c, d))
+        # still merged: one shared performer, or the hall-less listing has no cast
+        b2 = dict(b, credits=[{'role': 'Violin', 'name': 'Alena Baeva'}])
+        self.assertTrue(build.same_concert(a, b2))
+        grosser = dict(b, venueName='Tonhalle Zürich, Grosser Saal')
+        self.assertTrue(build.same_concert(dict(a, credits=None), grosser))   # no cast: the main hall
+        self.assertFalse(build.same_concert(dict(a, credits=None), b))        # … not the Kleiner Saal
+        # an orchestra's listing read from a summary only (no hall, no cast) vs a recital in the small hall
+        titan = ev('sob', 12177, self.T, 'Titan', city='Basel', venueName='Stadtcasino Basel')
+        guitar = ev('stadtcasino_basel', '24022027_virgile_barthe', self.T, 'Virgile Barthe', city='Basel',
+                    venueName='Stadtcasino Basel, Hans Huber-Saal', credits=[('Guitar', 'Virgile Barthe')])
+        self.assertFalse(build.same_concert(titan, guitar))
+        self.assertTrue(build.same_concert(titan, dict(guitar, venueName='Stadtcasino Basel, Musiksaal')))
+
+    def test_two_named_halls(self):
+        a = ev('lso_luzern', 1, self.T, 'Sinfoniekonzert', city='Luzern', venueName='KKL Luzern, Konzertsaal')
+        b = ev('lucerne_festival', 2, self.T, 'Forward', city='Luzern', venueName='KKL Luzern, Luzerner Saal')
+        self.assertFalse(build.same_concert(a, b))
+        m = ev('sob', 3, self.T, '1001 Nacht', city='Basel', venueName='Stadtcasino Basel, Musiksaal',
+               credits=_cast('Sinfonieorchester Basel', 'Ivor Bolton'))
+        h = ev('stadtcasino_basel', 4, self.T, 'Kammermusik', city='Basel', venueName='Stadtcasino Basel, Hans Huber-Saal',
+               credits=_cast('Sinfonieorchester Basel'))
+        self.assertFalse(build.same_concert(m, h))         # one shared name across two halls
+        w = ev('lucerne_festival', 5, self.T, 'Mahler 3', city='Luzern', venueName='KKL Luzern, Salle blanche',
+               credits=_cast('Riccardo Chailly', 'Lucerne Festival Orchestra'))
+        k = ev('lso_luzern', 6, self.T, 'LFO', city='Luzern', venueName='KKL Luzern, Konzertsaal',
+               credits=_cast('Riccardo Chailly', 'Lucerne Festival Orchestra', 'Anna Muster'))
+        self.assertTrue(build.same_concert(w, k))          # one hall, two names, the same cast
+
+    def test_similar_title_in_two_churches(self):
+        a = ev('zko', 1, self.T, 'Bach Weihnachtsoratorium', city='Zürich', venueName='Fraumünster')
+        b = ev('reformiert_zuerich', 2, self.T, 'Bach Weihnachtsoratorium', city='Zürich', venueName='Grossmünster')
+        self.assertFalse(build.same_concert(a, b))
+        c = ev('x', 3, self.T, 'Bach Johannespassion', city='Zürich', venueName='Kirche St. Peter')
+        d = ev('y', 4, self.T, 'Johannespassion Bach', city='Zürich', venueName='Kirche St. Jakob')
+        self.assertFalse(build.same_concert(c, d))
+        self.assertTrue(build.same_concert(dict(b, venueName='Fraumünster'), a))
+        self.assertFalse(build.venue_similar({'kirche'}, {'kirche'}, same_city=False))    # no town: too vague
+        self.assertTrue(build.venue_similar({'kirche'}, {'kirche'}))
+
+    def test_merge_log_names_the_kept_record(self):
+        ocg = ev('ocg', 'semi', '2026-11-07T14:30:00+01:00', '80e Concours de Genève – Demi-Finale 1', city='Vernier',
+                 venueName='Concorde espace culture', credits=[('Orchestra', "L'Orchestre de Chambre de Genève")])
+        cv = ev('concorde_vernier', 'semi', '2026-11-07T14:30:00+01:00', '80e Concours de Genève – Demi-finales',
+                city='Vernier', venueName='Concorde, Grande Salle', credits=[('Orchestra', 'Orchestre de Chambre de Genève')])
+        merges = []
+        out, merged = build.dedupe([cv, ocg], {'ocg': 30, 'concorde_vernier': 20}, None, merges)
+        self.assertEqual((merged, out[0]['id']), (1, 'ocg-semi'))
+        self.assertEqual(merges, [{'id': 'ocg-semi', 'absorbed': 'concorde_vernier-semi', 'source': 'concorde_vernier',
+                                   'strength': 2, 'minutes': 0}])
+
+
+class MergeFacts(unittest.TestCase):
+    PRIO = {'buehnen_bern': 30, 'casino_bern': 20, 'sob': 30, 'stadtcasino_basel': 20, 'musikkollegium': 30,
+            'opernhaus_zurich': 20}
+
+    def test_out_of_date_cast_does_not_win(self):
+        t = '2027-03-18T19:30:00+01:00'
+        bb = ev('buehnen_bern', 'la-valse', t, 'La Valse', city='Bern', venueName='Casino Bern, Grosser Saal',
+                credits=[('Conductor', 'Eva Ollikainen'), ('Violin', 'Gil Shaham'), ('Orchestra', 'Berner Symphonieorchester')],
+                program=[('Samuel Barber', 'Violinkonzert op. 14'), ('Maurice Ravel', 'La Valse')])
+        cb = ev('casino_bern', 'fantastique', t, 'Fantastique', city='Bern', venueName='Casino Bern, Grosser Saal',
+                credits=[('Conductor', 'Han-Na Chang'), ('Violin', 'Gil Shaham'), ('Orchestra', 'Berner Symphonieorchester'),
+                         ('Concertmaster', 'Anna Muster')],
+                program=[('Samuel Barber', 'Violinkonzert op. 14'), ('Hector Berlioz', 'Symphonie fantastique op. 14'),
+                         ('Hector Berlioz', 'Le Corsaire'), ('Hector Berlioz', 'Rob Roy')])
+        out, merged = build.dedupe([cb, bb], self.PRIO)
+        self.assertEqual((merged, out[0]['id']), (1, 'buehnen_bern-la-valse'))
+        self.assertIn({'role': 'Conductor', 'name': 'Eva Ollikainen'}, out[0]['credits'])
+        self.assertNotIn('Han-Na Chang', [c['name'] for c in out[0]['credits']])
+        self.assertEqual([p['title'] for p in out[0]['program']], ['Violinkonzert op. 14', 'La Valse'])
+
+    def test_richer_cast_and_programme_still_taken(self):
+        t = '2026-11-05T19:30:00+01:00'
+        mk = ev('musikkollegium', 9463, t, 'Angels in America', city='Winterthur', venueName='Stadthaus Winterthur',
+                credits=[('Orchestra', 'Musikkollegium Winterthur'), ('Ensemble', 'Internationales Opernstudio IOS'),
+                         ('Conductor', 'Oscar Jockel'), ('Soprano', 'Angela Denoke')],
+                program=[('Peter Eötvös', '')])
+        oz = ev('opernhaus_zurich', 200011, t, 'Angels in America', city='Winterthur', venueName='Stadthaus Winterthur',
+                credits=[('Conductor', 'Oscar Jockel'), ('The Angel', 'Angela Denoke'), ('Harper', 'Thalia Cook-Hansen'),
+                         ('Prior', 'Evan Gray'), ('Orchestra', 'Musikkollegium Winterthur')],
+                program=[('Peter Eötvös', 'Angels in America')])
+        out, merged = build.dedupe([oz, mk], self.PRIO)
+        self.assertEqual(out[0]['id'], 'musikkollegium-9463')
+        self.assertIn('Evan Gray', [c['name'] for c in out[0]['credits']])     # every person of the kept listing is there
+        self.assertEqual(out[0]['program'], [{'composer': 'Peter Eötvös', 'title': 'Angels in America'}])
+
+    def test_sob_keeps_its_programme_over_the_halls_free_text(self):
+        from sources import stadtcasino_basel as scb
+        t = '2027-02-24T19:30:00+01:00'
+        sob = ev('sob', 12177, t, 'Titan', city='Basel', venueName='Stadtcasino Basel, Musiksaal',
+                 credits=[('Conductor', 'Markus Poschner'), ('Orchestra', 'Sinfonieorchester Basel')],
+                 program=[('Geoffrey Gordon', 'Salt'), ('Geoffrey Gordon', 'Icarus'),
+                          ('Gustav Mahler', 'Sinfonie Nr. 1 D-Dur «Titan»')])
+        # what an earlier version of the hall's reader made of its page: the same composer for every line
+        hall = ev('stadtcasino_basel', '240227_sob', t, 'Sinfonieorchester Basel', city='Basel',
+                  venueName='Stadtcasino Basel, Musiksaal',
+                  credits=[('Clarinet', 'Rossana Rossignoli'), ('Conductor', 'Markus Poschner'),
+                           ('Orchestra', 'Sinfonieorchester Basel')],
+                  program=[('Geoffrey Gordon', 'Bonus Track "Salt" (Auftragskomposition)'),
+                           ('Geoffrey Gordon', '"Icarus" für Klarinette und Orchester'), ('Geoffrey Gordon', '- Pause -'),
+                           ('Geoffrey Gordon', 'Gustav Mahler'), ('Geoffrey Gordon', 'Sinfonie Nr. 1 D-Dur "Titan"'),
+                           ('Geoffrey Gordon', 'Konzertende ca. 21.30 Uhr')])
+        out, _ = build.dedupe([build.tidy_event(hall), build.tidy_event(sob)], self.PRIO)
+        self.assertEqual(out[0]['id'], 'sob-12177')
+        self.assertEqual([p['composer'] for p in out[0]['program']], ['Geoffrey Gordon', 'Geoffrey Gordon', 'Gustav Mahler'])
+        self.assertIn('Rossana Rossignoli', [c['name'] for c in out[0]['credits']])   # the richer cast still comes along
+        # and today's reader reads that page right
+        page = ('<div class="searchable"><p><strong>Rossana Rossignoli,</strong> Klarinette</p>'
+                '<p><strong>Markus Poschner, </strong>Leitung</p><p><strong>Sinfonieorchester Basel </strong></p>'
+                '<p><strong>18.30 Uhr Konzerteinführung </strong><strong>mit Benjamin Herzog</strong></p>'
+                '<p><strong><br>Geoffrey Gordon</strong></p><p>Bonus Track "Salt" (Auftragskomposition)</p>'
+                '<p><strong><br>Geoffrey Gordon</strong></p><p>"Icarus" für Klarinette und Orchester</p>'
+                '<p><br>- Pause -</p><p><br>Gustav Mahler</p><p>Sinfonie Nr. 1 D-Dur "Titan"</p>'
+                '<p><br>Konzertende ca. 21.30 Uhr</p></div>')
+        credits, program = scb._lineup(page)
+        self.assertEqual(program, [('Geoffrey Gordon', 'Bonus Track "Salt" (Auftragskomposition)'),
+                                   ('Geoffrey Gordon', '"Icarus" für Klarinette und Orchester'),
+                                   ('Gustav Mahler', 'Sinfonie Nr. 1 D-Dur "Titan"')])
+        self.assertEqual(credits, [('Clarinet', 'Rossana Rossignoli'), ('Conductor', 'Markus Poschner'),
+                                   ('Orchestra', 'Sinfonieorchester Basel')])
+
+
+class StadtcasinoLineup(unittest.TestCase):
+    def lineup(self, *paras):
+        from sources import stadtcasino_basel as scb
+        return scb._lineup('<div class="searchable">' + ''.join(f'<p>{p}</p>' for p in paras) + '</div>')
+
+    def test_people_and_roles_are_not_works(self):
+        self.assertEqual(self.lineup('<strong>Arcadi Volodos,</strong> Kalvier',
+                                     'Das Programm wird zu einem späteren Zeitpunkt bekannt gegeben.'),
+                         ([('Piano', 'Arcadi Volodos')], []))
+        credits, program = self.lineup('<strong>Ensemble Symphonique de Genève</strong>',
+                                       '<strong>Sergey Ostrovsky</strong>, Chefdirigent',
+                                       '<strong>Béla Bartók </strong>', '<em>Divertimento für Streichorchester</em>')
+        self.assertEqual(credits[1], ('Conductor', 'Sergey Ostrovsky'))
+        self.assertEqual(program, [('Béla Bartók', 'Divertimento für Streichorchester')])
+        credits, program = self.lineup('<strong>Julia Lopuszynska, </strong>Harfe', '<strong><br>Jana Ozolina, </strong>Diana Adamyan,',
+                                       '<strong>Lora Markova, Wojciech Niedziółka, </strong>Violinen',
+                                       '<strong>Maurice Ravel</strong>', 'Introduction et Allegro')
+        self.assertEqual(credits, [('Harp', 'Julia Lopuszynska'), ('Performer', 'Jana Ozolina'), ('Performer', 'Diana Adamyan'),
+                                   ('Violin', 'Lora Markova'), ('Violin', 'Wojciech Niedziółka')])
+        self.assertEqual(program, [('Maurice Ravel', 'Introduction et Allegro')])
+        # a real one-line work stays a work
+        self.assertEqual(self.lineup('<b>Charles Ives</b> Unanswered Question')[1], [('Charles Ives', 'Unanswered Question')])
+
+    def test_arrangers_split_names_and_movements(self):
+        credits, program = self.lineup(
+            '<strong>Franz Schubert </strong>',
+            '<em>Moments musicaux, D 780<br>— Nr. 1 in C-dur, Moderato<br>— Nr. 2 in As-dur, Andantino</em>',
+            '<strong>Franz Schubert / Irina Lankova</strong>', '<em>An die Musik in D-dur, D 547</em>',
+            '<strong>Sergei Rachmaninow / Zoltán Kocsis</strong> ', '<em>Vocalise in cis-moll, op. 34 Nr. 14</em>',
+            '<strong>Franz Schuber</strong>t ', '<em>Sonate in a-moll, D 784</em>')
+        self.assertEqual(program, [
+            ('Franz Schubert', 'Moments musicaux, D 780: Nr. 1 in C-dur, Moderato; Nr. 2 in As-dur, Andantino'),
+            ('Franz Schubert / Irina Lankova', 'An die Musik in D-dur, D 547'),
+            ('Sergei Rachmaninow / Zoltán Kocsis', 'Vocalise in cis-moll, op. 34 Nr. 14'),
+            ('Franz Schubert', 'Sonate in a-moll, D 784')])
+
+    def test_headings_and_typos_in_titles(self):
+        _, program = self.lineup(
+            '<strong>Frédéric Chopin</strong>', 'Mazurkas op. 41:', 'Nr. 1 cis-Moll, Nr. 2 e-Moll',
+            'Variationen B-Durüber “Là ci darem la mano” op. 2', '<br><strong>Ludwig van Beethoven</strong>',
+            'Sinfonie Nr. 9 d-Moll op. 125LE', '<strong>Felix Mendelssohn Bartholdy</strong>', 'Aus den «Liedern ohne Worte»:',
+            'Allegretto tranquillo op. 30 Nr. 6', 'Sinfonie Nr. 4«Italienische»', '<strong>Kristine Tjøgersen</strong>',
+            '«Between Trees» | CH', '<strong>Thomas Nidecker</strong>', '«Tableaux 16» für Orchester | Uraufführung')
+        self.assertEqual(program, [
+            ('Frédéric Chopin', 'Mazurkas op. 41: Nr. 1 cis-Moll, Nr. 2 e-Moll'),
+            ('Frédéric Chopin', 'Variationen B-Dur über “Là ci darem la mano” op. 2'),
+            ('Ludwig van Beethoven', 'Sinfonie Nr. 9 d-Moll op. 125'),
+            ('Felix Mendelssohn Bartholdy', 'Allegretto tranquillo op. 30 Nr. 6'),
+            ('Felix Mendelssohn Bartholdy', 'Sinfonie Nr. 4 «Italienische»'),
+            ('Kristine Tjøgersen', '«Between Trees»'), ('Thomas Nidecker', '«Tableaux 16» für Orchester')])
+        # a plain line after the interval is a composer only when it is a name followed by a work
+        _, program = self.lineup('<strong>Richard Strauss</strong>', 'Don Juan op. 20', '<br>Die Zauberflöte', 'Ouvertüre')
+        self.assertEqual(program, [('Richard Strauss', 'Don Juan op. 20'), ('Richard Strauss', 'Die Zauberflöte'),
+                                   ('Richard Strauss', 'Ouvertüre')])
+
+    def test_reused_programme(self):
+        from sources import stadtcasino_basel as scb
+        old = {'program': [{'composer': 'Arcadi Volodos', 'title': 'Kalvier'},
+                           {'composer': 'Ludwig van Beethoven', 'title': 'Sinfonie Nr. 9 d-Moll op. 125LE'}]}
+        self.assertTrue(scb._suspect(old))
+        self.assertEqual(scb._reused_program(old), [('Ludwig van Beethoven', 'Sinfonie Nr. 9 d-Moll op. 125')])
+        self.assertFalse(scb._suspect({'program': [{'composer': 'Beethoven', 'title': 'Für Elise'}]}))
+
+
+class CasinoBernProgramme(unittest.TestCase):
+    def test_headings_without_life_dates(self):
+        from sources import casino_bern as cb
+        frag = ('<p><strong>Frédéric Chopin (1810-1849)<br></strong>Klaviersonate Nr. 2 b-Moll op. 35 (ca. 20′)<br><br>'
+                '<strong>Frédéric Chopin / Hayato Sumino<br></strong>«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)'
+                '<br><br><strong>Hayato Sumino (1995)<br></strong>Lydian Harp (ca. 4′) <br>White Keys (Auswahl)<br><br>'
+                'Weitere Werke von Camille Saint-Saëns, Thomas Adès und Igor Strawinsky</p>')
+        self.assertEqual(cb.parse_program(frag), [
+            ('Frédéric Chopin', 'Klaviersonate Nr. 2 b-Moll op. 35'),
+            ('Frédéric Chopin / Hayato Sumino', '«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)'),
+            ('Hayato Sumino', 'Lydian Harp'), ('Hayato Sumino', 'White Keys (Auswahl)')])
+        frag = ('<p><strong>Karol Szymanowski (1882-1937)<br></strong>Mythen für Violine und Klavier op. 30 (ca. 21′)<br><br>'
+                '<strong>PatKop (1977)<br></strong>UniSolo für Violine und Klavier (ca. 15′)<br><br>'
+                '<strong>Fazıl Say (1970)<br></strong>Sonate für Violine und Klavier Nr. 3 op. 119 (ca. 10′)</p>')
+        self.assertEqual([c for c, _ in cb.parse_program(frag)], ['Karol Szymanowski', 'PatKop', 'Fazıl Say'])
+
+    def test_work_years_are_not_headings(self):
+        from sources import casino_bern as cb
+        frag = ('<p><strong>Arnold Schönberg (1874–1951)<br></strong>Verklärte Nacht (1899)<br>Pierrot Lunaire<br><br>'
+                'Ein Überlebender aus Warschau</p><p>Carmina Burana (1937)<br>O Fortuna</p>')
+        self.assertEqual(cb.parse_program(frag), [('Arnold Schönberg', 'Verklärte Nacht'), ('Arnold Schönberg', 'Pierrot Lunaire'),
+                                                  ('Arnold Schönberg', 'Ein Überlebender aus Warschau')])
+        frag = ('<p><strong>Traditional</strong><br>Christmas Carols</p><p><strong>Alan Silvestri (1950-heute)</strong><br>'
+                'God Bless Us Everyone</p><p><strong>Spectacular Christmas</strong><br>Hark! The Herald Angels Sing</p>'
+                '<p><strong>Antonio Vivaldi</strong><br>Die vier Jahreszeiten</p>')
+        self.assertEqual(cb.parse_program(frag), [('Alan Silvestri', 'God Bless Us Everyone')])     # no unknown headings
+        self.assertEqual(cb.parse_program(frag, ['Antonio Vivaldi'])[-1], ('Antonio Vivaldi', 'Die vier Jahreszeiten'))
+        self.assertFalse(cb.is_composer_head('Verklärte Nacht (1899)'))
+        self.assertTrue(cb.is_composer_head('Hayato Sumino (1995)', bold=True))
+        self.assertFalse(cb.is_composer_head('Sinfonie Nr. 5 (1937)', bold=True))
+
+
+class OpernhausCalendar(unittest.TestCase):
+    @staticmethod
+    def entry(uid, cls, day_html, hhmm, title, ld_start=None, url='/spielplan/kalendarium/x/'):
+        ld = ''
+        if ld_start:
+            ld = ('<script type="application/ld+json">{"@context":"http://schema.org/","@type":"Event","name":"%s",'
+                  '"startDate":"%s","url":"https://www.opernhaus.ch%s"}</script>' % (title, ld_start, url))
+        return (f'<div class="el-eventlistitem {cls}" id="uid_{uid}">{ld}<div class="date"><p>{day_html}</p><p>{hhmm}</p></div>'
+                f'<div class="details"><div class="inner"><div class="location">Hauptbühne</div><h2 >{title}</h2>'
+                f'<a href="{url}" class="link-box" title="x"></a></div></div></div>')
+
+    def test_block_of_the_next_entry_is_not_taken(self):
+        from sources import opernhaus_zurich as oz
+        day = '<span class="weekday">So</span> <span class="day">06</span> <span class="month">Dez</span>'
+        nxt = ('<script type="application/ld+json">{"@type":"Event","name":"Elektra","startDate":"2026-12-06T19:00",'
+               '"url":"https://www.opernhaus.ch/spielplan/kalendarium/elektra/"}</script>')
+        page = (self.entry(1, 'first', day, '11.15', '3. Kammerkonzert', url='/spielplan/kalendarium/kammerkonzert/') + nxt +
+                self.entry(2, 'noday', '', '19.00', 'Elektra', '2026-12-06T19:00', '/spielplan/kalendarium/elektra/') +
+                self.entry(3, 'first', '<span class="day">01</span> <span class="month">Jan</span>', '20.00', 'Silvester',
+                           '2027-01-01T19:30'))
+        rows = oz.parse_listing(page, {'ref': date(2026, 11, 30)})
+        self.assertEqual([(r['uid'], r['start'], r['url']) for r in rows], [
+            ('1', '2026-12-06T11:15', 'https://www.opernhaus.ch/spielplan/kalendarium/kammerkonzert/'),   # its own time and link
+            ('2', '2026-12-06T19:00', 'https://www.opernhaus.ch/spielplan/kalendarium/elektra/'),
+            ('3', '2027-01-01T20:00', 'https://www.opernhaus.ch/spielplan/kalendarium/x/')])               # the printed time wins
+
+    def test_production_page_facts(self):
+        from sources import opernhaus_zurich as oz
+        page = ('<div class="longinfo"><p>Ballett von Cathy Marston<br /> nach William Shakespeares Komödie<br /> <br />'
+                ' Musik von Felix Mendelssohn Bartholdy und<br /> Gabriel Prokofiev</p></div>'
+                '<script type="application/ld+json">{"@type":"Event","startDate":"2026-12-03T19:00","performer":['
+                '{"@type":"Person","name":"Mauro Peter","description":"Tito Vespasiano\\\\n"}]}</script>')
+        d = oz.parse_detail(page)
+        self.assertEqual(d['music'], ['Felix Mendelssohn Bartholdy', 'Gabriel Prokofiev'])
+        self.assertEqual(d['casts']['2026-12-03T19:00'], [('Tito Vespasiano', 'Mauro Peter', False)])
+        self.assertEqual(oz._operas_in_note('Rachmaninow – Die drei Opern', 'Aleko, Skupoi Rytsar & Francesca da Rimini'),
+                         [('Rachmaninow', 'Aleko'), ('Rachmaninow', 'Skupoi Rytsar'), ('Rachmaninow', 'Francesca da Rimini')])
+        self.assertEqual(oz._operas_in_note('Elektra', 'Oper von Richard Strauss'), [])
+        self.assertEqual(oz._operas_in_note('Puccini – Die drei Opern', 'Oper von Giacomo Puccini'), [])
+
+
+class LucerneWorks(unittest.TestCase):
+    def test_pieces_of_a_set_and_headings(self):
+        from sources import lso_luzern as lso
+
+        def item(label, *texts):
+            return ('<li class="tribe-events-works__item"><p class="tribe-events-works__label">%s</p>%s</li>'
+                    % (label, ''.join(f'<p class="tribe-events-works__text">{t}</p>' for t in texts)))
+        page = ('<div class="tribe-events-works">' +
+                item('Frédéric Chopin (1810–1849)', '24 Préludes, op. 28', 'XV Sostenuto in Des-Dur | 7’', '_',
+                     'Scherzo Nr. 4 in E-Dur, op. 54 | 11’', '_', 'Auswahl aus Mazurkas, op. 59 | 11’', 'I Mazurka in a-Moll',
+                     'II Mazurka in As-Dur', '_', 'Nocturnes, op. 62 | 7’', 'I Nr. 1 in H-Dur') +
+                item('Nach dem Requiem', 'Im Schatten von Beethoven') +
+                item('Richard Wagner (1813–1883)', 'Siegfried-Idyll, W W V 103') +
+                item('Vincenzo Bellini (1801–1835)', 'Ouvertüre', 'I Capuleti e i Montecchi') +
+                '</div>Im Kalender eintragen')
+        self.assertEqual(lso._parse_page(page)['program'], [
+            ('Frédéric Chopin', '24 Préludes, op. 28: XV Sostenuto in Des-Dur'),
+            ('Frédéric Chopin', 'Scherzo Nr. 4 in E-Dur, op. 54'),
+            ('Frédéric Chopin', 'Auswahl aus Mazurkas, op. 59: I Mazurka in a-Moll, II Mazurka in As-Dur'),
+            ('Frédéric Chopin', 'Nocturnes, op. 62: I Nr. 1 in H-Dur'),
+            ('Richard Wagner', 'Siegfried-Idyll, WWV 103'),
+            ('Vincenzo Bellini', 'Ouvertüre'), ('Vincenzo Bellini', 'I Capuleti e i Montecchi')])
+
+
+class TonhalleComposerList(unittest.TestCase):
+    def test_composers_named_in_the_line(self):
+        import sources.tonhalle as th
+        row = lambda name, function: f'<span class="name">{name}</span> <span class="function">{function}</span>'
+        works = ''.join([row('Hugo Wolf', '«Italienische Serenade»'),
+                         row('', 'H. Purcell, G.F. Händel, A. Vivaldi u.a.: Diverse Arien für Sopran und Orchester'),
+                         row('Giuseppe Verdi', 'Streichquartett e-Moll'), row('', 'Rigoletto: Caro nome, Bella figlia')])
+        page = f'<div class="info"><div class="artists"></div><div class="artists"></div><div class="artists">{works}</div><div class="price">'
+        self.assertEqual(th.parse_detail(page)['works'], [
+            ('Hugo Wolf', '«Italienische Serenade»'),
+            ('H. Purcell, G.F. Händel, A. Vivaldi u.a.', 'Diverse Arien für Sopran und Orchester'),
+            ('Giuseppe Verdi', 'Streichquartett e-Moll'), ('Giuseppe Verdi', 'Rigoletto: Caro nome, Bella figlia')])
 
 
 class CodeHash(unittest.TestCase):

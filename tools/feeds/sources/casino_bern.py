@@ -225,15 +225,40 @@ def parse_artists(fragment):
 _LIFE_SPAN_RE = re.compile(r'\(\s*(?:\*\s*(\d{4})|(\d{4})\s*[-–—]\s*(\d{4}|heute|today|present))\s*\)', re.I)
 
 
-def is_composer_head(line):
-    """'Johannes Brahms (1833–1897)', 'Beat Furrer (*1956)', 'A (1910-1991) & B (1907-2007)'."""
+# a bare birth year after a name: 'Hayato Sumino (1995)', 'PatKop (1977)'
+_BIRTH_YEAR_RE = re.compile(r'\s*\(\s*(?:\*\s*|geb\.\s*)?(\d{4})\s*\)\s*$')
+
+
+def _names_only(name):
+    """'Frédéric Chopin / Hayato Sumino', 'PatKop', 'Fazıl Say': names, no work words."""
+    if not name or re.search(r'\d|[«»"“”„]', name):
+        return False
+    for part in re.split(r'\s*(?:&|/|\bund\b)\s*', name):
+        if not looks_like_person(part, max_words=4) or \
+                any(w[:1].islower() and w not in _PARTICLES for w in part.split()):
+            return False
+    return True
+
+
+def is_composer_head(line, bold=False, known=()):
+    """'Johannes Brahms (1833–1897)', 'Beat Furrer (*1956)', 'A (1910-1991) & B (1907-2007)'.
+    A bold first line of a block is a heading also with a birth year only ('Hayato Sumino (1995)')
+    or, without dates, when it names a composer already listed above or a performer of the
+    evening ('Frédéric Chopin / Hayato Sumino'; ``known``: folded names). The site's composer
+    headings are bold; a work's year ('Verklärte Nacht (1899)') is not, and a bold heading such as
+    'Spectacular Christmas' names nobody we know."""
     spans = list(_LIFE_SPAN_RE.finditer(line or ''))
     if not spans:
-        return False
+        if not bold:
+            return False
+        if _BIRTH_YEAR_RE.search(line or ''):
+            return _names_only(_BIRTH_YEAR_RE.sub('', line).strip(' ,:'))
+        name = (line or '').strip(' ,:')
+        return _names_only(name) and any(fold(p) in known for p in re.split(r'\s*(?:&|/|\bund\b)\s*', name))
     for m in spans:
         if m.group(2) and m.group(3).isdigit() and not 15 <= int(m.group(3)) - int(m.group(2)) <= 110:
             return False                                   # '(1854–1859)' is a composition period
-    name = re.sub(r'\s+,', ',', strip_life_dates(line)).strip(' ,')
+    name = re.sub(r'\s+,', ',', _strip_dates(line)).strip(' ,')
     if not name:
         return False
     for part in re.split(r'\s*(?:&|,|/|\bund\b)\s*', name):
@@ -257,30 +282,71 @@ _MOVEMENT_RE = re.compile(r'(?i)^(?:[IVX]+\.|\d+\.)\s|^(allegro|andante|adagio|p
                           r'dies irae|intermezzo|tempo di)\b[^«»]{0,40}$')
 
 
-def _paragraphs(fragment):
+def _bold_lines(para):
+    """[(text, bold, starts_block)] for the <br>-separated lines of one paragraph. ``bold``: all of
+    the line's text is inside <strong>/<b> ('<strong>PatKop (1977)<br></strong>UniSolo …');
+    ``starts_block``: the paragraph's first line, or the first after an empty line ('<br><br>')."""
+    out, depth, text, bold_chars, chars, blank = [], 0, [], 0, 0, True
+
+    def flush():
+        line = clean(''.join(text))
+        if line:
+            out.append((line, chars > 0 and bold_chars == chars, blank or not out))
+        return not line
+
+    for tok in re.split(r'(<[^>]+>)', para):
+        if not tok:
+            continue
+        if tok.startswith('<'):
+            if re.match(r'(?i)<br\s*/?>', tok):
+                blank = flush()
+                text, bold_chars, chars = [], 0, 0
+            elif re.match(r'(?i)<(strong|b)\b', tok):
+                depth += 1
+            elif re.match(r'(?i)</(strong|b)\s*>', tok):
+                depth = max(0, depth - 1)
+            continue
+        text.append(tok)
+        n = len(clean(tok))
+        chars += n
+        bold_chars += n if depth else 0
+    flush()
+    return out
+
+
+def _paragraphs(fragment, marks=False):
+    """The lines of each paragraph or list item; with ``marks``, (text, bold, starts_block)."""
     text = re.sub(r'\s+', ' ', fragment or '')
     text = re.sub(r'(?is)<figure.*?</figure>', ' ', text)
     out = []
     for para in re.split(r'(?i)</p>|</li>|</ul>|</h[3-6]>', text):
-        lines = [clean(x) for x in re.split(r'(?i)<br\s*/?>', para) if clean(x)]
+        lines = _bold_lines(para)
         if lines:
-            out.append(lines)
+            out.append(lines if marks else [t for t, _, _ in lines])
     return out
 
 
-def parse_program(fragment):
+def parse_program(fragment, performers=()):
     """Paragraphs that start with 'Composer (1833–1897)' and list works -> [(composer, work)].
     Anything else (traditional pieces, notes, prose, movement lists) is left out."""
     program = []
-    for lines in _paragraphs(fragment):
-        head = lines[0]
-        if not is_composer_head(head):
+    names = {fold(n) for n in performers}                   # composers listed so far and the performers
+    heads = set()                                           # the composers listed so far
+    for marked in _paragraphs(fragment, marks=True):
+        head, bold, _ = marked[0]
+        if not is_composer_head(head, bold, names):
             continue
-        composer = re.sub(r'\s+,', ',', strip_life_dates(head)).strip(' ,')
+        composer = _composer_name(head)
+        names.add(fold(composer))
+        heads.add(fold(composer))
         prev = None
-        for line in lines[1:]:
-            if is_composer_head(line):                      # the next composer in the same paragraph
-                composer, prev = re.sub(r'\s+,', ',', strip_life_dates(line)).strip(' ,'), None
+        for line, bold, starts in marked[1:]:
+            if is_composer_head(line, bold and starts, names):     # the next composer in the same paragraph
+                composer, prev = _composer_name(line), None
+                names.add(fold(composer))
+                heads.add(fold(composer))
+                continue
+            if fold(_work(line)) in heads:                  # a composer's name read as a work: never a work
                 continue
             if prev is not None and (_CONT_RE.search(prev) or _KEY_START_RE.match(line)) and \
                     len(prev) + len(line) < 250:
@@ -298,6 +364,17 @@ def parse_program(fragment):
             prev = line
     program = [(c, _work(t)) for c, t in program]
     return [(c, t) for c, t in program if t]
+
+
+def _strip_dates(text):
+    """strip_life_dates, also for a living composer written '(1950-heute)'."""
+    return strip_life_dates(re.sub(r'(?i)\s*\(\s*\d{4}\s*[-–—]\s*(?:heute|today|present)\s*\)', ' ', text or ''))
+
+
+def _composer_name(head):
+    """'Johannes Brahms (1833–1897)' / 'Hayato Sumino (1995)' -> the name as listed."""
+    name = re.sub(r'\s+,', ',', _strip_dates(head)).strip(' ,')
+    return _BIRTH_YEAR_RE.sub('', name).strip(' ,:')
 
 
 def _work(text):
@@ -387,8 +464,9 @@ def fetch():
         for head, body in sections.items():
             if re.match(r'(?i)(künstler|kuenstler|mitwirkende|besetzung|interpret|artists)', head):
                 credits += parse_artists(body)
-            elif re.match(r'(?i)(programm|werke|program)\b', head):
-                program += parse_program(body)
+        for head, body in sections.items():
+            if re.match(r'(?i)(programm|werke|program)\b', head):
+                program += parse_program(body, [n for _, n in credits])
         h1 = re.search(r'<h1[^>]*>(.*?)</h1>', page_html, re.S)
         page_title = clean(h1.group(1)) if h1 else ''
         mine = [i for i in cands if i['page'] == page]

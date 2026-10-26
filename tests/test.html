@@ -282,6 +282,42 @@
       ok(!listen.oneWorkAlbum(canales), 'several works');
       ok(listen.oneWorkAlbum(['Symphony No. 5 in E-Flat Major, Op. 82: I. Tempo molto moderato', 'Symphony No. 5 in E-Flat Major, Op. 82: II. Andante mosso'].map((title) => ({ title }))), 'one work');
     });
+    test('boilerplate: "- Pause -", "Konzertende ca. …", end times — never a work that sounds like one', () => {
+      for (const x of ['- Pause -', '– Pause –', 'Konzertende ca. 21.30 Uhr', 'Konzertende ca. 21h.20 Uhr', 'Konzertbeginn 19.30 Uhr', 'Pause (20 Min.)', 'Pause ca. 20 Minuten', 'Fin vers 22h', 'Fin du concert vers 21h30', 'Ende ca. 21.45 Uhr']) ok(isBoilerplate(x), x);
+      for (const x of ['Für Elise', '4\'33\'\'', '«4′33»', 'Pausa', 'Pause del silenzio', 'Das Ende der Zeit', 'Ende', 'Fin de partie', 'Fine knacks for ladies', 'Beginn einer Reise', 'Entr\'acte für Streicher', 'Entr’acte', 'Entracte, pour flûte et harpe', 'Intermezzo op. 117', '«Per questa bella mano»']) ok(!isBoilerplate(x), x);
+    });
+    test('lines that name no work stay text: placeholders, headings, details of the line above', () => {
+      const none = [['Tobias Krebs', 'Neues Werk, für Ensemble (2027, Uraufführung)'], ['Fazıl Say', 'Auftragskomposition (2027)'], ['Wolfgang Amadeus Mozart', 'Œuvre à définir'],
+        ['Juan Arroyo', 'Création, pour quatuor à cordes et orchestre*'], ['Jean-François Michel', 'Création (commande de l’OCF)'], ['Helena Skljarov', 'NN für Video und Orchester | CH'],
+        ['Andrea Lorenzo Scartazzini', 'Werk für Klaviertrio und Schlagzeug (Uraufführung) (2027)'], ['Hayato Sumino', 'Eigenkomposition für Klavier und Orchester'], ['Hayato Sumino', 'Neues Stück für Klavier und Orchester'],
+        ['Duri Collenberg', 'Uraufführung für Kinderchor und Orchester (2026)'], ['NN', 'Neues Werk (Kolumbianischer Kompositionswettbewerb 2026)'], ['N.N.', 'Konzert für Violine'],
+        ['Hugo Wolf', 'H. Purcell, G.F. Händel, A. Vivaldi u.a.: Diverse Arien für Sopran und Orchester'], ['Wolfgang Amadeus Mozart', 'Briefe'], ['Sing-along', '«O du fröhliche» arr. von Wolfgang Drechsler'],
+        ['Joseph Haydn', '2.–4. Satz'], ['Franz Schuber', 't'], ['Franz Schubert', '— Nr. 1 in C-dur, Moderato'], ['Felix Mendelssohn Bartholdy', 'Aus den «Liedern ohne Worte»:']];
+      for (const [composer, title] of none) ok(!isWorkLine({ composer, title }) && !workIdentity({ composer, title }), `${composer} | ${title}`);
+      const works = [['Kurt Weill', 'Neues vom Tage'], ['Johannes Brahms', 'Neue Liebeslieder op. 65'], ['Darius Milhaud', 'La Création du monde op. 81a'], ['Joseph Haydn', 'Creation Mass'],
+        ['Ludwig van Beethoven', 'Für Elise'], ['Felix Mendelssohn', 'II. Orgelsonate c-Moll op. 65/2'], ['Ludwig van Beethoven', 'IV. Presto, aus: Streichquartett Nr. 14'], ['John Cage', '4′33″'],
+        ['Wolfgang Amadeus Mozart', '« Per questa bella mano », air pour basse, contrebasse obligée et orchestre, KV 612'], ['Gian Francesco Malipiero', 'Pause del silenzio'], ['Geoffrey Gordon', 'Bonus Track "Salt" (Auftragskomposition)']];
+      for (const [composer, title] of works) ok(isWorkLine({ composer, title }), `${composer} | ${title}`);
+    });
+    test('work identity: spellings, MWV next to op., glued letters, premiere marks, a piece after another, the WTK', () => {
+      const key = (composer, title) => workIdentity(matchProgramItem({ composer, title }))?.key || null;
+      eq(composerKey('Alexander Skrjabin'), composerKey('Alexander Scriabin'), 'Skrjabin / Scriabin');
+      eq(composerKey('Alexander Glasunow'), composerKey('Alexander Glazunov'), 'Glasunow / Glazunov');
+      eq(composerKey('Nikolaj Rimskij-Korsakow'), composerKey('Nikolai Rimsky-Korsakov'), 'Rimskij / Rimsky');
+      eq(key('Alexander Skrjabin', 'Le Poème de l’Extase op. 54'), key('Alexander Scriabin', 'Le Poème de l’Extase, op. 54'));
+      eq(key('Felix Mendelssohn Bartholdy', 'Klaviertrio Nr. 1 d-Moll op. 49 MWV Q 29'), key('Felix Mendelssohn', 'Trio pour piano n°1 en ré mineur, op.49'), 'MWV next to op.');
+      eq(key('Felix Mendelssohn Bartholdy', 'Doppelkonzert für Violine, Klavier und Streichorchester in d-Moll MWV O 4'), key('Felix Mendelssohn', 'Konzert für Violine, Klavier und Streichorchester d-Moll, MWV O4'), 'MWV alone');
+      eq(matchProgramItem({ composer: 'Ludwig van Beethoven', title: 'Sinfonie Nr. 9 d-Moll op. 125LE' }).workId, 'beethoven-symphony-9', '"op. 125LE" is op. 125');
+      eq(key('Pjotr Iljitsch Tschaikowsky', 'Dumka op. 59'), 'x-tchaikovsky-op59');
+      ok(/-op72b$/.test(key('Edvard Grieg', 'Slåtter op. 72b')), 'op. 72b keeps its letter');
+      eq(key('Kristine Tjøgersen', '«Between Trees» | CH'), key('Kristine Tjøgersen', '«Between Trees»'), 'a premiere mark');
+      ok(!/op28/.test(key('Hayato Sumino', '«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)')), 'a piece written after op. 28 No. 15');
+      eq(matchProgramItem({ composer: 'Frédéric Chopin', title: 'Prélude Des-Dur op. 28 Nr. 15 (“Regentropfen-Prélude”)' }).workId, undefined, 'one prélude is not the 24');
+      eq(matchProgramItem({ composer: 'Frédéric Chopin', title: '24 Préludes, op. 28' }).workId, 'chopin-preludes');
+      eq(matchProgramItem({ composer: 'Antonio Vivaldi', title: '«Le Quattro Stagione» («Die vier Jahreszeiten») Violinkonzerte op. 8/1-4' }).workId, 'vivaldi-four-seasons', 'op. 8/1-4: all four');
+      eq(key('Johann Sebastian Bach', 'Präludium und Fuge Nr. 2 c-Moll BWV 847 aus WTK Band I'), key('Johann Sebastian Bach', 'Präludium und Fuge Nr. 2 c-Moll BWV 847'), 'a piece of the WTK');
+      ok(key('Johann Sebastian Bach', 'Chaconne aus der Partita Nr. 2 d-Moll BWV 1004') !== key('Johann Sebastian Bach', 'Partita Nr. 2 d-Moll BWV 1004'), 'a movement stays apart');
+    });
     test('ICS import parses events, venues, cities, composers', () => {
       const ics = ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'UID:abc-1', 'DTSTART;TZID=Europe/Zurich:20261120T193000', 'DTEND;TZID=Europe/Zurich:20261120T213000',
         'SUMMARY:Sinfoniekonzert: Brahms & Sibelius', 'LOCATION:Tonhalle Zürich\\, Zürich', 'DESCRIPTION:Brahms Violin Concerto\\nSibelius Symphony No. 2',
@@ -345,6 +381,24 @@
         { id: 'kts_st_gallen-3912', source: 'kts_st_gallen', title: 'Fantastique', start: '2026-11-19T19:30:00+01:00', durationMin: 120, city: 'St. Gallen', venueName: 'Tonhalle St.Gallen', type: 'orchestral', series: 'Tonhallekonzert', credits: [{ role: 'Conductor', name: 'Arvo Volmer' }, { role: 'Orchestra', name: 'Sinfonieorchester St.Gallen' }], program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Ouvertu\u0308re zu Don Giovanni KV 527' }, { composer: 'Wolfgang Amadeus Mozart', title: 'Sinfonie Nr. 39 Es-Dur KV 543' }, { composer: 'Hector Berlioz', title: 'Symphonie fantastique' }], ticketUrl: 'https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=566&language=de', url: 'https://www.konzertundtheater.ch/programm/kalender/3-thk-fantastique/3912/', status: 'scheduled' },
         // a "_" between two Chopin lines
         { id: 'lso_luzern-21040', source: 'lso_luzern', title: 'LUNCHKONZERT MIT TIANYAO LYU', start: '2027-01-15T12:00:00+01:00', durationMin: 70, city: 'Luzern', venueName: 'HOTEL SCHWEIZERHOF LUZERN, ZEUGHEERSAAL', type: 'recital', series: 'Klavierfestival Le Piano Symphonique', credits: [{ role: 'Piano', name: 'Tianyao Lyu' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Sechs Variationen über ein Schweizer Lied in F-Dur, WoO 64' }, { composer: 'Frédéric Chopin', title: '24 Préludes, op. 28' }, { composer: 'Frédéric Chopin', title: '_' }, { composer: 'Frédéric Chopin', title: 'Scherzo Nr. 4 in E-Dur, op. 54' }], ticketUrl: 'https://tickets.sinfonieorchester.ch/checkout/lunchkonzert-surprise-2y2w1v', url: 'https://sinfonieorchester.ch/de/veranstaltung/lunchkonzert-surprise/', status: 'scheduled' },
+        // programme lines as these sites publish them (feed of 26 October 2026, 12:33): breaks and end times, a
+        // composer's or performer's name as a heading, a heading split from its numbers, lines naming no work,
+        // and the same works listed by form and key, in Italian or with MWV only
+        { id: 'sob-12177', source: 'sob', title: 'Titan', start: '2027-02-24T19:30:00+01:00', city: 'Basel', venueName: 'Stadtcasino Basel, Musiksaal', type: 'orchestral', credits: [{ role: 'Clarinet', name: 'Rossana Rossignoli' }, { role: 'Conductor', name: 'Markus Poschner' }, { role: 'Orchestra', name: 'Sinfonieorchester Basel' }], program: [{ composer: 'Geoffrey Gordon', title: 'Bonus Track "Salt" (Auftragskomposition)' }, { composer: 'Geoffrey Gordon', title: '"Icarus" für Klarinette und Orchester' }, { composer: 'Geoffrey Gordon', title: '- Pause -' }, { composer: 'Geoffrey Gordon', title: 'Gustav Mahler' }, { composer: 'Geoffrey Gordon', title: 'Sinfonie Nr. 1 D-Dur "Titan"' }, { composer: 'Geoffrey Gordon', title: 'Konzertende ca. 21.30 Uhr' }], url: 'https://www.sinfonieorchesterbasel.ch/de/konzerte/titan/12177', status: 'scheduled' },
+        { id: 'casino_bern-hayato-sumino-20270331-1930', source: 'casino_bern', title: 'Hayato Sumino', start: '2027-03-31T19:30:00+02:00', city: 'Bern', venueName: 'Casino Bern, Grosser Saal', type: 'recital', credits: [{ role: 'Piano', name: 'Hayato Sumino' }], program: [{ composer: 'Frédéric Chopin', title: 'Klaviersonate Nr. 2 b-Moll op. 35' }, { composer: 'Frédéric Chopin', title: 'Frédéric Chopin / Hayato Sumino' }, { composer: 'Frédéric Chopin', title: '«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)' }, { composer: 'Frédéric Chopin', title: 'Hayato Sumino' }, { composer: 'Frédéric Chopin', title: 'Lydian Harp' }, { composer: 'Frédéric Chopin', title: 'Imaginary Polonaise' }], url: 'https://www.casinobern.ch/programm/hayato-sumino/#31-03-2027', status: 'scheduled' },
+        { id: 'casino_bern-kopatchinskaja-say-20261209-1930', source: 'casino_bern', title: 'Kopatchinskaja & Say', start: '2026-12-09T19:30:00+01:00', city: 'Bern', venueName: 'Casino Bern, Grosser Saal', type: 'recital', credits: [{ role: 'Violin', name: 'Patricia Kopatchinskaja' }, { role: 'Piano', name: 'Fazil Say' }], program: [{ composer: 'Karol Szymanowski', title: 'Mythen für Violine und Klavier op. 30' }, { composer: 'Karol Szymanowski', title: 'Fazıl Say' }, { composer: 'Karol Szymanowski', title: 'Sonate für Violine und Klavier Nr. 3 op. 119 «Lost Screams Sonata»' }, { composer: 'Ludwig van Beethoven', title: 'Violinsonate Nr. 9 A-Dur op. 47 «Kreutzersonate»' }], url: 'https://www.casinobern.ch/programm/kopatchinskaja-say/#09-12-2026', status: 'scheduled' },
+        { id: 'stadtcasino_basel-23052027_tianyao_lyu', source: 'stadtcasino_basel', title: 'Tianyao Lyu', start: '2027-05-23T19:30:00+02:00', city: 'Basel', venueName: 'Stadtcasino Basel, Hans Huber-Saal', type: 'recital', credits: [{ role: 'Piano', name: 'Tianyao Lyu' }], program: [{ composer: 'Frédéric Chopin', title: 'Mazurkas op. 41:' }, { composer: 'Frédéric Chopin', title: 'Nr. 1 cis-Moll, Nr. 2 e-Moll, Nr. 3 B-Dur, Nr. 4 As-Dur' }, { composer: 'Frédéric Chopin', title: 'Prélude Des-Dur op. 28 Nr. 15 (“Regentropfen-Prélude”)' }], url: 'https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/23052027_tianyao_lyu/', status: 'scheduled' },
+        { id: 'stadtcasino_basel-210227_i_tempi', source: 'stadtcasino_basel', title: 'Kammerorchester I TEMPI – Preisträgerkonzert', start: '2027-02-21T17:00:00+01:00', city: 'Basel', venueName: 'Stadtcasino Basel, Musiksaal', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Gevorg Gharabekyan' }, { role: 'Orchestra', name: 'Kammerorchester I TEMPI' }], program: [{ composer: 'Antonio Vivaldi', title: 'Vier Jahreszeiten' }, { composer: 'Antonio Vivaldi', title: 'Weitere virtuose Werke' }, { composer: 'Antonio Vivaldi', title: '(Das definitive Programm wird nach dem Wettbewerb im zweiten Halbjahr 2026 bekannt gegeben.)' }], url: 'https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/210227_i_tempi/', status: 'scheduled' },
+        { id: 'ocf_fribourg-8490', source: 'ocf_fribourg', title: 'La symphonie des générations', start: '2026-11-28T17:00:00+01:00', city: 'Granges-Paccot', venueName: 'Forum Fribourg', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Philippe Bach' }, { role: 'Orchestra', name: 'Orchestre de chambre fribourgeois' }], program: [{ composer: 'Joseph Haydn', title: 'Symphonie n° 100 en sol majeur (dite « Militaire »)' }, { composer: 'Joseph Kocian', title: 'Création' }, { composer: 'Henryk Mikolaj Górecki', title: 'Symphonie n° 3 pour soprano et orchestre' }], url: 'https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8490', status: 'scheduled' },
+        { id: 'tonhalle-2056720', source: 'tonhalle', title: 'MS Benefizkonzert', start: '2026-11-29T11:00:00+01:00', city: 'Zürich', venueName: 'Tonhalle Zürich – Grosser Saal', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Camerata Schweiz' }, { role: 'Conductor', name: 'Howard Griffiths' }], program: [{ composer: 'Felix Mendelssohn Bartholdy', title: 'Konzert für Violine, Klavier und Streichorchester d-Moll' }], url: 'https://tonhallezuerich.ch/konzerte/kalender/ms-benefizkonzert-2056720/tz/', status: 'scheduled' },
+        { id: 'casino_bern-dovgan-eigus-20261126-1930', source: 'casino_bern', title: 'Dovgan & Eigus', start: '2026-11-26T19:30:00+01:00', city: 'Bern', venueName: 'Casino Bern, Grosser Saal', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Camerata Schweiz' }, { role: 'Conductor', name: 'Howard Griffiths' }], program: [{ composer: 'Felix Mendelssohn Bartholdy', title: 'Doppelkonzert für Violine, Klavier und Streichorchester in d-Moll MWV O 4' }], url: 'https://www.casinobern.ch/programm/dovgan-eigus/#26-11-2026', status: 'scheduled' },
+        { id: 'ocg-eternel-beethoven-20261219', source: 'ocg', title: 'Éternel Beethoven', start: '2026-12-19T18:00:00+01:00', city: 'Genève', venueName: 'Victoria Hall', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Steve Dunn' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Messe en ut majeur' }, { composer: 'Morten Lauridsen', title: 'Lux Aeterna' }], url: 'https://locg.ch/fr/calendrier/eternel-beethoven', status: 'scheduled' },
+        { id: 'lso_luzern-19908', source: 'lso_luzern', title: 'NATUR & GLAUBE – BEETHOVENS PASTORALE UND C-DUR-MESSE', start: '2027-03-28T11:00:00+02:00', city: 'Luzern', venueName: 'KKL Luzern, Konzertsaal', type: 'vocal-opera', credits: [{ role: 'Conductor', name: 'Maxime Pascal' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Messe in C-Dur, op. 86' }], url: 'https://sinfonieorchester.ch/de/veranstaltung/natur-glaube-beethovens-pastorale-und-c-dur-messe/', status: 'scheduled' },
+        { id: 'osi-175715631901023', source: 'osi', title: 'Alexander Malofeev', start: '2027-04-08T20:00:00+02:00', city: 'Lugano', venueName: 'LAC Lugano Arte e Cultura', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Krzysztof Urbański' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Coriolano ouverture' }], url: 'https://www.osi.swiss/concerti/tutti-i-concerti/2027-04-08-20-00', status: 'scheduled' },
+        { id: 'lso_luzern-19890', source: 'lso_luzern', title: 'BEETHOVEN PUR – ORCHESTER, KLAVIER, CHOR', start: '2026-12-03T19:30:00+01:00', city: 'Luzern', venueName: 'KKL Luzern, Konzertsaal', type: 'vocal-opera', credits: [{ role: 'Conductor', name: 'Lars Corijn' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Ouvertüre zur Oper Coriolan, op. 62' }], url: 'https://sinfonieorchester.ch/de/veranstaltung/beethoven-pur-klavier-chor/', status: 'scheduled' },
+        // NOT a real listing: test-only lines for the limits of the key-only rule (Mozart wrote many Masses in C;
+        // a concerto for one soloist in a key is no one work)
+        { id: 'test-same-key', source: 'test', title: 'Test listing: works named by form and key', start: '2027-01-03T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Messe C-Dur' }, { composer: 'Wolfgang Amadeus Mozart', title: 'Messe C-Dur KV 317 «Krönungsmesse»' }, { composer: 'Carl Stamitz', title: 'Klarinettenkonzert B-Dur' }, { composer: 'Carl Stamitz', title: 'Klarinettenkonzert Nr. 3 B-Dur op. 7' }], url: 'https://example.org/', status: 'scheduled' },
         // NOT a real listing: a test-only record for a town that is neither one of the 47 nor an extra town
         // (every town in today's feed is known, so the "town of its own" path needs a synthetic case)
         { id: 'test-unknown-town', source: 'test', title: 'Test listing in an unknown town', start: '2027-01-02T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', url: 'https://example.org/', status: 'scheduled' },
@@ -436,6 +490,37 @@
       eq(kts[0].workKey, 'x-mozart-kv527-overture');
       const lunch = repo.programItems(repo.concert('feed-lso_luzern-21040'));
       eq(lunch.map((it) => it.rawTitle), ['Sechs Variationen über ein Schweizer Lied in F-Dur, WoO 64', '24 Préludes, op. 28', 'Scherzo Nr. 4 in E-Dur, op. 54']);
+    });
+    test('programme as listed: breaks and end times go, a name heading gives the pieces after it their composer', () => {
+      const titan = repo.programItems(repo.concert('feed-sob-12177'));
+      eq(titan.map((it) => [it.composerName, it.rawTitle]), [['Geoffrey Gordon', 'Bonus Track "Salt" (Auftragskomposition)'], ['Geoffrey Gordon', '"Icarus" für Klarinette und Orchester'], ['Gustav Mahler', 'Sinfonie Nr. 1 D-Dur "Titan"']]);
+      ok(titan.every((it) => it.workKey && !/pause|konzertende|gordon-gustav/.test(it.workKey)), titan.map((it) => it.workKey).join());
+      const sumino = repo.programItems(repo.concert('feed-casino_bern-hayato-sumino-20270331-1930'));
+      eq(repo.concert('feed-casino_bern-hayato-sumino-20270331-1930').program.map((p) => [p.composer, p.title]), [['Frédéric Chopin', 'Klaviersonate Nr. 2 b-Moll op. 35'], ['Frédéric Chopin / Hayato Sumino', '«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)'], ['Hayato Sumino', 'Lydian Harp'], ['Hayato Sumino', 'Imaginary Polonaise']]);
+      ok(!sumino.some((it) => it.work?.id === 'chopin-preludes' || /op28/.test(it.workKey)), 'a postlude written after a prélude is neither that prélude nor the 24');
+      const say = repo.programItems(repo.concert('feed-casino_bern-kopatchinskaja-say-20261209-1930'));
+      eq(say.map((it) => it.composerName), ['Karol Szymanowski', 'Fazıl Say', 'Ludwig van Beethoven'], 'listed "Fazıl Say" is the credited "Fazil Say"');
+      const lyu = repo.programItems(repo.concert('feed-stadtcasino_basel-23052027_tianyao_lyu'));
+      eq(lyu.map((it) => [it.rawTitle, it.workKey]), [['Mazurkas op. 41: Nr. 1 cis-Moll, Nr. 2 e-Moll, Nr. 3 B-Dur, Nr. 4 As-Dur', 'x-chopin-op41'], ['Prélude Des-Dur op. 28 Nr. 15 (“Regentropfen-Prélude”)', 'x-chopin-op28-15']], 'a heading joined with its numbers; one prélude');
+      ok(!ent.workPageData('chopin-preludes', '2026-10-26').rows.some((r) => r.id === 'feed-stadtcasino_basel-23052027_tianyao_lyu'), 'not on the 24 Préludes page');
+    });
+    test('Listen cards only for lines that name a work', () => {
+      const tempi = repo.programItems(repo.concert('feed-stadtcasino_basel-210227_i_tempi'));
+      eq(tempi.map((it) => [it.rawTitle, !!it.workKey, repo.namesWork(it)]), [['Vier Jahreszeiten', true, true], ['Weitere virtuose Werke', false, false]]);
+      const ocf = repo.programItems(repo.concert('feed-ocf_fribourg-8490'));
+      eq(ocf.map((it) => [it.rawTitle, repo.namesWork(it)]), [['Symphonie n° 100 en sol majeur (dite « Militaire »)', true], ['Création', false], ['Symphonie n° 3 pour soprano et orchestre', true]]);
+      eq(repo.namesWork({ title: 'Création', workKey: null }), false);
+    });
+    test('work index: a listing by form, scoring and key joins the numbered work; so does another language\'s spelling', () => {
+      const ids = (id) => repo.concert(id).program.map(repo.workIdOf);
+      eq(ids('feed-tonhalle-2056720'), ['x-mendelssohn-mwv-o4'], 'Konzert für Violine, Klavier und Streichorchester d-Moll = MWV O 4');
+      eq(ids('feed-casino_bern-dovgan-eigus-20261126-1930'), ['x-mendelssohn-mwv-o4']);
+      eq(ids('feed-ocg-eternel-beethoven-20261219')[0], 'x-beethoven-op86', 'Messe en ut majeur = Messe in C-Dur, op. 86');
+      eq(ids('feed-osi-175715631901023'), ['x-beethoven-op62-overture'], 'Coriolano ouverture = Ouvertüre zur Oper Coriolan, op. 62');
+      eq(ent.workPageData('x-beethoven-op62-overture', '2026-10-26').rows.map((r) => r.where), ['KKL Luzern · Lucerne', 'LAC Lugano Arte e Cultura · Lugano']);
+      const test = ids('feed-test-same-key');
+      ok(test[0] !== test[1], `Mozart's "Messe C-Dur" is not K. 317: ${test}`);
+      ok(test[2] !== test[3], `a one-soloist concerto by key alone: ${test}`);
     });
     test('no demo concerts at run time', () => {
       ok(repo.allConcerts().length >= FIXTURE.concerts.length, 'fixture loaded');
@@ -650,6 +735,38 @@
       for (const [k, v] of Object.entries(savedKeys)) {
         try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {}
       }
+    }
+
+    // ---------- ▶ Preview: a lookup that ends after a newer tap, or after the user left the page, plays nothing ----------
+    {
+      const pv = await import('../js/ui/preview.js');
+      const music = await import('../js/music.js');
+      const SILENT = 'data:audio/mp4;base64,AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAAAhmcmVlAAAAG21kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
+      const slow = (track, ms) => () => new Promise((r) => setTimeout(() => r({ track }), ms));
+      const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+      const a = { id: 'a', title: 'A', preview: SILENT };
+      const b = { id: 'b', title: 'B', preview: `${SILENT}#b` };
+      music.preview.stop();
+      const left = pv.previewButton({ resolve: slow(a, 30) });
+      document.body.append(left);
+      left.click();
+      left.remove(); // the user went to another page
+      await pause(120);
+      const afterLeaving = music.previewState().track;
+      const slowBtn = pv.previewButton({ resolve: slow(a, 80) });
+      const fastBtn = pv.previewButton({ resolve: slow(b, 10) });
+      document.body.append(slowBtn, fastBtn);
+      slowBtn.click();
+      fastBtn.click(); // a newer tap
+      await pause(200);
+      const afterNewer = music.previewState().track;
+      slowBtn.remove();
+      fastBtn.remove();
+      music.preview.stop();
+      test('▶ Preview: a slow lookup does not start audio after the user left the page or tapped another preview', () => {
+        eq(afterLeaving, null, 'left the page');
+        eq(afterNewer?.id, 'b', 'the newer tap wins');
+      });
     }
 
     document.getElementById('summary').innerHTML = fail ? `<span class="fail">${fail} failed</span>, ${pass} passed` : `<span class="pass">All ${pass} tests passed</span>`;

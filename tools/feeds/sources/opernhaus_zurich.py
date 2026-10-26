@@ -30,6 +30,15 @@ Skipped: workshops, guided tours (Führungen), open space, talks, matinees/previ
 (introductions), children's and school-only formats, family concerts, galas/benefits,
 live broadcasts ("Opernhaus für alle"), guest performances abroad, dance-school shows and
 ballets without live music (no "Musikalische Leitung" on the production page).
+Kept on purpose: the public performances of a children's opera ("Kinderoper von …", e.g.
+Alice im Wunderland): full staged performances on the main stage with the house orchestra
+and tickets on sale. Its closed school performances ("Geschlossene Schulvorstellung") are
+skipped.
+
+The time printed in the calendar wins over the entry's JSON-LD when they disagree, and an
+entry whose JSON-LD block is missing (the site drops it once a performance has started)
+takes its date and time from the calendar text; a JSON-LD block is only taken from the
+entry's own part of the page, never from the block printed just before the next entry.
 """
 from __future__ import annotations
 
@@ -39,7 +48,7 @@ import unicodedata
 from datetime import datetime
 
 from common import (BudgetExceeded, FetchError, clean, event_id, get, guess_type, jsonld_events, log, looks_cancelled,
-                    make_event, previous_event, refresh_due, requests_left, same_title, to_zurich_iso)
+                    make_event, previous_event, refresh_due, requests_left, same_title, to_zurich_iso, today_zurich)
 
 from ._consent import group_role, looks_like_person, role_en
 
@@ -153,6 +162,18 @@ def _composer_from_note(note):
     return None
 
 
+def _operas_in_note(title, note):
+    """'Rachmaninow – Die drei Opern' + 'Aleko, Skupoi Rytsar & Francesca da Rimini' ->
+    [('Rachmaninow', 'Aleko'), ('Rachmaninow', 'Skupoi Rytsar'), ('Rachmaninow', 'Francesca da Rimini')]."""
+    m = re.match(r'^(.+?)\s+[–—-]\s+Die\s+\w+\s+(?:Opern|Einakter)$', clean(title))
+    if not m or not looks_like_person(m.group(1), max_words=4):
+        return []
+    works = [w.strip() for w in re.split(r'\s*(?:,|&|\bund\b)\s*', clean(note)) if w.strip()]
+    if len(works) < 2 or any(len(w) > 60 or re.search(r'(?i)\boper\b|\bvon\b', w) for w in works):
+        return []
+    return [(m.group(1), w) for w in works]
+
+
 def _choreographers_from_note(note):
     m = re.match(r'^(?:Ballett|Choreografien?|Choreographien?)\s+von\s+(.+?)\s*$', clean(note), re.I)
     if not m:
@@ -198,21 +219,65 @@ def _concert_type(title, note, credits):
 _LD_RE = re.compile(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', re.S | re.I)
 
 
-def parse_listing(page_html):
-    """-> list of dicts, one per calendar entry (raw facts, not yet filtered)."""
+_MONTHS = {'jan': 1, 'feb': 2, 'mär': 3, 'mar': 3, 'apr': 4, 'mai': 5, 'jun': 6, 'jul': 7, 'aug': 8, 'sep': 9,
+           'okt': 10, 'nov': 11, 'dez': 12}
+
+
+def _printed(chunk, state):
+    """(date, 'HH:MM') as the calendar prints them for this entry; a 'noday' entry has only a
+    time and is on the day of the entry before it (``state['day']``, carried across pages)."""
+    box = re.search(r'<div class="date">(.*?)</div>', chunk, re.S)
+    if not box:
+        return None, None
+    day = re.search(r'<span class="day">\s*(\d{1,2})\s*</span>', box.group(1))
+    mon = re.search(r'<span class="month">\s*([A-Za-zÄÖÜäöü]{3})', box.group(1))
+    hhmm = re.search(r'<p>\s*(\d{1,2})[.:](\d{2})\s*</p>', box.group(1))
+    when = state.get('day')
+    if day and mon and _MONTHS.get(mon.group(1).lower()):
+        month, d = _MONTHS[mon.group(1).lower()], int(day.group(1))
+        ref = state.get('ref') or datetime.now().date()
+        year = ref.year + (1 if month < ref.month - 6 else 0)
+        try:
+            when = datetime(year, month, d).date()
+        except ValueError:
+            when = None
+        state['day'] = when
+    if when:
+        state['ref'] = when
+    return when, (f'{int(hhmm.group(1)):02d}:{hhmm.group(2)}' if hhmm else None)
+
+
+def parse_listing(page_html, state=None):
+    """-> list of dicts, one per calendar entry (raw facts, not yet filtered). ``state`` carries
+    the calendar day from one page to the next (for entries that print only a time)."""
     out = []
+    state = {} if state is None else state
     chunks = re.split(r'<div class="el-eventlistitem', page_html or '')
     for chunk in chunks[1:]:
         m = re.match(r'[^>]*\bid="uid_(\d+)"', chunk)
         if not m:
             continue
         ld = None
-        for block in _LD_RE.findall(chunk):
+        # the entry's own block comes before its date box; the one at the end of the chunk is
+        # printed for the next entry
+        for block in _LD_RE.findall(chunk.split('<div class="date">', 1)[0]):
             evs = jsonld_events(f'<script type="application/ld+json">{block}</script>')
             if evs:
                 ld = evs[0]
                 break
-        if not ld or not ld.get('startDate'):
+        ld = ld or {}
+        day, hhmm = _printed(chunk, state)
+        start = str(ld.get('startDate') or '')
+        if day and hhmm:
+            printed = f'{day.isoformat()}T{hhmm}'
+            if not start:
+                log.info('%s: uid_%s has no JSON-LD; using the calendar\'s %s', KEY, m.group(1), printed)
+                start = printed
+            elif start[:16] != printed:
+                log.warning('%s: uid_%s JSON-LD says %s but the calendar shows %s; using the calendar',
+                            KEY, m.group(1), start[:16], printed)
+                start = printed
+        if not start:
             continue
         h2 = re.search(r'<h2[^>]*>(.*?)</h2>', chunk, re.S)
         loc = re.search(r'<div class="location">(.*?)</div>', chunk, re.S)
@@ -223,8 +288,8 @@ def parse_listing(page_html):
         out.append({
             'uid': m.group(1),
             'title': clean(h2.group(1)) if h2 else clean(ld.get('name')),
-            'start': ld.get('startDate'),
-            'end': ld.get('endDate'),
+            'start': start,
+            'end': ld.get('endDate') if str(ld.get('startDate') or '')[:16] == start[:16] else None,
             'location': clean(loc.group(1)) if loc else clean((ld.get('location') or {}).get('name')),
             'note': _note(note.group(1)) if note else '',
             'flags': clean(links.group(1)) if links else '',
@@ -262,7 +327,9 @@ def parse_detail(page_html):
         for p in ev.get('performer') or []:
             if not isinstance(p, dict):
                 continue
-            desc, name = clean(p.get('description')), clean(p.get('name'))
+            # the site sends a line break in a role as the two characters backslash + n ('Tito Vespasiano\\n')
+            desc = clean(re.sub(r'\\[nrt]', ' ', str(p.get('description') or '')))
+            name = clean(re.sub(r'\\[nrt]', ' ', str(p.get('name') or '')))
             is_group = 'Group' in str(p.get('@type') or '') or 'Organization' in str(p.get('@type') or '')
             if re.match(r'(?i)musikalische leitung|dirigent', desc) or (is_group and re.match(r'(?i)orchester', desc)):
                 live = True
@@ -279,7 +346,9 @@ def parse_detail(page_html):
     music, genre, composer = [], None, None
     if longinfo:
         lines = [clean(x) for x in re.split(r'(?i)<br\s*/?>|</p>|<p[^>]*>|\n', longinfo.group(1)) if clean(x)]
-        m = re.search(r'Musik von (.+?)(?:<|$)', longinfo.group(1).replace('\n', ' '))
+        # 'Musik von Felix Mendelssohn Bartholdy und<br /> Gabriel Prokofiev': a name list may go on after a break
+        flat = re.sub(r'(?i)(\b(?:und|and|et|&)|,)\s*<br\s*/?>\s*', r'\1 ', longinfo.group(1).replace('\n', ' '))
+        m = re.search(r'Musik von (.+?)(?:<|$)', flat)
         if m:
             music = [n for n in (x.strip() for x in re.split(r'\s*(?:,|\bund\b|&)\s*', clean(m.group(1))))
                      if looks_like_person(n, max_words=5)]
@@ -423,9 +492,9 @@ def credits_for(kind, people, players):
 def fetch():
     entries, seen = [], set()
     first = get(LISTING)                                     # FetchError here -> reuse yesterday
-    page_html, n = first, 1
+    page_html, n, state = first, 1, {'ref': today_zurich()}
     while True:
-        rows = parse_listing(page_html)
+        rows = parse_listing(page_html, state)
         for r in rows:
             if r['uid'] not in seen:
                 seen.add(r['uid'])
@@ -528,7 +597,9 @@ def fetch():
                     KEY, e['uid'], title, to_zurich_iso(e['start'], assume='Europe/Zurich'), end=end,
                     durationMin=prev.get('durationMin') if not end else None,
                     city=city, venueName=venue, type=prev.get('type'), series=series or prev.get('series'),
-                    credits=prev.get('credits'), program=prev.get('program'), url=e['url'], ticketUrl=e['ticket'],
+                    credits=prev.get('credits'),
+                    program=prev.get('program') or (_operas_in_note(e['title'], e['note']) if kind == 'opera' else None),
+                    url=e['url'], ticketUrl=e['ticket'],
                     status='cancelled' if cancelled else None))
             except ValueError as err:
                 log.warning('%s: skipped %s: %s', KEY, e['uid'], err)
@@ -541,9 +612,13 @@ def fetch():
         composer = (_composer_from_note(e['note']) or (d and d['composer'])) if kind == 'opera' else None
         if composer and not program:
             program = [(composer, e['title'])]
+        if kind == 'opera' and not program:
+            program = _operas_in_note(e['title'], e['note'])
         if kind == 'ballet' and d and d['music'] and not program:
+            # one ballet: its title goes with the first composer ('Musik von Felix Mendelssohn
+            # Bartholdy und Gabriel Prokofiev'); the others are named without a work
             single = re.match(r'(?i)^ballett von', e['note'])
-            program = [(c, e['title'] if single else '') for c in d['music']]
+            program = [(c, e['title'] if single and i == 0 else '') for i, c in enumerate(d['music'])]
         if kind == 'opera':
             ctype = 'vocal-opera'
         elif kind == 'ballet':

@@ -456,16 +456,14 @@ function standInWork(it) {
   };
 }
 
-// One entry per distinct programme work.
+// One entry per distinct programme work. A line the programme shows as text, without a work page ("Weitere
+// virtuose Werke", "Création", a placeholder for a piece not yet named), gets no card either.
 function listenEntries(items) {
   const seen = new Set();
   const out = [];
   for (const it of items) {
-    let work = it.work;
-    if (!work) {
-      if (!it.title) continue;
-      work = standInWork(it);
-    }
+    if (!repo.namesWork(it)) continue;
+    const work = it.work || standInWork(it);
     if (seen.has(work.id)) continue;
     seen.add(work.id);
     const name = it.composer?.short || it.composerName || '';
@@ -1032,8 +1030,12 @@ function bookChapters(c, items) {
   return chapters.filter((ch) => ch.paragraphs.length);
 }
 
+// Klang's programme notes are in English: in Chinese the book says so (as entity pages do).
+const englishOnly = () => (isZh() ? h('p', { class: 'cp-en-note' }, t('This text is available in English only for now.')) : null);
+
 function chapterEl(ch, i, full) {
   return h('section', { class: ['cp-ch', full && 'full'], dataset: { i: String(i) } },
+    full ? englishOnly() : null,
     full && ch.composer ? avatar(ch.composer.name, false, ch.composer.id) : null,
     ch.kicker ? h('div', { class: 'cp-ch-kicker' }, ch.kicker) : null,
     h(full ? 'h2' : 'h3', { class: 'cp-ch-title' }, ch.title),
@@ -1215,6 +1217,7 @@ function programBook(c, items, ctx) {
 
   const el = h('section', { class: 'cp-section cp-bookwrap' },
     h('h2', { class: 'pill-label' }, t('Program book')),
+    englishOnly(),
     h('div', { class: 'cp-book' }, chapters.length > 1 ? rail : null, card));
   return { el };
 }

@@ -1,10 +1,10 @@
 // Klang service worker: makes the installed app open offline.
-// Network-first for Klang's own files (so updates show immediately), with a cached fallback.
+// Network-first for Klang's own files (so updates show immediately, past the HTTP cache), with a cached fallback.
 // Google Fonts are cached; Apple (iTunes) data, artwork and the 30-second previews are never cached
 // here (previews stream from Apple; full pieces open in Apple Music Classical / Apple Music). The real
 // listings (data/concerts.json) are not precached: they are fetched network-first like any own file,
 // and feed.js also keeps a copy for an instant, offline start.
-const CACHE = 'klang-shell-v6';
+const CACHE = 'klang-shell-v7';
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -100,7 +100,11 @@ self.addEventListener('fetch', (e) => {
     })));
     return;
   }
-  e.respondWith(fetch(req).then((res) => {
+  // Klang's own files are revalidated with the server every time (a cheap 304 when unchanged): GitHub Pages
+  // lets browsers keep them 10 minutes, and a reload must never pair new modules with old ones. Page
+  // navigations go as they are (the browser already revalidates them on reload).
+  const fresh = req.mode === 'navigate' ? req : new Request(req, { cache: 'no-cache' });
+  e.respondWith(fetch(fresh).then((res) => {
     if (res.ok) {
       const copy = res.clone();
       caches.open(CACHE).then((c) => c.put(req, copy));

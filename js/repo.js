@@ -27,7 +27,7 @@ import * as feed from './feed.js';
 import { dayKeyOf, todayKey, monthKeyOf, addDays } from './time.js';
 import { normalize } from './util.js';
 import {
-  slug, matchCity, matchVenue, matchProgram, workFromTitle, guessType, workIdentity, isBoilerplate, isGenericWord,
+  slug, matchCity, matchVenue, matchProgram, matchComposer, workFromTitle, guessType, workIdentity, isBoilerplate, isGenericWord,
   searchTitle, englishTitle, workNumber, arrangerOf,
 } from './ics.js';
 
@@ -123,17 +123,57 @@ const nfc = (s) => (typeof s === 'string' ? s.normalize('NFC') : s);
 // A title that is only punctuation ("_", "–") or a note in brackets names no work: the line keeps its composer, or goes
 // when another line of the programme already names that composer.
 const NO_TITLE = /^[\s\p{P}\p{S}]*$/u;
-function cleanLines(list) {
-  const lines = (list || []).filter(Boolean).map((p) => {
-    const title = nfc(p.title || '');
+// Names compared with the letters NFD leaves alone folded: "Fazıl Say" (listed) is "Fazil Say" (credited).
+const foldName = (s) => normalize(String(s || '')).replace(/ı/g, 'i').replace(/ł/g, 'l').replace(/ø/g, 'o').replace(/ß/g, 'ss')
+  .replace(/æ/g, 'ae').replace(/œ/g, 'oe').replace(/[^a-z0-9]+/g, ' ').trim();
+const PARTICLE = /^(?:van|von|de|di|da|du|del|della|le|la|der)$/i;
+// A line whose title is only a name — a performer of the evening, the line's own composer, or the full name
+// of a composer Klang knows ("Gustav Mahler", "Frédéric Chopin / Hayato Sumino") — is a heading the site put
+// above the pieces that follow, read as a work by the line above's composer. Never a title with a number,
+// quotes or other words ("Im Schatten von Beethoven"), nor a bare surname.
+function isNameHeading(p, people) {
+  const title = String(p.title || '').trim();
+  if (!title || /[\d«»“”„"(]/.test(title) || title.split(/\s+/).length > 6) return false;
+  const own = foldName(p.composer);
+  return title.split(/\s*\/\s*/).every((part) => {
+    const f = foldName(part);
+    if (!f) return false;
+    if (f === own || people.has(f)) return true;
+    const comp = composerMap.get(matchComposer(part));
+    const words = part.trim().split(/\s+/);
+    if (!comp || words.length < 2) return false;
+    const name = new Set(foldName(comp.name).split(' '));
+    return words.every((w) => name.has(foldName(w)) || PARTICLE.test(w) || /^(?:\p{Lu}\.)+$/u.test(w));
+  });
+}
+// "Mazurkas op. 41:" + "Nr. 1 cis-Moll, Nr. 2 e-Moll, …" (one work over two lines) → one line
+const CONTINUES = /^\s*(?:(?:nr|nos?|n[°º])\.?\s*)?\d/i;
+function cleanLines(list, credits = []) {
+  const people = new Set((credits || []).map((cr) => foldName(cr?.name)).filter(Boolean));
+  const lines = [];
+  let heading = null; // the lines after a name heading that carry the line above's composer are by that name
+  for (const raw of (list || []).filter(Boolean)) {
+    const title = nfc(raw.title || '');
     const blank = !!title && (NO_TITLE.test(title) || /^\s*\(.*\)\s*$/s.test(title));
-    return { ...p, composer: nfc(p.composer), title: blank ? '' : title, blank };
-  }).filter((p) => !isBoilerplate(p.title));
+    const p = { ...raw, composer: nfc(raw.composer), title: blank ? '' : title, blank };
+    if (isBoilerplate(p.title)) continue;
+    if (isNameHeading(p, people)) { heading = { name: p.title.trim(), from: p.composer || '' }; continue; }
+    if (heading && (p.composer || '') === heading.from) p.composer = heading.name;
+    else heading = null;
+    lines.push(p);
+  }
+  for (let i = lines.length - 2; i >= 0; i--) {
+    const a = lines[i];
+    const b = lines[i + 1];
+    if (/:\s*$/.test(a.title) && b.title && (a.composer || '') === (b.composer || '') && CONTINUES.test(b.title)) {
+      lines.splice(i, 2, { ...a, title: `${a.title.trim()} ${b.title.trim()}` });
+    }
+  }
   const named = new Set(lines.filter((p) => p.title && p.composer).map((p) => normalize(p.composer)));
   return lines.filter((p) => !(p.blank && p.composer && named.has(normalize(p.composer)))).map(({ blank, ...p }) => p);
 }
-function programFor(list, title) {
-  const lines = cleanLines(list);
+function programFor(list, title, credits) {
+  const lines = cleanLines(list, credits);
   const program = matchProgram(lines, title).filter((p) => p && (p.title || p.composer || p.workId || p.composerId));
   if (program.length) return program;
   // an opera / ballet listing without a programme, titled with the work ("Die Zauberflöte")
@@ -150,7 +190,7 @@ function normalizeFeedConcert(feedRaw) {
   const cityId = cityFor(raw.city, raw.venueName);
   const { venueId, room } = venueFor(raw.venueName, cityId);
   const credits = creditsFor(raw.credits);
-  const program = programFor(raw.program, raw.title);
+  const program = programFor(raw.program, raw.title, raw.credits);
   const src = feed.sourceInfo(raw.source);
   const text = [raw.title, raw.series, raw.venueName, ...program.map((p) => `${p.composer || ''} ${p.title || ''}`)].join(' ');
   return {
@@ -186,8 +226,8 @@ function normalizeImported(c) {
   if (!out.cityId) out.cityId = cityFor(out.cityName || out.city || null, out.venueName || null);
   if (!out.venueId && out.venueName) Object.assign(out, venueFor(out.venueName, out.cityId));
   if (!out.cityId && out.venueId) out.cityId = venueMap.get(out.venueId)?.cityId || null;
+  out.program = matchProgram(cleanLines(out.program, out.credits), out.title || '');
   out.credits = creditsFor(out.credits);
-  out.program = matchProgram(cleanLines(out.program), out.title || '');
   out.type = out.type || 'mixed';
   out.status = out.status || 'scheduled';
   out.featured = !!out.featured || out.credits.length > 0 || out.program.length > 0;
@@ -242,13 +282,47 @@ function buildWorkIndex() {
     }
     if (targets.size === 1) alias.set(key, [...targets][0]);
   }
+  // A line that names only the form, scoring and key ("Messe en ut majeur", "Konzert für Violine, Klavier und
+  // Streicher d-Moll") joins the one numbered work of that composer listed with the same form, scoring and
+  // key — only for concertos for two or more soloists, masses and requiems, which a composer rarely wrote
+  // twice in one key (and never Mozart's or Haydn's masses: many of them share a key).
+  const keyOnly = (f, comp) => !!f && f.num == null && !!f.key && ((f.genre === 'concerto' && f.inst.length >= 2)
+    || ((f.genre === 'mass' || f.genre === 'requiem') && comp !== 'mozart' && comp !== 'haydn'));
+  const sameKeyed = (a, b) => a.genre === b.genre && a.sub === b.sub && a.inst.join() === b.inst.join() && a.key === b.key;
+  for (const [key, list] of byKey) {
+    const id = list[0].ident;
+    if (id.by !== 'form' || alias.has(key) || !keyOnly(id.form, id.comp)) continue;
+    const targets = new Set();
+    for (const [k2, l2] of catGroups) {
+      if (l2[0].ident.comp === id.comp && l2.some((e) => e.ident.form && sameKeyed(e.ident.form, id.form))) targets.add(k2);
+    }
+    if (targets.size === 1) alias.set(key, [...targets][0]);
+  }
   // A line without catalogue number whose title says what the listings of one numbered work of the
   // composer say (in English where they are genre, scoring or dance words) joins it: "Danses
   // norvégiennes" → «Norwegische Tänze» op. 35, "Ouvertüre zu «Die Hochzeit des Figaro»" → "Ouvertüre
   // zur Oper «Die Hochzeit des Figaro» KV 492". Never on generic words alone ("Sonate", "Klavierkonzert").
   const FILLER = new Set(['oper', 'opera', 'ballett', 'ballet']);
   const CAT_WORD = /^(?:op|opus|opp|bwv|kv|k|d|hob|rv|hwv|wab|s|lw|sz|bb|trv|mwv|woo|wq|fp|buxwv|wwv|l)$/;
-  const said = (words) => words.filter((w) => !FILLER.has(w)).join(' ');
+  const said = (words) => words.filter((w) => !FILLER.has(w));
+  // the same word, or the same name with another language's ending ("Coriolano" / "Coriolan", "Leonora" /
+  // "Leonore"): five letters in common and at most two different at the end; never a form, number or key
+  const stemEq = (a, b) => {
+    if (a === b) return true;
+    if (isGenericWord(a) || isGenericWord(b) || /[\d-]/.test(a + b)) return false;
+    let n = 0;
+    while (n < a.length && a[n] === b[n]) n++;
+    return n >= 5 && a.length - n <= 2 && b.length - n <= 2;
+  };
+  const sameWords = (a, b) => {
+    if (a.length !== b.length) return false;
+    const left = [...b];
+    return a.every((w) => {
+      const i = left.findIndex((v) => stemEq(w, v));
+      if (i >= 0) left.splice(i, 1);
+      return i >= 0;
+    });
+  };
   const numbered = [...byKey].filter(([, list]) => list[0].ident.by === 'catalogue');
   for (const [key, list] of byKey) {
     const id = list[0].ident;
@@ -257,7 +331,7 @@ function buildWorkIndex() {
     const mine = said(id.words);
     const targets = new Set();
     for (const [k2, l2] of numbered) {
-      if (l2[0].ident.comp === id.comp && l2.some((e) => said(e.ident.words) === mine)) targets.add(alias.get(k2) || k2);
+      if (l2[0].ident.comp === id.comp && l2.some((e) => sameWords(said(e.ident.words), mine))) targets.add(alias.get(k2) || k2);
     }
     if (targets.size === 1) alias.set(key, [...targets][0]);
   }
@@ -427,6 +501,10 @@ export function programItems(c) {
     };
   });
 }
+
+// Whether a programme item names a work (a repertoire work, or a line with a work page): only those get a
+// Listen card on the concert page — "Weitere virtuose Werke", "Création" or "Neues Werk" stay plain text.
+export const namesWork = (it) => !!(it && it.workKey && (it.work || it.title));
 
 export const isUpcoming = (c, today = todayKey()) => c.day >= today;
 

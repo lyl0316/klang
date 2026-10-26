@@ -7,7 +7,8 @@ free-text line-up and programme that is read conservatively (lines like "<b>Name
 Violine" and "<b>Composer</b> / work title").
 
 About 90 classical dates a season but at most 60 requests per run: event pages are fetched
-for new dates first and then for the soonest ones. A date whose page is not fetched this
+for new dates first (and dates whose kept programme an earlier version of this reader misread),
+then for the soonest ones. A date whose page is not fetched this
 run keeps the facts it had in the previously published Klang feed (read once per run;
 set KLANG_FEEDS_PREVIOUS=none to skip that); a date that was never fetched is left out
 until a later run reaches it.
@@ -18,6 +19,7 @@ lists them too, and build.py's de-duplication keeps the orchestra's record.
 """
 from __future__ import annotations
 
+import difflib
 import html as htmllib
 import os
 import re
@@ -221,7 +223,7 @@ _NN_RE = re.compile(r'^(n\.?\s*n\.?|tba|tbd|nn|weitere)$', re.I)
 _DATES_RE = re.compile(r'^\(?\s*\*?\s*\d{4}\s*(?:[–-]\s*(?:\d{4})?)?\s*\)?$')
 
 
-_ROLE_STEMS = ('solo', 'und', 'leitung', 'dirig', 'musikalisch', 'violin', 'viola', 'violen', 'violoncell', 'cello', 'kontrabass',
+_ROLE_STEMS = ('solo', 'und', 'leitung', 'dirig', 'chefdirig', 'gastdirig', 'musikalisch', 'violin', 'viola', 'violen', 'violoncell', 'cello', 'kontrabass',
                'klavier', 'piano', 'flot', 'oboe', 'klarinett', 'fagott', 'horn', 'trompet', 'posaun', 'tuba', 'harfe',
                'orgel', 'cembalo', 'gitarre', 'schlagzeug', 'perkussion', 'sopran', 'mezzo', 'alt', 'tenor', 'bariton',
                'bass', 'gesang', 'stimme', 'sprecher', 'moderation', 'akkordeon', 'saxophon', 'laute', 'blockflot',
@@ -265,19 +267,83 @@ def _is_role_label(text):
     return 0 < len(words) <= 5 and all(w.startswith(_ROLE_STEMS) for w in words) and len(text) <= 45
 
 
+# a role word misspelt on the page ('Kalvier') -> the role word it is meant to be
+_ROLE_WORDS = ('klavier', 'violine', 'viola', 'violoncello', 'kontrabass', 'flote', 'oboe', 'klarinette', 'fagott',
+               'horn', 'trompete', 'posaune', 'harfe', 'orgel', 'cembalo', 'gitarre', 'schlagzeug', 'sopran',
+               'mezzosopran', 'tenor', 'bariton', 'leitung', 'dirigent', 'akkordeon', 'saxophon', 'percussion')
+
+
+def _misspelt_role(text):
+    """'Kalvier' -> 'Klavier' (one word, close to a role word), else None."""
+    words = re.findall(r'[a-z]+', _fold(text))
+    if len(words) != 1 or len(words[0]) < 5:
+        return None
+    close = difflib.get_close_matches(words[0], _ROLE_WORDS, n=1, cutoff=0.85)
+    return close[0].capitalize() if close else None
+
+
+_PREMIERE_RE = re.compile(r'\s*\|\s*(?:CH|UA|EA|DEA|EEA|(?:Schweizer |Deutsche |Europäische )?(?:Erst|Ur)aufführung)\s*$', re.I)
+_CHILD_RE = re.compile(r'^[—–]\s*(\S.*)$')         # '— Nr. 1 in C-dur, Moderato': a piece of the work above
+_CONTINUED_RE = re.compile(r'^(?:Nr\.|No\.|n°)\s*\d')     # 'Mazurkas op. 41:' + 'Nr. 1 cis-Moll, Nr. 2 e-Moll'
+_SKIP_LINE_RE = re.compile(r'^[-–—\s]*(?:\d{1,2}[.:h]\d{2}\s*uhr|in kooperation|pause\b(?!\s+del\b)|konzert(?:ende|beginn|dauer)\b|'
+                           r'ende ca\b)', re.I)
+_ARTICLE_RE = re.compile(r'^(?:der|die|das|ein|eine|la|le|les|il|lo|the|an?)\s', re.I)
+
+
+def _composer_heading(name):
+    """'Joseph Haydn' or 'Franz Schubert / Irina Lankova' (a work and its arranger)."""
+    parts = [p.strip() for p in re.split(r'\s+/\s+', name)]
+    return all(_PERSON_RE.match(p) for p in parts)
+
+
+def _work_text(text):
+    """A work title as listed, without a premiere marker ('| CH'), a typo glued to an opus number
+    ('op. 125LE'), and with a space where two words were run together ('B-Durüber',
+    'Nr. 4«Italienische»')."""
+    t = _PREMIERE_RE.sub('', text)
+    t = re.sub(r'\b(op\.?\s*\d+)[A-Z]{2,}\b', r'\1', t)
+    t = re.sub(r'\b([A-Ha-h](?:is|es|s)?-(?:Dur|Moll|dur|moll))(?=[a-zäöüß]{3,})', r'\1 ', t)
+    t = re.sub(r'(?<=[0-9A-Za-zäöüß])«', ' «', t)
+    return t.strip()
+
+
+def _plain_heading(para, nxt):
+    """'<br>Gustav Mahler' as a paragraph of its own (not bold), followed by a short plain line:
+    the next composer, written without bold."""
+    if not re.match(r'\s*<br\s*/?>', para) or re.search(r'<(?:strong|b)\b', para):
+        return None
+    lines = [clean(x) for x in re.split(r'<br\s*/?>', para) if clean(x)]
+    if len(lines) != 1:
+        return None
+    text = lines[0]
+    if len(text.split()) > 4 or not _PERSON_RE.fullmatch(text) or _WORK_WORDS.search(_fold(text)) or \
+            _ARTICLE_RE.match(text) or _is_role_label(text):
+        return None
+    after = clean(nxt or '')
+    if not after or len(after) > 160 or re.search(r'<(?:strong|b)\b', nxt or '') or _SKIP_LINE_RE.match(after):
+        return None
+    return text
+
+
 def _lineup(html):
     """-> credits, program from the free-text columns (conservative)."""
     credits, program = [], []
     body = html.split('<div class="searchable">', 1)[1] if '<div class="searchable">' in html else ''
     body = body.split('<div class="event detail">', 1)[0]
+    # '<strong>Franz Schuber</strong>t': a bold tag that ends inside a word
+    body = re.sub(r'([a-zäöüß])</(strong|b)>([a-zäöüß]+)(?=[\s<,.;:]|$)', r'\1\3</\2>', body)
     # '<strong><br>Ferruccio Busoni</strong>': move line breaks out of bold text first
     body = re.sub(r'(<(?:strong|b)\b[^>]*>)((?:\s|<br\s*/?>)+)', r'\2\1', body)
     body = re.sub(r'((?:\s|<br\s*/?>)+)(</(?:strong|b)>)', r'\2\1', body)
     paras = re.findall(r'<p\b[^>]*>(.*?)</p>', body, re.S)
-    composer = None
-    for para in paras:
+    composer, pending, children = None, [], None     # pending: names of a line-up that goes on ('A, B,')
+    for pi, para in enumerate(paras):
         if len(clean(para)) > 160:                     # prose: never copied, ends a composer's works
             composer = None
+            continue
+        heading = _plain_heading(para, paras[pi + 1] if pi + 1 < len(paras) else '') if composer else None
+        if heading:                                    # '<br>Gustav Mahler' after the interval
+            composer, children = heading, None
             continue
         for line in re.split(r'<br\s*/?>', para):
             text = clean(line)
@@ -286,24 +352,38 @@ def _lineup(html):
             strong = clean(' '.join(re.findall(r'<(?:strong|b)\b[^>]*>(.*?)</(?:strong|b)>', line, re.S)))
             rest = clean(re.sub(r'<(strong|b)\b[^>]*>.*?</\1>', ' ', line, flags=re.S))
             if strong:
+                children = None
                 name = strong.strip(' ,-–:')                # '<b>Antonio Vivaldi - </b>Die vier Jahreszeiten'
                 tail = rest.strip(' ,')
                 if _NN_RE.match(name):                      # '<b>N. N.</b>, Klavier': not announced yet
                     composer = None
                     continue
-                if tail and not _DATES_RE.match(tail) and len(tail) <= 40 and ',' in (strong + ' ' + rest)[:len(strong) + 3]:
+                listed = ',' in (strong + ' ' + rest)[:len(strong) + 3]     # '<b>Name,</b> Rolle'
+                if tail and not _DATES_RE.match(tail) and len(tail) <= 40 and listed:
                     roles = _roles(tail, name)           # '<b>Silvia Careddu, </b>Flöte'
-                    if roles and (_is_role_label(tail) or roles[0] in ('Choir', 'Orchestra', 'Ensemble', 'Chorus master')):
+                    if not (roles and (_is_role_label(tail) or roles[0] in ('Choir', 'Orchestra', 'Ensemble', 'Chorus master'))):
+                        fixed = _misspelt_role(tail)       # '<b>Arcadi Volodos,</b> Kalvier'
+                        roles = _roles(fixed, name) if fixed and _PERSON_RE.match(name) else None
+                    if roles:
                         parts = [p.strip() for p in name.split(',') if p.strip()]
                         names = parts if len(parts) > 1 and all(_PERSON_RE.match(p) for p in parts) else [name]
                         m = re.fullmatch(r'([^,\s]+(?:\s+[^,\s]+)*),\s*([^,\s]+)', name) if len(names) == 1 else None
                         if m:                             # 'Elvekjær, Jens' / 'Jens Peter, Maintz'
                             names = [f'{m.group(2)} {m.group(1)}' if ' ' not in m.group(1) else f'{m.group(1)} {m.group(2)}']
+                        credits.extend(('Performer', n) for n in pending if not _NN_RE.match(n))
                         for n in names:                   # '<b>Lora Markova, Wojciech Koprowski,</b> Violine'
                             if not _NN_RE.match(n):
                                 credits.extend((role, n) for role in roles)
+                        pending, composer = [], None
+                        continue
+                    if _PERSON_RE.match(name) and rest.endswith(',') and \
+                            all(_PERSON_RE.fullmatch(n.strip()) for n in tail.split(',') if n.strip()):
+                        # '<b>Jana Ozolina, </b>Diana Adamyan,': names of a line-up, not a work
+                        pending = [name] + [n.strip() for n in tail.split(',') if _PERSON_RE.fullmatch(n.strip())]
                         composer = None
                         continue
+                credits.extend(('Performer', n) for n in pending if not _NN_RE.match(n))
+                pending = []
                 m = re.fullmatch(r'(.{3,60}?),\s*([^,]{3,40})', name) if not tail else None
                 if m and _PERSON_RE.match(m.group(1)) and _is_role_label(m.group(2)):
                     for role in _roles(m.group(2), m.group(1)):   # '<b>Christian Knüsel, Dirigent</b>'
@@ -319,14 +399,17 @@ def _lineup(html):
                         credits.append((role, name))
                     composer = None
                     continue
-                if _PERSON_RE.match(name) and (not tail or _DATES_RE.match(tail) or re.match(r'^\(?\s*geb\.', tail)):
-                    composer = name                       # '<b>Joseph Haydn</b> (1732–1809)'
+                if _composer_heading(name) and (not tail or _DATES_RE.match(tail) or re.match(r'^\(?\s*geb\.', tail)):
+                    composer = name                       # '<b>Joseph Haydn</b> (1732–1809)', '<b>Schubert / Liszt</b>'
                     continue
-                if _PERSON_RE.match(name) and tail and composer is None and len(tail) <= 120:
-                    program.append((name, tail))          # '<b>Charles Ives</b> Unanswered Question' on one line
+                if _PERSON_RE.match(name) and tail and composer is None and len(tail) <= 120 and \
+                        not _misspelt_role(tail):
+                    program.append((name, _work_text(tail)))   # '<b>Charles Ives</b> Unanswered Question' on one line
                     continue
                 composer = None
                 continue
+            credits.extend(('Performer', n) for n in pending if not _NN_RE.match(n))
+            pending = []
             if re.match(r'^\(?\s*(geb\.|\*)?\s*\d{4}\b', text) or re.match(r'^(konzert)?dauer\b', text, re.I) or \
                     re.match(r'^(ur|erst|schweizer erst|europäische erst)aufführung\b|^auftragswerk|^kompositionsauftrag', text, re.I):
                 continue                                  # '(geb. 1972)', 'Konzertdauer: ca. 95 min', 'Uraufführung'
@@ -339,13 +422,28 @@ def _lineup(html):
             if m and _PERSON_RE.match(m.group(1)):        # 'Dmitrij Schostakowitsch 1906-1975' without bold
                 composer = m.group(1)
                 continue
-            if composer and len(text) <= 160 and not re.match(r'^(\d{1,2}[.:]\d{2}\s*uhr|in kooperation|pause)', text, re.I):
+            if composer and len(text) <= 160 and not _SKIP_LINE_RE.match(text):
+                same = bool(program) and program[-1][0] == composer
+                child = _CHILD_RE.match(text)
+                if child:                                 # 'Moments musicaux, D 780' + '— Nr. 1 in C-dur, Moderato'
+                    if same and len(program[-1][1]) + len(text) < 280:
+                        sep = '; ' if children == len(program) else ': '
+                        program[-1] = (composer, f"{program[-1][1].rstrip(' :')}{sep}{_work_text(child.group(1))}")
+                        children = len(program)
+                    continue
+                children = None
                 if re.match(r'^[a-zäöüéè]', text):           # 'Seis diferencias' + 'sobre «O gloriosa Domina»'
-                    if program and program[-1][0] == composer and len(program[-1][1]) + len(text) < 200:
+                    if same and len(program[-1][1]) + len(text) < 200:
                         program[-1] = (composer, f'{program[-1][1]} {text}')
                     continue
-                program.append((composer, text))
-    return credits, program
+                if same and program[-1][1].endswith(':'):
+                    if _CONTINUED_RE.match(text):         # 'Mazurkas op. 41:' + 'Nr. 1 cis-Moll, Nr. 2 e-Moll'
+                        program[-1] = (composer, f'{program[-1][1]} {_work_text(text)}')
+                        continue
+                    program.pop()                         # 'Aus den «Liedern ohne Worte»:' heads the works below
+                program.append((composer, _work_text(text)))
+    credits.extend(('Performer', n) for n in pending if not _NN_RE.match(n))
+    return credits, [(c, t) for c, t in program if t]
 
 
 def _details(url):
@@ -402,6 +500,31 @@ def _previous():
     return out
 
 
+def _suspect(old):
+    """True when a programme kept from the previous feed has a line that an earlier version of
+    _lineup misread (a role read as a work, a heading ending in ':', '— Nr. 1', '| CH', 't'):
+    its page is read again first."""
+    for p in (old or {}).get('program') or []:
+        t = clean(p.get('title') if isinstance(p, dict) else '')
+        if t and (len(t) <= 2 or _is_role_label(t) or _misspelt_role(t) or
+                  _CHILD_RE.match(t) or t.endswith(':') or _SKIP_LINE_RE.match(t) or _work_text(t) != t):
+            return True
+    return False
+
+
+def _reused_program(old):
+    """The programme of the previous feed, with the lines that are clearly not works left out."""
+    out = []
+    for p in old.get('program') or []:
+        if not isinstance(p, dict):
+            continue
+        c, t = clean(p.get('composer')), clean(p.get('title'))
+        if t and (_SKIP_LINE_RE.match(t) or _is_role_label(t) or _misspelt_role(t)):
+            continue
+        out.append((c, _work_text(t) if t else t))
+    return out
+
+
 def _title(it):
     if it['subtitle'] and SERIES_RE.match(it['subtitle']):
         return it['title'], it['subtitle']
@@ -427,8 +550,12 @@ def fetch():
     previous = _previous() if items else {}
     # new dates first (the orchestra's own concerts last: the `sob` reader usually has them, and
     # build.py keeps its record), then the soonest known ones again to pick up changes
-    order = sorted(items, key=lambda it: ((it['url'], it['day'].isoformat()) in previous,
-                                          bool(it['ticket'] and SOB_TICKETS.search(it['ticket'])), it['day']))
+    # (and before those, known dates whose kept programme has a line misread by an earlier version)
+    def known(it):
+        old = previous.get((it['url'], it['day'].isoformat()))
+        return old is not None and not _suspect(old)
+
+    order = sorted(items, key=lambda it: (known(it), bool(it['ticket'] and SOB_TICKETS.search(it['ticket'])), it['day']))
     fetched = {}
     for it in order:
         if requests_left() <= 0:
@@ -450,7 +577,7 @@ def fetch():
                 events.append(make_event(
                     KEY, it['sid'], title, old['start'], durationMin=old.get('durationMin'),
                     city=old.get('city') or 'Basel', venueName=old.get('venueName') or VENUE,
-                    type=old.get('type'), series=series, credits=old.get('credits'), program=old.get('program'),
+                    type=old.get('type'), series=series, credits=old.get('credits'), program=_reused_program(old),
                     ticketUrl=it['ticket'] or old.get('ticketUrl'), url=it['url'],
                     status='cancelled' if it['cancelled'] or old.get('status') == 'cancelled' else 'scheduled'))
             except ValueError as err:
