@@ -2,7 +2,9 @@
 // a full-screen page (the dock / tab bar is hidden, see css/parity-personal.css) with its own top
 // bar (back ‹ · "Assistant (beta)" · history), "Just say what you're after.", four intent cards with
 // tappable 「example」 prompts, the dashed concert-code / feedback card, and a bottom panel: compact
-// now-playing row, the input, and "Runs on this device" (Sheng's quota line) beside the round ↑.
+// "Now listening" row, the input, and "Runs on this device" (Sheng's quota line) beside the round ↑.
+// Recordings open in Apple Music Classical / Apple Music (applemusic.js) — Klang plays no audio —
+// and can be saved to the Library (ui/save.js).
 // Unlike Sheng it is fully local: answers come from
 // js/assistant-engine.js (rules over Klang's own data) — nothing typed here leaves the device,
 // and there is no question quota. Conversations are kept for 3 days (store.saveAssistantConversation).
@@ -14,12 +16,12 @@ import { todayKey, relDayLabel, timeOf, dayKeyOf } from '../time.js';
 import { href, concertCard, avatar } from '../ui/components.js';
 import { openSheet } from '../ui/sheet.js';
 import { matchWorkTracks } from '../ui/listen.js';
-import { openPlayer } from '../ui/player.js'; // also lets the full player record each queue for "Up next"
+import { openSaveSheet } from '../ui/save.js';
 import { goBack } from '../main.js';
+import { searchAlbums, albumTracks } from '../music.js';
 import {
-  searchAlbums, albumTracks, player, playerState,
-  classicalAlbumURL, classicalSearchURL, appleMusicSearchURL, ITUNES_CREDIT,
-} from '../music.js';
+  workPiece, albumPiece, listenLink, onListening, clearListening, playAppName, searchURL, APPLE_CREDIT,
+} from '../applemusic.js';
 import { answer, saveFeedback } from '../assistant-engine.js';
 
 const ACTIVE_KEY = 'klang.assistant.active';
@@ -131,8 +133,8 @@ export function render() {
   const main = h('div', { class: 'as-main' });
 
   // Bottom panel like Sheng's (the tab bar is hidden on this full-screen page): a compact
-  // now-playing row (Paused · equalizer · play · expand ⌃), the input, then the "quota" line
-  // (Klang has no quota — it says where answers come from) beside the round ↑ button.
+  // "Now listening" row (the piece last opened in Apple Music · ⏭ next · ✕), the input, then the
+  // "quota" line (Klang has no quota — it says where answers come from) beside the round ↑ button.
   const input = h('textarea', { class: 'as-input', rows: '1', placeholder: PLACEHOLDER, 'aria-label': 'Ask the assistant', enterkeyhint: 'send', autocomplete: 'off' });
   const sendBtn = h('button', { class: 'as-send', type: 'submit', 'aria-label': 'Send', disabled: true }, icon('send', 18));
   const composer = h('form', { class: 'as-composer', onsubmit: (e) => { e.preventDefault(); send(input.value); } },
@@ -160,38 +162,38 @@ export function render() {
 
   root.append(top, main, panel);
 
-  // ---------- compact now playing (above the input) ----------
+  // ---------- compact "Now listening" (above the input) ----------
+  // The piece last opened in Apple Music from Klang: tap it to open it again, ⏭ opens the next
+  // piece of a Play-all run, ✕ clears the row.
   let npSig = '';
-  function paintNowPlaying(st) {
-    const sig = st.track ? `${st.track.id}|${st.playing}` : '';
+  function paintNowListening(L) {
+    const cur = L.current;
+    const sig = cur ? `${cur.id}|${L.index}|${L.queue.length}|${playAppName()}` : '';
     if (sig === npSig) return;
     npSig = sig;
-    npRow.hidden = !st.track;
-    root.classList.toggle('has-np', !!st.track);
-    if (!st.track) {
+    npRow.hidden = !cur;
+    root.classList.toggle('has-np', !!cur);
+    if (!cur) {
       clear(npRow);
       return;
     }
-    const t = st.track;
-    const playBtn = h('button', {
-      class: 'as-np-btn', type: 'button', 'aria-label': st.playing ? 'Pause' : 'Play',
-      onclick: (e) => { e.stopPropagation(); player.toggle(); },
-    }, icon(st.playing ? 'pause' : 'play', 17));
-    const expand = h('button', {
-      class: 'as-np-btn faint', type: 'button', 'aria-label': 'Open the player',
-      onclick: (e) => { e.stopPropagation(); openPlayer(); },
-    }, h('span', { class: 'as-up' }, icon('down', 18)));
-    clear(npRow).append(
-      t.artwork ? h('img', { class: 'as-np-art', src: t.artwork, alt: '' }) : h('span', { class: 'as-np-art ph' }, icon('music', 14)),
+    const open = listenLink(cur, [
+      cur.artwork ? h('img', { class: 'as-np-art', src: cur.artwork, alt: '' }) : h('span', { class: 'as-np-art ph' }, icon('music', 14)),
       h('span', { class: 'as-np-meta' },
-        h('span', { class: 'as-np-t' }, t.title || ''),
-        h('span', { class: 'as-np-s' }, st.playing ? (t.artist || 'Playing') : 'Paused')),
-      h('span', { class: ['as-eq', st.playing && 'on'], 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i')),
-      playBtn,
-      expand);
+        h('span', { class: 'as-np-t' }, cur.title || ''),
+        h('span', { class: 'as-np-s' }, [cur.artist || cur.composer, playAppName()].filter(Boolean).join(' · '))),
+    ], { cls: 'as-np-main', queue: L.queue, index: L.index, label: `Now listening: ${cur.title}. Open it again in ${playAppName()}` });
+    // a real link, like the mini player's ⏭ (iOS hands a tapped link to the app most reliably)
+    const next = L.next ? listenLink(L.next, icon('forward', 17), {
+      cls: 'as-np-btn', queue: L.queue, index: L.index + 1, label: `Next: ${L.next.title}, in ${playAppName()}`,
+    }) : null;
+    const close = h('button', {
+      class: 'as-np-btn faint', type: 'button', 'aria-label': 'Clear Now listening', onclick: () => clearListening(),
+    }, icon('close', 15));
+    npRow.replaceChildren(...[open, next, close].filter(Boolean));
   }
-  npRow.addEventListener('click', () => openPlayer());
-  unsubs.push(player.subscribe(paintNowPlaying));
+  // after the tap that changed it has been handled (the tapped link must stay in the page)
+  unsubs.push(onListening((L) => setTimeout(() => { if (alive) paintNowListening(L); }, 0)));
 
   // ---------- back: a conversation returns to the start; the start leaves the Assistant ----------
   function leave() {
@@ -208,7 +210,6 @@ export function render() {
       : h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Back', onclick: leave }, icon('back', 20)));
     clear(main).append(conv ? thread() : intro());
     paintPlaceholder();
-    paintPlaying(playerState());
   }
 
   function intro() {
@@ -229,12 +230,15 @@ export function render() {
     return h('div', { class: 'as-thread' }, msgs.map((m, i) => message(m, i === lastBot)));
   }
 
+  // Answers saved while Klang still played 30-second clips say so; Listen now opens the full piece.
+  const botText = (t) => String(t || '').replace(/tap Listen for 30-second previews\./, `tap Listen to play them in full in ${playAppName()}.`);
+
   function message(m, isLast) {
     if (m.role === 'user') return h('div', { class: 'as-msg user' }, h('div', { class: 'as-bubble' }, m.text));
     const d = m.data || {};
     return h('div', { class: 'as-msg bot' },
       h('div', { class: 'as-who' }, icon('sparkle', 12), 'Assistant'),
-      h('div', { class: 'as-bubble' }, m.text),
+      h('div', { class: 'as-bubble' }, botText(m.text)),
       results(d.items || [], d),
       d.link && h('button', { class: 'btn small as-open', type: 'button', onclick: () => openInConcerts(d.link) }, icon('calendar', 14), d.link.label),
       isLast && d.followUps?.length ? h('div', { class: 'as-suggest-row' },
@@ -266,15 +270,15 @@ export function render() {
     return out.childNodes.length ? out : null;
   }
 
-  // ---------- recordings (iTunes Search: previews streamed only, with Apple credit + links) ----------
+  // ---------- recordings (iTunes Search metadata; Listen opens Apple Music, with Apple credit) ----------
   function recordingBlock(d) {
     const term = d.term;
     const work = d.workId ? repo.work(d.workId) : null;
     const row = h('div', { class: 'h-scroll as-rec-row', 'aria-busy': 'true' },
       [0, 1, 2].map(() => h('div', { class: 'album-card' }, h('div', { class: 'art skeleton' }), h('div', { class: 'skeleton as-skel-line' }))));
-    const credit = h('p', { class: 'listen-credit' }, ITUNES_CREDIT, ' ',
-      h('a', { href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, 'Apple Music Classical'), ' · ',
-      h('a', { href: appleMusicSearchURL(term), target: '_blank', rel: 'noopener' }, 'Apple Music'));
+    const credit = h('p', { class: 'listen-credit' }, APPLE_CREDIT, ' ',
+      h('a', { href: searchURL(term, 'classical'), target: '_blank', rel: 'noopener' }, 'Apple Music Classical'), ' · ',
+      h('a', { href: searchURL(term, 'music'), target: '_blank', rel: 'noopener' }, 'Apple Music'));
     const wrap = h('div', { class: 'as-rec' },
       h('div', { class: 'as-rec-head' }, icon('album', 15), h('span', {}, d.label ? `Recordings · ${d.label}` : 'Recordings')),
       row, credit);
@@ -294,77 +298,85 @@ export function render() {
       if (!albums.length) {
         row.replaceChildren(h('div', { class: 'as-rec-msg' },
           h('p', {}, 'No recordings found on Apple Music for this search.'),
-          h('a', { class: 'btn small', href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), 'Search Apple Music Classical')));
+          h('a', { class: 'btn small', href: searchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), `Search ${playAppName()}`)));
         return;
       }
       row.replaceChildren(...albums.slice(0, 10).map((a) => albumCard(a, work)));
-      paintPlaying(playerState());
     }
     load();
     return wrap;
   }
 
+  // A recording card: the cover and Listen open the work on this album (album + its first track
+  // once known; the album until then) in Apple Music Classical / Apple Music; ＋ opens Save.
   function albumCard(a, work) {
-    const listen = h('button', { class: 'btn small primary as-listen', type: 'button', dataset: { album: String(a.id) } }, icon('play', 13), 'Listen');
-    listen.addEventListener('click', () => playAlbum(a, work, listen));
-    const lib = h('button', { class: 'icon-btn as-lib', type: 'button' });
-    const paintLib = () => {
-      const on = store.hasAlbum(a.id);
-      lib.replaceChildren(icon(on ? 'check' : 'plus', 15));
-      lib.classList.toggle('active', on);
-      lib.setAttribute('aria-label', on ? 'Remove from library' : 'Add to library');
-    };
-    lib.addEventListener('click', () => {
-      const on = store.toggleAlbum({ id: a.id, title: a.title, artist: a.artist, artwork: a.artwork, url: a.url, year: a.year, workId: work?.id });
-      toast(on ? 'Added to your library' : 'Removed from your library');
-      paintLib();
+    const comp = work ? repo.composer(work.composerId) : null;
+    let piece = work ? workPiece(work, comp?.name, a) : albumPiece(a);
+    const label = () => `Listen to ${work ? `${work.title}, ` : ''}${a.title}${a.artist ? ` — ${a.artist}` : ''}, in ${playAppName()}`;
+    const coverLink = () => listenLink(piece,
+      a.artwork ? h('img', { class: 'art', src: a.artwork, alt: '', loading: 'lazy' }) : h('div', { class: 'art' }),
+      { cls: 'as-art', label: label() });
+    const listenBtn = () => listenLink(piece, [icon('play', 13), 'Listen'], { cls: 'btn small primary as-listen', label: label() });
+    let cover = coverLink();
+    let listen = listenBtn();
+    const save = h('button', {
+      class: 'icon-btn as-lib', type: 'button',
+      onclick: (e) => { e.stopPropagation(); openSaveSheet(piece); },
     });
-    paintLib();
-    return h('div', { class: 'album-card as-album' },
-      h('a', { href: classicalAlbumURL(a.id), target: '_blank', rel: 'noopener', 'aria-label': `${a.title} in Apple Music Classical` },
-        a.artwork ? h('img', { class: 'art', src: a.artwork, alt: '', loading: 'lazy' }) : h('div', { class: 'art' })),
+    save.paint = () => {
+      const on = store.hasAlbum(a.id) || store.userPlaylists().some((pl) => store.isInPlaylist(pl.id, piece.id));
+      save.replaceChildren(icon(on ? 'check' : 'plus', 15));
+      save.classList.toggle('active', on);
+      save.setAttribute('aria-label', on ? `Saved — change where ${a.title} is saved` : `Save ${a.title} to your Library`);
+    };
+    save.paint();
+    const card = h('div', { class: 'album-card as-album', dataset: { album: String(a.id) } },
+      cover,
       h('div', { class: 't' }, a.title),
       h('div', { class: 's' }, [a.artist, a.year].filter(Boolean).join(' · ')),
-      h('div', { class: 'as-album-actions' }, listen, lib));
+      h('div', { class: 'as-album-actions' }, listen, save));
+    // When the card scrolls into view, find the work's first track so Listen opens that piece.
+    if (work) {
+      whenVisible(card, async () => {
+        try {
+          const { album, tracks } = await albumTracks(a.id);
+          const m = matchWorkTracks(work, tracks || []);
+          if (!m || !alive) return; // can't tell which tracks: keep the album link
+          piece = workPiece(work, comp?.name, { ...a, artwork: a.artwork || album?.artwork }, m.tracks[0]);
+          const c = coverLink();
+          const l = listenBtn();
+          cover.replaceWith(c);
+          listen.replaceWith(l);
+          cover = c;
+          listen = l;
+          save.paint();
+        } catch { /* offline: the album link still works */ }
+      });
+    }
+    return card;
   }
 
-  async function playAlbum(a, work, btn) {
-    const st = playerState();
-    if (st.track && String(st.track.albumId) === String(a.id)) {
-      player.toggle();
+  // Track lookups only for cards on screen (iTunes allows ~20 requests a minute).
+  const io = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        e.target.onVisible?.();
+      }
+    })
+    : null;
+  function whenVisible(el, fn) {
+    if (!io) {
+      fn();
       return;
     }
-    btn.disabled = true;
-    try {
-      const { album, tracks } = await albumTracks(a.id);
-      const withPreview = tracks.filter((t) => t.preview);
-      const m = work ? matchWorkTracks(work, withPreview) : null;
-      const list = (m ? m.tracks : withPreview).map((t) => ({ ...t, albumId: a.id, url: t.url || album?.url || a.url }));
-      if (!list.length) {
-        toast('No previews for this album — open it in Apple Music');
-        return;
-      }
-      player.play(list[0], list);
-    } catch (err) {
-      toast(`Couldn’t load the previews${err?.message ? ` — ${err.message}` : ''}`);
-    } finally {
-      btn.disabled = false;
-    }
+    el.onVisible = fn;
+    io.observe(el);
   }
-
-  function paintPlaying(st) {
-    for (const btn of root.querySelectorAll('.as-listen')) {
-      const on = !!st.track && String(st.track.albumId) === btn.dataset.album && st.playing;
-      btn.replaceChildren(icon(on ? 'pause' : 'play', 13), on ? 'Pause' : 'Listen');
-      btn.classList.toggle('on', on);
-    }
-  }
-  let lastSig = '';
-  unsubs.push(player.subscribe((st) => {
-    const sig = `${st.track?.albumId ?? ''}|${st.playing}`;
-    if (sig === lastSig) return;
-    lastSig = sig;
-    paintPlaying(st);
+  unsubs.push(() => io?.disconnect());
+  unsubs.push(store.subscribe((topic) => {
+    if (topic === 'library') root.querySelectorAll('.as-lib').forEach((b) => b.paint?.());
   }));
 
   // ---------- actions ----------
@@ -465,7 +477,6 @@ export function render() {
     if (!alive || conv !== c || !thinking.isConnected) return;
     thinking.replaceWith(message(botMsg, true));
     paintPlaceholder();
-    paintPlaying(playerState());
   }
 
   // ---------- history sheet (like Sheng: last 3 days, Done, can't be recovered) ----------

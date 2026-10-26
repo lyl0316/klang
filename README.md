@@ -16,25 +16,26 @@ python3 tools/serve.py
 
 Then open <http://localhost:8765>. The server turns caching off, so edits show up on reload.
 
-To run the tests, open `tests/test.html` (locally <http://localhost:8765/tests/test.html>). There are 24, covering:
+To run the tests, open `tests/test.html` (locally <http://localhost:8765/tests/test.html>). There are 30, covering:
 - the demo data: city counts, and no venue holding two concerts at once;
 - Swiss time handling and city matching;
 - calendar import/export and JSON feed import;
 - the local assistant;
-- favourites, library, hidden concerts, reminders, marks, and backup and restore.
+- favourites, library, hidden concerts, reminders, marks, and backup and restore;
+- listening: Apple Music Classical / Apple Music links, Now listening, your own playlists, and listens on the timeline.
 
 There's no build step and no dependencies: plain HTML, CSS and JavaScript modules.
 
 ## What's in it
 
-Klang follows Sheng's layout: five tabs, plus a dock with the mini player. As you scroll, the dock collapses into one pill: [current tab] [mini player] [search]. The colours are Sheng's dark palette, measured from its screenshots; there's also a light mode.
+Klang follows Sheng's layout: five tabs, plus a dock with the mini player, which shows what you're listening to in Apple Music Classical. As you scroll, the dock collapses into one pill: [current tab] [mini player] [search]. The colours are Sheng's dark palette, measured from its screenshots; there's also a light mode.
 
 | Tab | What it does |
 |---|---|
 | **Discover** | Album collage from Apple's Swiss classical chart, an editorial hero, **Concerts** and **Assistant** buttons, **Today's Pick** (a daily masonry of works and programmes), **Widely Loved** (good for newcomers: Solo, Symphonic, Chamber, Vocal) and **New on Record**. The profile button opens **Me**. |
 | **Concerts** | Sheng's Concerts tab for Switzerland. See below. |
-| **Activity** | Personal only: My concerts (Attended, Saved, Going), My Favorites (composers, artists, works), Following (venues and cities) and a timeline of your own activity. A bell opens in-app notifications. |
-| **Library** | Albums you add from Listen, concert playlists ("Add playlist to my Library"), and Recently added. |
+| **Activity** | Personal only: My concerts (Attended, Saved, Going), My Favorites (composers, artists, works), Following (venues and cities) and a timeline of your own activity, including the pieces you open in Apple Music Classical. A bell opens in-app notifications. |
+| **Library** | **Albums** you save, **your own playlists of pieces** (New playlist…, add from any Save button, reorder, rename, delete), concert and article playlists ("Add playlist to my Library"), and Recently added. Play and Play all open them in full in Apple Music Classical. |
 | **Search** | A local **Assistant** ("Just say what you're after"). Type "Mahler in Zurich in November", "chamber music in Geneva this weekend" or "a slower Goldbergs" and it answers with concerts, works, people or recordings. It runs on the device, with no AI service and no quota. |
 
 The **Concerts** tab has:
@@ -50,18 +51,18 @@ The **Concerts** tab has:
 1. Back and Share. The share sheet also has Copy link, Add to calendar (an .ics file with reminders) and Hide.
 2. Header, then the action tiles: Listen, Program, Notes, Podcasts, Ticket.
 3. Save + Going, or Save + Attended (with a private review) once the concert has started.
-4. A **Listen** carousel with one recording per work, Versions, Play all, and "Add playlist to my Library".
+4. A **Listen** carousel with one recording per work. **Listen** opens that work (the album at its first movement) in Apple Music Classical, where it plays in full. **Versions** picks another recording, and **Save** adds the album to your Library or the piece to one of your playlists. **Play all** opens the first work with the rest of the programme queued: ⏭ in the mini player opens the next one. "Add playlist to my Library" keeps the whole programme.
 5. **Program**, then a **Program book**: an original note for each work, all 104 in the repertoire, with a "Listen for" line and a full-screen reader.
 6. **Podcasts** (Apple Podcasts episodes), **Featured artists**, and Report a problem.
 
 **Other pages:**
-- **Work:** Listening guide, Recordings and Concerts.
+- **Work:** Listening guide, Recordings (tap one to play it in full in Apple Music Classical; + saves it) and Concerts.
 - **Composer:** Read Bio, Latest releases, Popular among listeners, Explore by period, genre or related composers, Editorials and Swiss concerts.
 - **Artist:** "On tour" route across Swiss cities, plus a Full Itinerary page.
 - **Venue and city pages.**
 - **Editorials:** original articles with a Swiss angle, including recording and concert embeds.
-- **Me:** Push preferences (in-app notifications and calendar alarms), Your region, Hidden concerts, New Year mode, appearance, and Data & imports.
-- **Full-screen player:** artwork-tinted background, info mode (Track, Composer, Performers, Work, Album, Track no.), Up next, "Post to your activity", and AirPlay in Safari.
+- **Me:** Push preferences (in-app notifications and calendar alarms), Your region, Hidden concerts, New Year mode, appearance, **Play in** (Apple Music Classical or Apple Music), and Data & imports.
+- **Now listening:** tap the mini player for a full-height view in Sheng's player style (artwork-tinted background). It shows the piece you last opened, with Play in Apple Music Classical, Save, Whole album, the Work, Album and Composer, and Up next for the rest of a Play-all run. Klang itself plays no sound.
 
 Community features are intentionally left out: other users, following people, comments and reactions. Everything personal stays on this device.
 
@@ -91,7 +92,7 @@ JSON feed format, either an array or `{ "concerts": [...] }`:
 ] }
 ```
 
-Your marks, follows, imports and posted listens are stored only in this browser (localStorage). **Me → Back up & import data** makes a backup file and restores it.
+Your marks, follows, imports, Library (albums and playlists) and listening history are stored only in this browser (localStorage). **Me → Back up & import data** makes a backup file and restores it.
 
 ## Composer portraits
 
@@ -107,14 +108,18 @@ These are the access options that were checked (October 2026):
 
 | Option | Cost | Used here? |
 |---|---|---|
-| iTunes Search / Lookup API (`itunes.apple.com/search`, `/lookup`, `country=CH`) | Free, no key, ~20 requests/min | **Yes.** Recordings ("Versions"), track lists, 30-second previews, podcast episodes, and the Swiss classical chart (RSS). |
-| Apple Music Classical web links (`classical.music.apple.com/ch/...`) | Free | **Yes.** "Apple Music Classical" links open the Classical app on iPhone. |
+| iTunes Search / Lookup API (`itunes.apple.com/search`, `/lookup`, `country=CH`) | Free, no key, ~20 requests/min | **Yes.** Recordings ("Versions"), track lists (the track ids for exact links), podcast episodes, and the Swiss classical chart (RSS). Metadata only. |
+| Apple Music Classical and Apple Music links (`classical.music.apple.com/ch/album/<album>?i=<track>`, `music.apple.com/ch/...`) | Free | **Yes.** Every Listen, Play and Play all is one of these links. On an iPhone it opens the exact piece, or the whole album, in the Apple Music Classical app (or Apple Music, chosen in **Me → Play in**), which plays it in full with your own subscription. Elsewhere it opens Apple's web player. |
 | Apple Music API / MusicKit on the Web (classical fields like `workName` and `movementName`; full playback and library access for subscribers) | Requires the Apple Developer Program, **US$99/year** | No |
 | A public Apple Music Classical API | Doesn't exist | — |
 
+How listening works, the free way:
+- **Klang plays no audio.** Nothing is streamed, downloaded or cached by Klang; the music plays in Apple's apps.
+- **Play all** opens the first piece and keeps the rest as "Now listening" on this device: the mini player's ⏭ opens the next piece. (Apple's links can't hand a whole queue to the app.)
+- **Save** keeps albums and pieces in Klang's own Library on this device. Adding to your Apple Music library would need MusicKit (paid), so it isn't done.
+
 Apple's terms are followed:
-- Previews are streamed, never downloaded or cached.
-- They appear with a link to Apple Music and the credit "provided courtesy of iTunes".
+- Recording details appear with links to Apple Music Classical and Apple Music, and are credited to Apple's iTunes Search API.
 - Only search metadata is cached, for 7 days.
 
 **Before a public launch,** add Apple's official "Listen on Apple Music" badge from Apple's marketing tools, and the trademark credit.
@@ -125,17 +130,19 @@ Apple's terms are followed:
 index.html, manifest.webmanifest, sw.js, icon.svg, icon-180.png
 css/app.css, theme.css, shell.css   base styles, typography, app shell
 css/parity-*.css                    per-area Sheng parity styles; parity-palette.css is the dark palette
-js/main.js            router, tab bar, collapsing dock, mini player
+css/listening.css                   mini player and the Now-listening view (the Save sheet is in shell.css)
+js/main.js            router, tab bar, collapsing dock, mini player (Now listening)
 js/time.js            Swiss time helpers (Europe/Zurich, DST)
 js/util.js            DOM helper, icons, storage, toast
-js/store.js           marks, follows, preferences, library, imports, backup (localStorage)
+js/store.js           marks, follows, preferences, library and playlists, imports, backup (localStorage)
 js/repo.js            data access, queries and counts
-js/music.js           iTunes Search/Lookup, chart, podcasts, preview player
+js/music.js           iTunes Search/Lookup, chart, podcasts (metadata only)
+js/applemusic.js      Apple Music Classical / Apple Music links, pieces, Now listening (no audio)
 js/ics.js             calendar export/import, JSON feeds
 js/assistant-engine.js  the local Assistant's parser and answers
 js/data/              cities (47), venues, repertoire (104 works), invented names, demo generator
 js/content/           programme notes (guides*.js), composer bios, editorials, portraits
-js/ui/                shared components, bottom sheet, Listen section, full-screen player
+js/ui/                shared components, bottom sheet, Listen section and Versions, Save sheet, Now-listening view
 js/views/             discover, concerts, concert, entity (work/composer/artist/venue/city),
                       editorial, activity, library, assistant, me, settings (Data & imports), map
 tests/test.html       unit tests (run in a browser)

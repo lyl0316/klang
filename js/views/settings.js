@@ -5,7 +5,7 @@ import { h, icon, toast, download, plural, storage } from '../util.js';
 import * as store from '../store.js';
 import * as repo from '../repo.js';
 import { parseICS, parseFeed } from '../ics.js';
-import { ITUNES_CREDIT } from '../music.js';
+import { APPLE_CREDIT, searchURL } from '../applemusic.js';
 import { rowItem, toggle, segmented, chip } from '../ui/components.js';
 import { todayKey } from '../time.js';
 
@@ -344,10 +344,10 @@ function backupGroup() {
 
 function aboutGroup() {
   const appleRow = rowItem({
-    title: 'Music previews',
-    subtitle: `${ITUNES_CREDIT} Apple Music and Apple Music Classical are trademarks of Apple Inc.`,
+    title: 'Listening',
+    subtitle: `Klang plays no audio. ${APPLE_CREDIT} Apple Music and Apple Music Classical are trademarks of Apple Inc.`,
     leadIcon: 'music',
-    to: 'https://music.apple.com/ch/',
+    to: searchURL('classical'), // opens the app chosen in Me → Play in
   });
   appleRow.target = '_blank';
   appleRow.rel = 'noopener';

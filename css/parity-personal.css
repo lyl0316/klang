@@ -87,6 +87,36 @@ body:has(#view .as-page) {
 .lib-item .main { min-height: 66px; }
 .lib-item .t { font-size: 15.5px; font-weight: 400; }
 .lib-item .s { font-size: 13px; }
+/* "New playlist…" (Apple Music's red ＋ row at the top of Playlists) */
+.lib-new .lib-new-ic { background: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); color: var(--accent-strong); }
+.lib-new .t { color: var(--accent-strong); font-weight: 500; }
+.lib-name-form { padding: 4px 0 10px; }
+
+/* album / playlist sheets: Play and Play all open Apple Music Classical / Apple Music */
+.lib-play-in { margin: 8px 12px 0; text-align: center; font-size: 12px; line-height: 1.4; color: var(--text-3); }
+.lib-caption-slot:empty, .lib-actions:empty { display: none; }
+.lib-sheet .pl-none { text-align: center; font-size: 13.5px; color: var(--text-3); }
+.lib-actions .btn.small { gap: 6px; }
+.lib-sheet-foot { gap: 10px; }
+.lib-tracks .track-row a.tt { color: inherit; }
+.lib-tracks .track-row.current a.tt { color: var(--accent); }
+.lib-tracks .track-row .tt .ta { display: block; }
+.lib-tracks .track-row.current .play { background: var(--accent); color: #fff; }
+.lib-tsave, .pl-save {
+  width: 30px; height: 30px; flex: none; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center; background: none; color: var(--text-3);
+}
+.lib-tsave:active, .pl-save:active { background: var(--surface-2); }
+a.pl-main { color: inherit; }
+.pl-item.editing { gap: 6px; }
+.pl-move, .pl-remove {
+  width: 32px; height: 32px; flex: none; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center; background: var(--surface-2); color: var(--text-2);
+}
+.pl-move[disabled] { opacity: 0.3; pointer-events: none; }
+.pl-up { display: inline-flex; transform: rotate(180deg); }
+.pl-remove { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent-strong); }
+.pl-delete.armed { background: var(--accent); border-color: transparent; color: #fff; }
 
 /* ---------- Me / Settings (me-01…05) ---------- */
 .me-profile { gap: 8px; padding: 18px 0 22px; }
@@ -122,7 +152,6 @@ body:has(#view .as-page) {
 .me-s { font-size: 12px; }
 .me-right { gap: 5px; font-size: 16px; letter-spacing: -0.01em; }
 .me-right > .icon:last-child { color: var(--text-3); opacity: 0.85; }
-.me-ok { font-size: 14px; color: var(--text-3); }
 .me-row.tone-accent .me-right > .icon { color: var(--accent); opacity: 0.6; }
 .me-gfoot { margin: 8px 16px 0; font-size: 12px; }
 .me-version { margin: 22px 0 0; font-size: 11.5px; }
@@ -138,11 +167,11 @@ body:has(#view .as-page) {
 .me-region .me-radio .me-t { font-size: 15.5px; }
 .me-region-foot { margin-top: 10px; }
 /* iOS 26-style switches (wide track, pill knob) on my pages */
-.me .switch, .np-queue .switch { width: 62px; height: 28px; }
-.me .switch span, .np-queue .switch span { border-radius: 14px; background: color-mix(in srgb, var(--text) 30%, var(--bg)); }
-.me .switch span::after, .np-queue .switch span::after { top: 2px; left: 2px; width: 37px; height: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
-.me .switch input:checked + span, .np-queue .switch input:checked + span { background: var(--accent); }
-.me .switch input:checked + span::after, .np-queue .switch input:checked + span::after { transform: translateX(21px); }
+.me .switch { width: 62px; height: 28px; }
+.me .switch span { border-radius: 14px; background: color-mix(in srgb, var(--text) 30%, var(--bg)); }
+.me .switch span::after { top: 2px; left: 2px; width: 37px; height: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.me .switch input:checked + span { background: var(--accent); }
+.me .switch input:checked + span::after { transform: translateX(21px); }
 
 /* ---------- Assistant (assistant-01…03): full-screen page, no tab bar ---------- */
 body:has(#view .as-page) .dock { display: none; }
@@ -169,7 +198,9 @@ body:has(#view .as-page) .dock { display: none; }
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
 }
 .as-np[hidden] { display: none; }
-.as-np { display: flex; align-items: center; gap: 10px; padding: 6px 0 8px; cursor: pointer; }
+.as-np { display: flex; align-items: center; gap: 6px; padding: 6px 0 8px; }
+.as-np-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; color: inherit; border-radius: 8px; }
+.as-np-main:active { opacity: 0.7; }
 .as-np-art { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; flex: none; background: var(--surface-3); display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
 .as-np-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .as-np-t { font-family: var(--serif); font-style: italic; font-size: 14px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -177,14 +208,9 @@ body:has(#view .as-page) .dock { display: none; }
 .as-np-btn { width: 34px; height: 34px; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--text); }
 .as-np-btn.faint { color: var(--text-3); }
 .as-np-btn:active { background: var(--surface-2); }
-.as-up { display: inline-flex; transform: rotate(180deg); }
-.as-eq { display: inline-flex; align-items: flex-end; gap: 2px; width: 18px; height: 14px; flex: none; margin-right: 2px; }
-.as-eq i { width: 3px; border-radius: 1px; background: var(--accent-strong); }
-.as-eq i:nth-child(1) { height: 7px; } .as-eq i:nth-child(2) { height: 12px; } .as-eq i:nth-child(3) { height: 5px; } .as-eq i:nth-child(4) { height: 10px; }
-.as-eq.on i { animation: as-eq 0.9s ease-in-out infinite alternate; }
-.as-eq.on i:nth-child(2) { animation-delay: -0.3s; } .as-eq.on i:nth-child(3) { animation-delay: -0.6s; } .as-eq.on i:nth-child(4) { animation-delay: -0.45s; }
-@keyframes as-eq { from { height: 3px; } to { height: 14px; } }
-@media (prefers-reduced-motion: reduce) { .as-eq.on i { animation: none; } }
+/* recording cards: the cover and Listen are links into Apple Music Classical / Apple Music */
+.as-album .as-art { display: block; border-radius: 10px; }
+.as-album .as-art:active { opacity: 0.85; }
 .as-panel .as-composer {
   position: static; transform: none; width: auto; left: auto; bottom: auto;
   display: block; padding: 4px 0 0; border: 0; border-radius: 0; background: none; box-shadow: none;
@@ -208,7 +234,7 @@ body.dock-collapsed .as-panel .as-composer { bottom: auto; }
 .as-hist-empty p { font-size: 13px; color: var(--text-2); }
 .as-hist-sheet .sheet-footer { border-top: 0; }
 
-/* ---------- Player (player-01…05) ---------- */
+/* ---------- Now listening frame (Sheng's player-01…03 look; see listening.css) ---------- */
 .np-top { justify-content: center; height: 30px; }
 .np-grab { width: 72px; height: 26px; }
 .np-grab::before { width: 36px; height: 5px; background: rgba(255, 255, 255, 0.32); }
@@ -219,79 +245,12 @@ body.dock-collapsed .as-panel .as-composer { bottom: auto; }
 .np-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-top: 2px; }
 .np-move { font-size: 13.5px; }
 .np-perf { font-size: 13.5px; color: var(--np-text-2); }
-.np-acts { gap: 0; }
-.np-icon { width: 38px; height: 38px; }
-/* "Post to your activity" tip under ♡ ••• */
-.np-tip-slot { margin-top: 2px; }
-.np-tip { height: 32px; margin-top: 8px; padding: 0 4px 0 10px; gap: 4px; border-radius: 10px; background: rgba(28, 24, 22, 0.55); font-size: 13px; }
-.np-tip-main { display: inline-flex; align-items: center; gap: 7px; min-width: 0; white-space: nowrap; color: #fff; }
-.np-tip-main .icon { color: var(--gold); }
-.np-tip.done .np-tip-main { color: var(--np-text-2); cursor: default; }
-.np-tip.done .np-tip-main .icon { color: #5fd38d; }
-.np-tip-x { width: 26px; height: 26px; flex: none; display: inline-flex; align-items: center; justify-content: center; color: var(--np-text-3); }
-/* scrubber: a thin line with 0:00 / -0:30 */
-.np-scrub { margin-top: 24px; }
-.np-bar { height: 3px; background: rgba(255, 255, 255, 0.22); }
-.np-bar i { background: rgba(255, 255, 255, 0.9); }
-.np-times { margin-top: 7px; font-size: 11px; color: var(--np-text-3); }
-.np-transport { gap: 44px; margin: 16px 0 8px; }
-.np-tbtn { width: 56px; height: 56px; }
-.np-tbtn .icon svg { width: 27px; height: 27px; }
-.np-tbtn.big .icon svg { width: 36px; height: 36px; }
-/* volume (only where the browser can set it; iOS uses the hardware buttons) */
-.np-volume { display: flex; align-items: center; gap: 12px; margin: 10px 0 2px; color: var(--np-text-2); flex: none; }
-.np-volume input[type='range'] {
-  flex: 1; min-width: 0; height: 18px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer;
-}
-.np-volume input[type='range']::-webkit-slider-runnable-track {
-  height: 3px; border-radius: 2px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.9) var(--v, 100%), rgba(255, 255, 255, 0.22) var(--v, 100%));
-}
-.np-volume input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); }
-.np-volume input[type='range']::-moz-range-track { height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.22); }
-.np-volume input[type='range']::-moz-range-progress { height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.9); }
-.np-volume input[type='range']::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: #fff; }
 .np-credit { margin-top: 12px; font-size: 10.5px; }
-.np-bottom { padding: 22px 8px 4px; }
 .np-composer { width: 40px; height: 40px; border: 1.5px solid rgba(255, 255, 255, 0.55); background: rgba(255, 255, 255, 0.16); }
-/* ⓘ info mode (player-03) */
-.np.info .np-meta { margin-top: 18px; }
-.np.info .np-thumb { width: 60px; height: 60px; border-radius: 6px; }
-.np.info .np-title { font-size: 15.5px; }
-.np.info .np-perf { font-size: 12.5px; }
-.np-info { margin-top: 16px; }
 .np-field { margin-bottom: 11px; }
 .np-field .k { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--np-text-3); }
 .np-field .v { margin-top: 1px; font-size: 14px; color: rgba(255, 255, 255, 0.92); }
 .np-field.main .v { font-size: 15px; font-weight: 600; line-height: 1.3; color: #fff; }
-.np-chip { height: 28px; padding: 0 8px 0 11px; border-radius: 14px; background: rgba(255, 255, 255, 0.14); font-size: 12.5px; }
-.np-chip .icon { opacity: 0.6; }
-/* ••• menu (player-05): icon left, label, Share Track with its time */
-.np-menu { min-width: 236px; padding: 6px 4px; border-radius: 18px; }
-.np-mi { gap: 14px; padding: 10px 14px; font-size: 15.5px; }
-.np-mi > .icon { width: 20px; color: rgba(255, 255, 255, 0.9); }
-.np-mi small { font-size: 11.5px; margin-top: 1px; }
-.np-msep { margin: 4px 0; height: 6px; background: rgba(0, 0, 0, 0.14); }
-/* Up next sheet (player-04): Done on the left, centred title */
-.np-qsheet .sheet-header { display: grid; grid-template-columns: 76px 1fr 76px; align-items: center; padding-top: 8px; }
-.np-qsheet .sheet-header > .btn { grid-column: 1; grid-row: 1; justify-self: start; height: 34px; padding: 0 15px; border-radius: 17px; background: var(--surface-2); border: 0; font-weight: 500; }
-.np-qsheet .sheet-header .grow { grid-column: 2; grid-row: 1; text-align: center; }
-.np-qsheet .sheet-header .t { font-size: 16px; font-weight: 600; }
-.np-loop { padding: 11px 14px; border-radius: 14px; margin: 6px 0 20px; }
-.np-loop > .icon { color: #3d8bfd; }
-.np-loop .t { font-size: 15px; font-weight: 500; }
-.np-qlabel { margin: 4px 4px 8px; font-size: 14px; font-weight: 600; color: var(--text-2); letter-spacing: 0; text-transform: none; }
-.np-qrow.now { padding: 10px 10px 10px 12px; gap: 12px; }
-.np-qrow.now img, .np-qrow.now .ph { width: 38px; height: 38px; border-radius: 6px; }
-.np-qrow .t { font-size: 14px; }
-/* "PREVIEW PLAYING · 30-second preview" (player-01) */
-.np-upsell .sheet-header { display: none; }
-.np-upsell .sheet-body { padding: 14px 22px 18px; }
-.np-upsell-k { font-size: 10.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
-.np-upsell-t { margin: 8px 0 6px; font-family: var(--serif); font-size: 21px; font-weight: 700; letter-spacing: -0.012em; line-height: 1.2; }
-.np-upsell-p { margin: 0 0 20px; font-size: 13.5px; line-height: 1.45; color: var(--text-2); }
-.np-upsell-cta { height: 44px; border-radius: 22px; font-size: 14.5px; font-weight: 600; }
-.np-upsell-skip { display: block; margin: 14px auto 4px; padding: 6px 10px; font-size: 13.5px; color: var(--text-3); }
 
 /* ---------- Notifications (bell): pill tabs like Sheng's Messages (activity-03) ---------- */
 .nt-tabs { display: flex; gap: 6px; margin: 8px 2px 4px; }
@@ -306,15 +265,6 @@ body.dock-collapsed .as-panel .as-composer { bottom: auto; }
 .nt-empty p { margin: 0; font-size: 13px; color: var(--text-3); }
 .nt-empty small { display: block; margin-top: 6px; font-size: 12px; color: var(--text-3); opacity: 0.8; }
 .nt-empty a { color: var(--accent); }
-/* the tip is a popover pointing at ♡ (it overlays the scrubber instead of pushing it down) */
-.np-tip-slot { position: relative; height: 0; z-index: 2; }
-.np-tip { position: absolute; right: 0; top: -4px; margin: 0; height: 36px; padding: 0 6px 0 12px; border-radius: 11px; background: rgba(12, 10, 9, 0.88); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
-.np-tip::before { content: ''; position: absolute; top: -6px; right: 52px; border: 6px solid transparent; border-top: 0; border-bottom-color: rgba(12, 10, 9, 0.88); }
-.np-tip-main { font-size: 13.5px; }
-/* shell.css sizes every `.np-tip button` as a 28px icon button; the label button must size to its text */
-.np-tip .np-tip-main { width: auto; height: 100%; justify-content: flex-start; color: #fff; }
-.np-tip.done .np-tip-main { color: var(--np-text-2); }
-.np.info .np-tip-slot { display: none; }
 .tl-ic.listen { color: var(--accent); }
 /* Assistant cards show their tag row (Type · Featured · Demo), so drop the duplicate Demo badge under the date */
 .as-page .concert-card .cc-badges .tag.demo { display: none; }

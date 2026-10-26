@@ -155,8 +155,10 @@
     // ---------- personal store (runs against a sandboxed copy of localStorage) ----------
     const saved = localStorage.getItem('klang.v1');
     const savedPosts = localStorage.getItem('klang.activity.posts.v1');
+    const savedListening = localStorage.getItem('klang.listening.v1');
     const store = await import('../js/store.js');
     const repo = await import('../js/repo.js');
+    const am = await import('../js/applemusic.js');
     try {
       store.resetAll();
       test('favourites toggle and are logged in the personal timeline', () => {
@@ -202,9 +204,90 @@
         store.setReview('demo-zurich-000', { rating: 5 });
         eq(store.markOf('demo-zurich-000').rating, 5);
       });
+
+      // ---------- listening: Apple Music Classical / Apple Music links (no audio in Klang) ----------
+      const work = { id: 'bach-goldberg', title: 'Goldberg Variations' };
+      const album = { id: 427415061, title: 'Bach: Goldberg Variations', artist: 'Glenn Gould', artwork: 'a.jpg', year: '1982' };
+      test('pieceURL: exact track or whole album, in Apple Music Classical or Apple Music', () => {
+        const piece = am.workPiece(work, 'Bach', album, { id: 427415063 });
+        eq(am.pieceURL(piece, 'classical'), 'https://classical.music.apple.com/ch/album/427415061?i=427415063');
+        eq(am.pieceURL(piece, 'music'), 'https://music.apple.com/ch/album/427415061?i=427415063');
+        const noTrack = am.workPiece(work, 'Bach', album);
+        eq(am.pieceURL(noTrack, 'classical'), 'https://classical.music.apple.com/ch/album/427415061');
+        eq(am.pieceURL(noTrack, 'music'), 'https://music.apple.com/ch/album/427415061');
+        eq(am.pieceURL(am.albumPiece(album), 'classical'), 'https://classical.music.apple.com/ch/album/427415061', 'album ignores track');
+        eq(am.pieceURL(am.makePiece({ title: 'Goldberg Variations', composer: 'Bach' }), 'music'), 'https://music.apple.com/ch/search?term=Bach%20Goldberg%20Variations', 'no album: search');
+      });
+      test('piece ids: whole album, one id per work whether or not its track is known, one per movement', () => {
+        const a = am.albumPiece(album);
+        eq(a.id, 'album:427415061');
+        eq(a.kind, 'album');
+        eq(am.workPiece(work, 'Bach', album, { id: 427415063 }).id, am.workPiece(work, 'Bach', album).id);
+        const mv = (trackId) => am.makePiece({ title: 'Variation', workId: work.id, collectionId: album.id, trackId });
+        ok(mv(1).id !== mv(2).id, 'single movements of one work stay distinct');
+        eq(am.toPlain(am.workPiece(work, 'Bach', album)).trackId, undefined, 'plain drops empty fields');
+      });
+      test('your own playlists: create, add / remove, rename, delete', () => {
+        store.resetAll();
+        const p1 = am.toPlain(am.workPiece(work, 'Bach', album, { id: 427415063 }));
+        const p2 = am.toPlain(am.albumPiece(album));
+        const pl = store.createPlaylist('  Sunday  ', p1);
+        eq(pl.name, 'Sunday');
+        eq(store.userPlaylists().map((x) => x.id), [pl.id]);
+        ok(store.isInPlaylist(pl.id, p1.id), 'first item');
+        eq(store.togglePlaylistItem(pl.id, p2), true);
+        eq(store.playlist(pl.id).items.map((x) => x.id), [p1.id, p2.id]);
+        store.moveInPlaylist(pl.id, p2.id, -1);
+        eq(store.playlist(pl.id).items[0].id, p2.id, 'moved up');
+        eq(store.togglePlaylistItem(pl.id, p1), false);
+        ok(!store.isInPlaylist(pl.id, p1.id), 'removed');
+        store.renamePlaylist(pl.id, 'Evening');
+        eq(store.playlist(pl.id).name, 'Evening');
+        store.renamePlaylist(pl.id, '   ');
+        eq(store.playlist(pl.id).name, 'Evening', 'blank name ignored');
+        ok(!store.hasPlaylist('concert-y') && store.togglePlaylist({ id: 'concert-y', name: 'Y', kind: 'concert', items: [] }), 'concert playlist');
+        eq(store.userPlaylists().length, 1, 'concert playlists are not user playlists');
+        store.deletePlaylist(pl.id);
+        eq(store.playlist(pl.id), null);
+        eq(store.userPlaylists().length, 0);
+      });
+      test('logListen puts a "listen" entry on the timeline (once per piece within 10 min)', () => {
+        store.resetAll();
+        const p = am.toPlain(am.workPiece(work, 'Bach', album, { id: 427415063 }));
+        store.logListen(p, 'Apple Music Classical');
+        store.logListen(p, 'Apple Music Classical');
+        const t = store.timeline();
+        eq(t.length, 1);
+        eq([t[0].type, t[0].id, t[0].label, t[0].app, t[0].trackId], ['listen', p.id, 'Goldberg Variations', 'Apple Music Classical', 427415063]);
+      });
+      test('listenLink is a real link that records Now listening with its queue', () => {
+        const pieces = [am.workPiece(work, 'Bach', album, { id: 1 }), am.workPiece({ id: 'w2', title: 'Partita' }, 'Bach', album, { id: 2 })];
+        const a = am.listenLink(pieces[0], 'Play all', { queue: pieces, index: 0 });
+        eq([a.tagName, a.target], ['A', '_blank']);
+        ok(a.href === am.pieceURL(pieces[0]), a.href);
+        a.addEventListener('click', (e) => e.preventDefault());
+        a.click();
+        const L = am.listening();
+        eq([L.current.id, L.next.id, L.queue.length], [pieces[0].id, pieces[1].id, 2]);
+        am.clearListening();
+        eq(am.listening().current, null);
+      });
+      test('backup round-trips your own playlists', () => {
+        store.resetAll();
+        const p = am.toPlain(am.albumPiece(album));
+        const pl = store.createPlaylist('Road trip', p);
+        const backup = store.exportUserData();
+        store.resetAll();
+        eq(store.userPlaylists().length, 0, 'reset clears playlists');
+        store.importUserData(backup);
+        const back = store.playlist(pl.id);
+        ok(back && back.kind === 'user', 'playlist restored');
+        eq([back.name, back.items.map((x) => x.id)], ['Road trip', [p.id]]);
+      });
     } finally {
       try { saved == null ? localStorage.removeItem('klang.v1') : localStorage.setItem('klang.v1', saved); } catch {}
       try { savedPosts == null ? localStorage.removeItem('klang.activity.posts.v1') : localStorage.setItem('klang.activity.posts.v1', savedPosts); } catch {}
+      try { savedListening == null ? localStorage.removeItem('klang.listening.v1') : localStorage.setItem('klang.listening.v1', savedListening); } catch {}
     }
 
     document.getElementById('summary').innerHTML = fail ? `<span class="fail">${fail} failed</span>, ${pass} passed` : `<span class="pass">All ${pass} tests passed</span>`;

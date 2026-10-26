@@ -1512,7 +1512,7 @@ function answerRecording(p) {
     ? ' Apple’s catalogue doesn’t list tempos, so I can’t sort by speed — open a few and compare; timings differ a lot between performers.'
     : '';
   const what = rec.label ? `recordings ${rec.loose ? 'for' : 'of'} ${rec.label}${rec.performer ? ` with ${rec.performer}` : ''}` : `recordings with ${rec.performer}`;
-  const reply = `${p.corrections.length ? `(Reading “${p.corrections[0][0]}” as ${p.corrections[0][1]}.) ` : ''}Here are ${what} on Apple Music — tap Listen for 30-second previews.${tempo}`;
+  const reply = `${p.corrections.length ? `(Reading “${p.corrections[0][0]}” as ${p.corrections[0][1]}.) ` : ''}Here are ${what} on Apple Music — tap Listen to play one in full.${tempo}`;
   rec.label = rec.label || rec.performer;
   const items = [{ kind: 'recording', data: { ...rec, tempo: !!p.cues.tempo } }];
   if (rec.workId) items.push({ kind: 'work', id: rec.workId });

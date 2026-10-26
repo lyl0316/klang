@@ -7,16 +7,18 @@
 //                       Works) · Timeline (your activity)
 //   #/activity/<list>   attended | saved | going | composers | artists | works | venues | cities |
 //                       following (venues and cities you follow with ☆, searchable — Sheng's Following)
+//
+// "Listened to …" entries are pieces Klang sent to Apple Music Classical / Apple Music
+// (applemusic.js); tapping one opens it there again. Klang itself plays no audio.
 
-import { h, icon, clear, toast, download, plural, normalize } from '../util.js';
+import { h, icon, clear, toast, download, plural, normalize, storage } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { buildICS } from '../ics.js';
 import { href, concertCard, emptyState, avatar, initials, cityLabel } from '../ui/components.js';
 import { todayKey, dayKeyOf, daysBetween, isPast, monthShort, dayNum, yearOf, timeOf } from '../time.js';
 import { unreadCount as notificationsUnread } from './me.js';
-import { postedListens } from '../ui/player.js';
-import { player } from '../music.js';
+import { makePiece, listenLink, playAppName } from '../applemusic.js';
 
 const MARK_PILLS = [
   { kind: 'attended', label: 'Attended', iconName: 'check' },
@@ -220,6 +222,8 @@ function stillTrue(e) {
       return store.hasAlbum(e.id);
     case 'playlist':
       return store.hasPlaylist(e.id);
+    case 'listen':
+      return true;
     default:
       return false; // hidden concerts and unknown types stay out of the timeline
   }
@@ -283,44 +287,61 @@ function describeEntry(e) {
     const p = store.libraryPlaylists().find((x) => x.id === e.id);
     if (!p) return null;
     const n = Array.isArray(p.items) ? p.items.length : 0;
+    const own = p.kind === 'user';
     return {
       tone: 'library',
       iconName: 'playlist',
       onClick: () => openFromLibrary('playlist', p),
-      text: ['Added the playlist ', h('b', {}, p.name || e.label || 'Playlist'), ' to your Library'],
-      sub: [`Playlist · ${plural(n, 'work')}`],
+      text: own
+        ? ['Created the playlist ', h('b', {}, p.name || e.label || 'Playlist')]
+        : ['Added the playlist ', h('b', {}, p.name || e.label || 'Playlist'), ' to your Library'],
+      sub: [`Playlist · ${plural(n, own ? 'piece' : 'work')}`],
     };
+  }
+  if (e.type === 'listen') {
+    const piece = makePiece({
+      id: e.id, kind: e.kind === 'album' ? 'album' : 'piece', title: e.label || 'a recording',
+      composer: e.composer || null, artist: e.artist || '', collectionId: e.collectionId || null,
+      trackId: e.trackId || null, artwork: e.artwork || null,
+    });
+    return listenEntry(piece, e.app);
   }
   return null;
 }
 
-// Tracks posted from the player ("Post to your activity"); tap one to hear the preview again.
-function listenEntry(p) {
-  const track = {
-    id: p.trackId, title: p.title, artist: p.artist, artwork: p.artwork, preview: p.preview,
-    url: p.url, album: p.album, collectionId: p.collectionId || undefined,
-  };
-  const name = p.work || p.title || 'a recording';
+// "Listened to <piece> · <app>": tap to open it again in Apple Music Classical / Apple Music.
+function listenEntry(piece, app = null) {
   return {
     tone: 'listen',
     iconName: 'headphones',
-    onClick: () => {
-      if (!track.preview) {
-        toast('No preview for this recording');
-        return;
-      }
-      player.play(track, [track]);
-    },
-    text: ['Listened to ', h('b', {}, name)],
-    sub: [p.composer && p.composer !== name ? p.composer : null, p.artist || null],
-    thumb: p.artwork || null,
-    at: p.at,
+    piece,
+    text: ['Listened to ', h('b', {}, piece.title), app ? ` · ${app}` : null],
+    sub: [piece.composer && piece.composer !== piece.title ? piece.composer : null, piece.artist || null],
+    thumb: piece.artwork || null,
   };
+}
+
+// Listens posted from the old in-app player (klang.activity.posts.v1, kept in backups) still show;
+// they now open in Apple Music too.
+const POSTS_KEY = 'klang.activity.posts.v1';
+const albumIdOf = (url) => /\/album\/(?:[^/?#]+\/)?(\d+)/.exec(String(url || ''))?.[1] || null;
+
+function postedListens() {
+  const v = storage.get(POSTS_KEY, []);
+  return Array.isArray(v) ? v.filter((p) => p && p.trackId != null && p.at) : [];
+}
+
+function postedEntry(p) {
+  const piece = makePiece({
+    title: p.work || p.title || 'a recording', composer: p.composer || null, artist: p.artist || '',
+    album: p.album || '', collectionId: p.collectionId || albumIdOf(p.url), trackId: p.trackId, artwork: p.artwork || null,
+  });
+  return { ...listenEntry(piece), at: p.at };
 }
 
 function timelineEntries() {
   const seen = new Set();
-  const out = postedListens().map(listenEntry);
+  const out = postedListens().map(postedEntry);
   for (const e of store.timeline()) {
     if (!e || !e.type || e.id == null) continue;
     const key = `${e.type}|${e.kind}|${e.id}`;
@@ -334,8 +355,7 @@ function timelineEntries() {
 }
 
 function tlItem(v) {
-  const tag = v.to ? 'a' : 'button';
-  return h(tag, { class: 'tl-item', href: v.to || null, type: tag === 'button' ? 'button' : null, onclick: v.onClick || null },
+  const kids = [
     h('span', { class: `tl-ic ${v.tone}` }, icon(v.iconName, 15)),
     h('div', { class: 'tl-main' },
       h('div', { class: 'tl-text' }, v.text),
@@ -344,7 +364,12 @@ function tlItem(v) {
         : null,
       v.extra,
       h('div', { class: 'tl-ago' }, ago(v.at))),
-    v.thumb ? h('img', { class: 'tl-thumb', src: v.thumb, alt: '', loading: 'lazy' }) : null);
+    v.thumb ? h('img', { class: 'tl-thumb', src: v.thumb, alt: '', loading: 'lazy' }) : null,
+  ];
+  // a listen is a real link, so the tap itself hands the piece to the Music / Classical app
+  if (v.piece) return listenLink(v.piece, kids, { cls: 'tl-item', label: `Listen again to ${v.piece.title} in ${playAppName()}` });
+  const tag = v.to ? 'a' : 'button';
+  return h(tag, { class: 'tl-item', href: v.to || null, type: tag === 'button' ? 'button' : null, onclick: v.onClick || null }, kids);
 }
 
 function timelineEmpty() {
@@ -390,8 +415,14 @@ function renderRoot() {
     paintTimeline();
   }
 
+  let later = 0;
   const unsub = store.subscribe((topic) => {
     if (['marks', 'follows', 'library', 'notifications', 'prefs'].includes(topic)) paint();
+    // a new "Listened to …" (tapping a listen link): repaint after the tap has been handled
+    else if (topic === 'timeline') {
+      clearTimeout(later);
+      later = setTimeout(paint, 0);
+    }
   });
   const onPosts = () => paint();
   window.addEventListener('klang:posts', onPosts);
@@ -402,6 +433,7 @@ function renderRoot() {
     body,
     cleanup() {
       unsub();
+      clearTimeout(later);
       window.removeEventListener('klang:posts', onPosts);
     },
   };

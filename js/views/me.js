@@ -10,7 +10,8 @@ import { h, icon, clear, toast, download, plural, debounce, normalize } from '..
 import * as store from '../store.js';
 import * as repo from '../repo.js';
 import { buildICS } from '../ics.js';
-import { ITUNES_CREDIT, classicalChart } from '../music.js';
+import { classicalChart } from '../music.js';
+import { PLAY_APPS, playApp, playAppName, albumURL } from '../applemusic.js';
 import { href, eventRow, emptyState, toggle, segmented, venueLabel, cityLabel, initials } from '../ui/components.js';
 import { openSheet } from '../ui/sheet.js';
 import {
@@ -34,7 +35,6 @@ const EXTRA_ICONS = {
   review: '<path d="M4 5h16v11H9.5L5 20z"/><path d="M12 7.4l1.1 2.2 2.4.35-1.75 1.7.4 2.4L12 12.9l-2.15 1.15.4-2.4L8.5 9.95l2.4-.35z" fill="currentColor" stroke="none"/>',
   calx: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M10 13.5l4 4M14 13.5l-4 4"/>',
   framed: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/>',
-  okcircle: '<circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/><path d="M8 12.4l2.7 2.7L16.2 9.6" style="stroke:var(--bg)" stroke-width="2.2"/>',
   joystick: '<circle cx="12" cy="6.5" r="3"/><path d="M12 9.5v6"/><path d="M5 16.5c0-1.1 3.1-2 7-2s7 .9 7 2-3.1 2-7 2-7-.9-7-2z"/><path d="M5 16.5v2c0 1.1 3.1 2 7 2s7-.9 7-2v-2"/>',
 };
 
@@ -350,13 +350,15 @@ export function render() {
       }),
     ], 'Show concerts featuring Johann Strauss on your calendar.'),
     ...group('Connections', [
-      row({
-        ic: 'music', title: 'Apple Music', to: 'https://music.apple.com/ch/', external: true, chevron: false,
-        right: h('span', { class: 'me-ok' }, glyph('okcircle', 15), 'Previews'),
+      // Klang plays no audio: Listen / Play open the piece in this app (applemusic.js).
+      pickerRow({
+        ic: 'music', title: 'Play in', value: playApp(),
+        options: PLAY_APPS,
+        onChange: (v) => store.setPref('playIn', v === 'music' ? 'music' : 'classical'),
       }),
       row({ ic: 'calendar', title: 'Calendar', value: 'Export .ics', valueCls: 'accent', onClick: exportCalendar, chevron: false }),
       row({ ic: 'upload', title: 'Data & imports', value: importsN ? `${importsN} imported` : null, to: '#/me/data' }),
-    ]),
+    ], 'Listen and Play open the piece in this app, where it plays in full with your Apple Music subscription.'),
     ...group('About', [
       row({ ic: 'star', title: 'Rate Klang', tone: 'accent', onClick: () => toast('Thanks!') }),
       row({ ic: 'download', title: 'Android & Web', onClick: openWebSheet }),
@@ -590,9 +592,9 @@ const LEGAL = [
     'Concerts tagged “Demo” are generated for illustration: the venues and works are real, but the performers, dates and programmes are invented. Don’t buy tickets or travel because of them.',
     'You can turn demo data off and import real listings (.ics calendars or JSON feeds) in Data & imports.',
   ]],
-  ['Music previews', [
-    ITUNES_CREDIT,
-    'Recordings are found with Apple’s public iTunes Search API. Previews are streamed from Apple and never downloaded or stored by Klang. Full tracks open in Apple Music or Apple Music Classical, which need your own subscription.',
+  ['Listening', [
+    'Klang plays no audio. Listen, Play and Play all open the piece — or the whole album — in Apple Music Classical or Apple Music (choose which in Me → Play in), where it plays in full. Both need your own Apple Music subscription.',
+    'Recording details (albums, tracks, artwork) come from Apple’s public iTunes Search API and are cached on this device for a week. Nothing is streamed, downloaded or stored by Klang; your Library and playlists only keep links to the recordings.',
   ]],
   ['Composer portraits', [
     'Composer portraits come from Wikimedia Commons and are shown only when Commons marks the file as public domain (or “no restrictions”). They load from Wikimedia’s servers, which see your IP address under the Wikimedia privacy policy. The list below links each portrait to its file page.',
@@ -741,7 +743,7 @@ function goingPreviews(now) {
     out.push({
       id: `preview:${id}`, type: 'goingPreview', kind: 'Before you go', icon: 'ticket',
       title: c.title,
-      text: `${whenOf(c)}. ${names.length ? `On the programme: ${names.join(' · ')}${works.length > 3 ? ' …' : ''}. ` : ''}${guide ? 'Read the listening guide and preview the music.' : 'Preview the music before you go.'}`,
+      text: `${whenOf(c)}. ${names.length ? `On the programme: ${names.join(' · ')}${works.length > 3 ? ' …' : ''}. ` : ''}${guide ? 'Read the listening guide and listen to the music.' : 'Listen to the music before you go.'}`,
       at: t, href: href.concert(id),
     });
   }
@@ -901,8 +903,8 @@ async function recordingMatches(now) {
     if (!hit || !released || released > now || now - released > 60 * DAY_MS) continue;
     out.push({
       id: `rec:${a.id}`, type: 'newRecordingMatch', kind: 'New recording', icon: 'wave',
-      title: a.title, text: `${a.artist} · a new release for ${hit.c.name}. Opens in Apple Music.`,
-      at: Math.min(now, atZ(dayKeyOf(new Date(released)), '10:00')), href: a.url, external: true,
+      title: a.title, text: `${a.artist} · a new release for ${hit.c.name}. Opens in ${playAppName()}.`,
+      at: Math.min(now, atZ(dayKeyOf(new Date(released)), '10:00')), href: albumURL(a.id), external: true,
     });
   }
   return capPerDay(out, limitOf('newRecordingLimit'));

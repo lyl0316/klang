@@ -94,8 +94,12 @@ export function concertCard(c, { hideCity = false, showDate = false } = {}) {
       (c.source === 'import' || c.source === 'feed') ? h('span', { class: 'tag import' }, 'Imported') : null),
     h('div', { class: 'cc-title' }, c.title),
     c.series && h('div', { class: 'cc-series' }, c.series),
-    (credits.length > 0 || ensembles.length > 0) ? h('div', { class: 'cc-credits' },
-      [...credits.slice(0, 8).map((cr) => [h('b', {}, `${cr.role}: `), cr.name]), ...ensembles.map((cr) => [cr.name])]
+    // Who plays: the orchestra / ensemble / choir gets its own labelled line (recitals have none).
+    ensembles.length > 0 ? h('div', { class: 'cc-ens' },
+      ensembles.map((cr, i) => [i ? h('span', { class: 'sep', 'aria-hidden': 'true' }, ' · ') : '',
+        h('span', { class: 'cr' }, h('span', { class: 'k' }, cr.role), ' ', h('span', { class: 'n' }, cr.name))])) : null,
+    credits.length > 0 ? h('div', { class: 'cc-credits' },
+      credits.slice(0, 8).map((cr) => [h('b', {}, `${cr.role}: `), cr.name])
         .map((parts, i) => [i ? h('span', { class: 'sep' }, ' · ') : '', h('span', { class: 'cr' }, parts)])) : null,
     byComposer.length > 0 ? h('div', { class: 'cc-program' },
       byComposer.slice(0, 10).map((g) => h('div', { class: 'row' },

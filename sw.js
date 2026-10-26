@@ -1,8 +1,8 @@
 // Klang service worker: makes the installed app open offline.
 // Network-first for Klang's own files (so updates show immediately), with a cached fallback.
-// Google Fonts are cached; Apple (iTunes) data, artwork and audio previews are never cached here
-// (Apple's terms: previews must be streamed only).
-const CACHE = 'klang-shell-v3';
+// Google Fonts are cached; Apple (iTunes) data and artwork are never cached here. Klang plays no
+// audio: Listen opens Apple Music Classical / Apple Music.
+const CACHE = 'klang-shell-v4';
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -11,6 +11,7 @@ const SHELL = [
   './icon.svg',
   './icon-180.png',
   './css/app.css',
+  './css/listening.css',
   './css/parity-concerts.css',
   './css/parity-discover.css',
   './css/parity-pages.css',
@@ -18,6 +19,7 @@ const SHELL = [
   './css/parity-personal.css',
   './css/shell.css',
   './css/theme.css',
+  './js/applemusic.js',
   './js/assistant-engine.js',
   './js/ics.js',
   './js/main.js',
@@ -29,6 +31,7 @@ const SHELL = [
   './js/ui/components.js',
   './js/ui/listen.js',
   './js/ui/player.js',
+  './js/ui/save.js',
   './js/ui/sheet.js',
   './js/content/bios.js',
   './js/content/editorials.js',
@@ -70,7 +73,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
   const isFont = url.host === 'fonts.googleapis.com' || url.host === 'fonts.gstatic.com';
-  if (!sameOrigin && !isFont) return; // Apple data/artwork/previews: straight to network
+  if (!sameOrigin && !isFont) return; // Apple data/artwork and links: straight to network
   if (isFont) {
     e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((res) => {
       const copy = res.clone();

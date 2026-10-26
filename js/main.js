@@ -1,4 +1,4 @@
-// App shell (mirrors Sheng): hash router, header, collapsing dock (tab bar + mini player), player.
+// App shell (mirrors Sheng): hash router, header, collapsing dock (tab bar + mini player), Now listening.
 //
 // View contract — every view module exports render functions (sync or async) returning:
 //   { title: string,            // document title / centred header title
@@ -13,10 +13,12 @@
 // Tabs (like Sheng): Discover · Concerts · Activity · Library · Search (Assistant).
 // The dock shows the mini player above the full tab bar; when you scroll down it collapses
 // into one pill: [current tab] [mini player] [search] — and expands again when you scroll up.
+// Klang plays no audio: the mini player shows "Now listening" — the piece last opened in Apple Music
+// Classical / Apple Music (applemusic.js) — and the Now-listening view lives in ui/player.js.
 
 import { h, icon, clear, toast } from './util.js';
-import { player, fmtDuration } from './music.js';
 import * as store from './store.js';
+import { listening, onListening, listenLink, playAppName } from './applemusic.js';
 
 const TABS = [
   { id: 'discover', label: 'Discover', icon: 'sparkle', path: '#/discover' },
@@ -56,7 +58,8 @@ const app = document.getElementById('app');
 const header = h('header', { class: 'app-header' });
 const view = h('main', { id: 'view', tabindex: '-1' });
 const tabbar = h('nav', { class: 'tabbar', 'aria-label': 'Main' });
-const mini = h('button', { class: 'mini-player', type: 'button', 'aria-label': 'Now playing' });
+// A group, not a button: its ↗ / ⏭ are real links (see the mini player below).
+const mini = h('div', { class: 'mini-player', role: 'group', 'aria-label': 'Now listening' });
 const dockTab = h('a', { class: 'dock-tab', 'aria-label': 'Current tab' });
 const dockSearch = h('a', { class: 'dock-search', href: '#/search', 'aria-label': 'Search' }, icon('search', 20));
 const dock = h('div', { class: 'dock' }, dockTab, mini, dockSearch, tabbar);
@@ -192,34 +195,50 @@ window.addEventListener('scroll', () => {
   lastY = y;
 }, { passive: true });
 
-// ---------- mini player ----------
-let lastState = null;
-player.subscribe((st) => {
-  lastState = st;
-  mini.classList.toggle('idle', !st.track);
-  if (!st.track) {
-    clear(mini).append(h('span', { class: 'art idle' }, icon('music', 16)), h('span', { class: 'meta' }, h('span', { class: 't' }, 'Nothing playing')));
+// ---------- mini player: Now listening ----------
+// Idle: "Nothing playing". Otherwise the piece last sent to Apple Music Classical / Apple Music with
+// ↗ (open it again) and, during a Play-all run, ⏭ (open the next piece). Both are real <a> links
+// from listenLink, so on an iPhone the tap itself hands the piece to the app. Tapping the rest of
+// the mini player opens the Now-listening view.
+const miniMain = h('button', { class: 'mp-main', type: 'button' });
+let nowListening = listening();
+
+function paintMini(L = nowListening) {
+  nowListening = L;
+  const cur = L.current;
+  mini.classList.toggle('idle', !cur);
+  clear(miniMain).append(
+    cur?.artwork
+      ? h('img', { class: 'art', src: cur.artwork, alt: '', onerror: (e) => e.target.replaceWith(h('span', { class: 'art idle' }, icon('music', 16))) })
+      : h('span', { class: 'art idle' }, icon('music', 16)),
+    h('span', { class: 'meta' },
+      h('span', { class: 't' }, cur ? cur.title : 'Nothing playing'),
+      cur ? h('span', { class: 's' }, cur.artist || cur.composer || playAppName()) : null));
+  miniMain.setAttribute('aria-label', cur ? `Now listening: ${cur.title}${cur.artist ? `, ${cur.artist}` : ''}. Show details` : 'Nothing playing');
+  if (!cur) {
+    mini.removeAttribute('title');
+    clear(mini).append(miniMain);
     return;
   }
-  const play = h('span', { class: 'mp-btn', role: 'button', tabindex: '0', 'aria-label': st.playing ? 'Pause' : 'Play' }, icon(st.playing ? 'pause' : 'play', 16));
-  play.addEventListener('click', (e) => { e.stopPropagation(); player.toggle(); });
+  const app = playAppName();
+  mini.title = `Opened in ${app}`;
   const parts = [
-    st.track.artwork ? h('img', { class: 'art', src: st.track.artwork, alt: '' }) : h('span', { class: 'art idle' }, icon('music', 16)),
-    h('span', { class: 'meta' }, h('span', { class: 't' }, st.track.title), h('span', { class: 's' }, st.track.artist)),
-    play,
+    miniMain,
+    listenLink(cur, icon('external', 17), { cls: 'mp-btn', queue: L.queue, index: L.index, label: `Open ${cur.title} again in ${app}` }),
   ];
-  if (st.hasNext) {
-    const next = h('span', { class: 'mp-btn', role: 'button', tabindex: '0', 'aria-label': 'Next' }, icon('forward', 16));
-    next.addEventListener('click', (e) => { e.stopPropagation(); player.next(); });
-    parts.push(next);
-  }
-  parts.push(h('span', { class: 'progress' }, h('i', { style: { width: `${Math.round(st.progress * 100)}%` } })));
+  if (L.next) parts.push(listenLink(L.next, icon('forward', 16), { cls: 'mp-btn', queue: L.queue, index: L.index + 1, label: `Next: ${L.next.title}, in ${app}` }));
   clear(mini).append(...parts);
-  mini.title = st.track.durationMs ? `30-second preview · full length ${fmtDuration(st.track.durationMs)}` : '';
-});
-mini.addEventListener('click', async () => {
-  if (!lastState?.track) {
-    toast('Nothing playing — open a concert or work and tap Listen');
+}
+
+paintMini();
+// Repaint on the next task: the link just tapped must stay in the page until its URL is handed over.
+onListening((L) => setTimeout(() => paintMini(L), 0));
+store.subscribe((topic) => topic === 'prefs' && paintMini()); // links follow the "Play in" choice
+
+mini.addEventListener('click', async (e) => {
+  if (e.target.closest('a')) return;
+  if (!nowListening.current) {
+    toast(`Nothing playing — tap Listen on a work or concert to play it in ${playAppName()}`);
     return;
   }
   try {
@@ -227,7 +246,6 @@ mini.addEventListener('click', async () => {
     mod.openPlayer();
   } catch (err) {
     console.error(err);
-    if (lastState.track.url) window.open(lastState.track.url, '_blank', 'noopener');
   }
 });
 

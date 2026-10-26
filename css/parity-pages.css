@@ -47,6 +47,25 @@
 .ep-album .t { margin-top: 8px; font-size: 13px; font-weight: 600; line-height: 1.28; }
 .ep-album .s { margin-top: 3px; font-size: 12px; }
 .ep-link { margin-top: 26px; font-size: 14px; font-weight: 600; color: var(--ep-accent, var(--accent-strong)); }
+/* A cover is a link that plays the recording in Apple Music Classical; "+" over its corner saves it */
+.ep-album { position: relative; }
+.ep-album-link { display: flex; flex-direction: column; min-width: 0; color: inherit; -webkit-tap-highlight-color: transparent; }
+.ep-album-link:active .ep-cover { opacity: 0.75; }
+.ep-album-link:focus-visible .ep-play { opacity: 1; }
+.ep-listen-note { margin: -4px 0 12px; font-size: 12.5px; line-height: 1.4; color: var(--text-3); }
+.ep-save {
+  position: absolute; top: 6px; right: 6px; z-index: 1; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+.ep-save::before { content: ''; position: absolute; inset: -8px; } /* a thumb-sized target */
+.ep-save.on { background: var(--accent); box-shadow: none; }
+.ep-save:active { transform: scale(0.92); }
+.ep-save.sm { top: 5px; right: 5px; width: 24px; height: 24px; }
+/* "More recordings" sheet: the same covers, as links */
+.ep-versions .version-card { position: relative; }
+.ep-versions .version-link { display: block; color: inherit; }
 /* iTunes credit moved to the foot of the page (Sheng has no fine print under its rails) */
 .ep-page > .ep-credit, .ep-itin-page > .ep-credit { margin: 22px 8px 0; text-align: center; font-size: 11px; line-height: 1.5; color: var(--text-3); }
 
@@ -198,6 +217,9 @@
 .ed-actions { gap: 10px; margin: 14px 0 16px; }
 .ed-recpill { height: 30px; padding: 0 14px; font-size: 13px; }
 .ed-add { width: 30px; height: 30px; }
+/* Play all opens Apple Music Classical: said in a quiet line under the pill */
+.ed-actions:has(+ .ed-listen-note) { margin-bottom: 7px; }
+.ed-listen-note { margin: 0 0 16px; font-size: 11.5px; line-height: 1.4; color: var(--text-3); }
 .ed-title { margin: 0 4px 14px; font-size: 28px; font-weight: 600; line-height: 1.22; letter-spacing: -0.012em; }
 .ed-dek { margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: var(--text-3); }
 .ed-people-sec .caps-label { margin-bottom: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; }
@@ -222,6 +244,13 @@
 .ed-rec-text { gap: 6px; }
 .ed-rec-cap { font-size: 15.5px; font-weight: 700; line-height: 1.32; }
 .ed-rec-perf { font-size: 12px; }
+.ed-rec-cover, .ed-rec-cap { color: inherit; -webkit-tap-highlight-color: transparent; }
+.ed-rec-cover:active { opacity: 0.8; }
+/* "+ Save": Save to Library (album and/or one of your playlists) */
+.ed-rec-save { display: inline-flex; align-items: center; gap: 4px; width: fit-content; height: 26px; margin-top: 2px; padding: 0 10px 0 7px;
+  border-radius: 13px; border: 1px solid var(--line-strong); font-size: 12px; font-weight: 600; color: var(--text-2); }
+.ed-rec-save.on { border-color: transparent; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-strong); }
+.ed-rec-save:active { transform: scale(0.96); }
 .ed-rec-work { margin: 14px 0 0; font-size: 15px; line-height: 1.45; color: var(--text-2); }
 .ed-workchip { height: 30px; margin-top: 14px; padding: 0 14px; border-radius: 15px; border-color: var(--line-strong); font-size: 12.5px; color: var(--text); }
 .ed-workchip .n { flex: none; color: var(--text-3); }

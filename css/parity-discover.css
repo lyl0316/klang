@@ -68,9 +68,13 @@
 
 /* ---------- Today's Pick ---------- */
 .dc-masonry { column-gap: 24px; margin-top: 17px; }
-.dc-card { padding: 17.5px 0 19px; }
+.dc-card { position: relative; padding: 17.5px 0 19px; }
+/* The card's link covers the whole card; the duration chip (a link to Apple Music) sits on top */
+.dc-card-link { display: block; color: inherit; -webkit-tap-highlight-color: transparent; }
+.dc-card-link::after { content: ''; position: absolute; inset: 0; }
+.dc-card .dc-chip { position: relative; z-index: 1; }
 /* Sheng tops a card's first line (badge, composer or type label) at the same height */
-.dc-card > .dc-comp:first-child { margin-top: -4px; }
+.dc-card-link > .dc-comp:first-child { margin-top: -4px; }
 .dc-badge { gap: 5px; font-size: 12.5px; font-weight: 500; line-height: 15px; margin-bottom: 8px; }
 .dc-badge.popular { color: var(--dc-red); }
 .dc-badge.gold { font-size: 12px; font-weight: 600; letter-spacing: 0.07em; gap: 7px; }
@@ -84,6 +88,8 @@
 .dc-chip { height: 24px; padding: 0 9px; margin-top: 8px; gap: 5px; border-radius: 6px; font-size: 12.5px; }
 .dc-chip.red { color: var(--dc-red); border-color: color-mix(in srgb, var(--dc-red) 46%, transparent); }
 .dc-chip.white { color: color-mix(in srgb, var(--bg) 78%, var(--text)); background: color-mix(in srgb, var(--text) 94%, var(--bg)); border-color: transparent; }
+/* the piece you last opened in Apple Music */
+.dc-chip[data-state='current'] { color: #fff; background: var(--dc-red); border-color: var(--dc-red); }
 .dc-card.prog .dc-type { font-size: 11.5px; font-weight: 600; line-height: 14px; letter-spacing: 0.08em; margin: 1px 0 5px; }
 .dc-pair + .dc-pair { margin-top: 10px; }
 .dc-pair .dc-work + .dc-work { margin-top: 6px; }
@@ -125,19 +131,30 @@
 
 /* ---------- New on Record ---------- */
 .dc-new { margin-top: 27px; }
-.h-scroll.dc-records { margin: 14px -24px 0; padding: 2px 24px 6px; gap: 10px; scroll-padding-inline: 24px; }
-.dc-album { width: 142px; }
+.h-scroll.dc-records { margin: 12px -24px 0; padding: 2px 24px 6px; gap: 10px; scroll-padding-inline: 24px; }
+.dc-new .dc-sub { margin-top: 4px; }
+.dc-album { position: relative; width: 142px; }
+.dc-album-link { display: block; color: inherit; -webkit-tap-highlight-color: transparent; }
+.dc-album-link:active .art { opacity: 0.75; }
 .dc-album .art-wrap { position: relative; display: block; }
 .dc-album .art { width: 142px; height: 142px; border-radius: 6px; }
 .dc-album .t { font-size: 13px; line-height: 17px; margin-top: 9px; }
 .dc-album .s { font-size: 12px; line-height: 16px; margin-top: 3px; }
-.dc-album.loading .art { opacity: 0.6; }
 .dc-album-state {
   position: absolute; left: 7px; bottom: 7px; width: 24px; height: 24px; border-radius: 50%;
   display: none; align-items: center; justify-content: center; background: var(--dc-red); color: #fff;
 }
-.dc-album[data-state='playing'] .dc-album-state, .dc-album[data-state='paused'] .dc-album-state { display: inline-flex; }
-.dc-album[data-state='paused'] .dc-album-state { opacity: 0.75; }
+.dc-album[data-state='current'] .dc-album-state { display: inline-flex; }
+/* "+" over the cover's corner: Save to Library */
+.dc-save {
+  position: absolute; top: 7px; right: 7px; z-index: 1; width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+  background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+.dc-save::before { content: ''; position: absolute; inset: -8px; } /* a thumb-sized target */
+.dc-save.on { background: var(--dc-red); box-shadow: none; }
+.dc-save:active { transform: scale(0.92); }
 
 /* page small print */
 .dc-foot { margin-top: 30px; color: var(--dc-dim); }

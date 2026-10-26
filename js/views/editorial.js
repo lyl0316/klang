@@ -3,17 +3,19 @@
 //   #/editorials/<composerId>  -> renderList({ composerId })   "<Composer> · Editorials": All / Featured / Mentioned
 //   #/article/<id>             -> renderArticle({ id })
 // Content: ARTICLES from js/content/editorials.js (may still be empty — elegant empty state).
-// Recording embeds use the free iTunes Search API (30-second previews, streamed only) with the
-// iTunes credit and Apple Music Classical links. Ratings and the article playlist stay on this device.
+// Recording embeds use the free iTunes Search API (metadata only) with the iTunes credit; Klang plays
+// no audio — Play all and each embed open the recording in Apple Music Classical (or Apple Music),
+// which plays it in full. Ratings, saves and the article playlist stay on this device.
 // No community features: no comments, reactions or public reviews.
 
 import { h, icon, toast, plural } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { ARTICLES } from '../content/editorials.js';
-import { searchAlbums, player, playerState, classicalSearchURL, ITUNES_CREDIT } from '../music.js';
-import { chosenTracks, searchTerm } from '../ui/listen.js';
-import '../ui/player.js'; // side effect: lets the full player record each queue for "Up next"
+import { searchAlbums, albumTracks, classicalSearchURL } from '../music.js';
+import { listenLink, makePiece, workPiece, pieceURL, toPlain, onListening, playAppName, APPLE_CREDIT, refineQueued } from '../applemusic.js';
+import { openSaveSheet } from '../ui/save.js';
+import { searchTerm, matchWorkTracks } from '../ui/listen.js';
 import { openSheet } from '../ui/sheet.js';
 import { href, chip, emptyState, venueLabel, cityLabel, withFace } from '../ui/components.js';
 import { openReport } from './entity.js';
@@ -278,59 +280,47 @@ export function renderArticle({ id } = {}) {
     };
   }
 
+  // Klang plays no audio: the recordings pill (Play all) and each embed's cover and caption are
+  // real links that open the recording in Apple Music Classical (or Apple Music, chosen in Me).
   const ctx = {
     article: a,
-    cards: [], // recording embeds { work, el, playBtn, state }
-    trackWork: new Map(), // trackId -> workId (to light up the playing card)
-    albums: new Map(), // workId -> album shown on its card
-    queueIds: new Set(), // the article queue started from the pill
-    queueActive: false,
-    pending: new Map(),
-    io: null,
-  };
-  if (typeof IntersectionObserver !== 'undefined') {
-    ctx.io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        ctx.io.unobserve(e.target);
-        const fn = ctx.pending.get(e.target);
-        ctx.pending.delete(e.target);
-        fn?.();
-      }
-    }, { rootMargin: '900px 0px' });
-  }
-  ctx.lazy = (el, fn) => {
-    if (ctx.io) {
-      ctx.pending.set(el, fn);
-      ctx.io.observe(el);
-    } else fn();
+    cards: [], // recording embeds { work, el, save }
+    pieces: new Map(), // workId -> the piece its links play (updated in place once the recording is found)
+    links: new Map(), // workId -> listen links that play it
+    lookups: new Map(), // workId -> Promise<{ album, piece } | null>
+    chain: Promise.resolve(), // lookups run one at a time
+    alive: true,
   };
 
   const works = recordingWorks(a);
+  for (const w of works) ctx.pieces.set(w.id, searchPiece(w));
   // Count unique works, not recording blocks: a work can have two captioned blocks, but the pill
   // (and the Library playlist) play one recording per work.
   const nRec = works.length;
 
-  // --- header: illustration, recordings pill + add, title, dek
-  const pill = nRec ? h('button', { class: 'ed-recpill', type: 'button', 'aria-label': `Play ${plural(nRec, 'recording')} from this article` }) : null;
-  const paintPill = (playing) => {
-    if (!pill) return;
-    pill.replaceChildren(plural(nRec, 'recording'), icon(playing ? 'pause' : 'play', 10));
-    pill.classList.toggle('on', playing);
-  };
-  paintPill(false);
-  pill?.addEventListener('click', () => playArticle(ctx, works, pill));
+  // --- header: Play all pill + add, title, dek
+  // Play all = the first recording, with the others queued in article order (the mini player's
+  // ⏭ opens the next one in Apple Music).
+  const queue = works.map((w) => ctx.pieces.get(w.id));
+  const pill = nRec ? listenLink(queue[0], [plural(nRec, 'recording'), icon('play', 10)], {
+    cls: 'ed-recpill',
+    queue,
+    index: 0,
+    label: `Play all ${plural(nRec, 'recording')} from this article in ${playAppName()}`,
+  }) : null;
+  if (pill) ctx.links.set(works[0].id, [pill]);
 
   const titleEl = h('h1', { class: 'ed-title' }, rich(a.title));
   const head = h('header', { class: 'ed-head' },
     illustration(a.illustration),
     nRec ? h('div', { class: 'ed-actions' }, pill, addButton(a, ctx, works)) : h('div', { class: 'ed-actions-gap' }),
+    nRec ? h('p', { class: 'ed-listen-note' }, `Plays in full in ${playAppName()}`) : null,
     titleEl,
     a.dek && h('p', { class: 'ed-dek' }, rich(a.dek)));
 
   // --- body
   const bodyEl = h('div', { class: 'ed-body' }, (a.blocks || []).map((b) => renderBlock(b, ctx)));
-  const credit = works.length ? h('p', { class: 'ed-credit' }, ITUNES_CREDIT, ' ',
+  const credit = works.length ? h('p', { class: 'ed-credit' }, APPLE_CREDIT, ' ',
     h('a', { href: classicalSearchURL(searchTerm(works[0])), target: '_blank', rel: 'noopener' }, 'Open Apple Music Classical'), '.') : null;
 
   const root = h('article', { class: 'ed-article' },
@@ -340,26 +330,22 @@ export function renderArticle({ id } = {}) {
     bodyEl,
     endMatter(a, credit));
 
+  // Find every recording now, in article order, so that Play all is ready when tapped.
+  for (const w of works) resolveWork(ctx, w).catch(() => {});
+
   // Header title fades in once the big title has scrolled away (CSS in shell.css).
   const onScroll = () => root.classList.toggle('ed-scrolled', titleEl.getBoundingClientRect().bottom < 64);
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  let lastPill = null;
-  const unsubscribe = player.subscribe((st) => {
-    const wid = st.track ? ctx.trackWork.get(st.track.id) : null;
-    for (const c of ctx.cards) {
-      const state = c.work.id === wid ? (st.playing ? 'playing' : 'paused') : 'idle';
-      if (state === c.state) continue;
-      c.state = state;
-      c.el.classList.toggle('is-current', state !== 'idle');
-      c.playIcon.replaceChildren(icon(state === 'playing' ? 'pause' : 'play', 13));
-      c.playBtn.setAttribute('aria-label', `${state === 'playing' ? 'Pause' : 'Play'} a preview of ${c.work.title}`);
-    }
-    const pillOn = !!(ctx.queueActive && st.playing && st.track && ctx.queueIds.has(st.track.id));
-    if (pillOn !== lastPill) {
-      lastPill = pillOn;
-      paintPill(pillOn);
-    }
+  // The recording you last opened in Apple Music lights up; the pill too while its run is playing.
+  const workIds = works.map((w) => w.id).join(' ');
+  const unListen = onListening((L) => {
+    const wid = L.current?.workId;
+    for (const c of ctx.cards) c.el.classList.toggle('is-current', !!wid && c.work.id === wid);
+    pill?.classList.toggle('on', L.queue.length > 1 && L.queue.map((p) => p.workId).join(' ') === workIds);
+  });
+  const unStore = store.subscribe((topic) => {
+    if (topic === 'library') ctx.cards.forEach((c) => c.save.paint());
   });
 
   const shareBtn = h('button', { class: 'icon-btn ed-share', type: 'button', 'aria-label': 'Share this article', onclick: () => shareArticle(a) }, icon('share', 18));
@@ -371,11 +357,60 @@ export function renderArticle({ id } = {}) {
     body: root,
     cleanup() {
       window.removeEventListener('scroll', onScroll);
-      unsubscribe();
-      ctx.io?.disconnect();
-      ctx.pending.clear();
+      ctx.alive = false;
+      unListen();
+      unStore();
     },
   };
+}
+
+// ---------- recordings (Apple Music) ----------
+// A work's links start as an Apple Music search for it, then point at your version (Versions on
+// the work page; else the first recording found) at the work's first track.
+function searchPiece(work) {
+  return makePiece({ title: work.title, composer: repo.composer(work.composerId)?.name || null, workId: work.id });
+}
+
+async function lookupWork(work) {
+  const albums = await searchAlbums(searchTerm(work), SEARCH_LIMIT);
+  const chosen = store.listenChoice(work.id); // the version picked on the work page, if any
+  const album = albums.find((x) => String(x.id) === String(chosen)) || albums[0] || null;
+  if (!album) return null;
+  let first = null;
+  try {
+    first = matchWorkTracks(work, (await albumTracks(album.id)).tracks)?.tracks[0] || null;
+  } catch {
+    // no track list: the links open the album
+  }
+  return { album, piece: workPiece(work, repo.composer(work.composerId)?.name, album, first) };
+}
+
+function resolveWork(ctx, work) {
+  if (!ctx.lookups.has(work.id)) {
+    const p = ctx.chain.then(() => (ctx.alive ? lookupWork(work) : null)).then((res) => {
+      const piece = ctx.pieces.get(work.id);
+      if (res && piece) {
+        Object.assign(piece, res.piece);
+        for (const link of ctx.links.get(work.id) || []) link.href = pieceURL(piece);
+        refineQueued(piece); // Play all tapped before this lookup finished: fix its ⏭ target
+      }
+      return res;
+    });
+    ctx.chain = p.catch(() => {});
+    ctx.lookups.set(work.id, p);
+  }
+  return ctx.lookups.get(work.id);
+}
+
+const pieceOf = (ctx, work) => {
+  if (!ctx.pieces.has(work.id)) ctx.pieces.set(work.id, searchPiece(work));
+  return ctx.pieces.get(work.id);
+};
+
+function addLink(ctx, work, link) {
+  if (!ctx.links.has(work.id)) ctx.links.set(work.id, []);
+  ctx.links.get(work.id).push(link);
+  return link;
 }
 
 // ---------- header pieces ----------
@@ -390,11 +425,8 @@ function addButton(a, ctx, works) {
     btn.setAttribute('aria-label', on ? 'Remove this article’s playlist from your Library' : 'Add this article’s playlist to your Library');
   };
   btn.addEventListener('click', () => {
-    const items = works.map((w) => {
-      const comp = repo.composer(w.composerId);
-      const album = ctx.albums.get(w.id);
-      return { workId: w.id, title: w.title, composer: comp?.name || '', ...(album ? { collectionId: album.id } : {}) };
-    });
+    // Plain pieces (applemusic.js), so Library plays each one in Apple Music Classical.
+    const items = works.map((w) => toPlain(pieceOf(ctx, w)));
     const on = store.togglePlaylist({ id, name: stripMarks(a.title), kind: 'article', articleId: a.id, items });
     toast(on ? 'Added to Library · Playlists' : 'Removed from your Library');
     paint();
@@ -453,107 +485,63 @@ function workChip(work, withCatalog = false) {
   return h('a', { class: 'ed-workchip', href: href.work(work.id) }, h('span', { class: 'lbl' }, label), h('span', { class: 'arr', 'aria-hidden': 'true' }, '→'));
 }
 
-async function albumFor(work) {
-  const albums = await searchAlbums(searchTerm(work), SEARCH_LIMIT);
-  const chosen = store.listenChoice(work.id); // the version picked on the work page, if any
-  return albums.find((x) => String(x.id) === String(chosen)) || albums[0] || null;
+// "+ Save" under an embed: Save to Library (the album, and/or the piece into one of your playlists).
+function saveControl(piece) {
+  const btn = h('button', {
+    class: 'ed-rec-save',
+    type: 'button',
+    onclick: (e) => {
+      e.stopPropagation();
+      openSaveSheet(piece);
+    },
+  });
+  const paint = () => {
+    const on = (piece.collectionId != null && store.hasAlbum(piece.collectionId)) ||
+      store.userPlaylists().some((pl) => (pl.items || []).some((it) => it.id === piece.id));
+    btn.classList.toggle('on', on);
+    btn.replaceChildren(icon(on ? 'check' : 'plus', 14), on ? 'Saved' : 'Save');
+    btn.setAttribute('aria-label', `${on ? 'Saved' : 'Save'}: ${piece.title}${piece.artist ? `, ${piece.artist}` : ''} — Save to Library`);
+  };
+  paint();
+  return { el: btn, paint };
 }
 
 function recordingEmbed(block, ctx) {
   const work = repo.work(block.workId);
   if (!work) return null;
   const comp = repo.composer(work.composerId);
+  const piece = pieceOf(ctx, work);
+  const cap = stripMarks(block.caption || work.title);
   const ph = h('span', { class: 'ed-rec-ph' }, icon('music', 26));
-  const playIcon = h('span', { class: 'ed-rec-play' }, icon('play', 13));
-  const playBtn = h('button', { class: 'ed-rec-cover', type: 'button', 'aria-label': `Play a preview of ${work.title}` }, ph, playIcon);
-  const capBtn = h('button', { class: 'ed-rec-cap', type: 'button' }, rich(block.caption || work.title));
-  const perf = h('div', { class: 'ed-rec-perf' }, 'Finding a recording…');
   // Sheng: cover with a play disc, serif caption, performer; then the plain work line and a
-  // work chip. (The Apple Music Classical link lives in the credit at the end of the article.)
+  // work chip. Cover and caption play the recording in Apple Music; "+ Save" keeps it.
+  const cover = addLink(ctx, work, listenLink(piece, [ph, h('span', { class: 'ed-rec-play' }, icon('play', 13))], {
+    cls: 'ed-rec-cover', label: `Play ${cap} in ${playAppName()}`,
+  }));
+  const capLink = addLink(ctx, work, listenLink(piece, rich(block.caption || work.title), {
+    cls: 'ed-rec-cap', label: `${cap}: play in ${playAppName()}`,
+  }));
+  const perf = h('div', { class: 'ed-rec-perf' }, 'Finding a recording…');
+  const save = saveControl(piece);
   const el = h('figure', { class: 'ed-rec', dataset: { work: work.id } },
-    h('div', { class: 'ed-rec-card' }, playBtn, h('div', { class: 'ed-rec-text' }, capBtn, perf)),
+    h('div', { class: 'ed-rec-card' }, cover, h('div', { class: 'ed-rec-text' }, capLink, perf, save.el)),
     h('figcaption', { class: 'ed-rec-work', title: comp?.name || null }, [work.title, work.catalog].filter(Boolean).join(', ')),
     workChip(work));
-  const card = { work, el, playBtn, playIcon, state: null };
-  ctx.cards.push(card);
-  const onPlay = () => playWork(card, ctx);
-  playBtn.addEventListener('click', onPlay);
-  capBtn.addEventListener('click', onPlay);
+  ctx.cards.push({ work, el, save });
 
-  ctx.lazy(el, async () => {
-    try {
-      const album = await albumFor(work);
-      if (!album) {
-        perf.textContent = 'Not found on Apple Music';
-        return;
-      }
-      ctx.albums.set(work.id, album);
-      if (album.artwork) ph.replaceWith(h('img', { src: album.artwork, alt: '', loading: 'lazy' }));
-      perf.textContent = album.artist || '';
-      perf.title = album.title || '';
-    } catch {
-      perf.textContent = 'Apple Music is not reachable right now';
+  resolveWork(ctx, work).then((res) => {
+    if (!res) {
+      perf.textContent = 'Not found on Apple Music · tap to search';
+      return;
     }
+    if (res.album.artwork) ph.replaceWith(h('img', { src: res.album.artwork, alt: '', loading: 'lazy' }));
+    perf.textContent = res.album.artist || '';
+    perf.title = res.album.title || '';
+    save.paint();
+  }).catch(() => {
+    perf.textContent = 'Apple Music is not reachable right now';
   });
   return el;
-}
-
-async function playWork(card, ctx) {
-  const st = playerState();
-  if (st.track && ctx.trackWork.get(st.track.id) === card.work.id) {
-    player.toggle();
-    return;
-  }
-  card.el.classList.add('is-loading');
-  try {
-    const { tracks } = await chosenTracks(card.work);
-    if (!tracks.length) {
-      toast('No preview of this recording on Apple Music');
-      return;
-    }
-    for (const t of tracks) ctx.trackWork.set(t.id, card.work.id);
-    ctx.queueActive = false;
-    player.play(tracks[0], tracks);
-  } catch {
-    toast('Apple Music is not reachable right now');
-  } finally {
-    card.el.classList.remove('is-loading');
-  }
-}
-
-// "N recordings ▸": the first matching track of each recording, in article order.
-async function playArticle(ctx, works, btn) {
-  const st = playerState();
-  if (ctx.queueActive && st.track && ctx.queueIds.has(st.track.id)) {
-    player.toggle();
-    return;
-  }
-  if (!works.length) return;
-  btn.disabled = true;
-  btn.classList.add('busy');
-  toast(`Lining up ${plural(works.length, 'recording')}…`);
-  try {
-    const results = await Promise.allSettled(works.map((w) => chosenTracks(w)));
-    const queue = [];
-    results.forEach((r, i) => {
-      const t = r.status === 'fulfilled' ? r.value.tracks[0] : null;
-      if (!t) return;
-      queue.push(t);
-      ctx.trackWork.set(t.id, works[i].id);
-    });
-    if (!queue.length) {
-      toast('No previews found for this article');
-      return;
-    }
-    ctx.queueIds = new Set(queue.map((t) => t.id));
-    ctx.queueActive = true;
-    if (playerState().track?.id === queue[0].id) player.stop();
-    player.play(queue[0], queue);
-    toast(`Playing ${plural(queue.length, 'recording')} in article order`);
-  } finally {
-    btn.disabled = false;
-    btn.classList.remove('busy');
-  }
 }
 
 // Next three Swiss performances of a work (or a composer), as compact rows with a date badge.

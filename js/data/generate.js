@@ -65,9 +65,9 @@ const ENSEMBLE_LANG = {
 };
 
 const SERIES = {
-  de: { orchestral: 'Sinfoniekonzert', chamber: 'Kammermusik', recital: 'Rezital', opera: 'Oper', choral: 'Chorkonzert', mixed: 'Sonntagsmatinee', lunch: 'Lunchkonzert', newyear: 'Neujahrskonzert', cantata: 'Bachkantate', song: 'Liederabend' },
-  fr: { orchestral: 'Concert symphonique', chamber: 'Musique de chambre', recital: 'Récital', opera: 'Opéra', choral: 'Concert choral', mixed: 'Matinée du dimanche', lunch: 'Concert de midi', newyear: 'Concert du Nouvel An', cantata: 'Cantate de Bach', song: 'Récital de lieder' },
-  it: { orchestral: 'Concerto sinfonico', chamber: 'Musica da camera', recital: 'Recital', opera: 'Opera', choral: 'Concerto corale', mixed: 'Matinée domenicale', lunch: 'Concerto di mezzogiorno', newyear: 'Concerto di Capodanno', cantata: 'Cantata di Bach', song: 'Liederabend' },
+  de: { orchestral: 'Sinfoniekonzert', chamber: 'Kammermusik', recital: 'Rezital', opera: 'Oper', choral: 'Chorkonzert', mixed: 'Sonntagsmatinee', evening: 'Abendkonzert', lunch: 'Lunchkonzert', newyear: 'Neujahrskonzert', cantata: 'Bachkantate', song: 'Liederabend' },
+  fr: { orchestral: 'Concert symphonique', chamber: 'Musique de chambre', recital: 'Récital', opera: 'Opéra', choral: 'Concert choral', mixed: 'Matinée du dimanche', evening: 'Concert du soir', lunch: 'Concert de midi', newyear: 'Concert du Nouvel An', cantata: 'Cantate de Bach', song: 'Récital de lieder' },
+  it: { orchestral: 'Concerto sinfonico', chamber: 'Musica da camera', recital: 'Recital', opera: 'Opera', choral: 'Concerto corale', mixed: 'Matinée domenicale', evening: 'Concerto serale', lunch: 'Concerto di mezzogiorno', newyear: 'Concerto di Capodanno', cantata: 'Cantata di Bach', song: 'Liederabend' },
 };
 
 // ---------- performer pools ----------
@@ -324,6 +324,11 @@ function makeConcert(rng, people, city, idx, dayKey, { past }) {
     : type === 'recital' ? buildRecital(rng, people.pools, lang)
     : type === 'vocal-opera' ? buildVocal(rng, people.pools, lang, ctx)
     : buildMixed(rng, people.pools, lang);
+  // A "Sunday matinee" only on Sundays; other days the mixed programme is an evening concert.
+  if (built.type === 'mixed' && weekdayOf(dayKey) !== 0) {
+    built.title = built.title.replace(SERIES[lang].mixed, SERIES[lang].evening);
+    built.series = SERIES[lang].evening;
+  }
   const music = built.program.reduce((s, w) => s + w.minutes, 0);
   const durationMin = music + (music > 55 ? 20 : 0);
   const st = startTime(rng, dayKey, music, built.type);

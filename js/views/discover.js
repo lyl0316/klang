@@ -2,17 +2,20 @@
 // floating album-cover collage with the profile button, editorial hero, Concerts / Assistant
 // buttons, "Today's Pick" masonry (work cards + concert programmes, chosen deterministically
 // per day), "Widely Loved" (story-style auto-advancing categories) and "New on Record"
-// (Apple Music Switzerland classical chart; tapping an album plays its preview, as in Sheng).
+// (Apple Music Switzerland classical chart). Klang plays no audio: a pick's "40 min ▷" chip and a
+// New on Record cover are real links that open the work / album in Apple Music Classical (or Apple
+// Music, chosen in Me), which plays it in full; "+" on a cover saves the album (ui/save.js).
 // No social features; everything is local.
 //
 // Route: #/discover  → render() (header: false; the page draws its own top area).
 
-import { h, icon, toast, TYPE_LABELS } from '../util.js';
+import { h, icon, TYPE_LABELS } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
-import { player, playerState, classicalChart, searchAlbums, albumTracks, ITUNES_CREDIT, classicalSearchURL } from '../music.js';
-import { chosenTracks } from '../ui/listen.js';
-import '../ui/player.js'; // side effect: lets the full player record each queue for "Up next"
+import { classicalChart, searchAlbums, albumTracks, classicalSearchURL } from '../music.js';
+import { listenLink, makePiece, workPiece, albumPiece, pieceURL, listening, onListening, playAppName, APPLE_CREDIT, refineQueued } from '../applemusic.js';
+import { openSaveSheet } from '../ui/save.js';
+import { searchTerm, matchWorkTracks } from '../ui/listen.js';
 import { href, avatar, venueLabel } from '../ui/components.js';
 import { todayKey, addDays, daysBetween, weekdayOf, monthShort, dayNum, yearOf, timeOf, relDayLabel, isPast } from '../time.js';
 
@@ -22,6 +25,11 @@ const WORK_CARDS = 7; // Sheng: ~7 single works …
 const PROGRAMME_CARDS = 6; // … and ~6 concert programmes
 const PROGRAMME_WORKS = 3; // works shown (and played) per programme card
 const ADVANCE_MS = 6000; // Widely Loved: one category per 6 s (the progress bar runs this long)
+const SEARCH_LIMIT = 25; // same as ui/listen.js, so the work page reuses the cached search
+// Pick works looked up per visit, 2 requests each: iTunes allows ~20 requests a minute, and the
+// page you open next must not wait behind Discover's prefetching.
+const PREFETCH_MAX = 16; // every chip on the page (iTunes calls are throttled and cached for 7 days)
+const PREFETCH_DWELL_MS = 800; // only chips that stay on screen this long
 
 const CATS = [
   { id: 'solo', label: 'Solo', genres: ['solo', 'piano'] },
@@ -73,8 +81,6 @@ const fmtN = (n) => n.toLocaleString('en-US');
 const titleOf = (w) => (w.catalog && !w.title.includes(w.catalog) ? `${w.title}, ${w.catalog}` : w.title);
 const svg = (markup, cls = '') => h('span', { class: `dc-svg ${cls}`.trim(), 'aria-hidden': 'true', html: markup });
 const TRI = '<svg width="8" height="9" viewBox="0 0 8 9"><path d="M1 1v7l6-3.5z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
-const BARS = '<svg width="8" height="9" viewBox="0 0 8 9"><path d="M1 1h2v7H1zM5 1h2v7H5z" fill="currentColor"/></svg>';
-const RING = '<svg width="9" height="9" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="15 9" stroke-linecap="round"/></svg>';
 
 // Content files are written in parallel; a missing or broken one must not break Discover.
 async function loadContent() {
@@ -341,11 +347,11 @@ function masonry(cards, estimates, probe) {
   return { el, cleanup: () => ro?.disconnect() };
 }
 
-function todaysPick(today, upcomingList, counts, playback) {
+function todaysPick(today, upcomingList, counts, listen) {
   const items = buildPicks(today, upcomingList, counts);
-  const cards = items.map((it) => (it.kind === 'work' ? workCard(it, today, playback) : programmeCard(it, today, playback)));
+  const cards = items.map((it) => (it.kind === 'work' ? workCard(it, today, listen) : programmeCard(it, today, listen)));
   const wd = WEEKDAY_LONG[weekdayOf(today)];
-  const sub = h('p', { class: 'dc-sub' }, `Tap a work for details. Today is ${monthShort(today)} ${dayNum(today)}, ${wd}`);
+  const sub = h('p', { class: 'dc-sub' }, `Tap a work for details, ▷ to play it in ${playAppName()}. Today is ${monthShort(today)} ${dayNum(today)}, ${wd}`);
   const grid = masonry(cards, items.map(estimate), sub);
   const el = h('section', { class: 'dc-section dc-pick' },
     h('h2', { class: 'dc-h2 sans' }, 'Today\'s Pick'),
@@ -354,20 +360,23 @@ function todaysPick(today, upcomingList, counts, playback) {
   return { el, cleanup: grid.cleanup };
 }
 
-function workCard(it, today, playback) {
+// A card is a block whose link covers it (CSS: .dc-card-link::after), so that its duration chip — a
+// link of its own, to Apple Music — can sit on top: the card opens the work, the chip plays it.
+function workCard(it, today, listen) {
   const w = it.work;
   const comp = repo.composer(w.composerId);
   const fav = comp && store.isFollowing('composer', comp.id);
-  return h('a', { class: 'dc-card', href: href.work(w.id) },
-    badgeEl(it.badge, today),
-    h('div', { class: 'dc-comp' }, comp?.short || comp?.name || '', fav ? icon('heart', 11, 'dc-fav') : null),
-    h('div', { class: 'dc-work' }, titleOf(w)),
-    w.minutes ? playback.chip(`w:${w.id}`, [w], `${w.minutes} min`, `${comp?.short || ''} — ${w.title}`, 'red') : null);
+  return h('div', { class: 'dc-card' },
+    h('a', { class: 'dc-card-link', href: href.work(w.id) },
+      badgeEl(it.badge, today),
+      h('div', { class: 'dc-comp' }, comp?.short || comp?.name || '', fav ? icon('heart', 11, 'dc-fav') : null),
+      h('div', { class: 'dc-work' }, titleOf(w))),
+    w.minutes ? listen.chip([w], `${w.minutes} min`, `${comp?.short || ''} — ${w.title}`.replace(/^ — /, ''), 'red') : null);
 }
 
 // Programme card: type label, composer + work(s) — consecutive works by one composer share
 // the name, as in Sheng — a white duration chip that plays them, and the city.
-function programmeCard(it, today, playback) {
+function programmeCard(it, today, listen) {
   const c = it.concert;
   const groups = [];
   for (const p of it.items) {
@@ -378,104 +387,134 @@ function programmeCard(it, today, playback) {
   }
   const cityName = repo.city(c.cityId)?.name || '';
   const when = c.day === today ? `Today, ${timeOf(c.start)}` : `${relDayLabel(c.day, today)}, ${timeOf(c.start)}`;
-  return h('a', { class: 'dc-card prog', href: href.concert(c.id), title: [c.title, when].filter(Boolean).join(' · ') },
-    h('div', { class: 'dc-type' }, (TYPE_LABELS[c.type] || 'concert').toLowerCase()),
-    groups.map((g) => h('div', { class: 'dc-pair' },
-      g.name ? h('div', { class: 'dc-comp' }, g.name) : null,
-      g.items.map((p) => (p.title ? h('div', { class: 'dc-work' }, p.work ? titleOf(p.work) : [p.title, p.catalog].filter(Boolean).join(', ')) : null)))),
-    it.works.length ? playback.chip(`c:${c.id}`, it.works, it.minutes ? `${it.minutes} min` : 'Listen', c.title, 'white') : null,
+  return h('div', { class: 'dc-card prog' },
+    h('a', { class: 'dc-card-link', href: href.concert(c.id), title: [c.title, when].filter(Boolean).join(' · ') },
+      h('div', { class: 'dc-type' }, (TYPE_LABELS[c.type] || 'concert').toLowerCase()),
+      groups.map((g) => h('div', { class: 'dc-pair' },
+        g.name ? h('div', { class: 'dc-comp' }, g.name) : null,
+        g.items.map((p) => (p.title ? h('div', { class: 'dc-work' }, p.work ? titleOf(p.work) : [p.title, p.catalog].filter(Boolean).join(', ')) : null))))),
+    it.works.length ? listen.chip(it.works, it.minutes ? `${it.minutes} min` : 'Listen', it.works.map((w) => w.title).join(', '), 'white') : null,
     cityName ? h('div', { class: 'dc-city' }, cityName) : null);
 }
 
-// Preview playback for pick chips: first matching recording of each work (the user's chosen
-// version, see listen.js), queued as one playlist. Chips mirror the player state.
-// key -> Set<trackId>; module-level so a pick that is still playing shows as playing on return.
-const trackIds = new Map();
+// Listening for pick chips: a chip is a real link (applemusic.listenLink), so on an iPhone the tap
+// itself opens Apple Music Classical. It starts as an Apple Music search for the work and, once the
+// card is on screen, points at your version of the work (Versions on the work page; else the first
+// recording found) at the work's first track. A programme chip plays its works in order (the mini
+// player's ⏭ opens the next one). Chips of the piece you last opened show as current.
+const resolved = new Map(); // `${workId}|${chosen version}` -> piece | null (survives re-renders)
 
-function makePlayback() {
-  const chips = new Map(); // key -> Set<el>
-  let loadingKey = null;
+const versionKey = (w) => `${w.id}|${store.listenChoice(w.id) ?? ''}`;
 
-  function stateOf(key, st) {
-    if (loadingKey === key) return 'loading';
-    const ids = trackIds.get(key);
-    if (st.track && ids && ids.has(st.track.id)) return st.playing ? 'playing' : 'paused';
-    return 'idle';
+function searchPiece(w) {
+  const comp = repo.composer(w.composerId);
+  return makePiece({ title: w.title, composer: comp?.name || null, workId: w.id });
+}
+
+async function lookupWork(w) {
+  const albums = await searchAlbums(searchTerm(w), SEARCH_LIMIT);
+  const chosen = store.listenChoice(w.id);
+  const album = albums.find((a) => String(a.id) === String(chosen)) || albums[0];
+  if (!album) return null;
+  let first = null;
+  try {
+    first = matchWorkTracks(w, (await albumTracks(album.id)).tracks)?.tracks[0] || null;
+  } catch {
+    // no track list: the link opens the album
+  }
+  return workPiece(w, repo.composer(w.composerId)?.name, album, first);
+}
+
+function makeListen() {
+  const chips = new Map(); // el -> { works, queue }
+  const pending = new Set();
+  let budget = PREFETCH_MAX;
+  let alive = true;
+  let chain = Promise.resolve(); // one lookup at a time
+
+  // Point every chip that plays `w` at its recording (its queue holds the pieces the tap records).
+  function apply(w, piece) {
+    for (const [el, c] of chips) {
+      let hit = false;
+      c.works.forEach((x, i) => {
+        if (x.id !== w.id) return;
+        Object.assign(c.queue[i], piece);
+        hit = true;
+      });
+      if (hit) el.href = pieceURL(c.queue[0]);
+    }
+    refineQueued(piece); // a programme tapped before this lookup finished: fix its ⏭ target
   }
 
-  function paint(st = playerState()) {
-    for (const [key, set] of chips) {
-      const s = stateOf(key, st);
-      for (const el of set) {
-        if (el.dataset.state === s) continue;
-        el.dataset.state = s;
-        el.querySelector('.dc-svg')?.replaceWith(svg(s === 'loading' ? RING : s === 'playing' ? BARS : TRI, s === 'loading' ? 'spin' : ''));
-        el.setAttribute('aria-label', `${s === 'playing' ? 'Pause' : 'Play'} preview: ${el.dataset.label}`);
+  function prefetch(c) {
+    for (const w of c.works) {
+      const key = versionKey(w);
+      if (resolved.has(key) || pending.has(key) || budget <= 0) continue;
+      budget -= 1;
+      pending.add(key);
+      chain = chain
+        .then(() => (alive ? lookupWork(w) : undefined))
+        .then((p) => {
+          if (p === undefined) return;
+          resolved.set(key, p);
+          if (p) apply(w, p);
+        })
+        .catch(() => {})
+        .finally(() => pending.delete(key));
+    }
+  }
+
+  const timers = new Map(); // el -> timeout while its chip is on screen
+  const io = typeof IntersectionObserver === 'function'
+    ? new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        clearTimeout(timers.get(e.target));
+        timers.delete(e.target);
+        if (!e.isIntersecting) continue;
+        timers.set(e.target, setTimeout(() => {
+          timers.delete(e.target);
+          io.unobserve(e.target);
+          const c = chips.get(e.target);
+          if (c && alive) prefetch(c);
+        }, PREFETCH_DWELL_MS));
       }
+    })
+    : null;
+
+  function paint(L = listening()) {
+    const wid = L.current?.workId;
+    for (const [el, c] of chips) {
+      const on = !!wid && c.works.some((w) => w.id === wid);
+      if (on) el.dataset.state = 'current';
+      else delete el.dataset.state;
     }
   }
 
-  async function start(key, works, label) {
-    const st = playerState();
-    const ids = trackIds.get(key);
-    if (st.track && ids && ids.has(st.track.id)) {
-      player.toggle();
-      return;
-    }
-    if (loadingKey === key) return;
-    loadingKey = key;
-    paint();
-    let queue = [];
-    let started = false;
-    try {
-      for (const w of works) {
-        let res;
-        try {
-          res = await chosenTracks(w);
-        } catch {
-          continue;
-        }
-        const tracks = (res?.tracks || []).filter((t) => t.preview);
-        if (!tracks.length) continue;
-        queue = queue.concat(tracks);
-        trackIds.set(key, new Set(queue.map((t) => t.id)));
-        if (!started) {
-          if (loadingKey !== key) return; // the user started something else meanwhile
-          started = true;
-          loadingKey = null;
-          player.play(tracks[0], queue);
-          toast(`30-second preview · ${label}`);
-        } else {
-          const now = playerState();
-          if (now.playing && now.track && queue.some((t) => t.id === now.track.id)) player.play(now.track, queue);
-          else break;
-        }
-      }
-      if (!started && loadingKey === key) toast('No preview found — open the work for more recordings');
-    } finally {
-      if (loadingKey === key) loadingKey = null;
-      paint();
-    }
-  }
-
-  function chip(key, works, text, label, tone) {
-    const el = h('span', { class: `dc-chip ${tone}`, role: 'button', tabindex: '0', dataset: { label } }, text, ' ', svg(TRI));
-    const go = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      start(key, works, label);
-    };
-    el.addEventListener('click', go);
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') go(e);
+  function chip(works, text, label, tone) {
+    const queue = works.map((w) => ({ ...(resolved.get(versionKey(w)) || searchPiece(w)) }));
+    const el = listenLink(queue[0], [text, ' ', svg(TRI)], {
+      cls: `dc-chip ${tone}`,
+      queue,
+      index: 0,
+      label: `Play ${label} in ${playAppName()}`,
     });
-    if (!chips.has(key)) chips.set(key, new Set());
-    chips.get(key).add(el);
+    chips.set(el, { works, queue });
+    if (io) io.observe(el);
+    else prefetch(chips.get(el));
     return el;
   }
 
-  const unsub = player.subscribe((st) => paint(st));
-  return { chip, paint, cleanup: () => unsub() };
+  const unsub = onListening(paint);
+  return {
+    chip,
+    paint,
+    cleanup() {
+      alive = false;
+      io?.disconnect();
+      timers.forEach((t) => clearTimeout(t));
+      unsub();
+    },
+  };
 }
 
 // ---------- Widely Loved ----------
@@ -637,44 +676,47 @@ function widelyLoved(loved, counts, today) {
 }
 
 // ---------- New on Record ----------
-// albumId -> Set<trackId> of the previews queued from it (module-level: survives re-renders)
-const albumTrackIds = new Map();
+// Sheng: tapping an album plays it. Here a cover is a link that opens the album in Apple Music
+// Classical, which plays it in full; "+" saves it. The album you last opened shows a red ▶.
 
-// Sheng: tapping an album starts playback. Here: its 30-second previews, queued in order.
-// Cmd/Ctrl/middle-click still opens the album in Apple Music.
-async function playAlbum(a, el) {
-  const st = playerState();
-  const ids = albumTrackIds.get(a.id);
-  if (st.track && ids && ids.has(st.track.id)) {
-    player.toggle();
-    return;
-  }
-  if (el.classList.contains('loading')) return;
-  el.classList.add('loading');
-  try {
-    const res = await albumTracks(a.id);
-    const tracks = (res?.tracks || []).filter((t) => t.preview);
-    if (!tracks.length) throw new Error('no previews');
-    albumTrackIds.set(a.id, new Set(tracks.map((t) => t.id)));
-    player.play(tracks[0], tracks);
-    toast(`30-second preview · ${a.title}`);
-  } catch {
-    toast('No preview for this album — Cmd/Ctrl-click opens it in Apple Music');
-  } finally {
-    el.classList.remove('loading');
-  }
+// ✓ once the album is in your Library (or the album is in one of your playlists).
+function isSaved(p) {
+  return store.hasAlbum(p.collectionId) || store.userPlaylists().some((pl) => (pl.items || []).some((it) => it.id === p.id));
+}
+
+function saveDisc(piece) {
+  const btn = h('button', {
+    type: 'button',
+    class: 'dc-save',
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openSaveSheet(piece);
+    },
+  });
+  const paint = () => {
+    const on = isSaved(piece);
+    btn.classList.toggle('on', on);
+    btn.replaceChildren(icon(on ? 'check' : 'plus', 15));
+    btn.setAttribute('aria-label', on ? `In your Library: ${piece.title}. Change where it’s saved` : `Save ${piece.title} to your Library`);
+  };
+  paint();
+  return { el: btn, paint };
 }
 
 function newOnRecord(chartP) {
   const strip = h('div', { class: 'h-scroll dc-records', 'aria-label': 'New classical albums' });
-  const section = h('section', { class: 'dc-section dc-new' }, h('h2', { class: 'dc-h2' }, 'New on Record'), strip);
-  const albums = new Map(); // album id -> element
+  const section = h('section', { class: 'dc-section dc-new' },
+    h('h2', { class: 'dc-h2' }, 'New on Record'),
+    h('p', { class: 'dc-sub' }, `Tap an album to play it in full in ${playAppName()}.`),
+    strip);
+  const albums = new Map(); // album id -> { el, save }
 
-  const paintState = (st = playerState()) => {
-    for (const [id, el] of albums) {
-      const ids = albumTrackIds.get(id);
-      const mine = !!(st.track && ids && ids.has(st.track.id));
-      el.dataset.state = mine ? (st.playing ? 'playing' : 'paused') : 'idle';
+  const paintState = (L = listening()) => {
+    const cur = L.current?.collectionId;
+    for (const [id, { el }] of albums) {
+      if (cur != null && String(cur) === String(id)) el.dataset.state = 'current';
+      else delete el.dataset.state;
     }
   };
 
@@ -682,22 +724,21 @@ function newOnRecord(chartP) {
     h('div', { class: 'skeleton dc-line' }), h('div', { class: 'skeleton dc-line short' }))));
 
   const paint = (list0) => {
-    const list = list0.filter((a) => a.title);
+    const list = list0.filter((a) => a.title && a.id);
     if (!list.length) throw new Error('empty chart');
     albums.clear();
     strip.replaceChildren(...list.map((a) => {
-      const el = h('a', { class: 'dc-album', href: a.url || '#', target: '_blank', rel: 'noopener', title: `${a.title} — ${a.artist || ''}` },
+      const piece = albumPiece(a);
+      const link = listenLink(piece, [
         h('span', { class: 'art-wrap' },
           a.artwork ? h('img', { class: 'art', src: a.artwork, alt: '', loading: 'lazy', decoding: 'async' }) : h('div', { class: 'art ph' }, icon('album', 28)),
-          svg(BARS, 'dc-album-state')),
+          h('span', { class: 'dc-album-state' }, icon('play', 11))),
         h('div', { class: 't' }, a.title),
-        h('div', { class: 's' }, a.artist || ''));
-      el.addEventListener('click', (e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || !a.id) return; // let the browser open Apple Music
-        e.preventDefault();
-        playAlbum(a, el);
-      });
-      albums.set(a.id, el);
+        h('div', { class: 's' }, a.artist || ''),
+      ], { cls: 'dc-album-link', label: `Play ${a.title}${a.artist ? ` by ${a.artist}` : ''} in ${playAppName()}` });
+      const save = saveDisc(piece);
+      const el = h('div', { class: 'dc-album', title: `${a.title} — ${a.artist || ''}` }, link, save.el);
+      albums.set(a.id, { el, save });
       return el;
     }));
     paintState();
@@ -714,14 +755,19 @@ function newOnRecord(chartP) {
 
   skeleton();
   chartP.then(paint).catch(fail);
-  const unsub = player.subscribe((st) => paintState(st));
-  return { el: section, cleanup: () => unsub() };
+  const unsubs = [
+    onListening(paintState),
+    store.subscribe((topic) => {
+      if (topic === 'library') for (const { save } of albums.values()) save.paint();
+    }),
+  ];
+  return { el: section, cleanup: () => unsubs.forEach((fn) => fn()) };
 }
 
 // Small print at the very end of the page (Sheng has none; Apple's terms want the iTunes credit
-// wherever previews play, so it sits below the last section instead of between them).
+// with a link to Apple Music, so it sits below the last section instead of between them).
 function footnote() {
-  return h('p', { class: 'dc-credit dc-foot' }, 'New on Record: Apple Music Switzerland classical chart. ', ITUNES_CREDIT, ' ',
+  return h('p', { class: 'dc-credit dc-foot' }, 'New on Record: Apple Music Switzerland classical chart. ', APPLE_CREDIT, ' ',
     h('a', { href: classicalSearchURL('classical'), target: '_blank', rel: 'noopener' }, 'Open Apple Music Classical'), '.');
 }
 
@@ -731,14 +777,14 @@ export async function render() {
   const today = todayKey();
   const upcomingList = repo.upcoming();
   const counts = workCounts(upcomingList);
-  const playback = makePlayback();
+  const listen = makeListen();
 
   // one chart request feeds both the collage and New on Record
   const chartP = classicalChart(20);
   chartP.catch(() => {}); // handled by each consumer
 
   const firstWork = repo.allWorks().find((w) => counts.has(w.id)) || repo.allWorks()[0];
-  const pick = todaysPick(today, upcomingList, counts, playback);
+  const pick = todaysPick(today, upcomingList, counts, listen);
   const loveBlock = widelyLoved(loved, counts, today);
   const records = newOnRecord(chartP);
 
@@ -750,7 +796,6 @@ export async function render() {
     loveBlock.el,
     records.el,
     footnote());
-  playback.paint();
 
   return {
     title: 'Discover',
@@ -760,7 +805,7 @@ export async function render() {
       pick.cleanup();
       loveBlock.cleanup();
       records.cleanup();
-      playback.cleanup();
+      listen.cleanup();
     },
   };
 }

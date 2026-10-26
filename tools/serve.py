@@ -21,9 +21,16 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 
+class Server(http.server.ThreadingHTTPServer):
+    # The default backlog (5) makes macOS reset connections when a page load and the service
+    # worker's precache arrive together ("Failed to fetch dynamically imported module").
+    request_queue_size = 128
+    daemon_threads = True
+
+
 if __name__ == '__main__':
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
     handler = partial(NoCacheHandler, directory=ROOT)
-    with http.server.ThreadingHTTPServer(('', port), handler) as httpd:
+    with Server(('', port), handler) as httpd:
         print(f'Klang running at http://localhost:{port}')
         httpd.serve_forever()

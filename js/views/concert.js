@@ -5,8 +5,9 @@
 //  2. action bar (5 square tiles): Listen · Program · Notes · Podcasts · Ticket — jump to sections,
 //     greyed out when there is nothing to show
 //  3. ♡ Save + Going (upcoming) / ♡ Save + Attended (started) and the private review
-//  4. Listen carousel: one big card per programme work (chosen recording, Listen + Versions),
-//     ▶ Play all, "Add playlist to my Library", iTunes credit
+//  4. Listen carousel: one big card per programme work (chosen recording, Listen + Versions + Save),
+//     ▶ Play all, "Add playlist to my Library", Apple credit. Klang plays no audio: Listen / Play all
+//     open the piece in Apple Music Classical (or Apple Music, chosen in Me), where it plays in full
 //  5. red pill "Program": roles table + works · 6. red pill "Program book": one chapter per work
 //     with a chapter rail and a full-screen reader (double-tap)
 //  7. PODCASTS (Apple Podcasts episodes) · 8. FEATURED ARTISTS (composers + performers with ♡)
@@ -19,13 +20,13 @@ import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { isPast, relDayLabel, TZ } from '../time.js';
 import { buildICS } from '../ics.js';
+import { artwork, searchAlbums, albumTracks, searchPodcasts } from '../music.js';
 import {
-  player, playerState, artwork, searchAlbums, searchPodcasts,
-  classicalAlbumURL, classicalSearchURL, appleMusicSearchURL, ITUNES_CREDIT,
-} from '../music.js';
+  APPLE_CREDIT, listenLink, onListening, workPiece, albumPiece, toPlain, pieceURL, searchURL, playAppName,
+} from '../applemusic.js';
 import { openSheet } from '../ui/sheet.js';
-import { openVersionsSheet, chosenTracks, searchTerm } from '../ui/listen.js';
-import '../ui/player.js'; // side effect: lets the full player record each queue for "Up next"
+import { openVersionsSheet, matchWorkTracks, searchTerm } from '../ui/listen.js';
+import { openSaveSheet } from '../ui/save.js';
 import { href, emptyState, followButton, avatar, venueLabel, cityLabel } from '../ui/components.js';
 import { GUIDES, WIDELY_LOVED, HOOKS } from '../content/guides.js';
 import { goBack } from '../main.js';
@@ -374,6 +375,10 @@ function openReviewSheet(c, items, keepSheet) {
 }
 
 // ---------- 4. listen carousel ----------
+// Klang plays no audio: the red Listen ring, the cover and ▶ Play all are links that open the piece
+// in Apple Music Classical / Apple Music (applemusic.js), where it plays in full with the listener's
+// own subscription. "Save" puts the piece in a playlist and/or its album in the Library (ui/save.js).
+
 // One entry per distinct programme work. Imported listings without a matching repertoire work
 // get a lightweight stand-in, so their pieces can still be searched on Apple Music.
 function listenEntries(items) {
@@ -398,20 +403,36 @@ function listenEntries(items) {
       it,
       work,
       real: !!it.work,
+      composer: it.composerShort || it.composerName || null,
       label: [it.composerShort || it.composerName, it.title].filter(Boolean).join(': '),
       albums: null,
       chosen: null,
       error: null,
       loading: false,
-      tracks: null,
-      trackIds: null,
+      tracks: null, // the work's tracks on the chosen album ([] = none matched: play the album)
       tracksPromise: null,
       tracksToken: 0,
-      busy: false,
       visible: false,
+      current: false, // the piece last sent to Apple Music (Now listening)
+      linkKey: null,
     });
   }
   return out;
+}
+
+// Same piece of the programme? (ids change once a track id is known, so compare album + work)
+function samePiece(a, b) {
+  if (!a || !b || a.kind === 'album' || b.kind === 'album' || !sameId(a.collectionId, b.collectionId)) return false;
+  return a.workId && b.workId ? a.workId === b.workId : a.title === b.title;
+}
+
+// Swap a listen link for one that opens `piece`, keeping its content and keyboard focus.
+function relink(old, piece, opts) {
+  const focused = document.activeElement === old;
+  const next = listenLink(piece, [...old.childNodes], opts);
+  old.replaceWith(next);
+  if (focused) next.focus({ preventScroll: true });
+  return next;
 }
 
 function listenBlock(c, entries, ctx) {
@@ -422,60 +443,36 @@ function listenBlock(c, entries, ctx) {
     return e.albums.find((a) => sameId(a.id, id)) || e.albums[0] || null;
   };
 
-  // ----- tracks of the chosen version (prefetched for visible cards, so Listen plays on tap) -----
+  // The piece a card plays: the chosen recording of the work, from its first movement once the
+  // album's tracks are in (until then the album; with no recording, an Apple Music search).
+  function entryPiece(e) {
+    const work = { id: e.real ? e.work.id : null, title: e.work.title };
+    return workPiece(work, e.composer, e.chosen, e.tracks?.[0] || null);
+  }
+
+  // Play all link + caption (built by paintPlayAll once the cards exist)
+  let playAllEl = h('a', { class: 'cp-playall' });
+  let playAllKey = '';
+  const playAllNote = h('p', { class: 'cp-playall-note' });
+  let linkedApp = playAppName(); // links follow the "Play in" choice made in Me
+
+  // ----- tracks of the chosen version (prefetched for visible cards, so a tap opens the work itself) -----
+  let wantAll = false; // Play all is near: line up every work
   function ensureTracks(e) {
-    if (e.tracks) return Promise.resolve(e.tracks);
-    if (e.tracksPromise) return e.tracksPromise;
+    if (!e.chosen || e.tracks || e.tracksPromise) return;
     const token = ++e.tracksToken;
-    e.tracksPromise = chosenTracks(e.work)
+    e.tracksPromise = albumTracks(e.chosen.id)
       .then(({ tracks }) => {
-        if (token !== e.tracksToken) return e.tracks || [];
-        // Tag previews with the programme work so the player's Info view can name it.
-        e.tracks = e.real ? tracks.map((t) => (t.workId ? t : { ...t, workId: e.work.id })) : tracks;
-        e.trackIds = new Set(tracks.map((t) => String(t.id)));
-        return tracks;
+        if (token === e.tracksToken) e.tracks = matchWorkTracks(e.work, tracks)?.tracks || [];
       })
-      .catch(() => {
-        if (token === e.tracksToken) e.tracksPromise = null;
-        return null;
-      })
-      .then((res) => {
-        if (ctx.alive()) paintButtons(e);
-        return res;
+      .catch(() => {}) // the album link still works; tried again when the card comes back into view
+      .finally(() => {
+        if (token !== e.tracksToken) return;
+        e.tracksPromise = null;
+        if (ctx.alive()) paintLinks(e);
       });
-    return e.tracksPromise;
   }
-
-  const tracksFor = async (e) => (await ensureTracks(e)) || [];
-
-  function startTracks(tracks) {
-    if (!tracks.length) {
-      toast('No previews on this recording — try another version');
-      return;
-    }
-    player.play(tracks[0], tracks);
-  }
-
-  function listenTo(e) {
-    const st = playerState();
-    if (st.track && e.trackIds?.has(String(st.track.id))) {
-      player.toggle();
-      return;
-    }
-    if (e.tracks) {
-      startTracks(e.tracks);
-      return;
-    }
-    e.busy = true;
-    paintButtons(e);
-    ensureTracks(e).then((tracks) => {
-      e.busy = false;
-      if (!ctx.alive()) return;
-      paintButtons(e);
-      if (tracks == null) toast('Couldn’t reach Apple Music — try again');
-      else startTracks(tracks);
-    });
-  }
+  const wanted = (e) => e.visible || wantAll;
 
   function applyChosen(e) {
     if (!e.albums) return;
@@ -483,11 +480,10 @@ function listenBlock(c, entries, ctx) {
     if (sameId(next?.id, e.chosen?.id)) return;
     e.chosen = next;
     e.tracks = null;
-    e.trackIds = null;
     e.tracksPromise = null;
     e.tracksToken += 1;
     paintCard(e);
-    if (e.visible && e.chosen) ensureTracks(e);
+    if (wanted(e)) ensureTracks(e);
   }
 
   async function loadAlbums(e) {
@@ -505,7 +501,7 @@ function listenBlock(c, entries, ctx) {
     if (e.albums) e.chosen = pickChosen(e);
     paintCard(e);
     reportStatus();
-    if (e.visible && e.chosen) ensureTracks(e);
+    if (wanted(e)) ensureTracks(e);
   }
 
   function reportStatus() {
@@ -516,9 +512,8 @@ function listenBlock(c, entries, ctx) {
   function buildCard(e) {
     e.coverEl = h('div', { class: 'cp-lc-cover' });
     e.metaEl = h('div', { class: 'cp-lc-meta' });
-    e.ringEl = h('span', { class: 'ring' }, sym('listenRing', 22));
-    e.listenBtn = h('button', { type: 'button', class: 'cp-lc-btn cp-lc-listen', disabled: true, onclick: () => listenTo(e) },
-      e.ringEl, h('span', { class: 'lbl' }, 'Listen'));
+    e.listenBtn = listenLink(entryPiece(e), [h('span', { class: 'ring' }, sym('listenRing', 22)), h('span', { class: 'lbl' }, 'Listen')],
+      { cls: 'cp-lc-btn cp-lc-listen' });
     const versionsBtn = h('button', {
       type: 'button',
       class: 'cp-lc-btn',
@@ -530,12 +525,19 @@ function listenBlock(c, entries, ctx) {
         reportStatus();
       })),
     }, h('span', { class: 'ring' }, sym('versions', 21, 2.1)), h('span', { class: 'lbl' }, 'Versions'));
+    e.saveRing = h('span', { class: 'ring' });
+    e.saveLbl = h('span', { class: 'lbl' });
+    e.saveBtn = h('button', {
+      type: 'button',
+      class: 'cp-lc-btn cp-lc-save',
+      onclick: () => ctx.keepSheet(openSaveSheet(entryPiece(e))),
+    }, e.saveRing, e.saveLbl);
     e.el = h('article', { class: 'cp-lc', role: 'listitem', 'aria-label': e.label },
-      h('div', { class: 'cp-lc-comp' }, e.it.composerShort || e.it.composerName || ' '),
+      h('div', { class: 'cp-lc-comp' }, e.it.composerShort || e.it.composerName || ' '),
       h('div', { class: 'cp-lc-work' }, [e.work.title, e.work.catalog].filter(Boolean).join(', ')),
       e.coverEl,
       e.metaEl,
-      h('div', { class: 'cp-lc-actions' }, e.listenBtn, versionsBtn));
+      h('div', { class: 'cp-lc-actions' }, e.listenBtn, versionsBtn, e.saveBtn));
     paintCard(e);
     return e.el;
   }
@@ -547,6 +549,8 @@ function listenBlock(c, entries, ctx) {
   function paintCard(e) {
     clear(e.coverEl);
     clear(e.metaEl);
+    e.coverLink = null;
+    const app = playAppName();
     if (e.loading || (!e.albums && !e.error)) {
       e.coverEl.append(h('div', { class: 'cp-lc-art skeleton', 'aria-hidden': 'true' }));
       e.metaEl.append(h('div', { class: 'skeleton cp-lc-skel' }), h('div', { class: 'skeleton cp-lc-skel short' }),
@@ -558,32 +562,63 @@ function listenBlock(c, entries, ctx) {
     } else if (!e.chosen) {
       e.coverEl.append(placeholderArt());
       e.metaEl.append(h('div', { class: 'cp-lc-artist' }, 'No recordings found on Apple Music'),
-        h('a', { class: 'cp-lc-album', href: classicalSearchURL(searchTerm(e.work)), ...extAttrs }, 'Search Apple Music Classical'));
+        h('a', { class: 'cp-lc-album', href: searchURL(searchTerm(e.work)), ...extAttrs }, `Search ${app}`));
     } else {
       const a = e.chosen;
-      e.coverEl.append(h('button', {
-        type: 'button',
-        class: 'cp-lc-art-btn',
-        'aria-label': `Play previews: ${a.artist}, ${a.title}`,
-        onclick: () => listenTo(e),
-      }, a.artwork ? h('img', { class: 'cp-lc-art', src: artwork(a.artwork, 600), alt: '', loading: 'lazy' }) : placeholderArt()));
+      e.coverLink = listenLink(entryPiece(e),
+        a.artwork ? h('img', { class: 'cp-lc-art', src: artwork(a.artwork, 600), alt: '', loading: 'lazy' }) : placeholderArt(),
+        { cls: 'cp-lc-art-btn' });
+      e.coverEl.append(e.coverLink);
+      // the album name opens the whole album
       e.metaEl.append(h('div', { class: 'cp-lc-artist' }, a.artist),
-        h('a', { class: 'cp-lc-album', href: classicalAlbumURL(a.id), ...extAttrs, title: 'Open in Apple Music Classical' },
-          a.title || ''));
+        listenLink(albumPiece(a), a.title || '', { cls: 'cp-lc-album', label: `Play the whole album “${a.title}” in ${app}` }));
     }
-    paintButtons(e);
+    e.linkKey = null;
+    paintLinks(e);
+    paintSave(e);
   }
 
-  function paintButtons(e) {
-    if (!e.listenBtn) return;
-    const st = playerState();
-    const current = !!st.track && !!e.trackIds?.has(String(st.track.id));
-    const playing = current && st.playing;
-    e.listenBtn.disabled = !e.chosen || e.busy || (!!e.tracks && !e.tracks.length);
-    e.listenBtn.classList.toggle('busy', e.busy);
-    e.listenBtn.classList.toggle('current', current);
-    e.listenBtn.setAttribute('aria-label', `${playing ? 'Pause' : 'Listen to'} ${e.label}`);
-    e.ringEl.replaceChildren(playing ? icon('pause', 13) : sym('listenRing', 22));
+  // Listen + cover links of a card: rebuilt when the piece they open changes (version chosen,
+  // tracks loaded, or the app changed in Me).
+  function paintLinks(e) {
+    const piece = entryPiece(e);
+    const key = pieceURL(piece);
+    if (key !== e.linkKey) {
+      e.linkKey = key;
+      const app = playAppName();
+      const who = e.chosen ? ` (${e.chosen.artist})` : '';
+      e.listenBtn = relink(e.listenBtn, piece, {
+        cls: ['cp-lc-btn cp-lc-listen', e.current && 'current'].filter(Boolean).join(' '),
+        label: `Listen to ${e.label}${who} in ${app}`,
+      });
+      if (e.coverLink) e.coverLink = relink(e.coverLink, piece, { cls: 'cp-lc-art-btn', label: `Play ${e.label}${who} in ${app}` });
+    }
+    paintPlayAll();
+  }
+
+  function isSaved(e) {
+    const p = entryPiece(e);
+    if (p.collectionId && store.hasAlbum(p.collectionId)) return true;
+    return store.userPlaylists().some((pl) => (pl.items || []).some((it) => samePiece(it, p)));
+  }
+
+  function paintSave(e) {
+    const ready = !e.loading && !!(e.albums || e.error);
+    const saved = ready && isSaved(e);
+    e.saveBtn.disabled = !ready;
+    e.saveBtn.classList.toggle('on', saved);
+    e.saveRing.replaceChildren(icon(saved ? 'check' : 'plus', 20));
+    e.saveLbl.textContent = saved ? 'In Library' : 'Add'; // not "Save": that word saves the concert itself
+    e.saveBtn.setAttribute('aria-label', saved
+      ? `Saved in your Library: ${e.label}. Change where it is saved`
+      : `Save ${e.label} to your Library`);
+  }
+
+  function paintCurrent(cur) {
+    for (const e of entries) {
+      e.current = samePiece(cur, entryPiece(e));
+      e.listenBtn.classList.toggle('current', e.current);
+    }
   }
 
   // ----- carousel -----
@@ -597,7 +632,7 @@ function listenBlock(c, entries, ctx) {
         const e = byEl.get(en.target);
         if (!e) continue;
         e.visible = en.isIntersecting;
-        if (e.visible && e.chosen) ensureTracks(e);
+        if (e.visible) ensureTracks(e);
       }
     }, { root: carousel, threshold: 0.35 });
     entries.forEach((e) => io.observe(e.el));
@@ -606,51 +641,31 @@ function listenBlock(c, entries, ctx) {
     entries.forEach((e) => { e.visible = true; });
   }
 
-  // ----- Play all -----
-  let playAllBusy = false;
-  const playAllLabel = h('span', {}, 'Play all');
-  const playAllBtn = h('button', { type: 'button', class: 'cp-playall', 'aria-label': 'Play previews of the whole programme' },
-    icon('play', 14), playAllLabel);
-  playAllBtn.onclick = async () => {
-    if (playAllBusy) return;
-    const ready = entries.every((e) => e.tracks || (e.albums && !e.albums.length) || (e.error && !e.albums));
-    let queue;
-    if (ready) {
-      queue = entries.flatMap((e) => e.tracks || []);
-    } else {
-      playAllBusy = true;
-      playAllBtn.disabled = true;
-      playAllLabel.textContent = 'Lining up…';
-      const lists = await Promise.all(entries.map(tracksFor));
-      playAllBusy = false;
-      if (!ctx.alive()) return;
-      playAllBtn.disabled = false;
-      playAllLabel.textContent = 'Play all';
-      queue = lists.flat();
-    }
-    if (!queue.length) {
-      toast('No previews found for this programme');
-      return;
-    }
-    if (playerState().track?.id === queue[0].id) player.stop();
-    player.play(queue[0], queue);
-    toast(`Playing ${plural(queue.length, 'preview')} in programme order`);
-  };
+  // ----- Play all: the first work, with the rest of the programme queued (⏭ in the player bar) -----
+  function paintPlayAll(force = false) {
+    const pieces = entries.map(entryPiece);
+    const key = pieces.map((p) => pieceURL(p)).join(' ');
+    if (key === playAllKey && !force) return;
+    playAllKey = key;
+    const app = playAppName();
+    const label = `Play all ${plural(pieces.length, 'work')} of the programme in ${app}`;
+    const next = listenLink(pieces[0], [icon('play', 14), h('span', {}, 'Play all')], { cls: 'cp-playall', queue: pieces, index: 0, label });
+    const focused = document.activeElement === playAllEl;
+    playAllEl.replaceWith(next);
+    playAllEl = next;
+    if (focused) next.focus({ preventScroll: true });
+    playAllNote.replaceChildren(h('span', {}, `Plays in full in ${app}`),
+      pieces.length > 1 ? h('span', {}, '⏭\uFE0E in the player bar for the next piece') : '');
+  }
 
-  // ----- Add playlist to my Library -----
+  // ----- Add playlist to my Library (each work as a piece the Library can open) -----
   const playlistId = `concert-${c.id}`;
   const playlistRecord = () => ({
     id: playlistId,
     name: c.title,
+    kind: 'concert',
     concertId: c.id,
-    items: entries.map((e) => ({
-      workId: e.real ? e.work.id : null,
-      collectionId: e.chosen?.id ?? null,
-      title: e.work.title,
-      composer: e.it.composerShort || e.it.composerName || '',
-      artist: e.chosen?.artist || null,
-      artwork: e.chosen?.artwork || null,
-    })),
+    items: entries.map((e) => toPlain(entryPiece(e))),
   });
   const plInput = h('input', { type: 'checkbox' });
   plInput.checked = store.hasPlaylist(playlistId);
@@ -663,31 +678,49 @@ function listenBlock(c, entries, ctx) {
     h('span', { class: 'n' }, plural(entries.length, 'work')));
 
   const term0 = searchTerm(entries[0].work);
-  const el = h('section', { class: 'cp-listen', 'aria-label': 'Listen' },
-    carousel,
-    h('div', { class: 'cp-listen-foot' },
-      entries.length ? playAllBtn : null,
-      plRow,
-      h('p', { class: 'cp-credit' }, ITUNES_CREDIT, ' ',
-        h('a', { href: classicalSearchURL(term0), ...extAttrs }, 'Apple Music Classical'), ' · ',
-        h('a', { href: appleMusicSearchURL(term0), ...extAttrs }, 'Apple Music'))));
+  const foot = h('div', { class: 'cp-listen-foot' },
+    playAllEl,
+    playAllNote,
+    plRow,
+    h('p', { class: 'cp-credit' }, APPLE_CREDIT, ' ',
+      h('a', { href: searchURL(term0, 'classical'), ...extAttrs }, 'Apple Music Classical'), ' · ',
+      h('a', { href: searchURL(term0, 'music'), ...extAttrs }, 'Apple Music')));
+  paintPlayAll(true);
+  const el = h('section', { class: 'cp-listen', 'aria-label': 'Listen' }, carousel, foot);
+
+  // Once Play all is near, line up the first movement of every work (a few cached lookups).
+  if (typeof IntersectionObserver === 'function') {
+    const io = new IntersectionObserver((list) => {
+      if (!list.some((en) => en.isIntersecting)) return;
+      io.disconnect();
+      wantAll = true;
+      entries.forEach(ensureTracks);
+    }, { rootMargin: '200px 0px' });
+    io.observe(foot);
+    ctx.observe(io);
+  } else {
+    wantAll = true;
+  }
 
   entries.forEach(loadAlbums);
 
-  let lastSig = '';
   return {
     el,
     onListenChoice() {
       entries.forEach(applyChosen);
     },
-    onPlayer(st) {
-      const sig = `${st.track?.id ?? ''}|${st.playing}`;
-      if (sig === lastSig) return;
-      lastSig = sig;
-      entries.forEach(paintButtons);
+    onListening(L) {
+      paintCurrent(L.current);
     },
-    paintPlaylist() {
+    onLibrary() {
       plInput.checked = store.hasPlaylist(playlistId);
+      entries.forEach(paintSave);
+    },
+    onPrefs() {
+      if (playAppName() === linkedApp) return; // another preference
+      linkedApp = playAppName();
+      entries.forEach(paintCard);
+      paintPlayAll(true);
     },
   };
 }
@@ -1236,9 +1269,10 @@ export function render({ id } = {}) {
     if (topic === 'marks') paintMarks();
     else if (topic === 'hidden') head.paintHidden();
     else if (topic === 'listen') listen?.onListenChoice();
-    else if (topic === 'library') listen?.paintPlaylist();
+    else if (topic === 'library') listen?.onLibrary();
+    else if (topic === 'prefs') listen?.onPrefs();
   });
-  const unsubPlayer = listen ? player.subscribe((st) => alive && listen.onPlayer(st)) : () => {};
+  const unsubListening = listen ? onListening((L) => alive && listen.onListening(L)) : () => {};
 
   return {
     title: c.title,
@@ -1247,7 +1281,7 @@ export function render({ id } = {}) {
     cleanup() {
       alive = false;
       unsubStore();
-      unsubPlayer();
+      unsubListening();
       observers.forEach((io) => io.disconnect());
       timers.forEach((t) => clearTimeout(t));
       timers.clear();

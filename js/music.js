@@ -1,12 +1,11 @@
 // Apple Music via the free, keyless iTunes Search / Lookup API (country=CH).
 // - searchAlbums(): recordings ("versions") of a work
-// - albumTracks(): movements of a recording, each with a 30-second preview
-// - player: streams previews in-app; full playback = "Open in Apple Music (Classical)".
+// - albumTracks(): movements of a recording (track ids for deep links)
+// - Klang plays no audio: Listen opens Apple Music Classical / Apple Music (applemusic.js).
 //
-// Apple's terms (performance-partners.apple.com/search-api): previews are streamed only
-// (never downloaded or cached), shown with a link to Apple Music and the credit
-// "provided courtesy of iTunes". Search/lookup *metadata* may be cached, so responses are
-// cached in localStorage for 7 days and calls are throttled under ~20 requests/minute.
+// Apple's terms (performance-partners.apple.com/search-api): show results with a link to Apple Music.
+// Search/lookup *metadata* may be cached, so responses are cached in localStorage for 7 days and calls
+// are throttled under ~20 requests/minute. No audio is streamed or stored by Klang.
 // The full Apple Music API (work/movement fields, full playback in-browser) needs the paid
 // Apple Developer Program (USD 99/yr) and is not used. Apple Music Classical has no public
 // API; we only deep-link to classical.music.apple.com (opens the Classical app on iOS).
@@ -139,7 +138,6 @@ export async function albumTracks(collectionId) {
       artist: r.artistName,
       album: r.collectionName,
       artwork: artwork(r.artworkUrl100, 300),
-      preview: r.previewUrl,
       durationMs: r.trackTimeMillis,
       url: r.trackViewUrl,
       disc: r.discNumber,
@@ -209,72 +207,10 @@ export const appleMusicSearchURL = (term) => `https://music.apple.com/ch/search?
 // Apple Music Classical web links (same album IDs as Apple Music; open the Classical app on iOS)
 export const classicalSearchURL = (term) => `https://classical.music.apple.com/ch/search?term=${encodeURIComponent(term)}`;
 export const classicalAlbumURL = (collectionId) => `https://classical.music.apple.com/ch/album/${collectionId}`;
-export const ITUNES_CREDIT = 'Recordings and 30-second previews provided courtesy of iTunes. Full tracks need an Apple Music subscription.';
+export const ITUNES_CREDIT = 'Recording details come from Apple’s iTunes Search API. Pieces play in full in Apple Music Classical or Apple Music, with your own subscription.';
 
 export const fmtDuration = (ms) => {
   if (!ms) return '';
   const s = Math.round(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
-
-// ---------- preview player ----------
-const listeners = new Set();
-const audio = typeof Audio !== 'undefined' ? new Audio() : null;
-let current = null; // track object
-let queue = [];
-
-function emit() {
-  for (const fn of listeners) fn(playerState());
-}
-
-export function playerState() {
-  return {
-    track: current,
-    playing: !!audio && !audio.paused && !!current,
-    progress: audio && audio.duration ? audio.currentTime / audio.duration : 0,
-    hasNext: queue.indexOf(current) >= 0 && queue.indexOf(current) < queue.length - 1,
-  };
-}
-
-export const player = {
-  subscribe(fn) {
-    listeners.add(fn);
-    fn(playerState());
-    return () => listeners.delete(fn);
-  },
-  play(track, list = null) {
-    if (!audio || !track?.preview) return;
-    if (list) queue = list.filter((t) => t.preview);
-    if (current?.id !== track.id) {
-      current = track;
-      audio.src = track.preview;
-    }
-    audio.play().catch(() => emit());
-    emit();
-  },
-  toggle() {
-    if (!audio || !current) return;
-    if (audio.paused) audio.play().catch(() => emit());
-    else audio.pause();
-  },
-  next() {
-    const i = queue.indexOf(current);
-    if (i >= 0 && i < queue.length - 1) player.play(queue[i + 1]);
-  },
-  stop() {
-    if (!audio) return;
-    audio.pause();
-    current = null;
-    emit();
-  },
-};
-
-if (audio) {
-  audio.preload = 'none';
-  for (const ev of ['play', 'pause', 'timeupdate']) audio.addEventListener(ev, emit);
-  audio.addEventListener('ended', () => {
-    const st = playerState();
-    if (st.hasNext) player.next();
-    else emit();
-  });
-}

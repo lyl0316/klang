@@ -1,0 +1,76 @@
+/* Now listening: mini player + sheet (main.js, ui/player.js). Owned by the player rework.
+   Klang plays no audio — these show the piece last opened in Apple Music Classical / Apple Music. */
+
+/* ---------- dock mini player ---------- */
+/* The mini player is a group (not a button): a body button that opens Now listening, then ↗ / ⏭ links. */
+.dock .mini-player { cursor: pointer; }
+.mini-player .mp-main {
+  flex: 1; min-width: 0; align-self: stretch;
+  display: flex; align-items: center; gap: 10px; text-align: left; border-radius: 12px;
+}
+.mini-player .mp-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mini-player a.mp-btn { color: var(--text); }
+.mini-player a.mp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ---------- Now listening view (reuses the .np player frame from shell.css / parity-personal.css) ---------- */
+.nl-label {
+  margin-top: 2px; text-align: center; font-size: 10.5px; font-weight: 650; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--np-text-3);
+}
+.nl .np-art-wrap { padding: 18px 0 24px; }
+.nl .np-art { width: min(100%, 300px, 38vh); }
+.nl .np-kicker { text-transform: none; letter-spacing: 0.01em; font-size: 13px; }
+.nl-album { margin-top: 1px; font-size: 13px; color: var(--np-text-3); }
+.nl-album:empty { display: none; }
+
+.nl-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; flex: none; }
+.nl-play {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  height: 52px; padding: 0 20px; border-radius: 26px;
+  background: var(--accent); color: #fff; font-size: 16px; font-weight: 650; letter-spacing: 0.005em;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+  transition: transform 0.1s, filter 0.15s;
+}
+.nl-play span { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nl-play:active { transform: scale(0.98); filter: brightness(0.94); }
+.nl-play:focus-visible, .nl-pill:focus-visible, .nl-qmain:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.nl-caption { margin: 0 8px; text-align: center; font-size: 12px; line-height: 1.45; color: var(--np-text-3); text-wrap: pretty; }
+.nl-swap { font-size: inherit; color: var(--np-text-2); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--np-line); }
+.nl-row { display: flex; gap: 10px; margin-top: 2px; }
+.nl-pill {
+  flex: 1; min-width: 0; height: 42px; padding: 0 14px; border-radius: 21px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--np-glass); color: #fff; font-size: 14px; font-weight: 600; white-space: nowrap;
+}
+.nl-pill:active { background: rgba(255, 255, 255, 0.2); }
+.nl-pill.on .icon { color: #5fd38d; }
+
+.nl-fields { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--np-line); flex: none; }
+.nl-fields .np-field .v a { color: #fff; }
+.nl-composer { display: inline-flex; align-items: center; gap: 10px; text-decoration: none !important; }
+.nl-composer .np-composer { width: 30px; height: 30px; font-size: 12px; flex: none; }
+.nl-composer > span:last-child { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--np-line); }
+.nl-dim { color: var(--np-text-3); font-weight: 400; }
+
+.nl-queue { flex: none; }
+.nl-queue:empty { display: none; }
+.nl-qlabel { margin: 14px 2px 6px; font-size: 15px; font-weight: 650; letter-spacing: -0.005em; color: #fff; }
+.nl-qrow { display: flex; align-items: center; gap: 4px; }
+.nl-qmain { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 8px; margin-left: -8px; border-radius: 12px; color: #fff; }
+.nl-qmain:active { background: var(--np-glass); }
+.nl-qmain img, .nl-qmain .ph {
+  width: 44px; height: 44px; border-radius: 7px; object-fit: cover; flex: none;
+  background: var(--np-glass); display: flex; align-items: center; justify-content: center; color: var(--np-text-3);
+}
+.nl-qmain .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.nl-qmain .t { font-size: 14px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nl-qmain .s { font-size: 12px; color: var(--np-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nl-qmain .go { flex: none; color: var(--np-text-3); }
+.nl-qsave { width: 36px; height: 36px; flex: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--np-text-2); }
+.nl-qsave:active { background: var(--np-glass); }
+.nl-qempty { margin: 16px 2px 0; font-size: 12.5px; color: var(--np-text-3); }
+
+.nl-foot { margin-top: auto; padding-top: 26px; text-align: center; flex: none; }
+.nl-clear { height: 34px; padding: 0 16px; border-radius: 17px; border: 1px solid var(--np-line); color: var(--np-text-2); font-size: 13px; font-weight: 500; }
+.nl-clear:active { background: var(--np-glass); }
+.nl .np-credit { margin-top: 14px; }
