@@ -38,7 +38,11 @@ skipped.
 The time printed in the calendar wins over the entry's JSON-LD when they disagree, and an
 entry whose JSON-LD block is missing (the site drops it once a performance has started)
 takes its date and time from the calendar text; a JSON-LD block is only taken from the
-entry's own part of the page, never from the block printed just before the next entry.
+entry's own part of the page, never from the block printed just before the next entry. On
+another day than the printed one (the printed date has no year), the JSON-LD date is kept.
+A performance missing from the calendar run that the previous feed had (the calendar moves
+up one place when a started performance is taken off it, so a page's first entry can be
+missed) is looked up on its production page.
 """
 from __future__ import annotations
 
@@ -48,7 +52,8 @@ import unicodedata
 from datetime import datetime
 
 from common import (BudgetExceeded, FetchError, clean, event_id, get, guess_type, jsonld_events, log, looks_cancelled,
-                    make_event, previous_event, refresh_due, requests_left, same_title, to_zurich_iso, today_zurich)
+                    make_event, previous_event, previous_events, refresh_due, requests_left, same_title, to_zurich_iso,
+                    today_zurich)
 
 from ._consent import group_role, looks_like_person, role_en
 
@@ -273,10 +278,15 @@ def parse_listing(page_html, state=None):
             if not start:
                 log.info('%s: uid_%s has no JSON-LD; using the calendar\'s %s', KEY, m.group(1), printed)
                 start = printed
-            elif start[:16] != printed:
+            elif start[:10] == printed[:10] and start[:16] != printed:
                 log.warning('%s: uid_%s JSON-LD says %s but the calendar shows %s; using the calendar',
                             KEY, m.group(1), start[:16], printed)
                 start = printed
+            elif start[:10] != printed[:10] and start[5:10] != printed[5:10]:
+                # the printed day has no year and a 'noday' entry borrows the day before it: the
+                # entry's own JSON-LD date is the safer one
+                log.warning('%s: uid_%s JSON-LD says %s but the calendar shows %s; using the JSON-LD',
+                            KEY, m.group(1), start[:16], printed)
         if not start:
             continue
         h2 = re.search(r'<h2[^>]*>(.*?)</h2>', chunk, re.S)
@@ -489,6 +499,25 @@ def credits_for(kind, people, players):
 # main
 # ---------------------------------------------------------------------------
 
+MAX_RECOVERY_PAGES = 8
+
+
+def missed_performances(previous, seen, today):
+    """{production page url: {uid, ...}} for upcoming performances of the previous feed (``previous``:
+    this source's events) whose uid the calendar run did not see (``seen``), soonest first."""
+    out, first = {}, {}
+    for ev in previous or []:
+        uid = str(ev.get('id') or '').rsplit('-', 1)[-1]
+        url = str(ev.get('url') or '')
+        if not uid.isdigit() or uid in seen or not url.startswith(BASE + '/spielplan/'):
+            continue
+        if str(ev.get('start') or '')[:10] < today.isoformat() or ev.get('status') == 'cancelled':
+            continue
+        out.setdefault(url, set()).add(uid)
+        first[url] = min(first.get(url, '9'), str(ev.get('start')))
+    return {u: out[u] for u in sorted(out, key=lambda u: (first[u], u))}
+
+
 def fetch():
     entries, seen = [], set()
     first = get(LISTING)                                     # FetchError here -> reuse yesterday
@@ -509,6 +538,25 @@ def fetch():
             break
     if not entries:
         raise FetchError(LISTING, 'no calendar entries found (layout changed?)')
+
+    # The site takes a performance off the calendar once it has started, and every later entry
+    # moves up one place: read while that happens, the first entry of the next page is missed.
+    # Upcoming performances of the previous feed that this run did not see are looked up on
+    # their production page, which lists every performance of the production.
+    pages = {}
+    for url, uids in list(missed_performances(previous_events(KEY), seen, today_zurich()).items())[:MAX_RECOVERY_PAGES]:
+        try:
+            pages[url] = get(url)
+        except (FetchError, BudgetExceeded) as err:
+            log.warning('%s: production page for missed performances failed: %s', KEY, err)
+            continue
+        found = [r for r in parse_listing(pages[url], {'ref': today_zurich()}) if r['uid'] in uids]
+        for r in found:
+            seen.add(r['uid'])
+            r['url'] = r['url'] or url
+            entries.append(r)
+        log.info('%s: %d of %d performance(s) missing from the calendar run found on %s',
+                 KEY, len(found), len(uids), url)
 
     kept, skipped = [], {}
     for e in entries:
@@ -558,6 +606,9 @@ def fetch():
     order = sorted((u for u in order if tiers[u][0] < 3), key=lambda u: tiers[u])
     details = {}
     for u in order:
+        if u in pages:                                    # already read for a missed performance
+            details[u] = parse_detail(pages[u])
+            continue
         if requests_left() <= 0:
             break
         try:

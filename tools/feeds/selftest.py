@@ -1191,6 +1191,37 @@ class TonhalleComposerList(unittest.TestCase):
             ('Giuseppe Verdi', 'Streichquartett e-Moll'), ('Giuseppe Verdi', 'Rigoletto: Caro nome, Bella figlia')])
 
 
+class OpernhausRecovery(unittest.TestCase):
+    ITEM = ('<div class="el-eventlistitem noday noadjust last" id="uid_{uid}">'
+            '<script type="application/ld+json">{{"@context":"http://schema.org/","@type":"Event","name":"L\'elisir d\'amore",'
+            '"startDate":"{start}","url":"https://www.opernhaus.ch/spielplan/kalendarium/lelisir-damore/",'
+            '"offers":{{"@type":"AggregateOffer","url":"https://tickets.opernhaus.ch/x"}}}}</script>'
+            '<div class="date"> {box} </div><div class="details"><div class="inner">'
+            '<div class="location">Hauptbühne Opernhaus</div><h2 >L\'elisir d\'amore</h2>'
+            '<div class="description">Oper von Gaetano Donizetti<br/></div></div></div></div>')
+
+    def test_json_ld_year_is_kept(self):
+        import sources.opernhaus_zurich as oz
+        page = self.ITEM.format(uid=199962, start='2027-05-09T19:30',
+                                box='<span class="day">09</span><span class="month">Mai</span><p>19.30</p>')
+        rows = oz.parse_listing(page, {'ref': date(2026, 10, 26)})    # a production page read in October
+        self.assertEqual(rows[0]['start'], '2027-05-09T19:30')
+        page = self.ITEM.format(uid=199962, start='2027-05-09T19:30',
+                                box='<span class="day">09</span><span class="month">Mai</span><p>20.00</p>')
+        self.assertEqual(oz.parse_listing(page, {'ref': date(2027, 5, 1)})[0]['start'], '2027-05-09T20:00')
+
+    def test_missed_performances(self):
+        import sources.opernhaus_zurich as oz
+        url = 'https://www.opernhaus.ch/spielplan/kalendarium/lelisir-damore/'
+        prev = [{'id': 'opernhaus_zurich-199962', 'start': '2027-05-09T19:30:00+02:00', 'url': url},
+                {'id': 'opernhaus_zurich-199961', 'start': '2027-05-06T20:00:00+02:00', 'url': url},
+                {'id': 'opernhaus_zurich-100', 'start': '2026-10-01T19:00:00+02:00', 'url': url},          # past
+                {'id': 'opernhaus_zurich-101', 'start': '2027-01-01T19:00:00+01:00', 'url': url, 'status': 'cancelled'},
+                {'id': 'opernhaus_zurich-102', 'start': '2027-01-02T19:00:00+01:00', 'url': 'https://example.org/x'}]
+        self.assertEqual(oz.missed_performances(prev, {'199961'}, date(2026, 10, 26)), {url: {'199962'}})
+        self.assertEqual(oz.missed_performances([], set(), date(2026, 10, 26)), {})
+
+
 class CodeHash(unittest.TestCase):
     def test_helpers_count(self):
         names = lambda key: [os.path.basename(p) for p in build.code_files(registry.discover([key])[0])]
