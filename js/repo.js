@@ -5,7 +5,7 @@ import { CITIES, CANTONS } from './data/cities.js';
 import { VENUES } from './data/venues.js';
 import { COMPOSERS, WORKS } from './data/repertoire.js';
 import { generateDemo, slug } from './data/generate.js';
-import { OPERNHAUS } from './data/opernhaus.js';
+import { REAL, REAL_CITIES } from './data/real.js';
 import * as store from './store.js';
 import { dayKeyOf, todayKey, monthKeyOf } from './time.js';
 import { normalize } from './util.js';
@@ -23,10 +23,11 @@ export function rebuild() {
   venueMap = new Map(VENUES.map((v) => [v.id, v]));
   artistMap = new Map(demo.artists.map((a) => [a.id, a]));
   const imported = store.getImports().map(normalizeImported);
-  // Opernhaus Zürich: the real calendar (data/opernhaus.js) replaces the demo listings there.
-  const opernhaus = OPERNHAUS.map((c) => normalizeImported({ ...c, series: c.series || c.room || null }));
-  const demoConcerts = demo.concerts.filter((c) => c.venueId !== 'opernhaus-zurich');
-  concerts = [...demoConcerts, ...opernhaus, ...imported]
+  // Real listings from the venues' own websites (data/real.js); in those cities the demo listings go.
+  const real = REAL.map((c) => normalizeImported(c));
+  const covered = new Set(REAL_CITIES);
+  const demoConcerts = demo.concerts.filter((c) => !covered.has(c.cityId));
+  concerts = [...demoConcerts, ...real, ...imported]
     .map((c) => ({ ...c, day: dayKeyOf(c.start) }))
     .sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
   concertMap = new Map(concerts.map((c) => [c.id, c]));
