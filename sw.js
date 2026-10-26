@@ -2,7 +2,7 @@
 // Network-first for Klang's own files (so updates show immediately), with a cached fallback.
 // Google Fonts are cached; Apple (iTunes) data and artwork are never cached here. Klang plays no
 // audio: Listen opens Apple Music Classical / Apple Music.
-const CACHE = 'klang-shell-v4';
+const CACHE = 'klang-shell-v5';
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -44,6 +44,7 @@ const SHELL = [
   './js/data/cities.js',
   './js/data/generate.js',
   './js/data/names.js',
+  './js/data/opernhaus.js',
   './js/data/repertoire.js',
   './js/data/venues.js',
   './js/views/activity.js',
