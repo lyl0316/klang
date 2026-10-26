@@ -111,7 +111,9 @@ export function artwork(url, size = 300) {
 }
 
 export async function searchAlbums(term, limit = 12) {
-  const json = await getJSON('/search', { term, media: 'music', entity: 'album', limit: String(limit) });
+  // No media=music: with an iPhone user agent Apple answers that with a 301 to musics:// (the Music
+  // app), which a web page can't follow. entity=album alone returns the same albums everywhere.
+  const json = await getJSON('/search', { term, entity: 'album', limit: String(limit) });
   return (json.results || [])
     .filter((r) => r.collectionId)
     .map((r) => ({
@@ -152,7 +154,7 @@ export async function albumTracks(collectionId) {
 
 // Albums by a composer (iTunes composerTerm search), newest first when `newest` is true.
 export async function composerAlbums(composerName, { limit = 25, newest = false } = {}) {
-  const json = await getJSON('/search', { term: composerName, media: 'music', entity: 'album', attribute: 'composerTerm', limit: String(limit) });
+  const json = await getJSON('/search', { term: composerName, entity: 'album', attribute: 'composerTerm', limit: String(limit) });
   const list = (json.results || []).filter((r) => r.collectionId).map((r) => ({
     id: r.collectionId,
     title: r.collectionName,
