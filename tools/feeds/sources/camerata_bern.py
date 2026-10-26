@@ -8,6 +8,8 @@ The list gives the title and series ("Imagine Abokonzert"), the date ("Sa, 21. N
 more local start times, the place ("Bern, Zentrum Paul Klee") and the line-up ("Lily Higson-Spence /
 Leitung und Violine"). The concert page adds the programme (composer + work); it is fetched once per
 title. Directing from the instrument ("Leitung und Violine") is credited as the instrument.
+A guest concert listed under just its town ("Brugg") takes the list's one-line programme
+("Mendelssohn, Tavener, Mustonen und Tschaikowski") as its title.
 
 Skipped: family concerts, the "12nach12" lunchtime rehearsal visits (Werkstatteinblick) and tours
 abroad (Monfalcone, London ...).
@@ -18,6 +20,7 @@ import html as htmllib
 import re
 
 from common import FetchError, clean, get, log, looks_cancelled, make_event, requests_left, to_zurich_datetime, today_zurich
+from ._consent import swiss_town
 from ._east import (NOT_A_CONCERT, find_date, find_time, fold, group_role, infer_type, is_group, local_iso, looks_foreign,
                     role_for)
 
@@ -66,7 +69,9 @@ def _entries(page):
             if name and not fold(name).startswith('weiterer termin'):
                 artists.append((label, name))
         ticket = re.search(r'href="([^"]+)"[^>]*class="btn btn-tickets', blk)
+        works = re.search(r'<div class="werke">(.*?)</div>', blk, re.S)
         out.append({'id': eid, 'title': title, 'series': clean(series.group(1)) if series else '',
+                    'works': clean(works.group(1)) if works else '',
                     'day': clean(day.group(1)), 'times': [clean(t) for t in re.findall(r'class="uhrzeit">(.*?)</span>', blk, re.S)],
                     'place': clean(place.group(1)) if place else '', 'url': htmllib.unescape(url.group(1)),
                     'artists': artists, 'ticket': htmllib.unescape(ticket.group(1)) if ticket else None})
@@ -141,9 +146,12 @@ def fetch():
         credits = [('Orchestra', ORCHESTRA) if fold(n) == fold(ORCHESTRA) else (r, n) for r, n in credits]
         kind = 'chamber' if chamber else (infer_type(e['title'], credits) or 'orchestral')
         sid = e['id'] + (f"-{e['n']}" if e['n'] else '')
+        title = e['title']
+        if (swiss_town(title) or fold(title) == fold(e['city'] or '')) and e['works']:
+            title = e['works']                              # 'Brugg' -> 'Mendelssohn, Tavener, Mustonen und Tschaikowski'
         try:
             events.append(make_event(
-                KEY, sid, e['title'], e['start'], city=e['city'], venueName=e['venue'], type=kind,
+                KEY, sid, title, e['start'], city=e['city'], venueName=e['venue'], type=kind,
                 series=e['series'] or None, credits=credits, program=programs.get(fold(e['title'])),
                 ticketUrl=e['ticket'], url=e['url'],
                 status='cancelled' if looks_cancelled(f"{e['title']} {e['series']}") else 'scheduled'))

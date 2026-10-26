@@ -14,6 +14,10 @@
 // Cities: the 47 Sheng cities (js/data/cities.js), the extra Swiss towns that have concerts, and a
 // city of its own (no coordinates, `dynamic: true`) for any other town a listing names.
 // Venues: the known venues (js/data/venues.js), else one made from the listing ({ dynamic: true }).
+// Works: the repertoire (js/data/repertoire.js), plus a work index over every programme line of every
+// listing (ics.js workIdentity): each line that names a work carries `wkey` — the repertoire id when
+// matched, else a language-independent 'x-…' id — so one work page lists every hall that plays it
+// (dynamicWork(id), query({ workId })).
 
 import { CITIES, CANTONS, EXTRA_CITIES } from './data/cities.js';
 import { VENUES } from './data/venues.js';
@@ -22,7 +26,10 @@ import * as store from './store.js';
 import * as feed from './feed.js';
 import { dayKeyOf, todayKey, monthKeyOf, addDays } from './time.js';
 import { normalize } from './util.js';
-import { slug, matchCity, matchVenue, matchProgramItem, workFromTitle, guessType } from './ics.js';
+import {
+  slug, matchCity, matchVenue, matchProgram, workFromTitle, guessType, workIdentity, isBoilerplate, isGenericWord,
+  searchTitle, englishTitle, workNumber, arrangerOf,
+} from './ics.js';
 
 const baseCities = [...CITIES, ...EXTRA_CITIES];
 const composerMap = new Map(COMPOSERS.map((c) => [c.id, c]));
@@ -107,15 +114,39 @@ function creditsFor(list) {
   return out;
 }
 
+// Programme lines without page boilerplate ("Programmänderungen vorbehalten", "Konzert mit Pause"); a
+// note in brackets only ("(Das definitive Programm wird … bekannt gegeben.)") keeps the composer.
+// A line naming only the composer takes the work the listing's title names ("Händel, Messiah").
+// Some sites publish decomposed accents ("Ouverture" + U+0308): text is kept composed (NFC), so
+// it reads, matches and searches the same as everywhere else.
+const nfc = (s) => (typeof s === 'string' ? s.normalize('NFC') : s);
+// A title that is only punctuation ("_", "–") or a note in brackets names no work: the line keeps its composer, or goes
+// when another line of the programme already names that composer.
+const NO_TITLE = /^[\s\p{P}\p{S}]*$/u;
+function cleanLines(list) {
+  const lines = (list || []).filter(Boolean).map((p) => {
+    const title = nfc(p.title || '');
+    const blank = !!title && (NO_TITLE.test(title) || /^\s*\(.*\)\s*$/s.test(title));
+    return { ...p, composer: nfc(p.composer), title: blank ? '' : title, blank };
+  }).filter((p) => !isBoilerplate(p.title));
+  const named = new Set(lines.filter((p) => p.title && p.composer).map((p) => normalize(p.composer)));
+  return lines.filter((p) => !(p.blank && p.composer && named.has(normalize(p.composer)))).map(({ blank, ...p }) => p);
+}
 function programFor(list, title) {
-  const program = (list || []).map(matchProgramItem).filter((p) => p && (p.title || p.composer || p.workId || p.composerId));
+  const lines = cleanLines(list);
+  const program = matchProgram(lines, title).filter((p) => p && (p.title || p.composer || p.workId || p.composerId));
   if (program.length) return program;
   // an opera / ballet listing without a programme, titled with the work ("Die Zauberflöte")
   const w = workFromTitle(title);
   return w ? [{ composerId: w.composerId, workId: w.id }] : [];
 }
 
-function normalizeFeedConcert(raw) {
+function normalizeFeedConcert(feedRaw) {
+  const raw = {
+    ...feedRaw,
+    title: nfc(feedRaw.title), series: nfc(feedRaw.series), venueName: nfc(feedRaw.venueName), city: nfc(feedRaw.city),
+    credits: (feedRaw.credits || []).filter(Boolean).map((cr) => ({ ...cr, role: nfc(cr.role), name: nfc(cr.name) })),
+  };
   const cityId = cityFor(raw.city, raw.venueName);
   const { venueId, room } = venueFor(raw.venueName, cityId);
   const credits = creditsFor(raw.credits);
@@ -156,7 +187,7 @@ function normalizeImported(c) {
   if (!out.venueId && out.venueName) Object.assign(out, venueFor(out.venueName, out.cityId));
   if (!out.cityId && out.venueId) out.cityId = venueMap.get(out.venueId)?.cityId || null;
   out.credits = creditsFor(out.credits);
-  out.program = (out.program || []).map(matchProgramItem).filter(Boolean);
+  out.program = matchProgram(cleanLines(out.program), out.title || '');
   out.type = out.type || 'mixed';
   out.status = out.status || 'scheduled';
   out.featured = !!out.featured || out.credits.length > 0 || out.program.length > 0;
@@ -164,6 +195,172 @@ function normalizeImported(c) {
   out.sourceUrl = out.sourceUrl || out.url || null;
   return out;
 }
+
+// ----- work index: one page per work, across every hall -----
+let workIndex = new Map(); // work id → { id, entries: [{ c, p, ident }], info }
+
+// Same numbered form? ("Sinfonie Nr. 4 B-Dur" and "Symphonie n° 4 en si bémol majeur, op. 60")
+function sameForm(a, b, comp) {
+  if (!a || !b || a.genre !== b.genre || a.sub !== b.sub || a.inst.join() !== b.inst.join()) return false;
+  if (a.num == null || a.num !== b.num) return false;
+  if (a.key && b.key) return a.key === b.key;
+  // the number alone: not for Schubert's and Dvořák's symphonies, which were renumbered
+  return !(a.genre === 'symphony' && (comp === 'schubert' || comp === 'dvorak'));
+}
+
+function buildWorkIndex() {
+  const byKey = new Map();
+  for (const c of concerts) {
+    for (const p of c.program) {
+      delete p.wkey;
+      if (p.workId) { p.wkey = p.workId; continue; } // a repertoire work: its own page
+      const ident = workIdentity(p);
+      if (!ident) continue;
+      if (!byKey.has(ident.key)) byKey.set(ident.key, []);
+      byKey.get(ident.key).push({ c, p, ident });
+    }
+  }
+  // A line without its catalogue number joins the one work of that composer the listings number
+  // the same way ("Sinfonie Nr. 4 B-Dur" → op. 60); "op. 5" joins "op. 5 No. 2" when the form agrees.
+  // how the listings of a group number the work (D 944 is "n° 8" in one, "n. 9" in another)
+  const formsOf = (list) => list.map((e) => e.ident.form).filter((f) => f && f.num != null);
+  const catGroups = [...byKey].filter(([k, list]) => list[0].ident.by === 'catalogue' && !/-(overture|suite)$/.test(k));
+  const alias = new Map();
+  for (const [key, list] of byKey) {
+    const id = list[0].ident;
+    const bareOpus = id.by === 'catalogue' && /^op\d+[a-z]?$/.test(id.cat) && !/-(overture|suite)$/.test(key);
+    if (id.by !== 'form' && !bareOpus) continue;
+    const mine = formsOf(list);
+    if (!mine.length) continue;
+    const targets = new Set();
+    for (const [k2, l2] of catGroups) {
+      const t = l2[0].ident;
+      if (k2 === key || t.comp !== id.comp) continue;
+      if (bareOpus && !t.cat.startsWith(`${id.cat}-`)) continue;
+      const theirs = formsOf(l2);
+      if (mine.some((f) => theirs.some((g) => sameForm(f, g, id.comp)))) targets.add(k2);
+    }
+    if (targets.size === 1) alias.set(key, [...targets][0]);
+  }
+  // A line without catalogue number whose title says what the listings of one numbered work of the
+  // composer say (in English where they are genre, scoring or dance words) joins it: "Danses
+  // norvégiennes" → «Norwegische Tänze» op. 35, "Ouvertüre zu «Die Hochzeit des Figaro»" → "Ouvertüre
+  // zur Oper «Die Hochzeit des Figaro» KV 492". Never on generic words alone ("Sonate", "Klavierkonzert").
+  const FILLER = new Set(['oper', 'opera', 'ballett', 'ballet']);
+  const CAT_WORD = /^(?:op|opus|opp|bwv|kv|k|d|hob|rv|hwv|wab|s|lw|sz|bb|trv|mwv|woo|wq|fp|buxwv|wwv|l)$/;
+  const said = (words) => words.filter((w) => !FILLER.has(w)).join(' ');
+  const numbered = [...byKey].filter(([, list]) => list[0].ident.by === 'catalogue');
+  for (const [key, list] of byKey) {
+    const id = list[0].ident;
+    if (id.by !== 'title' || !id.comp || id.part || id.arranged || id.excerpt || alias.has(key)) continue;
+    if (id.words.some((w) => CAT_WORD.test(w)) || !id.words.some((w) => !FILLER.has(w) && !isGenericWord(w))) continue;
+    const mine = said(id.words);
+    const targets = new Set();
+    for (const [k2, l2] of numbered) {
+      if (l2[0].ident.comp === id.comp && l2.some((e) => said(e.ident.words) === mine)) targets.add(alias.get(k2) || k2);
+    }
+    if (targets.size === 1) alias.set(key, [...targets][0]);
+  }
+  workIndex = new Map();
+  for (const [key, list] of byKey) {
+    const id = alias.get(key) || key;
+    if (!workIndex.has(id)) workIndex.set(id, { id, entries: [], info: null });
+    workIndex.get(id).entries.push(...list);
+  }
+  for (const g of workIndex.values()) {
+    g.entries.sort((a, b) => a.c.start.localeCompare(b.c.start));
+    for (const e of g.entries) e.p.wkey = g.id;
+  }
+}
+
+const mostCommon = (values) => {
+  const n = new Map();
+  for (const v of values) n.set(v, (n.get(v) || 0) + 1);
+  let best = null;
+  for (const [v, k] of n) if (best == null || k > n.get(best)) best = v; // ties: the earliest listing
+  return best;
+};
+const sameText = (s) => normalize(s).replace(/[^a-z0-9]+/g, ' ').trim();
+
+// A work outside the repertoire, as the listings publish it (null when no listing names it):
+// { id, dynamic: true, composerId, composerName (as listed), title (as most commonly published),
+//   titles (the other published forms), catalog, catalogNote, arranger, genre, q / qEnglish / qCatalog /
+//   qBroad (Apple Music searches, in that order), num, count }
+// "String Quartet op. 3/5" → "Canales String Quartet" (null when that is no broader than the title)
+export function broadTerm(surname, english) {
+  const bare = String(english || '').split(/\s+(?:op\.?|opus|BWV|KV|K\.|D\.?|Hob\.?|RV|HWV|WAB|Sz\.?|BB|TrV|MWV|WoO)\s*\d/i)[0].trim();
+  return bare && bare !== String(english || '').trim() ? `${surname} ${bare}` : null;
+}
+
+export function dynamicWork(id) {
+  const g = workIndex.get(id);
+  if (!g || !String(id).startsWith('x-')) return null;
+  if (g.info) return g.info;
+  const whole = g.entries.filter((e) => !e.ident.excerpt);
+  const pool = whole.length ? whole : g.entries;
+  // one vote per listing (a programme may repeat a line)
+  const votes = [];
+  const seen = new Set();
+  for (const e of pool) {
+    const k = `${e.c.id}\u0001${sameText(e.p.title)}`;
+    if (!seen.has(k)) { seen.add(k); votes.push(e.p.title.trim()); }
+  }
+  const title = mostCommon(votes);
+  // the other published forms, not counting notes in brackets ("…, op. 26 (1921)")
+  const plainTitle = (t) => sameText(searchTitle(t)) || sameText(t);
+  const titles = [];
+  for (const e of g.entries) {
+    const t = e.p.title.trim();
+    if (plainTitle(t) !== plainTitle(title) && !titles.some((x) => plainTitle(x) === plainTitle(t))) titles.push(t);
+  }
+  const composerId = mostCommon(g.entries.map((e) => e.p.composerId).filter(Boolean)) || null;
+  const comp = composerId ? composerMap.get(composerId) : null;
+  // a composer Klang doesn't know: the name as most listings spell it ("Sergej Prokofjew"), one vote
+  // per listing (it is also the search term: Apple finds "Prokofjew", not "Prokofieff")
+  const named = new Map();
+  for (const e of g.entries) {
+    const n = String(e.p.composer || '').trim();
+    if (n && !named.has(e.c.id)) named.set(e.c.id, n);
+  }
+  const composerName = comp ? comp.name : mostCommon([...named.values()]) || null;
+  const surname = comp ? comp.short.replace(/^[A-Z]\.\s*/, '').replace(/\s+II$/, '') : String(composerName || '').split(/\s*[/&;,]\s*/)[0].trim().split(/\s+/).pop() || '';
+  const catalog = g.entries.find((e) => e.ident.catLabel)?.ident.catLabel || null;
+  // the search names the catalogue number unless the title already does ("op. 60")
+  const catNum = catalog ? catalog.match(/(\d+[a-z]?)(?!.*\d)/i)?.[1] : null;
+  const shownCat = catNum && !new RegExp(`(^|[^0-9])${catNum}([^0-9a-z]|$)`, 'i').test(title) ? catalog : null;
+  const english = englishTitle(title);
+  // the repertoire's genre families, for the page's accent colour
+  const form = g.entries.find((e) => e.ident.form)?.ident.form;
+  const genre = !form ? (/\b(ouverture|overture|ouvertüre)\b/i.test(title) ? 'orchestral' : null)
+    : form.genre === 'symphony' ? 'symphony' : form.genre === 'concerto' ? 'concerto'
+      : form.genre === 'mass' || form.genre === 'requiem' ? 'sacred'
+        : form.genre === 'sonata' && form.inst[0] === 'piano' ? 'piano' : 'chamber';
+  g.info = {
+    id,
+    dynamic: true,
+    composerId,
+    composerName,
+    surname: surname || null,
+    title,
+    titles: titles.slice(0, 4),
+    catalog,
+    catalogNote: shownCat, // the catalogue number when the title doesn't already name it
+    arranger: arrangerOf(title), // an arrangement's arranger, as listed (recordings must name them)
+    genre,
+    q: [surname, searchTitle(title), shownCat].filter(Boolean).join(' '),
+    qEnglish: [surname, english].filter(Boolean).join(' '),
+    // the last resort: composer and catalogue number, which every language writes alike ("Prokofjew Op. 125")
+    qCatalog: surname && catalog ? `${surname} ${catalog}` : null,
+    // when nothing at all was found: the English form without its number ("Canales String Quartet")
+    qBroad: surname ? broadTerm(surname, english) : null,
+    num: workNumber(english),
+    count: new Set(g.entries.map((e) => e.c.id)).size,
+  };
+  return g.info;
+}
+
+// The work id a programme line opens: a repertoire id, an 'x-…' id, or null (no work named).
+export const workIdOf = (p) => p?.wkey || p?.workId || null;
 
 export function rebuild() {
   cityMap = new Map(baseCities.map((c) => [c.id, c]));
@@ -180,6 +377,7 @@ export function rebuild() {
   for (const c of list) byId.set(c.id, { ...c, day: dayKeyOf(c.start) });
   concerts = [...byId.values()].sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
   concertMap = new Map(concerts.map((c) => [c.id, c]));
+  buildWorkIndex();
   const used = new Set(concerts.map((c) => c.cityId).filter(Boolean));
   shownCities = [
     ...CITIES,
@@ -225,6 +423,7 @@ export function programItems(c) {
       title: w?.title || p.title || '',
       rawTitle: p.title || null,
       catalog: w?.catalog || p.catalog || null,
+      workKey: p.wkey || p.workId || null, // the work page this line opens (repertoire or 'x-…'), or null
     };
   });
 }
@@ -250,7 +449,7 @@ export function query({
     (!featuredOnly || c.featured) &&
     (!venueId || c.venueId === venueId) &&
     (!composerId || c.program.some((p) => (p.composerId || workMap.get(p.workId)?.composerId) === composerId)) &&
-    (!workId || c.program.some((p) => p.workId === workId)) &&
+    (!workId || c.program.some((p) => p.workId === workId || p.wkey === workId)) &&
     (!artistId || c.credits.some((cr) => cr.artistId === artistId)) &&
     (!idSet || idSet.has(c.id)));
 }

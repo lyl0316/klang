@@ -64,13 +64,16 @@ function pickChosen(work, albums, { current = null, firstAsDefault = true } = {}
 const tok = (s) => ` ${normalize(s || '').replace(/[^a-z0-9]+/g, ' ').trim()} `;
 
 // Catalogue numbers in a title as listed: "Sinfonie Nr. 6 F-Dur, op. 68" -> ['Op. 68'];
-// "Die Zauberflöte KV 620" -> ['KV 620', 'K. 620'] (Apple's track titles use either).
-const CATALOG = /\b(op(?:us|\.)?|bwv|kv|k\.|hwv|rv|hob\.?\s*[ivx]+[:/]?|d\.?|wq|woo|sz|bb|trv|mwv\s*[a-z]{0,2})\s*(\d+[a-z]?(?:\s*(?:nr\.?|no\.?)\s*\d+)?)/gi;
+// "Die Zauberflöte KV 620" -> ['KV 620', 'K. 620'] (Apple's track titles use either);
+// "op. 3/5", "op. 59 Nr. 1" -> 'Op. 3 No. 5', 'Op. 59 No. 1' (as Apple writes them; not "Op. 3", the set).
+const CATALOG = /\b(op(?:us|\.)?|bwv|kv|k\.|hwv|rv|hob\.?\s*[ivx]+[:/]?|d\.?|wq|woo|sz|bb|trv|mwv\s*[a-z]{0,2})\s*(\d+[a-z]?(?:\s*(?:\/|,?\s*(?:nr\.?|no\.?|n[°º]))\s*\d+(?![\d–-]))?)/gi;
 export function catalogKeys(text) {
   const out = [];
   for (const m of String(text || '').matchAll(CATALOG)) {
     const pre = m[1].replace(/\.$/, '').toLowerCase();
-    const num = m[2];
+    // "K. 412/514" is one work with two numbers; "op. 3/5" is No. 5 of op. 3
+    const num = /\//.test(m[2]) && !/^op/.test(pre) ? m[2].split('/')[0].trim()
+      : m[2].replace(/\s*(?:\/|,?\s*(?:nr\.?|no\.?|n[°º]))\s*/i, ' No. ');
     if (pre === 'd' && !/^\d{2,3}$/.test(num)) continue; // "D 960", not "D-Dur"
     const label = /^op/.test(pre) ? `Op. ${num}` : `${m[1].replace(/\.$/, '')} ${num}`;
     out.push(label);
@@ -97,6 +100,15 @@ export function matchWorkTracks(work, tracks) {
     if (hit.length) return { tracks: hit, key };
   }
   return null;
+}
+
+// An album that holds one work: every track is "<the same work>: <movement>" (or there is one track).
+// Only such a recording may preview from its start when a listed work's own tracks can't be found.
+export function oneWorkAlbum(tracks) {
+  if (!tracks || !tracks.length) return false;
+  if (tracks.length === 1) return true;
+  const heads = new Set(tracks.map((x) => { const i = String(x.title || '').indexOf(': '); return i > 0 ? tok(x.title.slice(0, i)) : null; }));
+  return heads.size === 1 && !heads.has(null);
 }
 
 // "Symphony No. 9 in D Minor, Op. 125: IV. Presto" -> "IV. Presto" (only when the prefix is this work)
@@ -486,7 +498,10 @@ export function openVersionsSheet(work, onChoose, { current = null, firstAsDefau
     if (!lookups.has(id)) {
       lookups.set(id, albumTracks(a.id).then(({ tracks }) => {
         const m = matchWorkTracks(work, tracks);
-        const q = previewQueue(m?.tracks?.length ? m.tracks : tracks.slice(0, 40), { work: known ? work : null, composer: comp, album: a });
+        // the recording from its start when its tracks don't name the work: a listed work (stand-in)
+        // only on an album of that one work
+        const fromStart = known || oneWorkAlbum(tracks) ? tracks.slice(0, 40) : [];
+        const q = previewQueue(m?.tracks?.length ? m.tracks : fromStart, { work: known ? work : null, composer: comp, album: a });
         queues.set(id, q);
         if (m?.tracks?.length) pieces.set(id, workPiece(known ? work : { title: work.title }, comp, a, m.tracks[0]));
         return { q, matched: !!m?.tracks?.length };

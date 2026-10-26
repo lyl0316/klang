@@ -79,21 +79,49 @@ def _page(payload):
 
 
 def parse_program(html):
-    """Works from the "Programme" panel: 'Composer (place, dates)' then '<i>Work</i> ...' lines."""
+    """Works from the "Programme" panel. Layouts seen:
+    - 'Composer (place, dates)' then '<em>Work</em>' lines, groups separated by a blank line;
+    - song recitals: '(Singer) Composer / Lyricist' then '<em>Song</em>';
+    - a '<strong>Section</strong>' heading above a group ('Prologue', 'Terre'), which is skipped;
+    - one paragraph each: '<strong>Composer</strong>', '(place, dates)', 'Work'."""
     m = re.search(r'<span[^>]*>Programme</span>.*?<section[^>]*data-block-type="text"[^>]*>(.*?)</section>',
                   html or '', re.S)
     if not m:
         return []
-    works = []
+    works, pending = [], None
+    name_re = r"[A-ZÀ-Ý][\w'’.-]+(?: (?:de |van |von |du |le |la |y )?[A-ZÀ-Ý][\w'’.-]+){0,4}"
     for para in re.findall(r'<p>(.*?)</p>', m.group(1), re.S):
+        # '<em>I wish it so<br></em><br>Guy Lafarge …': a closing tag between two <br> still ends the group
+        para = re.sub(r'(?i)((?:<br\s*/?>\s*)+)(</(?:em|i|strong|b)>)', r'\2\1', para)
         for group in re.split(r'(?i)(?:<br\s*/?>\s*){2,}', para):
             lines = [x for x in re.split(r'(?i)<br\s*/?>', group) if clean(x)]
             if not lines:
                 continue
-            first = clean(lines[0])
-            if '<em>' in lines[0] or not re.search(r'\(.*\d{4}.*\)|^[A-ZÀ-Ý][\w\'’.-]+(?: [A-ZÀ-Ý][\w\'’.-]+)+$', first):
+            while len(lines) > 1 and re.fullmatch(r'\s*<strong>[^<]*</strong>\s*', lines[0]) \
+                    and not re.search(r'\d{4}', lines[0]):
+                lines = lines[1:]                                 # a section heading: 'Prologue', 'Vide / Plénitude'
+            first = clean(lines[0]).strip('\u2060 ')
+            if len(lines) == 1:                                   # the one-paragraph-each layout
+                if re.fullmatch(r'\s*<strong>[^<]*</strong>\s*', lines[0]) and re.fullmatch(name_re, first):
+                    pending = first
+                elif re.fullmatch(r'\(.*\d{4}.*\)', first):
+                    pass                                          # '(Hambourg, 1833 - Vienne, 1897)'
+                elif pending and len(first) <= 200:
+                    works.append((pending, first.lstrip('-–• ')))
+                    pending = None
                 continue
-            composer = re.sub(r'\s*\(.*$', '', first).strip()
+            pending = None
+            # song recitals: '(Joséphine Baker) Georges Tabet / Augustin Lara' = (singer) composer / lyricist
+            song = re.sub(r'^\([^)]*\)\s*', '', first).split(' / ')[0].strip()
+            song = re.sub(r'\s*\((?!.*\d{4})[^)]*\)\s*$', '', song).strip()      # 'Francis Poulenc (Klavier Solo)'
+            if '<em>' in lines[0]:
+                continue
+            if re.search(r'\(.*\d{4}.*\)', first):
+                composer = re.sub(r'\s*\(.*$', '', first).strip()
+            elif re.fullmatch(name_re, song) and ('<em>' in lines[1] or ' / ' in first):
+                composer = song
+            else:
+                continue
             for ln in lines[1:]:
                 if '<em>' in ln:
                     works.append((composer, clean(ln).lstrip('-–• ')))

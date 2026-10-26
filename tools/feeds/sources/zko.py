@@ -13,8 +13,14 @@ Quirks (checked against the website on 26 Oct 2026):
   ``<strong>Composer</strong> Title`` lines, performers as ``Name (Rolle)`` lines. Only
   those facts are taken; the text itself is never copied.
 - The API has no event page URL. ``/konzerte/`` lists the Zürich concerts with their
-  pages; for the rest the WordPress short link ``/?post_type=noisa_events&p=<id>``
-  (which redirects to the event page) is used.
+  pages. For the rest (tours, festival), the WordPress short link
+  ``/?post_type=noisa_events&p=<id>`` is fetched once and the page's canonical URL
+  (``https://zko.ch/events/<slug>/``) is used; the short link is only the fallback.
+- A concert without a location in the API (one festival evening) takes its hall from the
+  event page's one-line summary ("… am 4. Juni 2027 um 19:30 Uhr im ZKO-Haus.").
+- A ticket link on a foreign site for a concert in Switzerland is a copy-paste slip on
+  zko.ch (Zug, 21 Jan 2027 linked to a German festival); it is dropped (the hall's own
+  listing, if merged, then supplies the ticket link).
 
 Skipped: children's and family formats (Kinder-, Nuggi-, Krabbel-, Purzel-, ABC-Konzert,
 Junges ZKO), talks without performers (Neuland), open rehearsals without a programme
@@ -27,7 +33,9 @@ import html as _html
 import re
 from datetime import datetime
 
-from common import (FetchError, clean, get, get_json, guess_type, log, looks_cancelled, make_event,
+from urllib.parse import urlsplit
+
+from common import (FetchError, clean, get, get_json, guess_type, log, looks_cancelled, make_event, requests_left,
                     to_zurich_datetime, to_zurich_iso)
 
 KEY = 'zko'
@@ -35,8 +43,8 @@ NAME = 'Zürcher Kammerorchester'
 SITE = 'https://zko.ch/'
 ATTRIBUTION = 'Source: Zürcher Kammerorchester (zko.ch)'
 KIND = 'orchestra'
-MAX_REQUESTS = 6
-TIME_LIMIT = 120
+MAX_REQUESTS = 25
+TIME_LIMIT = 180
 
 API_URL = 'https://zko.ch/wp-json/app/v1/concerts'
 LISTING_URL = 'https://zko.ch/konzerte/'
@@ -360,11 +368,48 @@ def page_urls(listing_html):
 # main
 # ---------------------------------------------------------------------------
 
-def parse(data, pages=None):
-    """API JSON (+ optional page URL map) -> list of events."""
+_FOREIGN_TLD = re.compile(r'\.(de|at|fr|it|li|nl|be|lu|uk|es|pt|pl|cz|sk|hu|dk|se|no|fi|ie|gr|us|jp|cn)$')
+
+
+def _ticket(url, location):
+    """None for a ticket link on a foreign country's site when the concert is in Switzerland."""
+    host = urlsplit(url or '').netloc.lower().split(':')[0]
+    if not host:
+        return None
+    if _FOREIGN_TLD.search(host) and _swiss(location):
+        log.info('zko: dropped foreign ticket link %s', url)
+        return None
+    return url
+
+
+def page_facts(html):
+    """Event page -> {'url': canonical URL, 'venue': hall from the summary line} (either may be None)."""
+    out = {'url': None, 'venue': None}
+    m = re.search(r'<link rel=["\']canonical["\'] href=["\'](https://zko\.ch/events/[^"\']+)', html or '')
+    if m:
+        out['url'] = m.group(1)
+    m = re.search(r'<meta name="description" content="([^"]*)"', html or '')
+    v = re.search(r'\bUhr (?:im|in der|in) ((?:[A-ZÄÖÜ][\w.\-]*)(?:\s+[A-ZÄÖÜ][\w.\-]*){0,4})\s*[.,]', m.group(1)) if m else None
+    if v:
+        out['venue'] = v.group(1)
+    return out
+
+
+def _page_key(e):
+    title = clean(e.get('title'))
+    try:
+        dm = to_zurich_datetime(_performances(e)[0][0]).strftime('%d/%m')
+    except (ValueError, TypeError, KeyError, IndexError):
+        return None
+    return dm, _norm_title(title)
+
+
+def parse(data, pages=None, details=None):
+    """API JSON (+ optional page URL map and {id: page_facts()}) -> list of events."""
     if not isinstance(data, list):
         raise ValueError(f'unexpected API answer: {type(data).__name__}')
     pages = pages or {}
+    details = details or {}
     events, skipped = [], {}
 
     def skip(why):
@@ -395,7 +440,10 @@ def parse(data, pages=None):
         if not program and _REHEARSAL_RE.search(clean(e.get('description'))):
             skip('open rehearsal')                  # "Hereinspaziert!": seats inside a rehearsal, no programme
             continue
-        venue = clean(location.get('name')).rstrip('.') or None
+        facts = details.get(int(e['id'])) or {}
+        venue = clean(location.get('name')).rstrip('.') or facts.get('venue') or None
+        if not clean(location.get('name')) and venue and not location.get('city'):
+            city = _city({'name': venue}, is_tour)
         if venue and re.fullmatch(r'(?i)hauptbühne opernhaus', venue):
             venue = 'Opernhaus Zürich, Hauptbühne'            # matches Klang's own venue name
         cancelled = looks_cancelled(title) or looks_cancelled(e.get('datetime_string_timeframe') or '')
@@ -406,7 +454,7 @@ def parse(data, pages=None):
             skip('bad date')
             continue
         dm = to_zurich_datetime(dates[0][0]).strftime('%d/%m')
-        url = pages.get((dm, _norm_title(title))) or SHORTLINK.format(id=int(e['id']))
+        url = pages.get((dm, _norm_title(title))) or facts.get('url') or SHORTLINK.format(id=int(e['id']))
         kind = _type(title, categories, credits)
         series = _series(title, categories)
         for start, end, ticket, is_main in dates:
@@ -414,7 +462,8 @@ def parse(data, pages=None):
             try:
                 events.append(make_event(
                     KEY, sid, title, start, end=end, city=city, venueName=venue, type=kind, series=series,
-                    credits=credits, program=program, ticketUrl=ticket or e.get('url') or None, url=url,
+                    credits=credits, program=program,
+                    ticketUrl=_ticket(ticket or e.get('url'), location), url=url,
                     status='cancelled' if cancelled else 'scheduled'))
             except ValueError as err:
                 log.warning('zko %s: skipped: %s', e.get('id'), err)
@@ -430,4 +479,21 @@ def fetch():
         pages = page_urls(get(LISTING_URL))
     except FetchError as err:                    # the page URLs are a nicety; short links still work
         log.warning('zko: concert listing unavailable (%s); using short links', err)
-    return parse(data, pages)
+    # event pages for concerts the listing does not link (tours) or the API gives no hall for
+    details = {}
+    for e in data if isinstance(data, list) else []:
+        if not isinstance(e, dict) or not e.get('id') or _KIDS_RE.search(f"{e.get('title')} {e.get('categories')}"):
+            continue
+        location = e.get('location') if isinstance(e.get('location'), dict) else {}
+        if _ABROAD_RE.search(str(e.get('categories') or '')) or not _swiss(location):
+            continue
+        listed = pages.get(_page_key(e))
+        if listed and clean(location.get('name')):
+            continue
+        if requests_left() <= 1:
+            break
+        try:
+            details[int(e['id'])] = page_facts(get(listed or SHORTLINK.format(id=int(e['id']))))
+        except (FetchError, ValueError, TypeError) as err:      # the short link still works
+            log.warning('zko %s: event page unavailable: %s', e.get('id'), err)
+    return parse(data, pages, details)

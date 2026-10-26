@@ -12,11 +12,15 @@ venue and start time and keeps the richer source.
 
 Each listing row has ``data-timestamp`` (a true Unix epoch, checked against the
 "19.30 Uhr" shown next to it), the title, performers with roles and the composers' names.
-The hall (Grosse / Kleine Tonhalle) and the works are only on the event page, so the
-requests left after the listings (cap 60) are spent on event pages, nearest concerts
-first. One event page also names the hall of every related date it lists. Concerts
-further ahead keep the composers' names from the listing and the venue
-"Tonhalle Zürich" until they come close enough.
+The hall (Grosse / Kleine Tonhalle), the works' titles and the full cast are only on the
+event page (one request per concert), so they are read incrementally: a concert whose
+listing is unchanged since the previous feed (same id, start and title, its listed
+performers and composers all in the earlier record) keeps the hall, works and cast read on
+an earlier run. The requests left after the listings (cap 120) go to concerts still
+missing them, nearest first; then to concerts in the next week and a fixed share of the
+others (each about every two weeks), to pick up changes. One event page also names the
+hall of every related date it lists. A concert not read yet keeps the composers' names
+from the listing and the venue "Tonhalle Zürich" until a later run reaches it.
 
 Skipped: guided tours, school and family concerts, children's series, talks
 (Prélude, readings), sing-alongs, events without a time, pop/comedy shows, and the
@@ -26,17 +30,21 @@ from __future__ import annotations
 
 import html as _html
 import re
+import unicodedata
 from datetime import datetime
 
-from common import (FetchError, clean, get, guess_type, log, looks_cancelled, make_event, requests_left,
-                    to_zurich_datetime, to_zurich_iso)
+from common import (BudgetExceeded, FetchError, clean, event_id, get, guess_type, log, looks_cancelled, make_event,
+                    previous_event, refresh_due, requests_left, to_zurich_datetime, to_zurich_iso)
 
 KEY = 'tonhalle'
 NAME = 'Tonhalle Zürich'
 SITE = 'https://www.tonhalle-orchester.ch/'
 ATTRIBUTION = 'Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhallezuerich.ch)'
 KIND = 'venue'
+MAX_REQUESTS = 120             # ~36 listing pages, the rest for event pages (common.MAX_REQUESTS_CAP is 150)
 TIME_LIMIT = 600
+REFRESH_NEAR_DAYS = 7          # event pages of concerts this close are read again every run
+REFRESH_EVERY_DAYS = 14        # the others again about every two weeks (common.refresh_due)
 
 TOZ = 'https://www.tonhalle-orchester.ch'
 TZ = 'https://tonhallezuerich.ch'
@@ -285,6 +293,11 @@ def _read_calendar(name, base, origin, rows):
 # ---------------------------------------------------------------------------
 
 _MORE_WORKS_RE = re.compile(r'(?i)^(?:sowie|und|plus)?\s*(?:weitere\s+)?werke\s+(?:u\.\s*a\.\s*)?von\s+(.+?)\.?$')
+# the evening's schedule written into the programme list ("19.30 Uhr - Set 2", "ca. 21.30 Uhr - Ende",
+# "PAUSE", "Solo Programm"), and "Anschliessend": what follows is the after-show, not the programme
+_SCHEDULE_RE = re.compile(r'(?i)^(?:ca\.?\s*)?\d{1,2}[.:]\d{2}\s*uhr\b|^(?:pause|konzertpause)\b|'
+                          r'^(?:solo|duo|trio)[\s-]*programm$|^[\s\-–—_]*$')
+_AFTER_RE = re.compile(r'(?i)^(?:anschliessend|anschließend|danach|im anschluss)\b')
 
 
 def parse_detail(page_html):
@@ -314,6 +327,10 @@ def parse_detail(page_html):
                 if 'is-pause' in fcls:
                     continue
                 title = clean(function)
+                if _AFTER_RE.match(title):
+                    break
+                if _SCHEDULE_RE.match(title):
+                    continue
                 more = _MORE_WORKS_RE.match(title)
                 if more:                                  # "sowie Werke von Mozart, Bach und Brahms"
                     for other in re.split(r'\s*,\s*|\s+und\s+|\s*&\s*', more.group(1)):
@@ -454,9 +471,10 @@ def _prepare(rows):
                 needs_page = True                       # somewhere else: the event page says where
         out.append({
             'row': row, 'key': row['key'], 'title': title, 'start': start, 'credits': credits,
-            'composers': _listing_composers(row['composers']), 'city': city,
+            'listed': list(credits), 'composers': _listing_composers(row['composers']), 'city': city,
             'venue': 'Tonhalle Zürich' if at_tonhalle else None, 'needs_page': needs_page,
             'works': [], 'detailed': False, 'characters': _characters(row['members']),
+            'reused': False, 'place_known': False, 'complete': False, 'type_hint': None,
             'cancelled': looks_cancelled(title) or any(looks_cancelled(x) for x in row['labels']),
         })
     if skipped:
@@ -469,22 +487,84 @@ def _detail_url(row):
     return TOZ + path
 
 
+def _name_key(text):
+    """'Igor Strawinsky' -> 'igor strawinsky', 'Händel' -> 'handel' (for comparing names)."""
+    s = unicodedata.normalize('NFKD', clean(text)).replace('ß', 'ss')
+    s = ''.join(ch for ch in s if not unicodedata.combining(ch)).lower()
+    return re.sub(r'[^a-z0-9]+', ' ', s).strip()
+
+
+def _listing_matches(c, prev):
+    """The listing still says what the previous record says: every performer listed is in its
+    cast and every composer listed is in its programme ('Strawinsky' in 'Igor Strawinsky')."""
+    cast = {_name_key(x.get('name')) for x in prev.get('credits') or []}
+    if any(_name_key(n) not in cast for _, n in c['listed']):
+        return False
+    composers = ' | '.join(_name_key(p.get('composer')) for p in prev.get('program') or [])
+    return all(_name_key(x) and _name_key(x) in composers for x in c['composers'])
+
+
+def _reuse(cands):
+    """Take the hall, works and cast read on an earlier run for concerts whose listing has
+    not changed (common.previous_event: same id, start and title). -> number reused."""
+    n = 0
+    for c in cands:
+        prev = previous_event(event_id(KEY, c['key']), c['start'], title=c['title'])
+        if not prev or not _listing_matches(c, prev):
+            continue
+        venue, city = prev.get('venueName'), prev.get('city')
+        hall = bool(venue) and venue != 'Tonhalle Zürich'
+        if c['needs_page'] and not (venue and city):
+            continue
+        works = [(p.get('composer') or '', p.get('title') or '') for p in prev.get('program') or []]
+        titled = any(t for _, t in works)
+        if titled:
+            c['works'] = works
+        if hall or c['needs_page']:
+            c['venue'], c['city'], c['place_known'] = venue, city, True
+        cast = [(x.get('role'), x.get('name')) for x in prev.get('credits') or [] if x.get('name')]
+        if len(cast) > len(c['credits']):                   # the event page's cast is fuller
+            c['credits'] = cast
+        c['type_hint'] = prev.get('type')
+        c['reused'] = True
+        c['complete'] = (titled or not c['composers']) and c['place_known']
+        n += 1
+    return n
+
+
+def _fetch_tier(c):
+    """0: place unknown, 1: details missing, 2: complete but due for a re-read, None: reuse."""
+    if c['needs_page'] and not c['place_known']:
+        return 0
+    if not c['complete']:
+        return 1
+    if refresh_due(c['key'], c['start'], near_days=REFRESH_NEAR_DAYS, every_days=REFRESH_EVERY_DAYS):
+        return 2
+    return None
+
+
 def _enrich(cands):
-    """Spend the remaining requests on event pages: events at other venues first, then the
-    nearest concerts. Pages also reveal the hall of related dates."""
+    """Spend the remaining requests on event pages: events at an unknown place first, then
+    concerts still missing details, then the ones due for a re-read; nearest first within
+    each (the ZKO's concerts last: build.py keeps the zko reader's record of them). Pages
+    also reveal the hall of related dates."""
     by_key = {c['key']: c for c in cands}
-    order = sorted(cands, key=lambda c: (not c['needs_page'],
-                                         any(n == 'Zürcher Kammerorchester' for _, n in c['credits']),
-                                         c['start']))
+    tiers = {c['key']: _fetch_tier(c) for c in cands}
+    order = sorted((c for c in cands if tiers[c['key']] is not None),
+                   key=lambda c: (tiers[c['key']], any(n == 'Zürcher Kammerorchester' for _, n in c['credits']),
+                                  c['start']))
     places = {}
     fetched = 0
     for c in order:
-        if c['detailed'] or (c['key'] in places and not c['needs_page'] and c['works']):
+        if c['detailed'] or (tiers[c['key']] < 2 and c['key'] in places and not c['needs_page'] and c['works']):
             continue
         if requests_left() <= 0:
             break
         try:
             d = parse_detail(get(_detail_url(c['row'])))
+        except BudgetExceeded as err:                   # time limit: keep what we have
+            log.warning('tonhalle: stopped reading event pages: %s', err.reason)
+            break
         except FetchError as err:
             log.warning('tonhalle %s: event page failed: %s', c['key'], err)
             continue
@@ -500,22 +580,24 @@ def _enrich(cands):
                 perf = [('Conductor' if r == 'Music Director' else r, n) for r, n in perf]
             c['credits'] = perf
             c['characters'] = _characters([(n, f) for n, f, _ in d['performers']])
-        # same programme on other dates: same title, performers and (several) composers
+        # same programme on other dates: same title, listed performers and (several) composers
         if d['works'] and len(set(c['composers'])) >= 2:
             for key in d['places']:
                 other = by_key.get(key)
                 if (other and other is not c and not other['works'] and other['title'] == c['title']
-                        and other['composers'] == c['composers'] and other['credits'] == c['credits']):
+                        and other['composers'] == c['composers'] and other['listed'] == c['listed']):
                     other['works'] = d['works']
     for c in cands:
         place = places.get(c['key'])
         if place:
             venue, city = _venue(place, fallback_city=c['city'])
             c['venue'], c['city'] = venue, city
-        elif c['needs_page']:
+        elif c['needs_page'] and not c['place_known']:
             c['city'] = None                            # unknown place outside the Tonhalle: leave it out
-    log.info('tonhalle: %d event page(s) read, halls known for %d of %d concerts', fetched,
-             sum(1 for c in cands if c['key'] in places), len(cands))
+    log.info('tonhalle: %d event page(s) read; %d concerts reused earlier details; halls known for %d, '
+             'works for %d of %d concerts', fetched, sum(1 for c in cands if c['reused'] and not c['detailed']),
+             sum(1 for c in cands if c['key'] in places or (c['venue'] or 'Tonhalle Zürich') != 'Tonhalle Zürich'),
+             sum(1 for c in cands if any(t for _, t in c['works'])), len(cands))
 
 
 def fetch():
@@ -523,6 +605,7 @@ def fetch():
     for name, base, origin in CALENDARS:
         _read_calendar(name, base, origin, rows)
     cands = _prepare(rows)
+    _reuse(cands)
     _enrich(cands)
     events = []
     for c in cands:
@@ -534,7 +617,9 @@ def fetch():
         try:
             events.append(make_event(
                 KEY, c['key'], c['title'], c['start'], city=c['city'], venueName=c['venue'],
-                type=_type(c['title'], c['credits'], c['works'], c['characters']), series=_series(c['title']),
+                type=(_type(c['title'], c['credits'], c['works'], c['characters']) if c['detailed'] or not c['reused']
+                      else c['type_hint'] or _type(c['title'], c['credits'], c['works'], c['characters'])),
+                series=_series(c['title']),
                 credits=c['credits'], program=program, ticketUrl=row.get('ticket'), url=row['url'],
                 status='cancelled' if c['cancelled'] else 'scheduled'))
         except ValueError as err:

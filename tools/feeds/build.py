@@ -8,16 +8,20 @@
 
 Each reader runs on its own (one at a time, isolated try/except, time limit, request cap).
 Events are checked, limited to today .. today+450 days (Swiss time), de-duplicated across
-sources, sorted, and written as {"generatedAt", "sources": [...], "concerts": [...]}.
+sources, given a type where the facts make it clear, sorted, and written as
+{"generatedAt", "sources": [...], "concerts": [...]}.
 
-When a reader fails (or suddenly returns nothing), its events from the previous feed
-(--previous, default: the published one) are reused, so one broken site does not empty a
-city. Exit status: 0 unless build.py itself has a bug (or --strict and a source failed
-without a fallback); 2 for bad arguments.
+The previous feed (--previous, default: the published one) is handed to the readers
+(common.previous_event), so readers that read detail pages can reuse what they learnt on
+earlier runs. When a reader fails (or suddenly returns nothing), its events from the
+previous feed are reused, so one broken site does not empty a city. Exit status: 0 unless
+build.py itself has a bug (or --strict and a source failed without a fallback); 2 for bad
+arguments.
 """
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import logging
@@ -27,6 +31,8 @@ import sys
 import threading
 import time
 import traceback
+import unicodedata
+import urllib.parse
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Optional
@@ -275,24 +281,145 @@ def title_similar(a, b):
     return _jaccard(ta, tb) >= 0.5 or (len(small) >= 2 and small <= big)
 
 
+# words that don't tell two concert titles apart ("3. Sinfoniekonzert" vs "4. Sinfoniekonzert")
+_TITLE_GENERIC = {'sinfoniekonzert', 'symphoniekonzert', 'abonnementskonzert', 'abokonzert', 'abo', 'kammerkonzert',
+                  'mittagskonzert', 'lunchkonzert', 'matinee', 'matineekonzert', 'soiree', 'orgelkonzert',
+                  'kirchenkonzert', 'adventskonzert', 'weihnachtskonzert', 'neujahrskonzert', 'festkonzert',
+                  'serenade', 'nr', 'no', 'op', 'teil', 'part', 'saison', 'season', 'gastspiel', 'zu', 'gast',
+                  'philharmonisches', 'philharmonische'}
+
+
+def _name_key(name):
+    return re.sub(r'[^a-z0-9]+', ' ', common._fold(name)).strip()
+
+
+# a leading article doesn't tell two performers apart ("L'Orchestre de Chambre de Genève")
+_ARTICLE_RE = re.compile(r'^(?:l|le|la|les|das|die|der|the|il|lo|gli|i) (?=\S{4})')
+
+
+def _performer_key(name):
+    return _ARTICLE_RE.sub('', _name_key(name))
+
+
+def shared_performers(a, b):
+    """How many performers (by name, ignoring case, accents, punctuation and a leading article)
+    both events credit."""
+    na = {_performer_key(c.get('name')) for c in a.get('credits') or [] if isinstance(c, dict)}
+    nb = {_performer_key(c.get('name')) for c in b.get('credits') or [] if isinstance(c, dict)}
+    return len({n for n in na & nb if len(n) >= 4})
+
+
+def venue_contains(a, b):
+    """True when one venue name contains the other ("Theater Casino Zug, Theatersaal" /
+    "Theater Casino Zug") and the shorter one names a place, not just "Kirche" or "Theater"."""
+    ka, kb = _name_key(a.get('venueName')), _name_key(b.get('venueName'))
+    if not ka or not kb:
+        return False
+    short, long_ = (ka, kb) if len(ka) <= len(kb) else (kb, ka)
+    if not re.search(rf'(?<![a-z0-9]){re.escape(short)}(?![a-z0-9])', long_):
+        return False
+    words = _tokens(short, _STOP | _CITY_WORDS)
+    distinctive = words - _GENERIC - _HALL_QUALIFIERS
+    return bool(distinctive) or len(words & _GENERIC) >= 2
+
+
+def title_very_similar(a, b):
+    """Titles with at least two telling words in common and little else ("Musiques sérieuses")."""
+    ta = {t for t in _tokens(a, _TITLE_STOP | _CITY_WORDS | _TITLE_GENERIC) if not t.isdigit()}
+    tb = {t for t in _tokens(b, _TITLE_STOP | _CITY_WORDS | _TITLE_GENERIC) if not t.isdigit()}
+    return min(len(ta), len(tb)) >= 2 and _jaccard(ta, tb) >= 0.75
+
+
+def match_strength(a, b):
+    """0 when two events (from different sources, starting within DEDUPE_MINUTES of each other)
+    are different concerts; otherwise how sure the match is (3 = similar venue, 2 = the same
+    performers, 1 = one venue name contains the other or very similar titles)."""
+    ca, cb = city_key(a.get('city')), city_key(b.get('city'))
+    if ca and cb and ca != cb:
+        return 0
+    same_city = bool(ca and cb)
+    va, vb = venue_tokens(a), venue_tokens(b)
+    if va and vb:
+        qa, qb = va & _HALL_QUALIFIERS, vb & _HALL_QUALIFIERS
+        if qa and qb and qa != qb:
+            return 0                      # Grosser Saal vs Kleiner Saal
+        if venue_similar(va, vb):
+            return 3
+        if not same_city:
+            return 0
+        # the same city at the same time, but the venue is named differently (an orchestra's
+        # listing vs the hall's): the same performers, the same building or the same title
+        shared = shared_performers(a, b)
+        if shared >= 2:
+            return 2
+        # one performer in common in a building named alike ("Concorde espace culture" /
+        # "Concorde, Grande Salle"): nobody plays in two halls at once
+        if shared and (va & vb) - _GENERIC - _HALL_QUALIFIERS:
+            return 2
+        if venue_contains(a, b) or title_very_similar(a.get('title'), b.get('title')):
+            return 1
+        return 0
+    if not same_city:
+        return 0
+    # a venue is missing: trust the city plus the same performers or a similar title
+    if shared_performers(a, b) >= 2:
+        return 2
+    return 1 if title_similar(a.get('title'), b.get('title')) else 0
+
+
 def same_concert(a, b):
     """True when two events (from different sources) describe the same performance.
     The caller has already checked that the starts are within DEDUPE_MINUTES."""
-    ca, cb = city_key(a.get('city')), city_key(b.get('city'))
-    if ca and cb and ca != cb:
-        return False
-    va, vb = venue_tokens(a), venue_tokens(b)
-    if va and vb:
-        if venue_similar(va, vb):
-            return True
-        return False
-    # a venue is missing: only trust a matching city plus a similar title
-    return bool(ca and cb) and title_similar(a.get('title'), b.get('title'))
+    return match_strength(a, b) > 0
 
 
 def richness(ev):
     return (2 * len(ev.get('credits') or []) + 2 * len(ev.get('program') or [])
             + sum(1 for f in ('venueName', 'city', 'durationMin', 'type', 'series', 'ticketUrl', 'url') if ev.get(f)))
+
+
+# ticket shops that sell for many Swiss venues: fine, but the venue's own box office is better
+_TICKET_SHOPS = ('ticketcorner.ch', 'ticketino.com', 'starticket.ch', 'eventfrog.ch', 'petzi.ch', 'monbillet.ch',
+                 'seetickets', 'eventim', 'ticketportal', '442hz.com', 'tixly', 'kulturticket.ch', 'ticketmaster',
+                 'etix.com', 'infomaniak', 'fnac', 'biletino', 'tickets.ch')
+
+
+def _site(url):
+    """Registrable domain of a URL ('kartenverkauf.theatercasino.ch' -> 'theatercasino.ch')."""
+    try:
+        host = (urllib.parse.urlsplit(str(url or '')).hostname or '').lower().rstrip('.')
+    except ValueError:
+        return ''
+    parts = host.split('.')
+    return '.'.join(parts[-2:]) if len(parts) >= 2 else host
+
+
+def _is_ticket_shop(url):
+    host = (urllib.parse.urlsplit(str(url or '')).hostname or '').lower()
+    return bool(host) and any(shop in host for shop in _TICKET_SHOPS)
+
+
+def ticket_rank(url, home):
+    """3: on the venue's or the organiser's own domain (``home``), 2: a ticket shop or a Swiss
+    site, 1: an unrelated foreign site (often a copy-paste slip on the source site), 0: none."""
+    if not url:
+        return 0
+    site = _site(url)
+    if site and site in home:
+        return 3
+    host = (urllib.parse.urlsplit(url).hostname or '').lower()
+    if any(shop in host for shop in _TICKET_SHOPS) or host.endswith(('.ch', '.li')):
+        return 2
+    return 1
+
+
+def _credit_score(credits):
+    names = {_name_key(c.get('name')) for c in credits or []}
+    return (len(names), sum(1 for c in credits or [] if c.get('role') != 'Performer'))
+
+
+def _program_score(program):
+    return (sum(1 for p in program or [] if p.get('title')), len(program or []))
 
 
 def ordered(ev):
@@ -301,8 +428,16 @@ def ordered(ev):
     return out
 
 
-def merge(a, b, priority):
-    """Keep the preferred record (higher source priority, then richer); fill its gaps from the other."""
+def merge(a, b, priority, sites=None):
+    """One record for two listings of the same performance.
+
+    The record of the source with the higher priority is kept (then the richer one), so the
+    id, title and link of a performance stay the same from day to day. It takes the richer
+    facts of the two: the longer cast (a bare 'Performer' role is replaced by the other
+    listing's instrument), the programme with more work titles, the more specific venue
+    ("Casino Bern, Grosser Saal" over "Casino Bern"), and the ticket link on the venue's or
+    the organiser's own domain rather than an unrelated foreign site. Empty fields are filled
+    from the other record. ``sites`` maps source key -> the source's SITE URL."""
     rank_a = (priority.get(a['source'], 0), richness(a))
     rank_b = (priority.get(b['source'], 0), richness(b))
     win, lose = (a, b) if rank_a >= rank_b else (b, a)
@@ -310,16 +445,67 @@ def merge(a, b, priority):
     for f in ('durationMin', 'city', 'venueName', 'type', 'series', 'credits', 'program', 'ticketUrl', 'url'):
         if not out.get(f) and lose.get(f):
             out[f] = lose[f]
+    # the richer cast, with specific roles where the other listing knows them
+    if lose.get('credits') and _credit_score(lose['credits']) > _credit_score(out.get('credits')):
+        out['credits'] = lose['credits']
+    other = win if out.get('credits') is lose.get('credits') else lose
+    roles = {_name_key(c.get('name')): c.get('role') for c in other.get('credits') or [] if c.get('role') != 'Performer'}
+    if out.get('credits') and any(c.get('role') == 'Performer' and _name_key(c.get('name')) in roles
+                                  for c in out['credits']):
+        out['credits'] = [dict(c, role=roles[_name_key(c.get('name'))])
+                          if c.get('role') == 'Performer' and _name_key(c.get('name')) in roles else c
+                          for c in out['credits']]
+    # the programme with more work titles (a listing often has composers only)
+    if lose.get('program') and _program_score(lose['program']) > _program_score(out.get('program')):
+        out['program'] = lose['program']
+    # the more specific venue name
+    vw, vl = _name_key(out.get('venueName')), _name_key(lose.get('venueName'))
+    if vw and vl and len(vl) > len(vw) and re.search(rf'(?<![a-z0-9]){re.escape(vw)}(?![a-z0-9])', vl):
+        out['venueName'] = lose['venueName']
+    # the ticket link on the venue's or organiser's own domain
+    home = {_site(x) for x in (a.get('url'), b.get('url'), (sites or {}).get(a['source']),
+                               (sites or {}).get(b['source'])) if x} - {''}
+    # (a direct link to a ticket shop is kept: it sells the ticket, a venue's event page may not)
+    if ticket_rank(lose.get('ticketUrl'), home) > ticket_rank(out.get('ticketUrl'), home) \
+            and not _is_ticket_shop(out.get('ticketUrl')):
+        out['ticketUrl'] = lose['ticketUrl']
     return ordered(out)
+
+
+# "Kammerfas- sung" (a word broken at a line end on the site) -> "Kammerfassung"; "Sommer- und
+# Herbstkonzerte" keeps its hyphen
+_BROKEN_WORD_RE = re.compile(r'(?<=[a-zäöüéèàß])- (?!(?:und|oder|bis|et|ou|and|or|e|o)\b)(?=[a-zäöüéèà]{2})')
+
+
+def _tidy_text(s, *, words=False):
+    s = re.sub(r'\s+', ' ', unicodedata.normalize('NFC', s)).strip()
+    return _BROKEN_WORD_RE.sub('', s) if words else s
+
+
+def tidy_event(ev):
+    """Text as one line, with composed accents (some sites send "u" + U+0308): titles, venue,
+    credits and programme. A line break inside a role ("Tito Vespasiano\\n") is a space."""
+    out = dict(ev)
+    for f in ('title', 'series', 'venueName', 'city'):
+        if isinstance(out.get(f), str):
+            out[f] = _tidy_text(out[f], words=f == 'title')
+    if out.get('credits'):
+        out['credits'] = [{k: (_tidy_text(v) if isinstance(v, str) else v) for k, v in c.items()}
+                          if isinstance(c, dict) else c for c in out['credits']]
+    if out.get('program'):
+        out['program'] = [{k: (_tidy_text(v, words=k == 'title') if isinstance(v, str) else v) for k, v in p.items()}
+                          if isinstance(p, dict) else p for p in out['program']]
+    return out
 
 
 def _ts(ev):
     return common.to_zurich_datetime(ev['start']).timestamp()
 
 
-def dedupe(events, priority):
+def dedupe(events, priority, sites=None):
     """Remove repeated ids within a source and the same performance listed by several
-    sources. ``priority`` maps source key -> int. Returns (events sorted by start, merged)."""
+    sources. ``priority`` maps source key -> int, ``sites`` source key -> SITE URL.
+    Returns (events sorted by start, merged count)."""
     by_id = {}
     for ev in events:
         prev = by_id.get(ev['id'])
@@ -327,24 +513,46 @@ def dedupe(events, priority):
     merged = len(events) - len(by_id)
     pending = sorted(by_id.values(), key=lambda e: (_ts(e), e['source'], e['id']))
     window = DEDUPE_MINUTES * 60
-    kept = []
+    kept, times, absorbed = [], [], []      # absorbed[i]: the sources already merged into kept[i]
     for ev in pending:
         t = _ts(ev)
-        hit = None
+        best = None                          # (strength, -abs(dt), index)
         for i in range(len(kept) - 1, -1, -1):
-            dt = t - _ts(kept[i])
+            dt = t - times[i]
             if dt > 2 * window:
                 break
-            if abs(dt) <= window and kept[i]['source'] != ev['source'] and same_concert(kept[i], ev):
-                hit = i
-                break
-        if hit is None:
+            if abs(dt) > window or ev['source'] in absorbed[i]:
+                continue
+            strength = match_strength(kept[i], ev)
+            if strength and (best is None or (strength, -abs(dt)) > best[:2]):
+                best = (strength, -abs(dt), i)
+        if best is None:
             kept.append(ordered(ev))
+            times.append(t)
+            absorbed.append({ev['source']})
         else:
-            kept[hit] = merge(kept[hit], ev, priority)
+            i = best[2]
+            (log.info if best[0] < 3 else log.debug)(
+                'merged %s into %s (%s)', ev['id'], kept[i]['id'],
+                {3: 'similar venue', 2: 'same performers', 1: 'venue/title'}[best[0]])
+            kept[i] = merge(kept[i], ev, priority, sites)
+            absorbed[i].add(ev['source'])
             merged += 1
     kept.sort(key=lambda e: (_ts(e), e['title'], e['id']))
     return kept, merged
+
+
+def settle_types(events, kinds=None):
+    """Last pass: fill in or correct each event's type from its facts (common.fix_type).
+    ``kinds`` maps source key -> KIND. Returns (events, number changed)."""
+    out, changed = [], 0
+    for ev in events:
+        fixed = common.fix_type(ev, (kinds or {}).get(ev.get('source')))
+        if fixed.get('type') != ev.get('type') or fixed.get('series') != ev.get('series'):
+            changed += 1
+            fixed = ordered(fixed)
+        out.append(fixed)
+    return out, changed
 
 
 # ---------------------------------------------------------------------------
@@ -355,15 +563,62 @@ def _now_iso():
     return datetime.now(common.ZURICH).isoformat(timespec='seconds')
 
 
+def _local_imports(path):
+    """Files of the sources/ modules that the module at ``path`` imports
+    (``from ._east import …``, ``from .geneva_victoria_hall import …``, ``import sources._x``)."""
+    try:
+        with open(path, encoding='utf-8') as f:
+            tree = ast.parse(f.read(), filename=path)
+    except (OSError, SyntaxError, ValueError, TypeError):
+        return []
+    names = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.level == 1:
+                if node.module:
+                    names.append(node.module.split('.')[0])
+                else:
+                    names.extend(a.name for a in node.names)          # from . import _east
+            elif node.level == 0 and (node.module or '').startswith('sources.'):
+                names.append(node.module.split('.')[1])
+        elif isinstance(node, ast.Import):
+            names.extend(a.name.split('.')[1] for a in node.names if a.name.startswith('sources.'))
+    here = os.path.join(HERE, 'sources')
+    return [os.path.join(here, n + '.py') for n in names if os.path.isfile(os.path.join(here, n + '.py'))]
+
+
+def code_files(src):
+    """The reader's own file, the sources/ helper modules it imports (also indirectly), and
+    common.py: what decides its output. Their contents make up the codeHash."""
+    first = getattr(src.module, '__file__', None)
+    files, todo = [], [first] if first else []
+    while todo:
+        path = os.path.abspath(todo.pop(0))
+        if path in files:
+            continue
+        files.append(path)
+        todo.extend(_local_imports(path))
+    return files + [os.path.abspath(common.__file__)]
+
+
 def _code_hash(src):
     h = hashlib.sha1()
-    for path in (getattr(src.module, '__file__', None), common.__file__):
+    for path in code_files(src):
         try:
             with open(path, 'rb') as f:
-                h.update(f.read())
+                h.update(os.path.basename(path).encode('utf-8') + b'\0' + f.read())
         except (OSError, TypeError):
             pass
     return h.hexdigest()[:12]
+
+
+def request_cap(src):
+    """The reader's own MAX_REQUESTS (default common.MAX_REQUESTS), at most common.MAX_REQUESTS_CAP."""
+    try:
+        wanted = int(getattr(src.module, 'MAX_REQUESTS', src.max_requests or common.MAX_REQUESTS))
+    except (TypeError, ValueError):
+        wanted = common.MAX_REQUESTS
+    return max(1, min(wanted, common.MAX_REQUESTS_CAP))
 
 
 def _annotate(kind, message):
@@ -415,12 +670,30 @@ def main(argv=None):
     sources = [s for s in registry.discover(only) if s.enabled or (only and s.key in only)]
     if not sources:
         print('No source readers found in tools/feeds/sources/.')
+    codes, changed = {}, []
+    for src in sources:
+        if src.module is not None:
+            src.max_requests = request_cap(src)    # the registry stops at the default of 60
+            codes[src.key] = _code_hash(src)
+    # readers reuse details they read on earlier runs (common.previous_event); after a change
+    # to a reader's code all of its reused details are due for a re-read (common.refresh_due)
+    feed = previous.data() if sources else None
+    for src in sources:
+        old = (previous.info(src.key) or {}).get('codeHash') if feed else None
+        if old and src.key in codes and old != codes[src.key]:
+            changed.append(src.key)
+    known = common.set_previous(feed, code_changed=changed)
+    if known:
+        log.info('previous feed handed to the readers: %d events (reader code changed since: %s)', known,
+                 ', '.join(changed) or 'none')
 
-    results, entries, all_events, priority = [], [], [], {}
+    results, entries, all_events, priority, kinds, sites = [], [], [], {}, {}, {}
     for src in sources:
         priority[src.key] = src.priority
+        kinds[src.key] = src.kind
+        sites[src.key] = src.site
         res = Result(key=src.key)
-        code = _code_hash(src) if src.module else None
+        code = codes.get(src.key)
         info = None
         if args.fresh_hours > 0 and not src.error:
             info = previous.info(src.key)
@@ -478,7 +751,10 @@ def main(argv=None):
         for ev in res.events[:max(0, args.show)]:
             print('    ' + json.dumps(ev, ensure_ascii=False))
 
-    concerts, merged = dedupe(all_events, priority)
+    concerts, merged = dedupe([tidy_event(ev) for ev in all_events], priority, sites)
+    concerts, retyped = settle_types(concerts, kinds)
+    if retyped:
+        log.info('type or series set from the facts for %d concert(s)', retyped)
     for entry in entries:   # counts after de-duplication
         entry['count'] = sum(1 for c in concerts if c['source'] == entry['key'])
     doc = {

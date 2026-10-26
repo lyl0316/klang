@@ -24,11 +24,11 @@ import { h, icon, clear, toast, download, normalize } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { isPast, relDayLabel, TZ } from '../time.js';
-import { buildICS } from '../ics.js';
+import { buildICS, searchTitle, englishTitle, englishNumbered, workNumber, arrangerOf } from '../ics.js';
 import { artwork, searchAlbums, albumTracks, searchPodcasts, preview, previewState, ITUNES_CREDIT } from '../music.js';
 import { listenLink, onListening, workPiece, albumPiece, toPlain, pieceURL, searchURL, playAppName } from '../applemusic.js';
 import { openSheet } from '../ui/sheet.js';
-import { openVersionsSheet, matchWorkTracks, searchTerm, previewQueue, catalogKeys } from '../ui/listen.js';
+import { openVersionsSheet, matchWorkTracks, searchTerm, previewQueue, catalogKeys, oneWorkAlbum } from '../ui/listen.js';
 import { previewButton, classicalButton } from '../ui/preview.js';
 import { openSaveSheet } from '../ui/save.js';
 import { href, emptyState, followButton, avatar, roleText, sourceCredit } from '../ui/components.js';
@@ -160,7 +160,7 @@ async function shareConcert(c) {
 
 // One programme line as plain text (calendar file, copied details): "Composer: Title, Op. 1"
 function programLine(it) {
-  return [it.composerName, [it.title, it.catalog].filter(Boolean).join(', ')].filter(Boolean).join(': ');
+  return [it.composerName, it.rawTitle || [it.title, it.catalog].filter(Boolean).join(', ')].filter(Boolean).join(': ');
 }
 
 function addToCalendar(c, items) {
@@ -421,44 +421,11 @@ function openReviewSheet(c, items, keepSheet) {
 //    work's first movement, to play with the listener's own subscription.
 // "Add" puts the piece in a playlist and/or its album in the Library (ui/save.js).
 
-// "Sinfonie Nr. 6 F-Dur, Pastorale, op. 68 (Fassung …)" -> search text without notes in brackets
-const searchTitle = (s) => String(s || '').replace(/\([^)]*\)|\[[^\]]*\]/g, ' ').replace(/,\s*\d+\.\s*Fassung\b.*$/i, ' ').replace(/[«»“”„"]/g, ' ')
-  .replace(/\s+/g, ' ').replace(/[\s,;:–-]+$/, '').trim();
-
-// Apple's catalogue is titled in English: when the listing's German title finds nothing, a second
-// search uses the usual English form ("Sinfonie für Streichorchester Nr. 8" -> "String Symphony No. 8").
-// Only a search term — the page always shows the title as listed.
-const INSTRUMENT = {
-  klavier: 'Piano', violine: 'Violin', violoncello: 'Cello', cello: 'Cello', viola: 'Viola', horn: 'Horn', flöte: 'Flute',
-  oboe: 'Oboe', klarinette: 'Clarinet', fagott: 'Bassoon', trompete: 'Trumpet', orgel: 'Organ', harfe: 'Harp',
-};
-const DE_EN = [
-  [/\b(?:Streichersinfonie|Sinfonie für Streich(?:orchester|er))/gi, 'String Symphony'],
-  [/\bKonzert für (Klavier|Violine|Violoncello|Cello|Viola|Horn|Flöte|Oboe|Klarinette|Fagott|Trompete|Orgel|Harfe)(?: und Orchester)?/gi, (m, i) => `${INSTRUMENT[i.toLowerCase()]} Concerto`],
-  [/\bKlavierkonzert/gi, 'Piano Concerto'], [/\bViolinkonzert/gi, 'Violin Concerto'], [/\b(?:Violon)?[Cc]ellokonzert/g, 'Cello Concerto'],
-  [/\bHornkonzert/gi, 'Horn Concerto'], [/\bKlarinettenkonzert/gi, 'Clarinet Concerto'], [/\bFlötenkonzert/gi, 'Flute Concerto'],
-  [/\bTrompetenkonzert/gi, 'Trumpet Concerto'], [/\bOboenkonzert/gi, 'Oboe Concerto'], [/\bDoppelkonzert/gi, 'Double Concerto'],
-  [/\bStreichquartett/gi, 'String Quartet'], [/\bStreichquintett/gi, 'String Quintet'], [/\bStreichsextett/gi, 'String Sextet'],
-  [/\bKlaviertrio/gi, 'Piano Trio'], [/\bKlavierquartett/gi, 'Piano Quartet'], [/\bKlavierquintett/gi, 'Piano Quintet'],
-  [/\bKlaviersonate/gi, 'Piano Sonata'], [/\bViolinsonate/gi, 'Violin Sonata'], [/\bCellosonate/gi, 'Cello Sonata'],
-  [/\b(?:Sinfonie|Symphonie)/gi, 'Symphony'], [/\bOuvertüre/gi, 'Overture'], [/\bMesse\b/gi, 'Mass'], [/\bKonzert\b/gi, 'Concerto'],
-  [/\bNr\.\s*/gi, 'No. '], [/\bn°\s*/gi, 'No. '],
-];
-function englishTitle(title) {
-  let s = searchTitle(title);
-  for (const [re, to] of DE_EN) s = s.replace(re, to);
-  return s.replace(/\b[A-Ha-h](?:is|es|s)?-(?:Dur|Moll)\b/g, ' ') // keys: albums rarely carry them
-    .split(',')[0] // "…, MWV N8", "…, Pastorale, op. 68": the work's name is enough
-    .replace(/\s+(?:für|pour|per)\s.*$/i, '').replace(/\s+/g, ' ').replace(/[\s;:–-]+$/, '').trim();
-}
-
-// "String Symphony No. 8" -> { kind: 'symphony', n: '8' } (compared with album titles, see albumRank)
-function workNumber(english) {
-  const m = /([A-Za-z]+)\s+No\.\s*(\d+)/.exec(english || '');
-  return m ? { kind: m[1].toLowerCase(), n: m[2] } : null;
-}
+// Search text for a programme line: ics.js searchTitle (notes in brackets dropped) and englishTitle
+// (Apple's catalogue is titled in English: "Sinfonie für Streichorchester Nr. 8" -> "String Symphony No. 8").
 
 // A programme line the repertoire doesn't know: searched on Apple Music by composer + title as listed.
+// Its id is the work page's ('x-…', repo.js work index), so a version chosen here is the work page's too.
 function standInWork(it) {
   const comp = it.composer?.short || it.composerName || '';
   const surname = it.composer ? comp : comp.trim().split(/\s+/).pop() || '';
@@ -469,16 +436,23 @@ function standInWork(it) {
   const overture = /ouvert[uü]re|overture/i.test(title) ? cats.flatMap((k) => [`${k} Overture`, `${k} Ouverture`]) : [];
   // a work known by its name: «Turn», “Veränderungen”
   const quoted = [...title.matchAll(/[«“„"]([^»”“"]{3,40})[»”“"]/g)].map((m) => m[1].trim());
+  // Apple's English track titles: "Klavierkonzert Nr. 3" is "Piano Concerto No. 3"
+  const english = englishNumbered(title);
+  const listed = it.workKey && it.workKey.startsWith('x-') ? repo.dynamicWork(it.workKey) : null;
   return {
-    id: `x-${key}`,
+    id: it.workKey && it.workKey.startsWith('x-') ? it.workKey : `x-${key}`,
     composerId: it.composer?.id || null,
     composerName: comp || null,
     title,
     catalog: it.catalog || null,
-    keys: [...overture, ...cats, ...quoted], // tell the work's tracks apart on an album
+    keys: [...overture, ...cats, ...quoted, ...(english ? [english] : [])], // tell the work's tracks apart on an album
     q: [surname, searchTitle(title), it.catalog && !title.includes(it.catalog) ? it.catalog : null].filter(Boolean).join(' '),
     qEnglish: [surname, englishTitle(title)].filter(Boolean).join(' '),
+    // the last resort, as on the work page: composer + catalogue number ("Prokofjew Op. 125")
+    qCatalog: surname && listed?.catalog ? `${surname} ${listed.catalog}` : null,
+    qBroad: surname ? repo.broadTerm(surname, englishTitle(title)) : null, // when nothing at all was found
     num: workNumber(englishTitle(title)),
+    arranger: arrangerOf(title), // Pletnev's two-piano Unfinished is only on albums that name Pletnev
   };
 }
 
@@ -503,7 +477,9 @@ function listenEntries(items) {
       real: !!it.work,
       composer: it.composer?.short || it.composerShort || it.composerName || null, // stored with pieces: as listed
       shown: compLabel(it) || null,
-      label: [compLabel(it), work.title].filter(Boolean).join(colon()),
+      // the title as the listing publishes it ("Symphonie n°7 … D. 759"), not the repertoire's English one
+      title: it.rawTitle || work.title,
+      label: [compLabel(it), it.rawTitle || work.title].filter(Boolean).join(colon()),
       surname: surname.trim() ? surname : null,
       albums: null,
       albumsPromise: null,
@@ -551,6 +527,7 @@ function listenBlock(c, entries, ctx) {
   // For a work outside the repertoire: 2 = the album names the composer and the work's number,
   // 1 = it names the composer (and no other number of the same kind), 0 = not this work.
   function albumRank(e, a) {
+    if (e.work.arranger && !nameKey(`${a.title} ${a.artist}`).includes(nameKey(e.work.arranger))) return 0;
     if (!e.surname || !nameKey(a.title).includes(e.surname)) return 0;
     const title = tok(a.title);
     if ((e.work.keys || []).some((k) => title.includes(tok(k)))) return 2;
@@ -585,7 +562,10 @@ function listenBlock(c, entries, ctx) {
       .then(({ tracks }) => {
         if (token !== e.tracksToken) return;
         e.tracks = onlyThePart(e, matchWorkTracks(e.work, tracks)?.tracks || []);
-        e.pvQueue = previewQueue(e.tracks.length ? e.tracks : tracks.slice(0, ALBUM_PREVIEW_MAX),
+        // a listed work whose tracks can't be found previews the recording from its start only when
+        // the album holds that one work (never another concerto of the same album)
+        const fromStart = e.real || oneWorkAlbum(tracks) ? tracks.slice(0, ALBUM_PREVIEW_MAX) : [];
+        e.pvQueue = previewQueue(e.tracks.length ? e.tracks : fromStart,
           { work: e.real ? e.work : null, composer: e.composer, album });
       })
       .catch(() => {}) // the album link still works; tried again when the card comes back into view
@@ -626,17 +606,20 @@ function listenBlock(c, entries, ctx) {
     e.albumsPromise = searchAlbums(searchTerm(e.work), SEARCH_LIMIT)
       .then((list) => { e.albums = list; }, (err) => { e.albums = null; e.error = err || new Error('failed'); })
       .then(async () => {
-        // a listing's own (German, French…) title found no album naming the composer: try the English form
-        const en = e.work.qEnglish;
-        if (e.real || !e.albums || !en || en === e.work.q || e.albums.some((x) => albumRank(e, x) === 2)) return;
-        try {
-          const more = await searchAlbums(en, SEARCH_LIMIT);
-          const before = e.albums;
-          e.albums = [...more, ...before.filter((a) => !more.some((m) => sameId(m.id, a.id)))];
-          if (e.albums.some((x) => albumRank(e, x) === 2) || (!before.some((x) => albumRank(e, x)) && pickChosen(e))) {
-            e.work.q = en; // Versions and the search links use what worked
-          } else e.albums = before;
-        } catch { /* keep the first results */ }
+        // a listing's own (German, French…) title found no album naming the work: try the English form,
+        // then composer + catalogue number, and with nothing found at all the English form without its number
+        for (const q of [e.work.qEnglish, e.work.qCatalog, e.work.qBroad]) {
+          if (e.real || !e.albums || !q || q === e.work.q || e.albums.some((x) => albumRank(e, x) === 2)) continue;
+          if (q === e.work.qBroad && e.albums.some((x) => albumRank(e, x))) continue;
+          try {
+            const more = await searchAlbums(q, SEARCH_LIMIT);
+            const before = e.albums;
+            e.albums = [...more, ...before.filter((a) => !more.some((m) => sameId(m.id, a.id)))];
+            if (e.albums.some((x) => albumRank(e, x) === 2) || (!before.some((x) => albumRank(e, x)) && pickChosen(e))) {
+              e.work.q = q; // Versions and the search links use what worked
+            } else e.albums = before;
+          } catch { /* keep the results so far */ }
+        }
       })
       .then(() => {
         e.loading = false;
@@ -699,7 +682,7 @@ function listenBlock(c, entries, ctx) {
     e.openEl = h('a', { class: 'pv-btn pv-open cp-lc-open' });
     e.el = h('article', { class: 'cp-lc', role: 'listitem', 'aria-label': e.label },
       h('div', { class: 'cp-lc-comp' }, e.shown || ' '),
-      h('div', { class: 'cp-lc-work' }, [e.work.title, e.real ? e.work.catalog : null].filter(Boolean).join(', ')),
+      h('div', { class: 'cp-lc-work' }, [e.title, e.real && !e.it.rawTitle ? e.work.catalog : null].filter(Boolean).join(', ')),
       e.coverEl,
       e.metaEl,
       h('div', { class: 'cp-lc-actions' }, e.pvBtn, versionsBtn, e.saveBtn),
@@ -965,18 +948,24 @@ function rolesTable(credits) {
   return dl;
 }
 
-// A programme line: the work page when the repertoire knows the work, else composer + title as listed.
+// A programme line, with the title as the listing publishes it. › opens the work's page — Klang's
+// own for a repertoire work, else the page that gathers every listing of that work ('x-…', repo.js),
+// where its other halls and dates are. A line naming only the composer opens the composer's page.
 function workRow(it) {
   const comp = compLabel(it);
-  const title = [it.title || t('Work to be announced'), it.catalog].filter(Boolean).join(', ');
+  const title = it.rawTitle || [it.title || t('Work to be announced'), it.catalog].filter(Boolean).join(', ');
+  const name = `${comp ? `${comp}${colon()}` : ''}${title}`;
+  const target = it.workKey ? { href: href.work(it.workKey), label: t('{name} — work page', { name }) }
+    : !it.rawTitle && it.composer ? { href: href.composer(it.composer.id), label: t('{name} — composer page', { name }) }
+      : null;
   const inner = [
     h('div', { class: 'main' },
       comp ? h('div', { class: 'comp' }, comp) : null,
       h('div', { class: 'work' }, title)),
-    it.work ? icon('chevron', 16, 'chev') : null,
+    target ? icon('chevron', 16, 'chev') : null,
   ];
-  return it.work
-    ? h('a', { class: 'cp-work', href: href.work(it.work.id), 'aria-label': t('{name} — work page', { name: `${comp ? `${comp}${colon()}` : ''}${title}` }) }, inner)
+  return target
+    ? h('a', { class: 'cp-work', href: target.href, 'aria-label': target.label }, inner)
     : h('div', { class: 'cp-work' }, inner);
 }
 

@@ -11,10 +11,17 @@ local time (checked against the site on 26 Oct 2026: 19.00 on the page = "T19:00
 
 Production pages carry one JSON-LD Event per remaining performance with that evening's
 cast in ``performer`` (role in ``description``), so conductors and singers are per date.
-They cost one request per production, so they are fetched for ballets first (to learn
-whether there is live music) and then for the productions playing soonest, within the
-request cap. Concert pages add the programme ("Composer: Work" lines) and the players
+Concert pages add the programme ("Composer: Work" lines) and the players
 ("Flöte <em>Name</em>"). Only those facts are taken, never descriptions or biographies.
+The page heading also corrects a typo in the calendar's short title
+("Kinderopernorcherster" -> "Kinderopernorchester").
+
+Production pages cost one request each and are read incrementally: a performance that the
+previous feed already has with its cast or programme (same id, start and title) keeps
+them. The requests left after the calendar (cap 120) go first to ballets and unclear
+entries not seen before (live music? a concert at all?), then to productions with a
+performance still missing details, soonest first, then to productions playing in the next
+two weeks and a fixed share of the others (each about once a week), to pick up cast changes.
 
 The terms of opernhaus.ch say its content may not be reproduced without consent. Klang
 republishes facts only (date, time, title, room, performers, works, links back).
@@ -28,10 +35,11 @@ from __future__ import annotations
 
 import html as _html
 import re
+import unicodedata
 from datetime import datetime
 
-from common import (BudgetExceeded, FetchError, clean, get, guess_type, jsonld_events, log, looks_cancelled,
-                    make_event, requests_left, to_zurich_iso)
+from common import (BudgetExceeded, FetchError, clean, event_id, get, guess_type, jsonld_events, log, looks_cancelled,
+                    make_event, previous_event, refresh_due, requests_left, same_title, to_zurich_iso)
 
 from ._consent import group_role, looks_like_person, role_en
 
@@ -40,8 +48,10 @@ NAME = 'Opernhaus Zürich'
 SITE = 'https://www.opernhaus.ch/'
 ATTRIBUTION = 'Source: Opernhaus Zürich (opernhaus.ch). Facts only; details and tickets on opernhaus.ch.'
 KIND = 'venue'
-MAX_REQUESTS = 60
-TIME_LIMIT = 420
+MAX_REQUESTS = 120             # ~20 calendar pages + ~60 productions (common.MAX_REQUESTS_CAP is 150)
+TIME_LIMIT = 600
+REFRESH_NEAR_DAYS = 14         # productions playing this soon are read again every run
+REFRESH_EVERY_DAYS = 7         # the others again about once a week (common.refresh_due)
 
 BASE = 'https://www.opernhaus.ch'
 LISTING = BASE + '/spielplan/kalendarium/'
@@ -77,6 +87,20 @@ _OPERA_RE = re.compile(r'\b(kinder)?oper(n|ette)?\b|konzertante auff|musiktheate
 _BALLET_RE = re.compile(r'ballett von|choreografien? von|choreographien? von|\bballett\b', re.I)
 _CONCERT_RE = re.compile(r'konzert|liederabend|rezital|recital|\bmesse\b|-messe\b|te deum|requiem|oratori|kantate|'
                          r'philharmon|scintilla|opera nova|orche|sinfoni|symphon|kammermusik|lieder\b', re.I)
+
+
+def _letters(text):
+    s = unicodedata.normalize('NFKD', clean(text))
+    return re.sub(r'[^a-z0-9]+', '', ''.join(ch for ch in s if not unicodedata.combining(ch)).lower())
+
+
+def _typo_fixed(title, other):
+    """``other`` when it spells the same title with a typo corrected ('Kinderopernorcherster' ->
+    'Kinderopernorchester'), else None. Differences of hyphenation, spacing or case are not
+    corrections: the calendar's own spelling is kept then ('Ein Sommer- nachtstraum')."""
+    if not other or _letters(other) == _letters(title):
+        return None
+    return clean(other) if same_title(other, title) else None
 
 
 def _weekday(start):
@@ -229,7 +253,8 @@ def _has_next(page_html):
 
 def parse_detail(page_html):
     """-> {'casts': {'YYYY-MM-DDTHH:MM': [(role_text, name, is_group)]}, 'live': bool,
-           'program': [(composer, title)], 'players': [(role, name)], 'music': [composer]}"""
+           'program': [(composer, title)], 'players': [(role, name)], 'music': [composer],
+           'genre': str|None, 'composer': str|None, 'heading': the page's <h1> title}"""
     casts, live = {}, False
     for ev in jsonld_events(page_html):
         start = str(ev.get('startDate') or '')[:16]
@@ -270,8 +295,9 @@ def parse_detail(page_html):
             if re.match(r'(?i)musiktheater', line):
                 genre = 'musictheatre'
                 break
+    heading = re.search(r'<h1[^>]*class="[^"]*\btitle\b[^"]*"[^>]*>(.*?)</h1>', page_html or '', re.S)
     return {'casts': casts, 'live': live, 'program': program, 'players': players, 'music': music,
-            'genre': genre, 'composer': composer}
+            'genre': genre, 'composer': composer, 'heading': clean(heading.group(1)) if heading else ''}
 
 
 _CONT_END_RE = re.compile(r'\b(und|f[üu]r|and|et|mit|aus|in|de|der|die|das|op\.|nach|von|à|pour)$', re.I)
@@ -300,10 +326,16 @@ def parse_program_info(fragment):
             re.match(r'^\s*<em>(.*?)</em>\s*([^<>]{2,40}?)\s*$', line_html)
         if pm:
             a, b = clean(pm.group(1)), clean(pm.group(2))
-            role, name = (a, b) if '<em>' not in line_html[:5] and line_html.find('<em>') > 0 else (b, a)
-            r = role_en(role)
-            if r and looks_like_person(name, max_words=6):
-                players.append((r, name))
+            role, names = (a, b) if '<em>' not in line_html[:5] and line_html.find('<em>') > 0 else (b, a)
+            r = _voice_role(role)
+            for name in re.split(r'\s*,\s*|\s+und\s+|\s*&\s*', names):   # "Viola <em>A, B</em>": two players
+                if r and looks_like_person(name, max_words=6):
+                    players.append((r, name.strip()))
+            continue
+        if _GENDERED_RE.match(line) and len(line) <= 90:
+            # "Sänger:innen des Internationalen Opernstudios": performers, not "composer: work"
+            players.append(('Ensemble', line))
+            composer = None
             continue
         m = re.match(r'^(.{2,60}?):\s*(.*)$', line)
         if m and looks_like_person(m.group(1), max_words=5) and not role_en(m.group(1)):
@@ -333,6 +365,20 @@ _STAFF_RE = re.compile(r'(?i)regie|mitarbeit|assisten|t[äa]nzer(in|innen)?\b|ba
                        r'koordinat|stunt|kampf|fecht|maske|requisit|technik|produktion')
 
 
+# a group named with a gender colon/star: "Sänger:innen des …", "Akademist*innen des …"
+_GENDERED_RE = re.compile(r'^[A-ZÄÖÜ][\wäöüß-]*[a-zäöüß][:*_]in(nen)?\b')
+
+
+def _voice_role(desc):
+    """role_en, also for numbered voices and parts ('Sopran I', 'Sopran 2', 'Violine II')."""
+    r = role_en(desc)
+    if r is None:
+        bare = re.sub(r'\s+(?:[IVX]{1,3}|\d)\.?$', '', clean(desc))
+        if bare != clean(desc):
+            r = role_en(bare)
+    return r
+
+
 def credits_for(kind, people, players):
     """Per-performance cast -> [(role, name)] in Klang's order (conductor, soloists, groups, staging)."""
     conductors, soloists, groups, staging = [], [], [], []
@@ -346,7 +392,7 @@ def credits_for(kind, people, players):
                 continue
             groups.append((r if r in ('Orchestra', 'Choir', 'Ensemble') else (group_role(name) or 'Ensemble'), name))
             continue
-        r = role_en(desc)
+        r = _voice_role(desc)
         if r == '':
             continue
         if r in ('Narrator', 'Presenter') and kind in ('opera', 'musictheatre'):
@@ -413,14 +459,34 @@ def fetch():
         e['kind'] = kind
         kept.append(e)
 
-    # production pages: ballets (live music?) and unclear entries first, then the soonest productions
-    order, first_start = [], {}
+    # what the previous feed already knows about each performance (same id, start and title)
+    for e in kept:
+        e['prev'] = None
+        try:
+            prev = previous_event(event_id(KEY, e['uid']), to_zurich_iso(e['start'], assume='Europe/Zurich'),
+                                  title=e['title'])
+        except ValueError:
+            prev = None
+        if prev and (prev.get('credits') or prev.get('program')):
+            e['prev'] = prev
+
+    # production pages: ballets and unclear entries not seen before (live music? a concert?),
+    # then productions with a performance still missing details, then the ones due for a re-read
+    tiers, order = {}, []
     for e in kept:
         u = e['url']
-        if u and u.startswith(BASE + '/spielplan/') and u not in first_start:
-            first_start[u] = (0 if e['kind'] in ('ballet', 'maybe') else 1, e['start'])
+        if not (u and u.startswith(BASE + '/spielplan/')):
+            continue
+        if e['prev'] is None:
+            tier = 0 if e['kind'] in ('ballet', 'maybe') else 1
+        elif refresh_due(u, e['start'], near_days=REFRESH_NEAR_DAYS, every_days=REFRESH_EVERY_DAYS):
+            tier = 2
+        else:
+            tier = 3                                      # reuse, unless another performance needs the page
+        if u not in tiers:
             order.append(u)
-    order.sort(key=lambda u: first_start[u])
+        tiers[u] = min(tiers.get(u, (9, '')), (tier, str(e['start'])))
+    order = sorted((u for u in order if tiers[u][0] < 3), key=lambda u: tiers[u])
     details = {}
     for u in order:
         if requests_left() <= 0:
@@ -432,11 +498,12 @@ def fetch():
         except FetchError as err:
             log.warning('%s: production page failed: %s', KEY, err)
 
-    events = []
+    events, reused = [], 0
     for e in kept:
         d = details.get(e['url'])
+        prev = e['prev'] if d is None else None
         kind = e['kind']
-        if kind == 'maybe':
+        if kind == 'maybe' and prev is None:
             kind = d['genre'] if d and d['genre'] else None
             if kind is None:
                 skipped['not a concert (production page)'] = skipped.get('not a concert (production page)', 0) + 1
@@ -444,7 +511,28 @@ def fetch():
         if kind == 'ballet' and d is not None and not d['live']:
             skipped['ballet without live music'] = skipped.get('ballet without live music', 0) + 1
             continue
+        # the page heading (or the title kept from it on an earlier run) fixes a typo in the short title
+        title = _typo_fixed(e['title'], d.get('heading') if d else None) or \
+            _typo_fixed(e['title'], prev.get('title') if prev else None) or e['title']
         venue, city = _venue(e['location'])
+        series = _series(e['title'], e['note']) or ('Ballett' if kind == 'ballet' else None)
+        cancelled = looks_cancelled(f"{e['title']} {e['note']} {e['flags']}")
+        try:
+            end = to_zurich_iso(e['end'], assume='Europe/Zurich') if e.get('end') else None
+        except ValueError:
+            end = None
+        if prev is not None:                              # details read on an earlier run
+            reused += 1
+            try:
+                events.append(make_event(
+                    KEY, e['uid'], title, to_zurich_iso(e['start'], assume='Europe/Zurich'), end=end,
+                    durationMin=prev.get('durationMin') if not end else None,
+                    city=city, venueName=venue, type=prev.get('type'), series=series or prev.get('series'),
+                    credits=prev.get('credits'), program=prev.get('program'), url=e['url'], ticketUrl=e['ticket'],
+                    status='cancelled' if cancelled else None))
+            except ValueError as err:
+                log.warning('%s: skipped %s: %s', KEY, e['uid'], err)
+            continue
         people = (d['casts'].get(str(e['start'])[:16]) if d else None) or []
         credits = credits_for(kind, people, d['players'] if d else [])
         if not any(r == 'Choreographer' for r, _ in credits) and kind == 'ballet':
@@ -464,19 +552,16 @@ def fetch():
             ctype = 'mixed'
         else:
             ctype = _concert_type(e['title'], e['note'], credits)
-        cancelled = looks_cancelled(f"{e['title']} {e['note']} {e['flags']}")
-        try:
-            end = to_zurich_iso(e['end'], assume='Europe/Zurich') if e.get('end') else None
-        except ValueError:
-            end = None
         try:
             events.append(make_event(
-                KEY, e['uid'], e['title'], to_zurich_iso(e['start'], assume='Europe/Zurich'), end=end,
-                city=city, venueName=venue, type=ctype, series=_series(e['title'], e['note']),
+                KEY, e['uid'], title, to_zurich_iso(e['start'], assume='Europe/Zurich'), end=end,
+                city=city, venueName=venue, type=ctype, series=series,
                 credits=credits, program=program, url=e['url'], ticketUrl=e['ticket'],
                 status='cancelled' if cancelled else None))
         except ValueError as err:
             log.warning('%s: skipped %s: %s', KEY, e['uid'], err)
-    log.info('%s: %d calendar entries, %d kept, %d production pages read; skipped %s',
-             KEY, len(entries), len(events), len(details), skipped)
+    missing = sum(1 for ev in events if not ev.get('credits') and not ev.get('program'))
+    log.info('%s: %d calendar entries, %d kept, %d production pages read (of %d), %d performances reused earlier '
+             'details, %d still without cast or programme; skipped %s',
+             KEY, len(entries), len(events), len(details), len(tiers), reused, missing, skipped)
     return events

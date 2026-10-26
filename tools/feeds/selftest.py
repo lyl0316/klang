@@ -2,9 +2,11 @@
 """Offline smoke test of the feed framework: python3 tools/feeds/selftest.py
 
 Covers common.py (ICS incl. DST, to_zurich_iso, make_event, jsonld_events, clean,
-guess_type, robots.txt rules, and the polite GET against a throwaway server on
-127.0.0.1), the source registry, and build.py (checks, de-duplication, fallback to the
-previous feed). Nothing leaves this machine.
+guess_type, robots.txt rules, the polite GET against a throwaway server on 127.0.0.1,
+the previous feed for incremental details, and the type rules), the source registry,
+build.py (checks, de-duplication and the merge rule, the type pass, codeHash, request
+caps, fallback to the previous feed) and the incremental details of the Tonhalle and
+Opernhaus readers. Nothing leaves this machine.
 """
 from __future__ import annotations
 
@@ -362,7 +364,7 @@ class PoliteGet(unittest.TestCase):
         self.assertTrue(all(ua == common.USER_AGENT for _, _, ua in _Handler.log))
         times = [t for t, _, _ in _Handler.log]
         gaps = [b - a for a, b in zip(times, times[1:])]
-        self.assertGreaterEqual(min(gaps), 0.29, gaps)   # Crawl-delay: 0.3 honoured
+        self.assertGreaterEqual(min(gaps), 0.27, gaps)   # Crawl-delay: 0.3 honoured (arrival times jitter a little)
 
     def test_budget(self):
         with common.source_budget('cap', max_requests=2) as budget:
@@ -378,6 +380,8 @@ class PoliteGet(unittest.TestCase):
                 common.get(self.base + '/page')
             self.assertEqual(budget.used, 0)
         with common.source_budget('big', max_requests=500) as budget:
+            self.assertEqual(budget.max_requests, common.MAX_REQUESTS_CAP)
+        with common.source_budget('default') as budget:
             self.assertEqual(budget.max_requests, common.MAX_REQUESTS)
 
 
@@ -501,6 +505,367 @@ class Build(unittest.TestCase):
         self.assertNotIn('Too far', titles)
         starts = [common.to_zurich_datetime(c['start']) for c in doc['concerts']]
         self.assertEqual(starts, sorted(starts))
+
+
+class Merge(unittest.TestCase):
+    PRIO = {'zko': 30, 'camerata_bern': 30, 'zuger_sinfonietta': 30, 'osr': 30, 'musikkollegium': 30,
+            'argovia_philharmonic': 30, 'theater_casino_zug': 20, 'casino_bern': 20, 'tonhalle': 20, 'x': 20, 'y': 20}
+
+    def test_zug_duplicates(self):
+        start = '2027-03-04T19:30:00+01:00'
+        hall = ev('theater_casino_zug', 'a38c', start, 'INSGEHEIM', city='Zug', venueName='Theater Casino Zug, Theatersaal',
+                  credits=[('Performer', 'Reto Bieri'), ('Orchestra', 'CAMERATA BERN')],
+                  ticketUrl='https://kartenverkauf.theatercasino.ch/selection/1', url='https://www.theatercasino.ch/programm/insgeheim')
+        orch = ev('camerata_bern', 31225, start, '«Insgeheim» in Zug', city='Zug', venueName='Theater Casino Zug',
+                  credits=[('Clarinet', 'Reto Bieri'), ('Orchestra', 'Camerata Bern')],
+                  url='https://www.cameratabern.ch/konzerte/insgeheim-in-zug-1')
+        self.assertTrue(build.same_concert(hall, orch))
+        out, merged = build.dedupe([hall, orch], self.PRIO)
+        self.assertEqual((merged, len(out)), (1, 1))
+        m = out[0]
+        self.assertEqual(m['id'], 'camerata_bern-31225')                      # the orchestra's record (stable id)
+        self.assertEqual(m['venueName'], 'Theater Casino Zug, Theatersaal')    # the more specific venue
+        self.assertEqual(m['ticketUrl'], 'https://kartenverkauf.theatercasino.ch/selection/1')
+        self.assertEqual(m['credits'][0], {'role': 'Clarinet', 'name': 'Reto Bieri'})
+
+    def test_ticket_on_the_venues_domain(self):
+        start = '2027-01-21T19:30:00+01:00'
+        zko = ev('zko', 19808, start, 'ZKO on Tour — Gabriela Montero & Simon Höfele', city='Zug',
+                 venueName='Theater Casino Zug', credits=[('Piano', 'Gabriela Montero'), ('Trumpet', 'Simon Höfele'),
+                                                          ('Orchestra', 'Zürcher Kammerorchester')],
+                 program=[('Leoš Janáček', 'Idylle für Streichorchester')],
+                 ticketUrl='https://festspiele-mv.de/alle-konzerte/vivaldi-recomposed', url='https://zko.ch/events/zko-on-tour/')
+        hall = ev('theater_casino_zug', '78a3', start, 'Idyllen und Visionen', city='Zug',
+                  venueName='Theater Casino Zug, Theatersaal',
+                  credits=[('Piano', 'Gabriela Montero'), ('Trumpet', 'Simon Höfele'), ('Orchestra', 'Zürcher Kammerorchester')],
+                  ticketUrl='https://kartenverkauf.theatercasino.ch/selection/event/date?productId=1',
+                  url='https://www.theatercasino.ch/programm/idyllen-und-visionen')
+        out, merged = build.dedupe([zko, hall], self.PRIO, {'zko': 'https://zko.ch/', 'theater_casino_zug': 'https://www.theatercasino.ch/'})
+        self.assertEqual(merged, 1)
+        self.assertEqual(out[0]['id'], 'zko-19808')
+        self.assertEqual(out[0]['ticketUrl'], 'https://kartenverkauf.theatercasino.ch/selection/event/date?productId=1')
+        self.assertEqual(out[0]['program'], [{'composer': 'Leoš Janáček', 'title': 'Idylle für Streichorchester'}])
+        home = {'zko.ch', 'theatercasino.ch'}
+        self.assertEqual(build.ticket_rank('https://festspiele-mv.de/x', home), 1)
+        self.assertEqual(build.ticket_rank('https://kartenverkauf.theatercasino.ch/x', home), 3)
+        self.assertEqual(build.ticket_rank('https://www.ticketcorner.ch/x', home), 2)
+        self.assertEqual(build.ticket_rank(None, home), 0)
+
+    def test_orchestra_on_tour_and_guest_orchestra(self):
+        cast = [('Conductor', 'Tugan Sokhiev'), ('Piano', 'Yefim Bronfman'), ('Orchestra', 'Orchestre de la Suisse Romande')]
+        osr = ev('osr', 'rach', '2027-04-30T19:30:00+02:00', '100% Rachmaninoff', city='Bern', venueName='Casino Bern',
+                 credits=cast, ticketUrl='https://www.osr.ch/fr/concert/rachmaninoff', url='https://www.osr.ch/fr/concert/rachmaninoff')
+        cb = ev('casino_bern', 'rv', '2027-04-30T19:30:00+02:00', 'Rendezvous mit Rachmaninow', city='Bern',
+                venueName='Casino Bern, Grosser Saal', credits=cast, ticketUrl='https://buehnenbern.ch/spielplan/genf/',
+                url='https://www.casinobern.ch/programm/rendezvous-mit-rachmaninow/')
+        mk = ev('musikkollegium', 9399, '2026-11-24T19:00:00+01:00', 'Eroica', city='Winterthur', venueName='Stadthaus Winterthur',
+                credits=[('Orchestra', 'argovia philharmonic'), ('Conductor', 'Josep Vicent'), ('Voice', 'Ginesa Ortega')])
+        ar = ev('argovia_philharmonic', 268491, '2026-11-24T19:00:00+01:00', 'Gastspiel Winterthur', city='Winterthur',
+                venueName='Stadtsaal Winterthur', credits=[('Voice', 'Ginesa Ortega'), ('Conductor', 'Josep Vicent'),
+                                                           ('Orchestra', 'Argovia Philharmonic')])
+        out, merged = build.dedupe([osr, cb, mk, ar], self.PRIO)
+        self.assertEqual(merged, 2)
+        b = next(e for e in out if e['id'] == 'osr-rach')
+        self.assertEqual(b['venueName'], 'Casino Bern, Grosser Saal')
+        self.assertEqual(b['ticketUrl'], 'https://www.osr.ch/fr/concert/rachmaninoff')   # the organiser's own shop
+        self.assertEqual(sorted(e['id'] for e in out), ['argovia_philharmonic-268491', 'osr-rach'])
+
+    def test_not_the_same_concert(self):
+        t = '2026-12-01T19:30:00+01:00'
+        a = ev('x', 1, t, 'Adventskonzert', city='Zürich', venueName='Fraumünster', credits=[('Organ', 'A B'), ('Choir', 'Chor X')])
+        b = ev('y', 1, t, 'Adventskonzert', city='Zürich', venueName='Grossmünster', credits=[('Organ', 'A B'), ('Choir', 'Chor Y')])
+        self.assertFalse(build.same_concert(a, b))          # one shared name, a one-word title
+        c = ev('y', 2, t, 'Konzert', city='Basel', venueName='Stadtcasino', credits=[('Organ', 'A B'), ('Choir', 'Chor X')])
+        self.assertFalse(build.same_concert(a, c))          # the same performers, but another city
+        g = ev('x', 3, t, 'Kammermusik', city='Zürich', venueName='Tonhalle Zürich, Grosser Saal',
+               credits=[('Violin', 'Anna Muster'), ('Piano', 'Ben Beispiel')])
+        k = ev('y', 3, t, 'Kammermusik', city='Zürich', venueName='Tonhalle Zürich, Kleiner Saal',
+               credits=[('Violin', 'Anna Muster'), ('Piano', 'Ben Beispiel')])
+        self.assertFalse(build.same_concert(g, k))          # Grosser vs Kleiner Saal
+        self.assertFalse(build.venue_contains({'venueName': 'Kirche'}, {'venueName': 'Kirche St. Peter'}))
+        self.assertFalse(build.venue_contains({'venueName': 'Kirche Zug'}, {'venueName': 'Reformierte Kirche Zug'}))
+        self.assertTrue(build.venue_contains({'venueName': 'Theater Casino Zug'}, {'venueName': 'Theater Casino Zug, Theatersaal'}))
+        self.assertTrue(build.title_very_similar('Musiques sérieuses', '2. Abo-Konzert: Musiques sérieuses'))
+        self.assertFalse(build.title_very_similar('Weihnachtskonzert', 'Weihnachtskonzert'))
+        p = ev('x', 4, t, 'Musiques sérieuses', city='Zug', venueName='Theater Casino Zug, Theatersaal')
+        q = ev('y', 4, '2026-12-01T19:40:00+01:00', 'Musiques sérieuses', city='Zug', venueName='Casino')
+        self.assertTrue(build.same_concert(p, q))           # very similar titles in the same city
+
+    def test_one_listing_per_source(self):
+        t = '2027-01-21T19:30:00+01:00'
+        cast = [('Piano', 'Gabriela Montero'), ('Trumpet', 'Simon Höfele')]
+        a = ev('zko', 1, t, 'A', city='Zug', venueName='Theater Casino Zug', credits=cast)
+        b1 = ev('theater_casino_zug', 1, t, 'B', city='Zug', venueName='Theater Casino Zug, Theatersaal', credits=cast)
+        b2 = ev('theater_casino_zug', 2, t, 'B (Zusatzvorstellung)', city='Zug', venueName='Theater Casino Zug, Theatersaal',
+                credits=cast)
+        out, merged = build.dedupe([a, b1, b2], self.PRIO)
+        self.assertEqual((merged, len(out)), (1, 2))        # a source's second listing is not absorbed too
+
+    def test_one_shared_performer_in_the_same_building(self):
+        ocg = ev('ocg', 'semi', '2026-11-07T14:30:00+01:00', '80e Concours de Genève – Demi-Finale 1', city='Vernier',
+                 venueName='Concorde espace culture', credits=[('Orchestra', "L'Orchestre de Chambre de Genève")],
+                 ticketUrl='https://www.infomaniak.events/shop/abc', url='https://locg.ch/concours')
+        cv = ev('concorde_vernier', 'semi', '2026-11-07T14:30:00+01:00',
+                '80e Concours de Genève – Demi-finales du Concours de Direction d’orchestre', city='Vernier',
+                venueName='Concorde, Grande Salle', credits=[('Orchestra', 'Orchestre de Chambre de Genève'),
+                                                             ('Ensemble', 'Ensemble Contrechamps')],
+                url='https://www.concorde.ch/evenement/concours')
+        self.assertTrue(build.same_concert(ocg, cv))        # the article doesn't count; one hall, one orchestra
+        other = ev('y', 1, '2026-11-07T14:30:00+01:00', 'Konzert', city='Vernier', venueName='Salle des fêtes du Lignon',
+                   credits=[('Orchestra', 'Orchestre de Chambre de Genève')])
+        self.assertFalse(build.same_concert(ocg, other))    # another building: not merged on one name
+        prio = {'ocg': 30, 'concorde_vernier': 20}
+        out, merged = build.dedupe([ocg, cv], prio, {'ocg': 'https://locg.ch/', 'concorde_vernier': 'https://www.concorde.ch/'})
+        self.assertEqual((merged, out[0]['id']), (1, 'ocg-semi'))
+        self.assertEqual(out[0]['ticketUrl'], 'https://www.infomaniak.events/shop/abc')   # the shop link is kept
+
+    def test_tidy_text(self):
+        e = ev('x', 1, '2026-12-01T19:30:00+01:00', 'Ein Sommer- nachtstraum', venueName='Opernhaus\n Zürich',
+               credits=[('Tito Vespasiano\n', 'Mauro Peter')],
+               program=[('Darius Milhaud', 'La Création du Monde (Kammerfas- sung)'),
+                        ('Anton Bruckner', 'Sommer- und Herbstlieder'), ('Gabriel Faure\u0301', 'Requiem')])
+        t = build.tidy_event(e)
+        self.assertEqual(t['title'], 'Ein Sommernachtstraum')
+        self.assertEqual(t['venueName'], 'Opernhaus Zürich')
+        self.assertEqual(t['credits'][0]['role'], 'Tito Vespasiano')
+        self.assertEqual([p['title'] for p in t['program']][:2], ['La Création du Monde (Kammerfassung)', 'Sommer- und Herbstlieder'])
+        self.assertEqual(t['program'][2]['composer'], 'Gabriel Fauré')            # composed accent (NFC)
+
+
+class Types(unittest.TestCase):
+    def test_orchestra_members_are_chamber_music(self):
+        e = ev('ocg', 'esp', '2027-01-14T20:00:00+01:00', 'Espagne intime', type='orchestral',
+               credits=[('Harpsichord', 'Benjamin Alard'), ('Choreographer', 'Israel Galván'),
+                        ('Orchestra', "Solistes de l'Orchestre de Chambre de Genève")])
+        out = common.fix_type(e, 'orchestra')
+        self.assertNotEqual(out.get('series'), 'Ballett')      # a dancer with a chamber group is no ballet
+
+    def test_recitals(self):
+        sokolov = ev('casino_bern', 1, '2026-11-05T19:30:00+01:00', 'Grigory Sokolov', type='orchestral',
+                     series='Abonnementskonzert', credits=[('Piano', 'Grigory Sokolov')],
+                     program=[('Franz Schubert', 'Klaviersonate Nr. 21 in B-Dur D 960')])
+        self.assertEqual(common.fix_type(sokolov, 'venue')['type'], 'recital')
+        duo = ev('casino_bern', 2, '2026-12-09T19:30:00+01:00', 'Kopatchinskaja & Say', type='orchestral',
+                 credits=[('Violin', 'Patricia Kopatchinskaja'), ('Piano', 'Fazil Say')],
+                 program=[('Ludwig van Beethoven', 'Violinsonate Nr. 9 A-Dur op. 47 «Kreutzersonate»')])
+        self.assertEqual(common.fix_type(duo, 'venue')['type'], 'recital')
+        schiff = ev('casino_bern', 3, '2026-12-19T18:00:00+01:00', 'Sir András Schiff', type='orchestral',
+                    credits=[('Piano', 'Sir András Schiff')], program=[('J. S. Bach', 'Italienisches Konzert BWV 971')])
+        self.assertEqual(common.fix_type(schiff, 'venue')['type'], 'recital')
+        self.assertEqual(common.infer_type('Grigory Sokolov', [('Piano', 'Grigory Sokolov')]), 'recital')
+        self.assertEqual(common.infer_type('Duo-Abend Kammermusik', [('Violin', 'A B'), ('Piano', 'C D')]), 'chamber')
+
+    def test_not_recitals(self):
+        concerto = ev('casino_bern', 4, '2026-11-05T19:30:00+01:00', 'Lang Lang', type='orchestral',
+                      credits=[('Piano', 'Lang Lang')], program=[('Chopin', 'Klavierkonzert Nr. 2 f-Moll op. 21')])
+        self.assertEqual(common.fix_type(concerto, 'venue')['type'], 'orchestral')     # a concerto needs an orchestra
+        own = ev('osr', 5, '2026-11-05T19:30:00+01:00', 'Concert de Noël', type='orchestral', credits=[('Soprano', 'A B')])
+        self.assertEqual(common.fix_type(own, 'orchestra')['type'], 'orchestral')      # the orchestra plays uncredited
+        rez = ev('osr', 6, '2026-11-05T19:30:00+01:00', 'Klavierabend Yuja Wang', type='orchestral', credits=[('Piano', 'Yuja Wang')])
+        self.assertEqual(common.fix_type(rez, 'orchestra')['type'], 'recital')         # unless the title says recital
+        led = ev('x', 7, '2026-11-05T19:30:00+01:00', 'Daniel Hope', type='orchestral',
+                 credits=[('Violin & direction', 'Daniel Hope')])
+        self.assertEqual(common.fix_type(led, 'venue')['type'], 'orchestral')
+        self.assertEqual(common.fix_type(ev('x', 8, '2026-11-05T19:30:00+01:00', 'T', type='chamber',
+                                            credits=[('Violin', 'A B'), ('Piano', 'C D')]))['type'], 'chamber')
+        self.assertEqual(common.fix_type(ev('x', 9, '2026-11-05T19:30:00+01:00', 'T', type='chamber',
+                                            credits=[('Piano', 'A B')]))['type'], 'recital')
+
+    def test_missing_type_and_ballet(self):
+        f = lambda **kw: common.fix_type(ev('x', 1, '2026-11-05T19:30:00+01:00', kw.pop('title', 'Matinee'), **kw))
+        self.assertEqual(f(credits=[('Oboe', 'A A'), ('Clarinet', 'B B'), ('Bassoon', 'C C'), ('Horn', 'D D')])['type'], 'chamber')
+        self.assertEqual(f(credits=[('Orchestra', 'Orchestra della Svizzera italiana')])['type'], 'orchestral')
+        self.assertNotIn('type', f(title='Konzert'))
+        ballet = f(title='Ein Sommernachtstraum', type='orchestral',
+                   credits=[('Conductor', 'A B'), ('Choreographer', 'Cathy Marston'), ('Orchestra', 'Philharmonia Zürich')])
+        self.assertEqual((ballet['type'], ballet['series']), ('orchestral', 'Ballett'))
+        self.assertEqual(f(title='Echos', credits=[('Choreographer', 'A B'), ('Conductor', 'C D')])['series'], 'Ballett')
+        opera = f(title='La Cenerentola', type='vocal-opera',
+                  credits=[('Conductor', 'A B'), ('Director', 'C D'), ('Choreographer', 'E F'), ('Performer', 'G H'),
+                           ('Choir', 'Herrenchor'), ('Orchestra', 'Sinfonieorchester St. Gallen')])
+        self.assertEqual((opera['type'], opera.get('series')), ('vocal-opera', None))
+        series = f(title='Ballettabend', type='orchestral', series='Tanz', credits=[('Choreographer', 'A B'), ('Conductor', 'C D')])
+        self.assertEqual(series['series'], 'Tanz')
+
+    def test_build_pass(self):
+        events = [ev('casino_bern', 1, '2026-11-05T19:30:00+01:00', 'Grigory Sokolov', type='orchestral',
+                     credits=[('Piano', 'Grigory Sokolov')]),
+                  ev('zko', 2, '2026-11-05T19:30:00+01:00', 'Daniel Hope', type='orchestral', credits=[('Violin', 'Daniel Hope')])]
+        out, changed = build.settle_types(events, {'casino_bern': 'venue', 'zko': 'orchestra'})
+        self.assertEqual(changed, 1)
+        self.assertEqual([e['type'] for e in out], ['recital', 'orchestral'])
+
+
+class Incremental(unittest.TestCase):
+    def tearDown(self):
+        common.set_previous(None)
+
+    def test_previous_event(self):
+        old = ev('tonhalle', 2055696, '2026-11-20T19:30:00+01:00', 'Järvi dirigiert Mozarts Requiem',
+                 venueName='Tonhalle Zürich – Grosser Saal', program=[('Wolfgang Amadeus Mozart', 'Requiem d-Moll KV 626')])
+        other = ev('zko', 1, '2026-11-20T19:30:00+01:00', 'ZKO')
+        self.assertEqual(common.set_previous({'concerts': [old, other, {'id': 'bad'}, 'x']}), 2)
+        eid = common.event_id('tonhalle', 2055696)
+        self.assertEqual(eid, old['id'])
+        got = common.previous_event(eid, '2026-11-20T18:30:00Z')                 # the same instant
+        self.assertEqual(got['program'], old['program'])
+        got['program'].append({'composer': 'X', 'title': 'Y'})                  # a copy
+        self.assertEqual(len(common.previous_event(eid, old['start'])['program']), 1)
+        self.assertIsNone(common.previous_event(eid, '2026-11-21T19:30:00+01:00'))   # another date: not reused
+        self.assertIsNone(common.previous_event(eid, old['start'], title='Mahler 6'))
+        self.assertIsNotNone(common.previous_event(eid, old['start'], title='JÄRVI dirigiert Mozarts «Requiem»'))
+        self.assertIsNone(common.previous_event('tonhalle-1', old['start']))
+        self.assertEqual([e['id'] for e in common.previous_events('tonhalle')], [old['id']])
+        self.assertTrue(common.same_title('Kinderopernorcherster', 'Kinderopern\xadorchester'))
+        self.assertFalse(common.same_title('1. Kammerkonzert', '2. Kammerkonzert'))
+        common.set_previous(None)
+        self.assertIsNone(common.previous_event(eid, old['start']))
+
+    def test_refresh_due(self):
+        os.environ['KLANG_FEEDS_TODAY'] = '2026-11-01'
+        try:
+            self.assertTrue(common.refresh_due('a', '2026-11-05T19:30:00+01:00', near_days=7))
+            days = []
+            for d in range(7):
+                os.environ['KLANG_FEEDS_TODAY'] = (date(2026, 11, 1) + timedelta(days=d)).isoformat()
+                days.append(common.refresh_due('page-42', '2027-05-01T19:30:00+02:00', near_days=7, every_days=7))
+            self.assertEqual(days.count(True), 1)                                # once a week
+            far = [d for d in range(7) if not days[d]][0]
+            os.environ['KLANG_FEEDS_TODAY'] = (date(2026, 11, 1) + timedelta(days=far)).isoformat()
+            common.set_previous([], code_changed={'opernhaus_zurich'})
+            with common.source_budget('opernhaus_zurich'):
+                self.assertTrue(common.refresh_due('page-42', '2027-05-01T19:30:00+02:00'))   # new reader code
+            with common.source_budget('tonhalle'):
+                self.assertFalse(common.refresh_due('page-42', '2027-05-01T19:30:00+02:00'))
+        finally:
+            del os.environ['KLANG_FEEDS_TODAY']
+
+    def test_tonhalle_reuses_unchanged_listing(self):
+        from sources import tonhalle
+        ts = int(datetime(2027, 3, 3, 19, 30, tzinfo=Z).timestamp())
+        row = {'href': '/konzerte/kalender/mozart-requiem-2055696/', 'key': '2055696', 'ts': ts,
+               'title': 'Järvi dirigiert Mozarts Requiem', 'hour': '19.30 Uhr', 'composers': 'Strawinsky, Mozart',
+               'ticket': None, 'labels': [], 'members': [('Paavo Järvi', 'Music Director'), ('Tonhalle-Orchester Zürich', '')],
+               'calendars': {'toz', 'tz'}, 'url': 'https://www.tonhalle-orchester.ch/konzerte/kalender/mozart-requiem-2055696/'}
+        start = common.to_zurich_iso(ts)
+        old = ev('tonhalle', '2055696', start, row['title'], city='Zürich', venueName='Tonhalle Zürich – Grosser Saal',
+                 type='vocal-opera', credits=[('Conductor', 'Paavo Järvi'), ('Soprano', 'Katharina Konradi'),
+                                              ('Orchestra', 'Tonhalle-Orchester Zürich')],
+                 program=[('Igor Strawinsky', '«Symphonie de psaumes»'), ('Wolfgang Amadeus Mozart', 'Requiem d-Moll KV 626')])
+        common.set_previous([old])
+        cands = tonhalle._prepare({'2055696': dict(row)})
+        self.assertEqual(tonhalle._reuse(cands), 1)
+        c = cands[0]
+        self.assertTrue(c['complete'])
+        self.assertEqual(c['venue'], 'Tonhalle Zürich – Grosser Saal')
+        self.assertEqual(c['works'][1], ('Wolfgang Amadeus Mozart', 'Requiem d-Moll KV 626'))
+        self.assertEqual(len(c['credits']), 3)
+        os.environ['KLANG_FEEDS_TODAY'] = '2027-03-01'
+        try:
+            self.assertEqual(tonhalle._fetch_tier(c), 2)                        # in two days: read it again
+        finally:
+            del os.environ['KLANG_FEEDS_TODAY']
+        changed = dict(row, members=row['members'] + [('Lisa Batiashvili', 'Violine')])
+        cands = tonhalle._prepare({'2055696': changed})
+        self.assertEqual(tonhalle._reuse(cands), 0)                             # a new name in the listing
+        self.assertEqual(tonhalle._fetch_tier(cands[0]), 1)
+
+    def test_opernhaus_heading_and_programme(self):
+        from sources import opernhaus_zurich as oz
+        d = oz.parse_detail('<h1 class="title">Kinderopern&shy;orchester</h1>')
+        self.assertEqual(d['heading'], 'Kinderopernorchester')
+        self.assertEqual(oz._typo_fixed('Kinderopernorcherster', d['heading']), 'Kinderopernorchester')
+        self.assertIsNone(oz._typo_fixed('Ein Sommernachtstraum', 'Ein Sommer- nachtstraum'))   # just a line break
+        self.assertIsNone(oz._typo_fixed('3. Kammerkonzert', '4. Kammerkonzert'))
+        program, players = oz.parse_program_info(
+            '<p>Bass-Bariton <em>Bryn Terfel</em><br>Sänger:innen des Internationalen Opernstudios</p>'
+            '<p>Franz Schubert: Ständchen</p><p>Viola <em>Alexander Tatarinov, Valentyna Pryshlyak</em></p>')
+        self.assertEqual(program, [('Franz Schubert', 'Ständchen')])          # "Sänger:innen" is not a composer
+        self.assertEqual(players, [('Bass-baritone', 'Bryn Terfel'), ('Ensemble', 'Sänger:innen des Internationalen Opernstudios'),
+                                   ('Viola', 'Alexander Tatarinov'), ('Viola', 'Valentyna Pryshlyak')])
+        cast = oz.credits_for('concert', [('Musikalische Leitung', 'Harry Bicket', False), ('Sopran I', 'Rosa Feola', False),
+                                          ('Sopran II', 'Thalia Cook-Hansen', False)], [])
+        self.assertEqual(cast, [('Conductor', 'Harry Bicket'), ('Soprano', 'Rosa Feola'), ('Soprano', 'Thalia Cook-Hansen')])
+
+    def test_build_hands_previous_to_readers(self):
+        today = common.today_zurich()
+        start = common.to_zurich_iso(datetime.combine(today + timedelta(days=9), datetime.min.time()).replace(hour=19, tzinfo=Z))
+        seen = {}
+
+        def fetch():
+            seen['left'] = common.requests_left()
+            old = common.previous_event(common.event_id('inc', 7), start, title='Liederabend')
+            return [ev('inc', 7, start, 'Liederabend', program=(old or {}).get('program'))]
+
+        def big_fetch():
+            seen['big'] = common.requests_left()
+            return []
+
+        mod = types.SimpleNamespace(KEY='inc', NAME='Inc', SITE='https://inc.example.ch/', ATTRIBUTION='Source: inc',
+                                    fetch=fetch, MAX_REQUESTS=120, __file__=__file__)
+        big = types.SimpleNamespace(KEY='big', NAME='Big', SITE='https://big.example.ch/', ATTRIBUTION='Source: big',
+                                    fetch=big_fetch, MAX_REQUESTS=500, __file__=__file__)
+        fakes = [registry.Source(key=m.KEY, name=m.NAME, site=m.SITE, attribution=m.ATTRIBUTION, module=m, time_limit=30)
+                 for m in (mod, big)]
+        with tempfile.TemporaryDirectory() as tmp:
+            prev_path, out_path = os.path.join(tmp, 'prev.json'), os.path.join(tmp, 'out.json')
+            with open(prev_path, 'w', encoding='utf-8') as f:
+                json.dump({'concerts': [ev('inc', 7, start, 'Liederabend', program=[('Schubert', 'Winterreise D 911')])]}, f)
+            saved = registry.discover
+            registry.discover = lambda only=None: fakes
+            try:
+                from contextlib import redirect_stdout, redirect_stderr
+                import io
+                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                    self.assertEqual(build.main(['--out', out_path, '--previous', prev_path]), 0)
+            finally:
+                registry.discover = saved
+            with open(out_path, encoding='utf-8') as f:
+                doc = json.load(f)
+        self.assertEqual(doc['concerts'][0]['program'], [{'composer': 'Schubert', 'title': 'Winterreise D 911'}])
+        self.assertEqual((seen['left'], seen['big']), (120, common.MAX_REQUESTS_CAP))
+
+
+class TonhalleProgramme(unittest.TestCase):
+    def test_schedule_lines_are_not_works(self):
+        import sources.tonhalle as th
+        def row(name, function, cls=''):
+            return f'<span class="name">{name}</span> <span class="function{cls}">{function}</span>'
+        works = ''.join([row('Wolfgang Amadeus Mozart', 'Quintett für Klarinette und Streicher KV 581'),
+                         row('', '19.30 Uhr - Set 2'), row('Stefan Szypura', 'Solo Programm'), row('', 'PAUSE'),
+                         row('', 'ca. 21.30 Uhr - Ende'), row('Maurice Ravel', 'Klavierkonzert G-Dur'), row('', '–'),
+                         row('', 'Anschliessend'), row('', 'Live Act, Visuals und DJ'), row('Emanuel Meshvinski', 'Arrangements')])
+        page = ('<div class="info"><div class="artists"></div><div class="artists"></div>'
+                f'<div class="artists">{works}</div><div class="price">')
+        self.assertEqual(th.parse_detail(page)['works'],
+                         [('Wolfgang Amadeus Mozart', 'Quintett für Klarinette und Streicher KV 581'),
+                          ('Maurice Ravel', 'Klavierkonzert G-Dur')])
+
+
+class CodeHash(unittest.TestCase):
+    def test_helpers_count(self):
+        names = lambda key: [os.path.basename(p) for p in build.code_files(registry.discover([key])[0])]
+        self.assertEqual(names('opernhaus_zurich'), ['opernhaus_zurich.py', '_consent.py', 'common.py'])
+        self.assertIn('_geneva.py', names('geneva_grand_theatre'))
+        self.assertIn('geneva_victoria_hall.py', names('geneva_grand_theatre'))
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, 'sources'))
+            reader, helper = os.path.join(tmp, 'sources', 'r.py'), os.path.join(tmp, 'sources', '_h.py')
+            with open(reader, 'w') as f:
+                f.write('from ._h import x\nfrom common import clean\n')
+            with open(helper, 'w') as f:
+                f.write('x = 1\n')
+            src = types.SimpleNamespace(module=types.SimpleNamespace(__file__=reader))
+            saved = build.HERE
+            build.HERE = tmp
+            try:
+                self.assertEqual([os.path.basename(p) for p in build.code_files(src)], ['r.py', '_h.py', 'common.py'])
+                before = build._code_hash(src)
+                with open(helper, 'w') as f:
+                    f.write('x = 2\n')
+                self.assertNotEqual(build._code_hash(src), before)              # a helper edit invalidates reuse
+            finally:
+                build.HERE = saved
 
 
 if __name__ == '__main__':

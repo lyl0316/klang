@@ -301,7 +301,11 @@ def parse_program(fragment):
 
 
 def _work(text):
-    t = strip_minutes(text)
+    # durations anywhere ('(ca. 35’)', '(~50′)') and premiere notes (', Schweizer Erstaufführung')
+    t = re.sub(r'\s*\(\s*(?:ca\.\s*|~\s*)?\d{1,3}\s*(?:[′\'’]|min\.?|minutes?|Min\.?)\s*\)', '', text or '')
+    t = re.sub(r'(?i)\s*(?:,\s*|\(\s*)(?:schweizer |europäische |deutschsprachige )?(?:erst|ur)aufführung\s*\)?\s*$', '', t)
+    t = re.sub(r'\s*\(\s*\d{4}[^)]*$', '', t)                         # '… Britten (1977' (bracket left open on the page)
+    t = strip_minutes(t)
     t = re.sub(r'\s*\((?:\d{4}(?:\s*[-–/]\s*\d{2,4})?|ca\.\s*\d{4}|UA[^)]*)\)\s*$', '', t)
     return strip_minutes(t).strip(' ,;')
 
@@ -427,6 +431,11 @@ def fetch():
             room = p['room']
             venue = f'Casino Bern, {room}' if room and 'casino' not in fold(room) else (room or 'Casino Bern')
             series = _series(item['subtitles'] if item else [], p['promoter'])
+            if re.search(r'(?i)generalprobe', f"{p['label']} {title}") or \
+                    (re.search(r'(?i)musik punkt 10', p['label']) and fold(p['promoter']).startswith('buhnen bern')):
+                # Bühnen Bern presents its 'Musik Punkt 10' mornings as public dress rehearsals
+                # ("Diese öffentlichen Generalproben …", buehnenbern.ch); kept, and labelled as such
+                series = 'Öffentliche Generalprobe'
             p_credits, p_program = list(credits), list(program)
             if p['label'] and re.search(r'(?i)musik punkt 10|kurzkonzert', p['label']):
                 # a short morning format ('Musik Punkt 10 – Respighis Rom'): only the works by the

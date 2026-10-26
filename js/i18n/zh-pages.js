@@ -151,6 +151,15 @@ export default {
   'A full listening guide for this work hasn’t been written yet.': '这部作品的完整聆听指南尚未撰写。',
   '{what} dates from {year}, when {name} was about {age}.': '{what} 作于 {year} 年，当时 {name} 约 {age} 岁。',
   '{what} dates from {year}.': '{what} 作于 {year} 年。',
+  // a work outside the repertoire (#/work/x-…): the listings' own facts
+  'No current listing names this work. Programmes change — search for it instead.': '目前没有演出信息列出这部作品。节目时有变动，可以试试搜索。',
+  'Also listed as:': '其他刊载名称：',
+  'As the venues list it — this work isn’t in Klang’s repertoire yet, so there is no listening guide.':
+    '按各场馆公布的信息显示。这部作品尚未收入 Klang 的曲库，因此没有聆听指南。',
+  'Found on Apple Music by composer and title — tap a cover for a 30-second preview; ↗ plays the recording in full in {app}.':
+    '按作曲家和作品名在 Apple Music 上找到。轻点封面试听 30 秒；轻点 ↗ 在 {app} 中完整播放录音。',
+  'At {n} hall': '共 {n} 个场馆', 'At {n} halls': '共 {n} 个场馆',
+  'No announced Swiss programme has this work right now.': '目前瑞士已公布的节目中没有这部作品。',
   'A performance lasts about {time}.': '演出时长约 {time}。',
   'On stage in Switzerland: {n} upcoming performances in {cities}; the next is {when} in {city}.':
     '瑞士近期将上演 {n} 场，分布在 {cities}；下一场：{when}，{city}。',

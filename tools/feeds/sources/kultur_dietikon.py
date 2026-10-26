@@ -6,7 +6,9 @@ The calendar ("The Events Calendar" REST API) lists every cultural event in Diet
 start time; it has no categories, so classical concerts are picked by words in the title and text
 (symphony, chamber music, string quartet, opera studio, oratorio, composers' names ...), and pop,
 jazz, brass band, comedy and film are left out. The event text is used only to classify; it is not
-republished. Facts kept: date, time, title, link. Up to two requests per run.
+republished. The API's venue field is usually empty; the hall then comes from the address block
+that closes the text ("<strong>Zehntenscheune</strong><br>Kronenplatz 11<br>8953 Dietikon").
+Facts kept: date, time, title, hall, link. Up to two requests per run.
 """
 from __future__ import annotations
 
@@ -35,6 +37,23 @@ NOT_CLASSICAL = re.compile(r'jazz|funk|rock\b|\bpop\b|comedy|comedian|\bdj\b|cha
 STUDENTS = re.compile(r'schuler\*?innen|gesangsschuler|instrumentalschuler|vorspiel|stufentest')
 
 
+_ADDRESS_RE = re.compile(r'<p>\s*<strong>([^<]{3,80})</strong>\s*<br\s*/?>\s*([^<]{3,80}?)\s*<br\s*/?>\s*(\d{4})\s+([^<]{2,40}?)\s*</p>',
+                         re.S)
+
+
+def address_venue(description):
+    """(hall, town) from the text's closing address block, else (None, None).
+    'Reformierte Kirche' alone becomes 'Reformierte Kirche Dietikon'."""
+    blocks = _ADDRESS_RE.findall(description or '')
+    if not blocks:
+        return None, None
+    name, _street, _zip, town = (clean(x) for x in blocks[-1])
+    if re.fullmatch(r'(?i)(evang\.?-?ref\.?|reformierte|ref\.|katholische|kath\.|christkatholische)?\s*kirche', name) \
+            and fold(town) not in fold(name):
+        name = f'{name} {town}'
+    return name or None, town or None
+
+
 def fetch():
     today = today_zurich()
     events = []
@@ -52,10 +71,11 @@ def fetch():
         if start[11:16] == '00:00' or to_zurich_datetime(start).date() < today:
             continue                                        # 00:00 marks an all-day market or festival
         venue = e.get('venue') if isinstance(e.get('venue'), dict) else {}
+        hall, town = address_venue(e.get('description'))
         try:
             events.append(make_event(
-                KEY, e.get('id'), title, start, city=clean(venue.get('city')) or 'Dietikon',
-                venueName=clean(venue.get('venue')) or None, type=guess_type(title), url=e.get('url'),
+                KEY, e.get('id'), title, start, city=clean(venue.get('city')) or town or 'Dietikon',
+                venueName=clean(venue.get('venue')) or hall, type=guess_type(title), url=e.get('url'),
                 ticketUrl=e.get('website') or None, status='cancelled' if looks_cancelled(title) else 'scheduled'))
         except ValueError as err:
             log.warning('%s: skipped %s: %s', KEY, e.get('id'), err)

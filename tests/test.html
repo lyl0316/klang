@@ -24,12 +24,14 @@
     const { VENUES } = await import('../js/data/venues.js');
     const { WORKS, COMPOSERS } = await import('../js/data/repertoire.js');
     const { COUNTRIES, country, countryCities, otherCountries } = await import('../js/data/countries.js');
-    const { parseICS, buildICS, parseFeed, matchCity, matchVenue, matchComposer, matchProgramItem, workFromTitle } = await import('../js/ics.js');
+    const { parseICS, buildICS, parseFeed, matchCity, matchVenue, matchComposer, matchProgramItem, matchProgram, workFromTitle, workIdentity, composerKey, isBoilerplate, arrangerOf, isWorkLine, englishNumbered } = await import('../js/ics.js');
+    const listen = await import('../js/ui/listen.js');
     const { zurichOffset, dayKeyOf, timeOf, addDays, relDayLabel, fullDateTime } = await import('../js/time.js');
     const store = await import('../js/store.js');
     const i18n = await import('../js/i18n.js');
     const feed = await import('../js/feed.js');
     const repo = await import('../js/repo.js');
+    const ent = await import('../js/views/entity.js');
     store.setPref('lang', 'en'); // the tests below expect English unless they switch to Chinese
 
     const out = document.getElementById('out');
@@ -176,6 +178,110 @@
       eq(workFromTitle('Carmen-Suite'), null);
       eq(workFromTitle('Orgelkonzert'), null);
     });
+    test('works: requiems, Passions, Masses and the Four Seasons as programmes list them', () => {
+      const w = (composer, title) => matchProgramItem({ composer, title }).workId || null;
+      eq(w('Wolfgang Amadeus Mozart', 'Requiem in d-Moll KV 626 (1791) (~50′)'), 'mozart-requiem');
+      eq(w('Wolfgang Amadeus Mozart', 'Requiem en ré mineur, K. 626'), 'mozart-requiem');
+      eq(w('Jean-Sébastien Bach', 'Messe en si mineur, BWV 232'), 'bach-mass-b-minor');
+      eq(w('Johann Sebastian Bach', 'h-Moll Messe, BWV 232'), 'bach-mass-b-minor');
+      eq(w('Johannes Brahms', 'Ein deutsches Requiem, op. 45'), 'brahms-requiem');
+      eq(w('Johann Sebastian Bach', 'Passion selon saint Matthieu, BWV 244'), 'bach-st-matthew');
+      eq(w('Johann Sebastian Bach', 'Weihnachtsoratorium BWV 248 (Kantaten 1, 3 und 6)'), 'bach-christmas-oratorio');
+      eq(w('Antonio Vivaldi', 'Vier Jahreszeiten'), 'vivaldi-four-seasons');
+      eq(w('Antonio Vivaldi', '«Le Quattro Stagione» («Die vier Jahreszeiten») Violinkonzerte op. 8/1-4'), 'vivaldi-four-seasons');
+      eq(w('Antonio Vivaldi', 'Le Quattro Stagioni, op. 8 – La Primavera (RV 269) – L’Estate (RV 315) – L’Autunno (RV 293) – L’Inverno (RV 297)'), 'vivaldi-four-seasons');
+      eq(w('Antonio Vivaldi', 'L’Hiver (Les Quatre Saisons)'), null, 'one season');
+      eq(w('Franz Schubert', 'Symphonie inachevée en si mineur'), 'schubert-unfinished');
+      eq(w('Georges Bizet', 'Carmen (version de concert)'), 'bizet-carmen', 'a concert version is still the opera');
+      eq(w('Camille Saint-Saëns', 'Le Carnaval des animaux pour deux pianos et orchestre'), 'saint-saens-carnival', 'two pianos are its scoring');
+    });
+    test('works: a transcription or arrangement is not the original', () => {
+      const w = (composer, title) => matchProgramItem({ composer, title }).workId || null;
+      eq(w('Franz Schubert', 'Sinfonie Nr. 7 Die Unvollendete in h-Moll, D 759, transkribiert für zwei Klaviere von Mikhail Pletnev'), null, 'Pletnev two-piano Unfinished');
+      eq(w('Franz Schubert', 'Sinfonie h-Moll D 759 «Unvollendete», Klavierfassung'), null);
+      eq(w('Franz Schubert', 'Symphonie inachevée, arr. pour quintette'), null);
+      eq(w('Franz Schubert', 'Sinfonie Nr. 8 h-Moll D 759 für zwei Klaviere'), null, 'a reduction of a symphony');
+      eq(w('Johann Sebastian Bach', 'Variations Goldberg, BWV 988 Transcription pour orgue par Jean-Luc Thellin'), null);
+      eq(w('Franz Schubert', 'Symphonie n°7 en si mineur, D. 759, « Inachevée »'), 'schubert-unfinished', 'the original, numbered 7');
+      eq(arrangerOf('Sinfonie Nr. 7 Die Unvollendete in h-Moll, D 759, transkribiert für zwei Klaviere von Mikhail Pletnev'), 'Pletnev');
+      eq(arrangerOf('«Venezianisches Gondellied» (arr. Virgile Barthe)'), 'Barthe');
+      eq(arrangerOf('3e Symphonie, (transcription pour quatuor avec piano de Ferdinand Ries)'), 'Ries');
+      eq(arrangerOf('Streichquartett Nr. 16 F-Dur, op. 135 (Fassung für Streichorchester)'), null, 'no name given');
+      eq(arrangerOf('Ouverture de La Forza del Destino'), null, 'not an arrangement');
+    });
+    test('a line naming only the composer takes the work the listing\'s title names', () => {
+      const ids = (lines, title) => matchProgram(lines, title).map((p) => p.workId || null);
+      eq(ids([{ composer: 'Händel', title: '' }], 'Händel, Messiah'), ['handel-messiah']);
+      eq(ids([{ composer: 'Strawinsky', title: '' }, { composer: 'Mozart', title: '' }], 'Paavo Järvi mit Mozarts Requiem'), [null, 'mozart-requiem']);
+      eq(ids([{ composer: 'Bach', title: '' }, { composer: 'Mozart', title: '' }], 'Les Musiciens du Louvre – Mozarts Requiem'), [null, 'mozart-requiem']);
+      eq(ids([{ composer: 'Bach', title: '' }], 'Sir John Eliot Gardiner: Bach, Messe h-Moll'), ['bach-mass-b-minor']);
+      eq(ids([{ composer: 'Brahms', title: '' }], 'Brahms: Ein deutsches Requiem'), ['brahms-requiem']);
+      eq(ids([{ composer: 'Bach', title: '' }], 'Bach: Matthäuspassion'), ['bach-st-matthew']);
+      eq(ids([{ composer: 'Vivaldi', title: '' }], 'Philharmonie der Solisten / VIVALDI - Die vier Jahreszeiten'), ['vivaldi-four-seasons']);
+      eq(ids([{ composer: 'Mozart', title: '' }], 'Ein Requiem für Zürich – Werke von Pärt und Mozart'), [null], 'a generic name needs the composer next to it');
+      eq(ids([{ composer: 'Mozart', title: 'Sinfonie Nr. 40 g-Moll KV 550' }], 'Mozart Requiem'), [null], 'a line with its own title keeps it');
+      ok(isBoilerplate('Programmänderungen vorbehalten.') && isBoilerplate('Konzert mit Pause') && isBoilerplate('Ca. 2 Stunden 15 Minuten'), 'boilerplate');
+      ok(!isBoilerplate('Pavane pour une infante défunte'), 'a work is not boilerplate');
+    });
+    test('work identity: the same work in German, French and Italian listings is one work', () => {
+      const key = (composer, title) => workIdentity(matchProgramItem({ composer, title }))?.key || null;
+      const same = (a, b, msg) => { const x = key(...a); const y = key(...b); ok(x && x === y, `${msg}: ${x} vs ${y}`); return x; };
+      eq(same(['Ludwig van Beethoven', 'Sinfonie Nr. 4 B-Dur, op. 60'], ['Ludwig van Beethoven', 'Symphonie N° 4 en si bémol majeur op. 60'], 'Beethoven 4'), 'x-beethoven-op60');
+      eq(same(['Sergej Prokofjew', 'Sinfonie Nr. 1 D-Dur op. 25 (Symphonie Classique)'], ['Sergueï Prokofiev', 'Symphonie n°1 en ré majeur, op. 25, « Classique »'], 'Prokofjew / Prokofiev'), 'x-prokofiev-op25');
+      same(['Wolfgang Amadeus Mozart', 'Symphonie n°29 en la majeur, KV 201'], ['W. A. Mozart', 'Sinfonie Nr. 29 A-Dur, KV201'], 'KV 201');
+      same(['Franz Schubert', 'Sinfonia n. 9 in do maggiore D 944 La Grande'], ['Franz Schubert', 'Sinfonie Nr. 8 C-Dur, D 944 «Grosse»'], 'D 944 numbered 8 or 9');
+      same(['Joseph Haydn', 'Sinfonie Nr. 100 G-Dur, Hob I:100 «Militär»'], ['Joseph Haydn', 'Symphonie n° 100 en sol majeur, Hob. I:100'], 'Hob. I:100');
+      same(['L. van Beethoven', 'Quatuor à cordes nº7 en fa majeur, op.59 nº1, «Razumovsky»'], ['Ludwig van Beethoven', 'Streichquartett Nr. 7 Rasumowsky in F-Dur, op. 59/1'], 'op. 59 No. 1');
+      same(['Felix Mendelssohn Bartholdy', 'Konzert für Violine, Klavier und Streichorchester d-Moll'], ['Felix Mendelssohn', 'Concerto pour violon, piano et cordes en ré mineur'], 'no catalogue: form, scoring and key');
+      same(['Joseph Haydn', 'Cellokonzert Nr. 1 in C-Dur'], ['Franz Joseph Haydn', 'Concerto per violoncello e orchestra n. 1 in do maggiore'], 'Italian');
+      same(['Ludwig van Beethoven', 'Coriolan-Ouvertüre op. 62'], ['Ludwig van Beethoven', 'Ouvertüre zum Trauerspiel «Coriolan» c-Moll, op. 62'], 'an overture');
+      same(['Pjotr Iljitsch Tschaikowsky', 'Excerpts from the ballet Sleeping Beauty, Op. 66'], ['Pjotr Iljitsch Tschaikowsky', 'Dornröschen, Ballett op. 66'], 'excerpts of the whole ballet');
+      same(['Dieter Ammann', '«Turn» für Orchester'], ['Ammann', 'Turn'], 'surname only');
+      eq(composerKey('Carl Philipp Emanuel Bach'), 'cpe-bach', 'a namesake keeps the initials');
+      eq(composerKey('C. P. E. Bach'), 'cpe-bach');
+      eq(composerKey('Leopold Mozart'), 'l-mozart');
+      eq(composerKey('Rimski-Korsakow'), composerKey('Nikolai Rimsky-Korsakov'), 'transliterations');
+    });
+    test('work identity: different works stay apart', () => {
+      const key = (composer, title) => workIdentity(matchProgramItem({ composer, title }))?.key || null;
+      const apart = (a, b, msg) => { const x = key(...a); const y = key(...b); ok(x && y && x !== y, `${msg}: both ${x}`); };
+      apart(['Ludwig van Beethoven', 'Sinfonie Nr. 4 B-Dur, op. 60'], ['Ludwig van Beethoven', 'Sinfonie Nr. 7 A-Dur, op. 92'], 'op. 60 / op. 92');
+      apart(['Franz Schubert', 'Sinfonie Nr. 8 C-Dur'], ['Franz Schubert', 'Sinfonie Nr. 8 h-Moll'], 'same number, other key');
+      apart(['Sergej Prokofjew', 'Klavierkonzert Nr. 2 g-Moll'], ['Sergej Prokofjew', 'Violinkonzert Nr. 2 g-Moll'], 'piano / violin');
+      apart(['Pjotr Iljitsch Tschaikowski', 'Schwanensee op. 20'], ['Pjotr Iljitsch Tschaikowski', 'Schwanensee op. 20, 2. Akt, Nr. 13 Tanz der kleinen Schwäne'], 'one number of the ballet');
+      apart(['Pjotr Iljitsch Tschaikowski', 'Schwanensee op. 20'], ['Pjotr Iljitsch Tschaikowski', 'Schwanensee op. 20, Introduktion'], 'its introduction');
+      apart(['Peter Tschaikowski', 'Der Nussknacker, op. 71 (1892)'], ['Pjotr Iljitsch Tschaikowsky', 'Nussknacker-Suite, op. 71a'], 'ballet / suite');
+      apart(['Wolfgang Amadeus Mozart', 'Ouvertüre zu Don Giovanni KV 527'], ['Wolfgang Amadeus Mozart', 'Duett «La ci darem la mano» aus der Oper Don Giovanni, KV 527'], 'overture / duet');
+      apart(['Ludwig van Beethoven', 'Streichquartett Nr. 16 F-Dur, op. 135'], ['Ludwig van Beethoven', 'Streichquartett Nr. 16 F-Dur, op. 135 (Fassung für Streichorchester)'], 'original / arrangement');
+      apart(['Johann Sebastian Bach', 'Partita Nr. 2 c-Moll BWV 826'], ['Johann Sebastian Bach', 'Partita en ré mineur, BWV 1004'], 'two partitas');
+      apart(['Johannes Brahms', 'Vier Klavierstücke op. 119'], ['Johannes Brahms', 'Klavierstücke, op. 119, Intermezzi nos 1, 3 et 4'], 'a choice of pieces');
+      apart(['Johann Sebastian Bach', 'Sinfonia d-Moll'], ['Johann Christoph Friedrich Bach', 'Sinfonia in d-Moll für Streicher und Basso continuo'], 'namesakes');
+      eq(workIdentity(matchProgramItem({ composer: 'Johann Sebastian Bach', title: 'Triosonate Es-Dur BWV 525, Triosonate d-Moll BWV 527' })).by, 'title', 'several works in one line: no catalogue key');
+      eq(workIdentity({ composer: 'Werke von', title: 'P. Tschaikowski, G. Puccini, M. Glinka, J. Strauss u.a.' }), null, 'not a work');
+      eq(workIdentity({ composer: 'Orawa', title: 'für Streichorchester' }), null, 'a continuation line');
+      eq(workIdentity({ composer: 'Mozart', title: '' }), null, 'no title');
+    });
+    test('work lines: "Für Elise" is a work, "für Streichorchester" is not; several works in one line; concert overtures', () => {
+      const key = (composer, title) => workIdentity(matchProgramItem({ composer, title }))?.key || null;
+      ok(isWorkLine(matchProgramItem({ composer: 'Ludwig van Beethoven', title: 'Für Elise' })), 'Für Elise');
+      ok(isWorkLine({ composer: 'Wolfgang Amadeus Mozart', title: '« Per questa bella mano », air pour basse, contrebasse obligée et orchestre, KV 612' }), 'an aria');
+      ok(isWorkLine({ composer: 'Claude Debussy', title: 'Pour le piano' }), 'Pour le piano');
+      ok(!isWorkLine({ composer: 'Orawa', title: 'für Streichorchester' }) && !isWorkLine({ composer: 'X', title: 'pour piano et orchestre' }), 'a scoring continued from the line before');
+      ok(/^x-beethoven-/.test(key('Ludwig van Beethoven', 'Für Elise')), 'Für Elise gets a work page');
+      eq(workIdentity(matchProgramItem({ composer: 'Antonín Dvořák', title: 'Danses slaves pour quatre mains, extraits des op. 46 et 72' })).by, 'title', 'op. 46 et 72: two works');
+      eq(key('Antonín Dvořák', '«Othello» Konzertouvertüre, op. 93'), key('Antonín Dvořák', 'Ouverture « Othello », op. 93'), 'a concert overture');
+      eq(englishNumbered('Klavierkonzert Nr. 3 C-Dur op. 26'), 'Piano Concerto No. 3');
+      eq(englishNumbered('Streichquartett Nr. 3 Es-Dur'), 'String Quartet No. 3');
+      eq(englishNumbered('Symphonie n° 5 en mi bémol majeur, op. 82'), 'Symphony No. 5');
+      eq(englishNumbered('«Turn» für Orchester'), null);
+      eq(listen.catalogKeys('Streichquartett op. 3/5'), ['Op. 3 No. 5'], 'No. 5 of op. 3, not the set');
+      eq(listen.catalogKeys('Quatuor op.59 nº1'), ['Op. 59 No. 1']);
+      ok(!listen.catalogKeys('Concerto pour cor, K. 412/514').some((k) => /No\./.test(k)), 'K. 412/514 is one work');
+      // Cambini Quartet's Canales album holds op. 3 Nos. 1–3: never previewed from its start for op. 3/5
+      const canales = ['String Quartet In D Major Op. 3 No. 1: I. Allegro Maestoso', 'String Quartet In E-Flat Major Op. 3 No. 2: I. Allegro Maestoso'].map((title) => ({ title }));
+      ok(!listen.oneWorkAlbum(canales), 'several works');
+      ok(listen.oneWorkAlbum(['Symphony No. 5 in E-Flat Major, Op. 82: I. Tempo molto moderato', 'Symphony No. 5 in E-Flat Major, Op. 82: II. Andante mosso'].map((title) => ({ title }))), 'one work');
+    });
     test('ICS import parses events, venues, cities, composers', () => {
       const ics = ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'UID:abc-1', 'DTSTART;TZID=Europe/Zurich:20261120T193000', 'DTEND;TZID=Europe/Zurich:20261120T213000',
         'SUMMARY:Sinfoniekonzert: Brahms & Sibelius', 'LOCATION:Tonhalle Zürich\\, Zürich', 'DESCRIPTION:Brahms Violin Concerto\\nSibelius Symphony No. 2',
@@ -215,6 +321,10 @@
         { key: 'kts_st_gallen', name: 'Konzert und Theater St.Gallen', site: 'https://www.konzertundtheater.ch/', attribution: 'Source: Konzert und Theater St.Gallen (konzertundtheater.ch)', count: 1, ok: true, error: null },
         { key: 'opernhaus_zurich', name: 'Opernhaus Zürich', site: 'https://www.opernhaus.ch/', attribution: 'Source: Opernhaus Zürich (opernhaus.ch). Facts only; details and tickets on opernhaus.ch.', count: 1, ok: true, error: null },
         { key: 'reformiert_zuerich', name: 'Reformierte Kirche Zürich', site: 'https://reformiert-zuerich.ch/', attribution: 'Source: Reformierte Kirche Zürich (reformiert-zuerich.ch). Facts only; details there.', count: 1, ok: true, error: null },
+        { key: 'musikkollegium', name: 'Musikkollegium Winterthur', site: 'https://www.musikkollegium.ch/', attribution: 'Source: Musikkollegium Winterthur (musikkollegium.ch)', count: 1, ok: true, error: null },
+        { key: 'ocl', name: 'Orchestre de Chambre de Lausanne', site: 'https://www.ocl.ch/', attribution: 'Source: Orchestre de Chambre de Lausanne (ocl.ch). Facts only; details and tickets on ocl.ch.', count: 1, ok: true, error: null },
+        { key: 'lso_luzern', name: 'Luzerner Sinfonieorchester', site: 'https://sinfonieorchester.ch/', attribution: 'Source: Luzerner Sinfonieorchester (sinfonieorchester.ch)', count: 1, ok: true, error: null },
+        { key: 'geneva_victoria_hall', name: 'Victoria Hall, Genève (Ville de Genève)', site: 'https://victoriahall.geneve.ch/', attribution: 'Source: Ville de Genève – Agenda du Victoria Hall (opendata.swiss, via OpenAgenda). Licence: open use, source must be given.', count: 1, ok: true, error: null },
         { key: 'kammerorchester_basel', name: 'Kammerorchester Basel', site: 'https://www.kammerorchesterbasel.ch/', attribution: 'Source: Kammerorchester Basel (kammerorchesterbasel.ch). Facts only; details and tickets there.', count: 1, ok: true, error: null },
       ],
       concerts: [
@@ -224,6 +334,17 @@
         { id: 'opernhaus_zurich-200322', source: 'opernhaus_zurich', title: 'Die Zauberflöte', start: '2026-10-30T19:00:00+01:00', durationMin: 190, city: 'Zürich', venueName: 'Opernhaus Zürich, Hauptbühne', type: 'vocal-opera', credits: [{ role: 'Conductor', name: 'Tarmo Peltokoski' }, { role: 'Pamina', name: 'Regula Mühlemann' }, { role: 'Orchestra', name: 'Orchester der Oper Zürich' }, { role: 'Choir', name: 'Chor der Oper Zürich' }], program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Die Zauberflöte' }], ticketUrl: 'https://tickets.opernhaus.ch/webshop/webticket/shop?event=15163&language=de', url: 'https://www.opernhaus.ch/spielplan/kalendarium/die-zauberfloete/', status: 'scheduled' },
         { id: 'reformiert_zuerich-16109', source: 'reformiert_zuerich', title: '«Die Winterreise»', start: '2026-11-13T19:30:00+01:00', durationMin: 90, city: 'Zürich', venueName: 'Johanneskirche', url: 'https://reformiert-zuerich.ch/event/die-winterreise-16109/', status: 'scheduled' },
         { id: 'kammerorchester_basel-liestal-202611171930', source: 'kammerorchester_basel', title: 'Kammerorchester Basel – Konzertreise mit Pianistin Angela Hewitt', start: '2026-11-17T19:30:00+01:00', city: 'Liestal', venueName: 'Stadtkirche', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Kammerorchester Basel' }], url: 'https://www.blkonzerte.ch/31-angela-hewitt-klavier', status: 'scheduled' },
+        { id: 'musikkollegium-9249', source: 'musikkollegium', title: 'Barbara Hannigan', start: '2027-03-17T19:30:00+01:00', durationMin: 105, city: 'Winterthur', venueName: 'Stadthaus Winterthur', type: 'orchestral', series: 'Abonnementskonzert', credits: [{ role: 'Orchestra', name: 'Musikkollegium Winterthur' }, { role: 'Conductor', name: 'Barbara Hannigan' }], program: [{ composer: 'Igor Strawinsky', title: 'Konzert für Kammerorchester Es-Dur «Dumbarton Oaks»' }, { composer: 'Benjamin Britten', title: '«Les illuminations» op. 18 für hohe Stimme und Streichorchester, Text von Arthur Rimbaud' }, { composer: 'Ludwig van Beethoven', title: 'Sinfonie Nr. 4 B-Dur, op. 60' }], ticketUrl: 'https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161690/', url: 'https://www.musikkollegium.ch/programm/barbara-hannigan-27-03-17-9249', status: 'scheduled' },
+        { id: 'tonhalle-2056742', source: 'tonhalle', title: 'Händel, Messiah', start: '2026-12-20T17:00:00+01:00', city: 'Zürich', venueName: 'Tonhalle Zürich', type: 'vocal-opera', credits: [{ role: 'Choir', name: 'Schweizer Jugendchor' }, { role: 'Orchestra', name: 'La Cetra Barockorchester Basel' }, { role: 'Conductor', name: 'Nicolas Fink' }], program: [{ composer: 'Händel', title: '' }], url: 'https://tonhallezuerich.ch/konzerte/kalender/haendel-messiah-2056742/tz/', status: 'scheduled' },
+        { id: 'ocl-a00a5635-0dda-4aec-8f8f-3091d8eaf6d3-ocl.ch', source: 'ocl', title: 'Les Grands Concerts n°2 | Christie · Le Messie de Haendel (mer.)', start: '2026-10-28T19:30:00+01:00', durationMin: 180, city: 'Lausanne', venueName: 'Théâtre de Beaulieu', type: 'vocal-opera', series: 'Les Grands Concerts n°2', credits: [{ role: 'Conductor', name: 'William Christie' }, { role: 'Orchestra', name: 'Orchestre de Chambre de Lausanne' }], program: [{ composer: 'Georg Friedrich Haendel', title: 'Le Messie, HWV 56' }], url: 'https://www.ocl.ch/concert/grand-concert-n2/', status: 'scheduled' },
+        { id: 'lso_luzern-21013', source: 'lso_luzern', title: 'YUNCHAN LIM, MARTHA ARGERICH & MIKHAIL PLETNEV', start: '2027-01-13T19:00:00+01:00', durationMin: 140, city: 'Luzern', venueName: 'KKL Luzern, Konzertsaal', type: 'orchestral', series: 'Klavierfestival Le Piano Symphonique', credits: [{ role: 'Piano', name: 'Martha Argerich' }, { role: 'Conductor', name: 'Mikhail Pletnev' }, { role: 'Piano', name: 'Yunchan Lim' }, { role: 'Orchestra', name: 'Luzerner Sinfonieorchester' }], program: [{ composer: 'Franz Schubert', title: 'Sinfonie Nr. 7 Die Unvollendete in h-Moll, D 759, transkribiert für zwei Klaviere von Mikhail Pletnev' }, { composer: 'Franz Liszt', title: 'Klavierkonzert Nr. 2 in A-Dur, S 125' }, { composer: 'Sergei Rachmaninow', title: 'Sinfonische Tänze, op. 45' }], url: 'https://sinfonieorchester.ch/de/veranstaltung/yunchan-lim-martha-argerich-mikhail-pletnev/', status: 'scheduled' },
+        // the SJSO's autumn tour: the same works listed in German at the Tonhalle and in French at the Victoria Hall
+        { id: 'tonhalle-2056338', source: 'tonhalle', title: 'Herbsttournee Schweizer Jugend-Sinfonie-Orchester SJSO: «Nordwärts»', start: '2026-10-30T19:30:00+01:00', city: 'Zürich', venueName: 'Tonhalle Zürich – Grosser Saal', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Schweizer Jugend-Sinfonie-Orchester SJSO' }, { role: 'Conductor', name: 'Izabelė Jankauskaitė' }], program: [{ composer: 'Edvard Grieg', title: '«Norwegische Tänze» op. 35' }, { composer: 'Einojuhani Rautavaara', title: '«Cantus Arcticus», Concerto for Birds and Orchestra' }, { composer: 'Jean Sibelius', title: 'Sinfonie Nr. 5 Es-Dur op. 82' }], ticketUrl: 'https://www.kulturticket.ch/11617/sjso-schweizer-jugend-sinfonie-orchester/event/2037', url: 'https://tonhallezuerich.ch/konzerte/kalender/herbsttournee-schweizer-jugend-sinfonie-orchester-sjso-nordwaerts-2056338/tz/', status: 'scheduled' },
+        { id: 'geneva_victoria_hall-94547020-20261101', source: 'geneva_victoria_hall', title: 'Orchestre Symphonique Suisse des Jeunes – «Vers le nord»', start: '2026-11-01T17:00:00+01:00', durationMin: 120, city: 'Genève', venueName: 'Victoria Hall', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Orchestre Symphonique Suisse des Jeunes' }], program: [{ composer: 'Edvard Grieg', title: 'Danses norvégiennes' }, { composer: 'Einojuhani Rautavaara', title: 'Cantus Arcticus, Concerto for Birds and Orchestra' }, { composer: 'Jean Sibelius', title: 'Symphonie n° 5 en mi bémol majeur, op. 82' }], ticketUrl: 'https://billetterie-culture.geneve.ch/selection/event/date?productId=10229301208804', url: 'https://openagenda.com/victoria-hall-client/events/94547020_swiss-youth-symphony-orchestra', status: 'scheduled' },
+        // as published: "Ouvertu\u0308re" with a decomposed ü
+        { id: 'kts_st_gallen-3912', source: 'kts_st_gallen', title: 'Fantastique', start: '2026-11-19T19:30:00+01:00', durationMin: 120, city: 'St. Gallen', venueName: 'Tonhalle St.Gallen', type: 'orchestral', series: 'Tonhallekonzert', credits: [{ role: 'Conductor', name: 'Arvo Volmer' }, { role: 'Orchestra', name: 'Sinfonieorchester St.Gallen' }], program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Ouvertu\u0308re zu Don Giovanni KV 527' }, { composer: 'Wolfgang Amadeus Mozart', title: 'Sinfonie Nr. 39 Es-Dur KV 543' }, { composer: 'Hector Berlioz', title: 'Symphonie fantastique' }], ticketUrl: 'https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=566&language=de', url: 'https://www.konzertundtheater.ch/programm/kalender/3-thk-fantastique/3912/', status: 'scheduled' },
+        // a "_" between two Chopin lines
+        { id: 'lso_luzern-21040', source: 'lso_luzern', title: 'LUNCHKONZERT MIT TIANYAO LYU', start: '2027-01-15T12:00:00+01:00', durationMin: 70, city: 'Luzern', venueName: 'HOTEL SCHWEIZERHOF LUZERN, ZEUGHEERSAAL', type: 'recital', series: 'Klavierfestival Le Piano Symphonique', credits: [{ role: 'Piano', name: 'Tianyao Lyu' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Sechs Variationen über ein Schweizer Lied in F-Dur, WoO 64' }, { composer: 'Frédéric Chopin', title: '24 Préludes, op. 28' }, { composer: 'Frédéric Chopin', title: '_' }, { composer: 'Frédéric Chopin', title: 'Scherzo Nr. 4 in E-Dur, op. 54' }], ticketUrl: 'https://tickets.sinfonieorchester.ch/checkout/lunchkonzert-surprise-2y2w1v', url: 'https://sinfonieorchester.ch/de/veranstaltung/lunchkonzert-surprise/', status: 'scheduled' },
         // NOT a real listing: a test-only record for a town that is neither one of the 47 nor an extra town
         // (every town in today's feed is known, so the "town of its own" path needs a synthetic case)
         { id: 'test-unknown-town', source: 'test', title: 'Test listing in an unknown town', start: '2027-01-02T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', url: 'https://example.org/', status: 'scheduled' },
@@ -260,6 +381,61 @@
     test('featured = names a performer or a piece', () => {
       ok(repo.concert('feed-opernhaus_zurich-200322').featured);
       ok(!repo.concert('feed-test-unknown-town').featured, 'bare listing');
+    });
+    test('work index: one work page lists every hall that plays it', () => {
+      const osr = repo.concert('feed-osr-beethoven-1-4-5-20261105');
+      const mk = repo.concert('feed-musikkollegium-9249');
+      eq(repo.workIdOf(osr.program[1]), 'x-beethoven-op60', 'OSR, in French');
+      eq(repo.workIdOf(mk.program[2]), 'x-beethoven-op60', 'Musikkollegium, in German');
+      eq(repo.workIdOf(osr.program[2]), 'beethoven-symphony-5', 'a repertoire work keeps its id');
+      eq(repo.query({ workId: 'x-beethoven-op60', from: '2026-10-26' }).map((c) => c.id), ['feed-osr-beethoven-1-4-5-20261105', 'feed-musikkollegium-9249']);
+      const d = repo.dynamicWork('x-beethoven-op60');
+      eq([d.composerId, d.catalog, d.count, d.dynamic], ['beethoven', 'Op. 60', 2, true]);
+      ok(['Symphonie N° 4 en si bémol majeur op. 60', 'Sinfonie Nr. 4 B-Dur, op. 60'].includes(d.title) && d.titles.length === 1, 'title as published, the other form listed');
+      ok(/^Beethoven /.test(d.q) && /op\. 60/.test(d.q), `search: ${d.q}`);
+      eq(repo.dynamicWork('beethoven-symphony-5'), null, 'repertoire works have their own page');
+      eq(repo.dynamicWork('x-nothing-here'), null);
+      // a work Klang doesn't know: Strawinsky's Dumbarton Oaks, from the listing alone
+      const dumbarton = repo.workIdOf(mk.program[0]);
+      ok(/^x-stravinsky-/.test(dumbarton), dumbarton);
+      eq(repo.dynamicWork(dumbarton).title, 'Konzert für Kammerorchester Es-Dur «Dumbarton Oaks»');
+    });
+    test('work page data: Messiah at Tonhalle and in Lausanne, hall · city in both languages', () => {
+      const ton = repo.concert('feed-tonhalle-2056742');
+      eq([ton.program[0].workId, repo.programItems(ton)[0].workKey, repo.programItems(ton)[0].rawTitle], ['handel-messiah', 'handel-messiah', null], '{Händel, ""} + "Händel, Messiah"');
+      const ocl = repo.programItems(repo.concert('feed-ocl-a00a5635-0dda-4aec-8f8f-3091d8eaf6d3-ocl.ch'))[0];
+      eq([ocl.work?.id, ocl.rawTitle], ['handel-messiah', 'Le Messie, HWV 56'], 'the title as published is kept for the concert page');
+      const page = ent.workPageData('handel-messiah', '2026-10-26');
+      eq(page.rows.map((r) => r.where), ['Théâtre de Beaulieu · Lausanne', 'Tonhalle Zürich · Zurich']);
+      const pletnev = repo.programItems(repo.concert('feed-lso_luzern-21013'))[0];
+      ok(!pletnev.work && /^x-schubert-/.test(pletnev.workKey), `transcription: ${pletnev.workKey}`);
+      ok(!ent.workPageData('schubert-unfinished', '2026-10-26').rows.some((r) => r.id === 'feed-lso_luzern-21013'), 'not on the Unfinished page');
+      eq(ent.workPageData(pletnev.workKey, '2026-10-26').rows.map((r) => r.where), ['KKL Luzern · Lucerne']);
+      eq(repo.dynamicWork(pletnev.workKey).arranger, 'Pletnev', 'its recordings must name the arranger');
+      store.setPref('lang', 'zh');
+      try {
+        eq(ent.workPageData('x-beethoven-op60', '2026-10-26').rows.map((r) => r.where), ['Théâtre de Beaulieu · 洛桑', 'Stadthaus Winterthur · 温特图尔']);
+      } finally { store.setPref('lang', 'en'); }
+    });
+    test('work index: the SJSO tour — the same works in German at the Tonhalle and in French at the Victoria Hall', () => {
+      const ton = repo.concert('feed-tonhalle-2056338').program.map(repo.workIdOf);
+      const vh = repo.concert('feed-geneva_victoria_hall-94547020-20261101').program.map(repo.workIdOf);
+      eq(vh, ton, 'Danses norvégiennes = «Norwegische Tänze» op. 35; Cantus Arcticus; Sibelius 5');
+      eq(ton[0], 'x-grieg-op35');
+      eq(ent.workPageData('x-grieg-op35', '2026-10-26').rows.map((r) => r.where), ['Tonhalle Zürich · Zurich', 'Victoria Hall · Geneva']);
+      ok(repo.dynamicWork('x-grieg-op35').titles.includes('Danses norvégiennes'), 'the other published title');
+      eq(repo.dynamicWork(ton[2]).titles, [repo.dynamicWork(ton[2]).title === 'Sinfonie Nr. 5 Es-Dur op. 82' ? 'Symphonie n° 5 en mi bémol majeur, op. 82' : 'Sinfonie Nr. 5 Es-Dur op. 82']);
+      eq(repo.dynamicWork('x-grieg-op35').qCatalog, 'Grieg Op. 35', 'the catalogue search');
+      // a generic title never joins a numbered work on its own ("Le nozze di Figaro" is not its overture)
+      eq(workIdentity(matchProgramItem({ composer: 'Wolfgang Amadeus Mozart', title: 'Le nozze di Figaro' })).words.includes('overture'), false);
+    });
+    test('feed text: decomposed accents are composed, a "_" line goes', () => {
+      const kts = repo.programItems(repo.concert('feed-kts_st_gallen-3912'));
+      eq(kts[0].rawTitle, 'Ouvertüre zu Don Giovanni KV 527');
+      ok(kts[0].rawTitle === kts[0].rawTitle.normalize('NFC'), 'NFC');
+      eq(kts[0].workKey, 'x-mozart-kv527-overture');
+      const lunch = repo.programItems(repo.concert('feed-lso_luzern-21040'));
+      eq(lunch.map((it) => it.rawTitle), ['Sechs Variationen über ein Schweizer Lied in F-Dur, WoO 64', '24 Préludes, op. 28', 'Scherzo Nr. 4 in E-Dur, op. 54']);
     });
     test('no demo concerts at run time', () => {
       ok(repo.allConcerts().length >= FIXTURE.concerts.length, 'fixture loaded');

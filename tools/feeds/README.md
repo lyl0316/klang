@@ -7,17 +7,18 @@ Sheng's data is never used. The research behind the source list is in `spec/CONC
 ## How it works
 
 1. **Schedule.** `.github/workflows/pages.yml` runs at 04:23 UTC (early morning in Switzerland), on every push to `main`, and on demand.
-2. **Fetch.** `build.py` finds every reader in `sources/` and runs them one after another. Each reader fetches its site through `common.get()`, which is polite by construction (see [Politeness](#politeness)).
+2. **Fetch.** `build.py` finds every reader in `sources/` and runs them one after another. Each reader fetches its site through `common.get()`, which is polite by construction (see [Politeness](#politeness)). The previously published feed is handed to the readers, so a reader that reads one detail page per concert can reuse what it learnt on earlier runs (see [Incremental details](#incremental-details)).
 3. **Normalise.** Each reader returns a list of events made by `common.make_event()`. Every event has Swiss local time with the correct offset.
 4. **Combine.** `build.py` then:
    - keeps events from today to today + 450 days (Swiss time);
-   - merges the same performance listed by two sources;
+   - merges the same performance listed by two sources (see [De-duplication](#de-duplication));
+   - fills in or corrects the type where the facts make it clear (see [Types](#types));
    - sorts the events by start time;
    - writes `{"generatedAt", "sources", "concerts"}`.
 5. **Recover.** If a reader fails, its events from the previously published feed are reused. One broken site therefore doesn't empty a city. This also happens when a reader times out, or returns nothing when it had at least 5 events last time.
 6. **Deploy.** The workflow uploads the whole app folder, including the fresh `data/concerts.json`, to GitHub Pages.
 
-Pushes reuse any source that was fetched successfully in the last 20 hours with the same reader code (`--fresh-hours 20`). Developing the app therefore doesn't make extra requests to the venues. Scheduled and manual runs always fetch.
+Pushes reuse any source that was fetched successfully in the last 20 hours with the same reader code (`--fresh-hours 20`). Developing the app therefore doesn't make extra requests to the venues. Scheduled and manual runs always fetch. The code compared (`codeHash`) is the reader's file, the `sources/` modules it imports (helpers such as `_east.py`, also indirectly, or another reader it borrows from) and `common.py`, so editing a helper invalidates the reuse too.
 
 > **Pages setting.** The workflow deploys with `actions/deploy-pages`. The repository's **Settings → Pages → Build and deployment → Source** must be **GitHub Actions**, not "Deploy from a branch".
 
@@ -36,7 +37,7 @@ python3 tools/feeds/build.py --out /tmp/concerts.json   # everything, like the d
 |---|---|
 | `--only k1,k2` | Runs only these readers. The output then contains only their events, so don't write it over the real feed. |
 | `--out PATH` | Output file. The default is `data/concerts.json` in the app. |
-| `--previous URL_OR_PATH` | Feed to fall back on when a source fails. The default is the published `https://lyl0316.github.io/klang/data/concerts.json`; `none` disables it. A local copy at `--out` is the second choice. |
+| `--previous URL_OR_PATH` | The last feed: readers reuse details from it, and it is the fallback when a source fails. The default is the published `https://lyl0316.github.io/klang/data/concerts.json`; `none` disables it. A local copy at `--out` is the second choice. |
 | `--fresh-hours H` | Reuses sources fetched OK less than H hours ago with the same code (`codeHash`). |
 | `--timeout S` | Per-source time limit. The default is the reader's `TIME_LIMIT`, or 600 s. |
 | `--show N` | Prints N sample events per source. |
@@ -125,7 +126,8 @@ Reader checklist:
   - instruments and voices: `Piano`, `Violin`, `Soprano` …;
   - `Orchestra`, `Ensemble` or `Choir` for groups;
   - `Performer` when the site gives no role and the name isn't obviously a group.
-- **Stay within 60 requests.** One run may send at most 60 requests (`common.MAX_REQUESTS`). When a site needs one request per concert, check `requests_left()` before fetching detail pages, or read a listing or .ics instead. A reader can lower its own cap with `MAX_REQUESTS`, or set `TIME_LIMIT` (seconds, at most 1200).
+- **Stay within your request cap.** One run may send at most 60 requests (`common.MAX_REQUESTS`) unless the reader sets its own `MAX_REQUESTS`: lower, or up to 150 (`common.MAX_REQUESTS_CAP`) for a reader that needs one detail page per concert. The delay between requests and `Crawl-delay` still apply, so set `TIME_LIMIT` (seconds, at most 1200) to fit. Check `requests_left()` before fetching detail pages, or read a listing or .ics instead.
+- **Read detail pages incrementally.** A reader that reads one page per concert reuses the previous feed's details and spends its requests on the concerts still missing them, nearest first. See [Incremental details](#incremental-details).
 - **Test it** with `build.py --only <key> --previous none --show 5 -v`, then run `selftest.py`.
 - **Add a row** to the [Sources](#sources) table below.
 
@@ -142,7 +144,7 @@ Reader checklist:
 - **It waits between requests** to the same host, at least 1.5 s, or longer when `Crawl-delay` or `Request-rate` asks for it.
 - **Sources run one at a time,** with no parallel requests.
 - **It retries twice** on 429, 5xx and network errors, honouring `Retry-After` up to 120 s.
-- **It caps each source** at 60 requests per run, with a time limit. The daily schedule means each site is read about once a day.
+- **It caps each source** at 60 requests per run by default (at most 150 for a reader that sets `MAX_REQUESTS` to read detail pages), with a time limit. The daily schedule means each site is read about once a day, and detail pages already read are reused rather than fetched again every day.
 - **It never logs in, sends forms, or sets cookies or credentials.**
 - **Only Tier 1 and Tier 2 sources** from `spec/CONCERT-FEEDS.md` are read. Tier 3 sites ask for written consent before reproduction, so they are not fetched until that consent exists:
   - Opernhaus Zürich;
@@ -168,15 +170,29 @@ Only these facts are republished:
 
 Descriptions, programme notes, essays and images are never copied. `make_event` has no field for them. Each source's credit is in `sources[].attribution` of the feed.
 
+## Incremental details
+
+Some sites list a concert's performers and composers but keep the hall, the works' titles or the full cast on a page per concert. Reading every page every day would exceed the request cap (and be impolite), so such readers work incrementally:
+
+1. `build.py` hands the previous feed to `common` before the readers run.
+2. For each concert in today's listing the reader asks for the previous record: `common.previous_event(common.event_id(KEY, sid), start, title=title)`. It is returned only when it is clearly the same performance: the same id, the same start (same instant) and, when `title` is given, the same title (apart from case, accents, punctuation or a typo, never a different number).
+3. The reader also checks that its listing still says what that record says (Tonhalle: every listed performer is in the cast, every listed composer in the programme). Then it reuses the record's details instead of reading the page.
+4. The requests left after the listing go to the concerts still missing details, nearest first; then to concerts due for a re-read (`common.refresh_due(key, start, near_days=…, every_days=…)`: always for concerts in the next days, the others on a fixed rotation), so changes are picked up. On the first run after the reader's code changed (its `codeHash` differs from the previous feed's), every reused concert is due, so a parser fix reaches all of them as far as the cap allows.
+
+Within a few daily runs every concert has its full details. Readers doing this: `tonhalle` (event pages; cap 120), `opernhaus_zurich` (production pages; cap 120). `common.previous_events(KEY)` returns all of a source's previous events, for a reader that matches by something else (e.g. event URL and day). The previous record may contain fields that `build.py` merged in from another source listing the same performance; they describe the same performance, so they are safe to keep.
+
 ## De-duplication
 
-The same performance often appears twice, for example the OSR's own calendar and the Ville de Genève dataset for Victoria Hall. Two events from different sources are treated as one when all of these hold:
+The same performance often appears twice, for example the OSR's own calendar and the Ville de Genève dataset for Victoria Hall, or an orchestra's own listing and the hall's. Two events from different sources that start within 20 minutes of each other are treated as one when:
 
-- **City:** the same city (aliases are matched: Zürich/Zurich, Genève/Geneva/Genf …).
-- **Venue:** a similar venue. "Tonhalle Zürich" ≈ "Tonhalle Zürich, Grosser Saal", but Grosser ≠ Kleiner Saal. When a venue is missing, the titles must be similar instead.
-- **Time:** starts within 20 minutes of each other.
+- **City:** they are in the same city (aliases are matched: Zürich/Zurich, Genève/Geneva/Genf …), or a city is missing and the venues are similar; and
+- **Venue:** the venues are similar. "Tonhalle Zürich" ≈ "Tonhalle Zürich, Grosser Saal", but Grosser ≠ Kleiner Saal (never merged). Or, in the same city with venues named differently ("Theater Casino Zug" / "…, Theatersaal", "Stadthaus" / "Stadtsaal Winterthur"), at least one of:
+  - **two or more of the same performers** (by name);
+  - **one venue name contains the other**, and the shorter one names a place, not just "Kirche" or "Theater";
+  - **very similar titles**: at least two telling words, mostly the same ("Musiques sérieuses").
+- When a venue is missing, the same city plus a similar title or two shared performers is enough.
 
-The record kept comes from the source with the higher priority:
+The record kept (its id, title and links) comes from the source with the higher priority, so a performance keeps its id from day to day:
 
 | `KIND` | Priority |
 |---|---|
@@ -184,7 +200,21 @@ The record kept comes from the source with the higher priority:
 | `venue` / `festival` | 20 (the default) |
 | `aggregator` | 10 |
 
-A module's `PRIORITY` overrides its kind. Between equal priorities, the richer record wins. Its empty fields (ticket link, duration, programme …) are then filled from the other record.
+A module's `PRIORITY` overrides its kind. Between equal priorities, the richer record wins. It then takes the richer facts of the two:
+
+- the longer cast; a bare `Performer` role gets the other listing's instrument ("Clarinet");
+- the programme with more work titles;
+- the more specific venue ("Casino Bern, Grosser Saal" over "Casino Bern");
+- the ticket link on the venue's or the organiser's own domain (theirs or a ticket shop / Swiss site before an unrelated foreign site, which is usually a slip on the source site);
+- any field it lacks (duration, series, type …).
+
+## Types
+
+After merging, `build.py` checks each concert's `type` against its facts (`common.fix_type`, also usable in a reader as `common.infer_type(title, credits, program, series)`):
+
+- **Missing type:** inferred from the facts. One or two players with no orchestra, ensemble, choir or conductor are a `recital` (a duo whose title says chamber music: `chamber`); otherwise the title's words, then the groups credited (orchestra → `orchestral`, choir → `vocal-opera`, an ensemble or 3–12 players → `chamber`).
+- **Clearly wrong:** `orchestral` for one or two players with no orchestra, ensemble, choir or conductor becomes `recital` (Sokolov, Schiff, Kopatchinskaja & Say …), and so does `chamber` for a single player. Not when the title or a work needs an orchestra or choir (a concerto, a symphony, a mass …), and not for an orchestra's or ensemble's own listing (the group plays even when not credited) unless its title says recital ("Klavierabend").
+- **Ballet with live music** (a choreographer plus an orchestra or conductor, no singers): stays `orchestral` and gets the series `Ballett` when it has none.
 
 ## common.py reference
 
@@ -203,6 +233,13 @@ A module's `PRIORITY` overrides its kind. Between equal priorities, the richer r
 | `as_list(value)` | `None` → `[]`, a scalar → `[value]`. Handy for JSON-LD. |
 | `today_zurich()` | Today's date in Switzerland. `KLANG_FEEDS_TODAY=YYYY-MM-DD` overrides it. |
 | `requests_left()` | Requests the running source may still send. |
+| `event_id(source, sid)` | The id `make_event` gives (`'tonhalle-2055696'`). |
+| `previous_event(event_id, start, *, title=None)` | A copy of the previous feed's record of this concert, or `None`. Only for the same id and start instant (and title, if given). See [Incremental details](#incremental-details). |
+| `previous_events(source_key)` | Copies of the source's events in the previous feed. |
+| `refresh_due(key, start=None, *, near_days=7, every_days=7)` | Whether to read a reusable detail page again: always within `near_days` or after a change to the reader's code, else once every `every_days` days on a rotation by `key`. |
+| `same_title(a, b)` | Titles equal apart from case, accents, punctuation or a typo (never a different number). |
+| `infer_type(title, credits=None, program=None, series=None)` | Type from the facts (see [Types](#types)), or `None`. |
+| `fix_type(event, kind=None)` | A copy of the event with its type filled in or corrected, as `build.py`'s last pass. |
 | `log` | `logging.getLogger('feeds')`. |
 
 **`parse_ics` details:**

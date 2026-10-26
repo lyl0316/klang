@@ -5,8 +5,13 @@
 //
 //   Work:     floating back · ♡ · share; composer portrait + name, serif title, caps
 //             "1892 · ~23 MIN", Listening guide sheet, Recordings carousel, More recordings
-//             (every version), Report a problem, Concerts N (date blocks, city only). Section bars
+//             (every version), Report a problem, Concerts N (date blocks, HALL · CITY). Section bars
 //             take the work's genre colour, as on Sheng.
+//             A work outside the repertoire (#/work/x-…, repo.js work index: the same piece in every
+//             listing, whatever the language) gets the same page from the listings alone: composer
+//             (linked when Klang knows them), the title as most commonly published (+ the other
+//             published forms), Recordings found on Apple Music by surname + title, Concerts N across
+//             every hall. Nothing is written about it that the listings don't say.
 //   Composer: back · share; portrait, serif name, Read Bio / Explore Works / Editorials N,
 //             centred ♡, caps life line; Latest releases, Popular among listeners,
 //             "Explore <name>" (By period · By genre · Related), then Swiss Concerts N.
@@ -48,7 +53,8 @@ import {
 import { workPiece, albumPiece, pieceURL, albumURL, listening, onListening, playApp, playAppName } from '../applemusic.js';
 import { previewButton, classicalButton } from '../ui/preview.js';
 import { openSaveSheet } from '../ui/save.js';
-import { searchTerm, matchWorkTracks } from '../ui/listen.js';
+import { searchTerm, matchWorkTracks, catalogKeys, oneWorkAlbum } from '../ui/listen.js';
+import { englishNumbered } from '../ics.js';
 
 // ---------- reference tables (English keys; shown through t()) ----------
 const GENRES = [
@@ -370,6 +376,8 @@ const SUB = {
   flagCity: (c) => [flagCH(), cityText(c) ? h('span', { class: 'cty' }, cityText(c)) : null,
     cityText(c) ? h('span', { class: 'sep' }, '·') : null, venueText(c)],
   venue: (c) => [venueText(c), c.room].filter(Boolean).join(' · '),
+  // work pages: where each performance is — "Tonhalle Zürich · Zurich"
+  venueCity: (c) => [venueText(c), cityText(c)].filter(Boolean).join(' · '),
   program: (c) => [typeLabel(c.type, TYPE_LABELS[c.type]), c.series, c.room].filter(Boolean).join(' · '),
 };
 
@@ -566,18 +574,22 @@ export function workTracks(work, tracks) {
 
 // What a recording is as a piece: the work on that recording (work page), or the whole album.
 function recordingPiece(work, a, track = work ? firstTracks.get(`${work.id}|${a.id}`) : null) {
-  return work ? workPiece(work, repo.composer(work.composerId)?.name, a, track || null) : albumPiece(a);
+  return work ? workPiece(work, repo.composer(work.composerId)?.name || work.composerName || null, a, track || null) : albumPiece(a);
 }
 
 // The preview of a recording: the work's own tracks on that album (all of them for an album), first
 // one playing and the rest queued. Tracks carry the piece fields so the player can name the work.
+// A work outside the repertoire whose tracks can't be told apart (Apple titles them in English, the
+// listing in German or French) previews the recording from its start, as the concert page does — but
+// only when the album holds that one work: Richter's "Prokofieff and Rachmaninoff" album starts with
+// another concerto.
 function previewOf(album, work = null) {
   return albumTracks(album.id).then(({ tracks }) => {
     const m = work ? workTracks(work, tracks) : null;
-    if (work && !m) return null; // this recording's tracks don't name the work: no guessing
-    const list = (m || tracks).filter((x) => x.preview);
+    if (work && !m && !(work.dynamic && oneWorkAlbum(tracks))) return null; // the tracks don't name the work: no guessing
+    const list = (m || tracks.slice(0, 40)).filter((x) => x.preview);
     if (!list.length) return null;
-    const composer = work ? repo.composer(work.composerId)?.name || null : null;
+    const composer = work ? repo.composer(work.composerId)?.name || work.composerName || null : null;
     for (const x of list) {
       Object.assign(x, { trackId: x.id, collectionId: album.id, workId: work?.id || null, workTitle: work?.title || null, composer });
     }
@@ -809,7 +821,8 @@ function recordingsRail({
 // ---------- More recordings (every version of a work) ----------
 // Sheng's Versions sheet: tap a cover to hear its preview (it becomes your version); "Open" plays it
 // in full in Apple Music Classical; "+" saves it.
-function openRecordingsSheet(w, title, term, onChoose) {
+// load(): the albums to show (a listed work passes its own, filtered search).
+function openRecordingsSheet(w, title, term, onChoose, load = () => searchAlbums(term, SEARCH_LIMIT)) {
   const bag = [];
   const body = h('div', { class: 'versions' },
     h('div', { class: 'versions-grid', 'aria-busy': 'true' }, Array.from({ length: 9 }, () => h('div', { class: 'skeleton version-skel' }))));
@@ -859,7 +872,7 @@ function openRecordingsSheet(w, title, term, onChoose) {
         h('a', { class: 'btn small', href: appleMusicSearchURL(term), target: '_blank', rel: 'noopener' }, icon('music', 14), 'Apple Music'))));
   }
 
-  searchAlbums(term, SEARCH_LIMIT)
+  Promise.resolve().then(load)
     .then((albums) => (albums.length ? paint(albums) : message(t('No recordings of this work found on Apple Music.'))))
     .catch(() => message(t('Couldn’t load recordings. Check your connection and try again.')));
   return sheet;
@@ -1157,6 +1170,7 @@ function openGuide(w, comp, guides, up) {
 }
 
 export async function renderWork({ id }) {
+  if (String(id).startsWith('x-')) return renderListedWork(id);
   const w = repo.work(id);
   if (!w) return notFound('Work', t('This work isn’t in Klang’s repertoire.'));
   const content = await loadContent();
@@ -1198,7 +1212,7 @@ export async function renderWork({ id }) {
     h('section', { class: 'ep-sec' },
       epHead(t('Concerts'), { bar: true, count: up.length }),
       up.length
-        ? eventList(up, (x) => eventItem(x, mark, { sub: SUB.cityOnly }), { initial: 40 }).el
+        ? eventList(up, workEvent(up, mark), { initial: 40 }).el
         : softEmpty('calendar', t('No upcoming performances'),
           t('This work isn’t on any announced Swiss programme right now. Add it to your favourites to catch new dates.')),
       up.length ? sourcesLine(up) : null),
@@ -1210,6 +1224,132 @@ export async function renderWork({ id }) {
     actions: topActions(
       favButton('work', id, w.title, bag),
       shareButton(label, t('{title} — recordings and concerts in Switzerland', { title: label }), href.work(id))),
+    body,
+    cleanup: () => bag.forEach((fn) => fn()),
+  };
+}
+
+// A work page's performance: date, title, "Hall · City" — and the time when the day has another
+// performance of the work (a lunch concert and the evening one).
+function workEvent(list, mark) {
+  const n = new Map();
+  for (const c of list) n.set(c.day, (n.get(c.day) || 0) + 1);
+  return (c) => eventItem(c, mark, { sub: SUB.venueCity, time: n.get(c.day) > 1 });
+}
+
+// ---------- a work outside the repertoire (#/work/x-…) ----------
+// Album titles name the composer as Apple spells it ("Prokofiev", "Shostakovich"); listings write
+// "Prokofjew", "Schostakowitsch": compare the two through the same transliteration.
+const nameKey = (s) => tokens(s).replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u')
+  .replace(/tsch/g, 'ch').replace(/sch/g, 'sh').replace(/tch/g, 'ch').replace(/ff /g, 'v ').replace(/w/g, 'v').replace(/j/g, 'i').replace(/y /g, 'i ');
+
+// The listed work as the recordings rail and the Versions sheet take it (ui/listen.js stand-in):
+// { id, title, composerId, composerName, catalog, keys (catalogue numbers, quoted names), q, … }
+function listedWork(d) {
+  const quoted = [...d.title.matchAll(/[«“„"]([^»”“"]{3,40})[»”“"]/g)].map((m) => m[1].trim());
+  const cats = catalogKeys(`${d.title} ${d.catalog || ''}`);
+  const overture = /ouvert[uü]re|overture/i.test(d.title) ? cats.flatMap((k) => [`${k} Overture`, `${k} Ouverture`]) : [];
+  // Apple's English track titles: "Klavierkonzert Nr. 3" is "Piano Concerto No. 3"
+  const english = englishNumbered(d.title);
+  return { ...d, keys: [...overture, ...cats, ...quoted, ...(english ? [english] : [])] };
+}
+
+
+// Recordings of a listed work: albums that name the composer, those that also name the work first
+// (catalogue number, "Symphony No. 4", a quoted name); the English form of the title when the
+// listing's own finds nothing better. An arrangement: only recordings that name its arranger.
+function listedRecordings(w) {
+  const sur = w.surname ? nameKey(w.surname) : null;
+  const arr = w.arranger ? nameKey(w.arranger) : null;
+  const rank = (a) => {
+    if (arr && !nameKey(`${a.title} ${a.artist}`).includes(arr)) return 0; // an arrangement: the arranger's version only
+    if (!sur || !nameKey(a.title).includes(sur)) return sur ? 0 : 1;
+    const title = tokens(a.title);
+    if ((w.keys || []).some((k) => title.includes(tokens(k)))) return 2;
+    if (!w.num) return 1;
+    const found = [...title.matchAll(new RegExp(` ${w.num.kind}s? (?:no|nr|nos) (\\d+)`, 'g'))].map((m) => m[1]);
+    return !found.length ? 1 : found.includes(w.num.n) ? 2 : 0;
+  };
+  const pick = (albums) => albums.map((a) => [a, rank(a)]).filter(([, r]) => r > 0).sort((x, y) => y[1] - x[1]).map(([a]) => a);
+  return async () => {
+    let albums = pick(await searchAlbums(w.q, SEARCH_LIMIT));
+    // then the English form, then composer + catalogue number ("Prokofjew Op. 125"), while no album names the work
+    // and, when nothing at all was found, the English form without its number ("Canales String Quartet")
+    for (const q of [w.qEnglish, w.qCatalog, w.qBroad]) {
+      if (!q || q === w.q || albums.some((a) => rank(a) === 2) || (q === w.qBroad && albums.length)) continue;
+      try {
+        const more = pick(await searchAlbums(q, SEARCH_LIMIT));
+        if (more.length) albums = [...more, ...albums.filter((a) => !more.some((b) => same(a.id, b.id)))].sort((x, y) => rank(y) - rank(x));
+      } catch { /* keep what was found */ }
+    }
+    return albums;
+  };
+}
+
+// What a work page lists (the unit tests read it too): the work — Klang's own, or one gathered from
+// the listings ('x-…') — and its performances from `from` on in every hall, each "Hall · City".
+export function workPageData(id, from = todayKey()) {
+  const work = String(id).startsWith('x-') ? repo.dynamicWork(id) : repo.work(id) || null;
+  if (!work) return null;
+  const concerts = repo.query({ workId: id, from });
+  return { work, concerts, rows: concerts.map((c) => ({ id: c.id, day: c.day, title: c.title, where: SUB.venueCity(c) })) };
+}
+
+function renderListedWork(id) {
+  const d = repo.dynamicWork(id);
+  if (!d) {
+    return notFound('Work', t('No current listing names this work. Programmes change — search for it instead.'));
+  }
+  const w = listedWork(d);
+  const bag = [];
+  const mark = liveMarks(bag);
+  const comp = d.composerId ? repo.composer(d.composerId) : null;
+  const compShown = comp ? composerShort(comp) : d.composerName;
+  const label = [compShown, d.title].filter(Boolean).join(isZh() ? '：' : ': ');
+  const up = repo.upcoming({ workId: id });
+  const term = d.q;
+  const loadRecordings = listedRecordings(w);
+  const rail = recordingsRail({
+    load: loadRecordings,
+    title: (a) => a.artist,
+    sub: (a) => a.title,
+    work: w,
+    term, bag, ariaLabel: t('Recordings of {title}', { title: label }),
+    chosenId: store.listenChoice(id), autoSelect: true,
+    onSelect: (a) => store.setListenChoice(id, a.id),
+    extra: h('button', { class: 'ep-link', type: 'button', onclick: () => openRecordingsSheet(w, [compShown, d.title].filter(Boolean).join(' · '), term, (a) => rail.select(a), loadRecordings) },
+      t('More recordings'), icon('chevron', 14)),
+    credit: 'detached',
+  });
+  const halls = new Set(up.map((c) => c.venueId || c.venueName).filter(Boolean)).size;
+  const body = h('div', { class: ['ep-page', 'ep-workpage', 'ep-listed', `ga-${d.genre || 'other'}`] },
+    h('header', { class: 'ep-head' },
+      comp
+        ? h('a', { class: 'ep-comp-link', href: href.composer(comp.id) }, portrait(comp.name, 'md', comp.id), h('span', {}, composerName(comp)))
+        : d.composerName ? h('div', { class: 'ep-comp-link' }, portrait(d.composerName, 'md'), h('span', {}, d.composerName)) : null,
+      h('h1', { class: 'ep-name work' }, d.title),
+      d.catalogNote ? h('div', { class: 'ep-caps' }, d.catalogNote) : null,
+      d.titles.length
+        ? h('p', { class: 'ep-also' }, h('span', { class: 'k' }, t('Also listed as:')), isZh() ? '' : ' ', d.titles.map((x) => h('span', { class: 'v', lang: 'und' }, x)))
+        : null,
+      h('p', { class: 'ep-listed-note' }, t('As the venues list it — this work isn’t in Klang’s repertoire yet, so there is no listening guide.'))),
+    h('section', { class: 'ep-sec' }, epHead(t('Recordings'), { bar: true }),
+      h('p', { class: 'ep-listen-note' }, t('Found on Apple Music by composer and title — tap a cover for a 30-second preview; ↗ plays the recording in full in {app}.', { app: t(playAppName()) })),
+      rail.el),
+    reportPill({ kind: 'work', name: [d.composerName, d.title].filter(Boolean).join(': '), label, path: href.work(id) }),
+    h('section', { class: 'ep-sec' },
+      epHead(t('Concerts'), { bar: true, count: up.length }),
+      up.length > 1 && halls > 1 ? h('p', { class: 'ep-listen-note' }, tn(halls, 'At {n} hall', 'At {n} halls')) : null,
+      up.length
+        ? eventList(up, workEvent(up, mark), { initial: 40 }).el
+        : softEmpty('calendar', t('No upcoming performances'), t('No announced Swiss programme has this work right now.')),
+      up.length ? sourcesLine(up) : null),
+    rail.credit);
+
+  return {
+    title: d.title,
+    back: true,
+    actions: topActions(shareButton(label, t('{title} — recordings and concerts in Switzerland', { title: label }), href.work(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };

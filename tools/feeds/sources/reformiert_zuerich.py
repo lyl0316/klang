@@ -15,6 +15,12 @@ Andacht, Evensong), rehearsals, sing-alongs, children's and family formats, guid
 talks, workshops, musicals, parties, and gospel/jodel/band events. Only facts are used
 (title, time, church, the musicians named in ``elements``); the descriptions are not read.
 
+An event without a church in ``elements`` (an outside organiser's concert, e.g. "Weihnachtskonzert
+bei Kerzenlicht") links to the organiser's page for details. That page is fetched (at most
+three per run, robots.txt obeyed) only to find which church the event's date is in: the
+church must be one of the city's Reformed churches named below, near that date. Nothing
+else is taken from it.
+
 The site's terms ask for consent before its content is reproduced. Klang republishes
 facts only (date, time, title, church, performers, links back).
 """
@@ -22,7 +28,8 @@ from __future__ import annotations
 
 import re
 
-from common import FetchError, clean, get_json, guess_type, log, looks_cancelled, make_event, to_zurich_iso
+from common import (FetchError, clean, get, get_json, guess_type, log, looks_cancelled, make_event, requests_left,
+                    to_zurich_datetime, to_zurich_iso)
 
 from ._consent import fold, group_role, looks_like_person, role_en
 
@@ -149,6 +156,54 @@ def _venue(place):
     return p
 
 
+# the Reformed churches of Zürich, as this reader names them elsewhere
+_CHURCHES = (
+    (r'fraum[üu]nster', 'Fraumünster'), (r'grossm[üu]nster', 'Grossmünster'), (r'st\.?\s*peter', 'Kirche St. Peter'),
+    (r'predigerkirche|predigern', 'Predigerkirche'), (r'wasserkirche', 'Wasserkirche'),
+    (r'neum[üu]nster', 'Kirche Neumünster'), (r'johanneskirche', 'Johanneskirche'), (r'pauluskirche', 'Pauluskirche'),
+    (r'markuskirche', 'Markuskirche, Seebach'), (r'kirche enge', 'Kirche Enge'), (r'kirche fluntern', 'Kirche Fluntern'),
+    (r'kirche unterstrass', 'Kirche Unterstrass'), (r'kirche oberstrass', 'Kirche Oberstrass'),
+    (r'kirche letten', 'Kirche Letten'), (r'kirche st\.?\s*jakob', 'Kirche St. Jakob'), (r'kirche leimbach', 'Kirche Leimbach'),
+    (r'alte kirche wollishofen', 'Alte Kirche Wollishofen'), (r'kirche b[üu]hl', 'Kirche Bühl Wiedikon'),
+    (r'thomaskirche', 'Thomaskirche Im Gut'), (r'lavaterhaus', 'Lavaterhaus'),
+)
+_DE_MONTHS = ('januar', 'februar', 'märz', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober',
+              'november', 'dezember')
+MAX_ORGANISER_PAGES = 3
+
+
+def _links(node):
+    """External links in the API's rich-text ``description`` (a list of nodes)."""
+    out = []
+    if isinstance(node, list):
+        for n in node:
+            out += _links(n)
+    elif isinstance(node, dict):
+        attrs = node.get('attrs') if isinstance(node.get('attrs'), dict) else {}
+        href = attrs.get('href')
+        if node.get('type') == 'a' and isinstance(href, str) and href.startswith('http') \
+                and 'reformiert-zuerich.ch' not in href:
+            out.append(href)
+        out += _links(node.get('children'))
+    return out
+
+
+def church_on_date(page, start):
+    """The Zürich Reformed church named right after the event's date on an organiser's page
+    ('Donnerstag, 10. Dezember 2026, 20.00 Uhr Fraumünster Zürich'), else None."""
+    text = clean(re.sub(r'(?is)<(script|style)\b.*?</\1>', ' ', page or ''))
+    day = start.day
+    dates = [rf'\b0?{day}\.\s*{_DE_MONTHS[start.month - 1]}\s+{start.year}', rf'\b0?{day}\.0?{start.month}\.(?:{start.year}|{start.year % 100})\b']
+    for d in dates:
+        for m in re.finditer(d, text, re.I):
+            window = text[m.end():m.end() + 80]
+            window = re.split(r'\b\d{1,2}\.\s*[A-Za-zä]+\s+\d{4}|\b\d{1,2}\.\d{1,2}\.\d{2,4}', window)[0]  # up to the next date
+            for rx, name in _CHURCHES:
+                if re.search(rx, window, re.I):
+                    return name
+    return None
+
+
 def _type(title, sub, credits):
     text = f'{title} {sub}'
     if re.search(r'orgel', text, re.I):
@@ -189,6 +244,22 @@ def fetch():
         log.warning('%s: city-centre query failed: %s', KEY, err)
 
     events, seen, skipped = [], set(), 0
+    organiser_pages = {}
+
+    def organiser_church(e):
+        start = to_zurich_datetime(e['key_data']['begin'])
+        for href in _links((e.get('texts') or {}).get('description'))[:1]:
+            if href not in organiser_pages:
+                if len(organiser_pages) >= MAX_ORGANISER_PAGES or requests_left() <= 1:
+                    return None
+                try:
+                    organiser_pages[href] = get(href)
+                except FetchError as err:
+                    log.info('%s: organiser page unavailable: %s', KEY, err)
+                    organiser_pages[href] = ''
+            return church_on_date(organiser_pages[href], start)
+        return None
+
     for e in rows:
         if not isinstance(e, dict) or e.get('id') in seen:
             continue
@@ -199,6 +270,8 @@ def fetch():
             continue
         title, sub = _title(e), _subtitle(e)
         venue, people = _place_and_people(e)
+        if not venue and not clean((e.get('address') or {}).get('street')):
+            venue = organiser_church(e)                # 'Weihnachtskonzert bei Kerzenlicht' -> 'Fraumünster'
         city = clean((e.get('address') or {}).get('location')) or 'Zürich'
         credits = []
         for r, name in people + _text_people((e.get('texts') or {}).get('text')):

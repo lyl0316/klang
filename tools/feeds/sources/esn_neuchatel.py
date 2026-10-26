@@ -11,8 +11,11 @@ and the line-up ("Name · role" lines and the ensembles); the works follow under
 
 robots.txt: only a sitemap line, everything allowed. No terms of use on the site.
 
-Skipped: family and school concerts ("Concert famille", "Concerts des écoliers") and runs
-announced without a start time ("du 11 au 14 avril 2027"), which are not invented.
+Skipped: school concerts ("Concerts des écoliers"), family formats without a programme, and
+runs announced without a start time ("du 11 au 14 avril 2027"), which are not invented. A
+family concert that is a real orchestral concert with a programme (Poulenc's "L'Histoire de
+Babar" with a narrator and the orchestra) is kept, with the series "Concert famille".
+The title is the page's own title ("Autour de la saison"), never a programme line.
 """
 from __future__ import annotations
 
@@ -112,12 +115,25 @@ def _credits(html_fragment):
             continue                                               # work headings are in italics
         m = re.match(r'^(.+?)\s+·\s+(.+)$', t)
         if m:
-            role = role_for(m.group(2), m.group(1))
+            role = 'Narrator' if re.search(r'\bjeu\b|\brecit', fold(m.group(2))) else role_for(m.group(2), m.group(1))
             if role:
                 out.append((role, m.group(1)))
         elif group_role(t) and not re.search(r'[.:!?]$', t) and not re.match(r'(?i)(avec|en |dans|le |la |l[\'’])', t):
             out.append((group_role(t), re.sub(r'\s*\(.*?\)\s*$', '', t) if t.endswith(')') and 'NEC' in t else t))
     return out
+
+
+def _full_name(composer, body):
+    """'V. Villard' -> 'Valentin Villard' when the page names him in full ('Valentin Villard a choisi …')."""
+    m = re.fullmatch(r'((?:[A-Z]\.\s*(?:-\s*)?){1,3})\s*([A-ZÀ-Ý][\w’\'-]+(?:\s+(?:von|van|de|du|di|da|le|la)?\s*[A-ZÀ-Ý][\w’\'-]+)?)',
+                     composer.strip())
+    if not m:
+        return composer
+    initials = re.findall(r'[A-Z]', m.group(1))
+    surname = re.escape(m.group(2))
+    given = r'\s+'.join(r'%s[a-zà-ÿ]+(?:-[A-ZÀ-Ý][a-zà-ÿ]+)?' % i for i in initials)
+    full = re.search(r'\b(%s)\s+%s\b' % (given, surname), clean(body))
+    return f'{full.group(1)} {m.group(2)}' if full else composer
 
 
 def parse_page(html):
@@ -155,6 +171,7 @@ def parse_page(html):
             for w in re.split(r'(?i)<br\s*/?>', works):
                 if clean(w).strip('\u200d '):
                     program.append((composer, clean(w).strip('\u200d ')))
+    program = [(_full_name(c, body), w) for c, w in program]
     tagline = re.search(r'<meta content="([^"]*)" name="description"', page)
     return {'title': clean(title.group(1)) if title else '', 'perfs': perfs, 'credits': credits, 'program': program,
             'ticket': ticket.group(1) if ticket else None, 'all': clean(head.group(1)) if head else '',
@@ -175,14 +192,16 @@ def fetch():
         except FetchError as err:
             log.warning('%s: no page for %s: %s', KEY, url, err)
             continue
-        if not info['title'] or is_not_a_concert(f"{info['title']} {info['tagline']}"):
+        if not info['title']:
+            continue
+        head = f"{info['title']} {info['tagline']}"
+        family = bool(re.search(r'\bfamille\b|\bfamilial', fold(head)))
+        conducted = any(r == 'Conductor' for r, _ in info['credits'])
+        if is_not_a_concert(head) and not (family and info['program'] and conducted
+                                           and not re.search(r'ecolier|scolaire|ecole|creche', fold(head))):
             continue
         slug = url.rsplit('/', 1)[-1]
-        title, series = info['title'], None
-        if fold(title).strip() == 'autour de la saison' and info['program']:   # a series label, not a title
-            series = title
-            comp, work = info['program'][-1]
-            title = f'{comp}: {work}'
+        title, series = info['title'], ('Concert famille' if family else None)
         credits = list(info['credits'])
         if not any(fold(ORCHESTRA) in fold(n) for _, n in credits):
             credits.append(('Orchestra', ORCHESTRA))

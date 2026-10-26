@@ -8,12 +8,18 @@ Python 3.9+ standard library only. Every reader in ``sources/`` imports from her
 Politeness is built into ``get``: it identifies as KlangConcertBot, obeys robots.txt
 (cached per host), waits between requests to the same host (at least ``MIN_DELAY``
 seconds, longer if robots.txt asks via Crawl-delay or Request-rate), retries twice on
-transient errors, and stops after ``MAX_REQUESTS`` requests per source (``build.py``
-also sets a per-source time limit). It never logs in and never sends forms.
+transient errors, and stops after ``MAX_REQUESTS`` requests per source (a reader that
+reads one detail page per concert may raise its own cap up to ``MAX_REQUESTS_CAP``;
+``build.py`` also sets a per-source time limit). It never logs in and never sends forms.
+
+Readers that read detail pages can reuse what the previous feed already knows about a
+concert (``previous_event``) and spend their requests on concerts still missing details.
 """
 from __future__ import annotations
 
 import codecs
+import copy
+import difflib
 import gzip
 import hashlib
 import html
@@ -41,14 +47,18 @@ __all__ = [
     'make_event', 'today_zurich', 'FetchError',
     # extras
     'BudgetExceeded', 'to_zurich_datetime', 'as_list', 'looks_cancelled', 'requests_left',
-    'source_budget', 'USER_AGENT', 'ZURICH', 'TYPES', 'MIN_DELAY', 'MAX_REQUESTS', 'log',
+    'source_budget', 'USER_AGENT', 'ZURICH', 'TYPES', 'MIN_DELAY', 'MAX_REQUESTS', 'MAX_REQUESTS_CAP', 'log',
+    # incremental details and type rules
+    'event_id', 'previous_event', 'previous_events', 'set_previous', 'refresh_due', 'same_title', 'infer_type',
+    'fix_type',
 ]
 
 USER_AGENT = 'KlangConcertBot/1.0 (+https://lyl0316.github.io/klang/; personal, non-commercial)'
 BOT_TOKEN = 'KlangConcertBot'          # product token matched against robots.txt groups
 ZURICH = ZoneInfo('Europe/Zurich')
 MIN_DELAY = 1.5                        # seconds between two requests to the same host
-MAX_REQUESTS = 60                      # hard cap of HTTP requests per source per run
+MAX_REQUESTS = 60                      # HTTP requests per source per run, unless the reader sets MAX_REQUESTS
+MAX_REQUESTS_CAP = 150                 # the most a reader may ask for (detail-heavy readers)
 MAX_BYTES = 20 * 1024 * 1024           # refuse responses larger than this
 RETRIES = 2                            # extra attempts after a transient failure
 BACKOFF = (5.0, 15.0)                  # seconds to wait before retry 1 and 2
@@ -79,7 +89,7 @@ class BudgetExceeded(FetchError):
 class _Budget:
     def __init__(self, key=None, max_requests=MAX_REQUESTS, deadline=None):
         self.key = key
-        self.max_requests = max(0, min(int(max_requests), MAX_REQUESTS))
+        self.max_requests = max(0, min(int(max_requests), MAX_REQUESTS_CAP))
         self.deadline = deadline          # time.monotonic() value, or None
         self.used = 0                     # HTTP requests sent (robots.txt not counted)
         self.exhausted = None             # reason string once the budget ran out
@@ -105,7 +115,8 @@ def _budget():
 
 @contextmanager
 def source_budget(key, *, max_requests=MAX_REQUESTS, seconds=None):
-    """Give the current thread a fresh request budget (used by build.py around each fetch())."""
+    """Give the current thread a fresh request budget (used by build.py around each fetch()).
+    ``max_requests`` is clamped to MAX_REQUESTS_CAP."""
     previous = getattr(_local, 'budget', None)
     b = _Budget(key, max_requests, time.monotonic() + seconds if seconds else None)
     _local.budget = b
@@ -1005,3 +1016,271 @@ def make_event(source, sid, title, start, **fields) -> dict:
             ev[key] = u
     ev['status'] = _status(fields.get('status'))
     return ev
+
+
+# ---------------------------------------------------------------------------
+# the previous feed: incremental details for readers that read detail pages
+# ---------------------------------------------------------------------------
+
+_previous_lock = threading.Lock()
+_previous_by_id = {}
+_previous_by_source = {}
+_previous_stale = frozenset()      # sources whose reader code changed since the previous feed
+
+
+def set_previous(feed, *, code_changed=()) -> int:
+    """Hand the previous feed's events to the readers. build.py calls this once, before the
+    readers run. ``feed`` is a Klang feed dict, a list of events, or None (forget it).
+    ``code_changed``: source keys whose reader code (codeHash) differs from the one that made
+    the previous feed; their reusable details are all due for a re-read (refresh_due), so a
+    parser fix reaches every concert as soon as the request cap allows.
+    Returns the number of events kept."""
+    concerts = feed.get('concerts') if isinstance(feed, dict) else feed
+    by_id, by_source = {}, {}
+    for e in concerts if isinstance(concerts, list) else []:
+        if not isinstance(e, dict):
+            continue
+        eid, src = e.get('id'), e.get('source')
+        if isinstance(eid, str) and isinstance(src, str) and eid.startswith(src + '-') and e.get('start'):
+            by_id[eid] = e
+            by_source.setdefault(src, []).append(e)
+    global _previous_by_id, _previous_by_source, _previous_stale
+    with _previous_lock:
+        _previous_by_id, _previous_by_source = by_id, by_source
+        _previous_stale = frozenset(code_changed or ())
+    return len(by_id)
+
+
+def event_id(source, sid) -> str:
+    """The id make_event() gives to site id ``sid`` of ``source``: ('tonhalle', 2055696) -> 'tonhalle-2055696'."""
+    return _make_id(source, sid)
+
+
+def previous_events(source_key) -> list[dict]:
+    """Copies of this source's events in the previous feed ([] without a previous feed)."""
+    return [copy.deepcopy(e) for e in _previous_by_source.get(source_key, [])]
+
+
+def _same_instant(a, b):
+    try:
+        return to_zurich_datetime(a) == to_zurich_datetime(b)
+    except (ValueError, TypeError):
+        return False
+
+
+def _title_key(text):
+    return re.sub(r'[^a-z0-9]+', '', _fold(clean(text)))
+
+
+def same_title(a, b) -> bool:
+    """True when two titles are the same apart from case, accents, punctuation and spacing,
+    or differ only by a typo ('Kinderopernorcherster' / 'Kinderopernorchester'), never by a number."""
+    ka, kb = _title_key(a), _title_key(b)
+    if not ka or not kb:
+        return False
+    if ka == kb:
+        return True
+    if re.findall(r'\d+', ka) != re.findall(r'\d+', kb):
+        return False                      # '1. Kammerkonzert' is not '2. Kammerkonzert'
+    return min(len(ka), len(kb)) >= 8 and difflib.SequenceMatcher(None, ka, kb).ratio() >= 0.9
+
+
+def previous_event(event_id, start, *, title=None) -> dict | None:
+    """The previous feed's record of this concert, or None.
+
+    It is returned only when it is clearly the same performance: the same id
+    (``event_id(KEY, sid)``), the same start (the same instant), and, when ``title`` is
+    given, the same title (``same_title``). The result is a copy. A reader decides itself
+    whether the listing still matches (e.g. the same performers) before reusing its details.
+    Note that the previous record may hold fields that build.py filled from another source
+    listing the same performance."""
+    prev = _previous_by_id.get(event_id)
+    if prev is None or not _same_instant(prev.get('start'), start):
+        return None
+    if title is not None and not same_title(title, prev.get('title')):
+        return None
+    return copy.deepcopy(prev)
+
+
+def refresh_due(key, start=None, *, near_days=7, every_days=7) -> bool:
+    """Whether a detail page that could be reused from the previous feed should be read again
+    anyway: always for a concert within ``near_days`` days (cast changes), otherwise once every
+    ``every_days`` days on a fixed rotation by ``key``, so the re-reads are spread evenly.
+    Always when the running reader's code changed since the previous feed (set_previous)."""
+    running = getattr(getattr(_local, 'budget', None), 'key', None)
+    if running is not None and running in _previous_stale:
+        return True
+    today = today_zurich()
+    if start is not None:
+        try:
+            if (to_zurich_datetime(start).date() - today).days <= near_days:
+                return True
+        except (ValueError, TypeError):
+            return True
+    if every_days <= 1:
+        return True
+    slot = int(hashlib.sha1(str(key).encode('utf-8')).hexdigest()[:8], 16) % every_days
+    return slot == today.toordinal() % every_days
+
+
+# ---------------------------------------------------------------------------
+# concert type from the facts (credits, programme, title)
+# ---------------------------------------------------------------------------
+
+_LEADER_ROLE_RE = re.compile(r'conduct|direction|music director|musikalische leitung|^leitung|dirig|chorus master|'
+                             r'chorleitung|chef de choeur|chef d.orchestre|maestro')
+_CHOREO_ROLE_RE = re.compile(r'choreo')
+_STAGING_ROLE_RE = re.compile(r'director|regie|mise en scene|staging|stage|dramaturg|design|light|licht|costume|kostum|'
+                              r'\bset\b|buhne|video|assistan')
+_SPEAKER_ROLE_RE = re.compile(r'presenter|moderat|host|narrat|speaker|sprecher|erzahl|reader|recitation|actor|schauspiel|dancer|tanz')
+_VOICE_ROLE_RE = re.compile(r'sopran|mezzo|\balto\b|\balt\b|contralto|countertenor|tenor|bariton|(?<!double )\bbass\b|basso|'
+                            r'voice|vocal|gesang|stimme|singer')
+# players from an orchestra, credited as a group: chamber music, not the orchestra
+_MEMBERS_RE = re.compile(r'(?:solistes|soloists|solisten|musikerinnen|musiker|musicians|musiciens|members|mitglieder|membres|'
+                         r'blaser|bläser|streicher|cordes|vents)\b')
+_ORCH_NAME_RE = re.compile(r'orchest|orquest|philharm|filarm|sinfoniett|symphoniker|sinfoniker|camerata')
+_CHOIR_NAME_RE = re.compile(r'\bchor\b|chor |chore\b|choir|chorus|choeur|\bcoro\b|vokalensemble|vocal ensemble|singers|kantorei')
+_GROUP_NAME_RE = re.compile(r'ensemble|quartet|quartett|quatuor|quartetto|\btrio\b|quintet|sextet|septet|oktett|octet|'
+                            r'consort|collegium|musiker|musicians|solisten|soloists|academy|akademie|\bband\b|players|'
+                            r'harmonie|kapelle|brass')
+# words in a title or series that say an orchestra, a choir or a stage is involved
+_ENSEMBLE_TEXT_RE = re.compile(r'sinfoni|symphon|orchest|orquest|philharm|filarm|\bchor|choir|choeur|\bcoro\b|kantorei|'
+                               r'\boper\b|\bopera\b|\bopern|operette|oratori|requiem|\bpassion\b|\bmesse\b|\bmissa\b|'
+                               r'kantate|cantata|ballett|ballet|big ?band')
+# works that need an orchestra or a choir (a concerto, a symphony, a mass ...)
+_CONCERTO_RE = re.compile(r'(klavier|violin|cello|viola|bratschen|kontrabass|floten|oboen|klarinetten|fagott|horn|trompeten|'
+                          r'posaunen|tuba|orgel|harfen|gitarren|cembalo|saxophon|marimba|schlagzeug|doppel|tripel)konzert|'
+                          r'\bkonzert (fur|in [a-h]|nr|no)\b|\bconcerto\b(?! italiano)|\bconcert (pour|no|n.)|sinfonie|'
+                          r'symphonie|symphony|sinfonia concertante|orchest|\bmesse\b|\bmissa\b|requiem|oratori|kantate|'
+                          r'cantata|\bpassion\b')
+_STAGE_TEXT_RE = re.compile(r'\boper\b|\bopera\b|\bopern|operette|singspiel|musical')
+
+
+def _credit_facts(credits):
+    """Counts of what the credits say: groups, conductors, choreographers, staging, voices, and
+    the set of individual players (instruments, voices, 'Performer')."""
+    f = {'orchestra': 0, 'choir': 0, 'ensemble': 0, 'leaders': 0, 'choreo': 0, 'staging': 0, 'voices': 0,
+         'players': set()}
+    for role, name in _role_name_pairs(credits, 'role', 'name'):
+        name = clean(name)
+        if not name:
+            continue
+        r, n = _fold(clean(role) or 'Performer').strip(), _fold(name)
+        if _MEMBERS_RE.match(n):                 # "Solistes de l'Orchestre …", "Musiker*innen des …"
+            f['ensemble'] += 1
+        elif r in ('orchestra', 'orchester', 'orchestre', 'orchestra da camera'):
+            f['orchestra'] += 1
+        elif r in ('choir', 'chorus', 'chor', 'choeur', 'coro'):
+            f['choir'] += 1
+        elif r in ('ensemble', 'band', 'group', 'quartet', 'trio'):
+            f['ensemble'] += 1
+        elif _LEADER_ROLE_RE.search(r):
+            f['leaders'] += 1
+        elif _CHOREO_ROLE_RE.search(r):
+            f['choreo'] += 1
+        elif _STAGING_ROLE_RE.search(r):
+            f['staging'] += 1
+        elif _SPEAKER_ROLE_RE.search(r):
+            continue
+        elif _ORCH_NAME_RE.search(n):            # a group credited as 'Performer' or by instrument
+            f['orchestra'] += 1
+        elif _CHOIR_NAME_RE.search(n):
+            f['choir'] += 1
+        elif _GROUP_NAME_RE.search(n):
+            f['ensemble'] += 1
+        else:
+            f['players'].add(n)
+            if _VOICE_ROLE_RE.search(r):
+                f['voices'] += 1
+    return f
+
+
+def _solo_or_duo(f):
+    """1 or 2 when the credits are one or two players and no group, conductor or staging, else 0."""
+    if f['orchestra'] or f['choir'] or f['ensemble'] or f['leaders'] or f['staging'] or f['choreo']:
+        return 0
+    n = len(f['players'])
+    return n if n in (1, 2) else 0
+
+
+def _is_ballet(f, text):
+    """A choreographer with an orchestra or conductor, and no choir, singers or opera."""
+    return bool(f['choreo'] and (f['orchestra'] or f['leaders']) and not f['choir'] and not f['voices']
+                and not _STAGE_TEXT_RE.search(text))
+
+
+def _works_text(program):
+    return ' '.join(_fold(f'{clean(c)} {clean(t)}') for c, t in _role_name_pairs(program, 'composer', 'title'))
+
+
+def infer_type(title, credits=None, program=None, series=None, *, solo_rule=True) -> str | None:
+    """Klang's concert type from the facts, or None when they don't say.
+
+    - A ballet with live music (a choreographer plus an orchestra or conductor): 'orchestral'.
+    - One or two players and no orchestra, ensemble, choir or conductor: 'recital' (a duo whose
+      title says chamber music: 'chamber'), unless the title or a work needs an orchestra or a
+      choir (a concerto, a symphony, a mass ...). ``solo_rule=False`` skips this, e.g. for an
+      orchestra's own listing where the orchestra plays without being credited.
+    - Otherwise the title's and series' words (guess_type), then the groups credited (an
+      orchestra: 'orchestral', a choir: 'vocal-opera', an ensemble or 3–12 players:
+      'chamber'), then the works' titles.
+    ``credits``/``program`` take the same shapes as make_event()."""
+    f = _credit_facts(credits)
+    text = _fold(f'{clean(title)} {clean(series)}')
+    if _is_ballet(f, text):
+        return 'orchestral'
+    worded = guess_type(text)
+    n = _solo_or_duo(f) if solo_rule else 0
+    if n and not _ENSEMBLE_TEXT_RE.search(text) and not _CONCERTO_RE.search(f'{text} {_works_text(program)}'):
+        return 'chamber' if n == 2 and worded == 'chamber' else 'recital'
+    if worded:
+        return worded
+    if f['orchestra']:
+        return 'orchestral'
+    if f['choir']:
+        return 'vocal-opera'
+    if f['ensemble'] or 3 <= len(f['players']) <= 12:
+        return 'chamber'
+    return guess_type(_works_text(program))
+
+
+def fix_type(ev, kind=None) -> dict:
+    """A copy of the event with its type filled in or corrected from its facts (build.py's
+    last pass over the merged feed):
+
+    - a missing type is inferred (``infer_type``);
+    - 'orchestral' for one or two players with no orchestra, ensemble, choir or conductor
+      becomes 'recital' (a duo whose title says chamber music: 'chamber'); so does 'chamber'
+      for a single player;
+    - a ballet with live music (choreographer + orchestra or conductor, no singers) stays
+      'orchestral' and gets the series 'Ballett' when it has none.
+
+    ``kind`` is the source's KIND. An orchestra's or ensemble's own listing implies that the
+    group plays even when it is not credited, so the one-or-two-players rule is applied to
+    it only when the title itself says recital ("Klavierabend", "Liederabend" ...)."""
+    out = dict(ev)
+    credits, program = ev.get('credits') or [], ev.get('program') or []
+    f = _credit_facts(credits)
+    text = _fold(f"{clean(ev.get('title'))} {clean(ev.get('series'))}")
+    group_source = kind in ('orchestra', 'ensemble')
+    cur = out.get('type')
+    if cur in (None, '', 'orchestral') and _is_ballet(f, text):
+        out['type'] = 'orchestral'
+        if not out.get('series'):
+            out['series'] = 'Ballett'
+        return out
+    if not cur:
+        guessed = infer_type(ev.get('title'), credits, program, ev.get('series'), solo_rule=not group_source)
+        if guessed:
+            out['type'] = guessed
+        return out
+    if cur not in ('orchestral', 'chamber'):
+        return out
+    n = _solo_or_duo(f)
+    worded = guess_type(text)
+    if not n or (cur == 'chamber' and (n != 1 or worded == 'chamber')):
+        return out
+    free = not _ENSEMBLE_TEXT_RE.search(text) and not _CONCERTO_RE.search(f'{text} {_works_text(program)}')
+    if worded == 'recital' or (free and not group_source):
+        out['type'] = 'chamber' if n == 2 and worded == 'chamber' else 'recital'
+    return out

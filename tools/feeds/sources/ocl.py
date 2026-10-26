@@ -207,6 +207,10 @@ def _venue_city(location):
 # main
 # ---------------------------------------------------------------------------
 
+# a weekday that tells two dates of one programme apart in the .ics: ' (mer.)', ' (jeu.)'
+_WEEKDAY_TAG = re.compile(r'\s*\((?:lun|mar|mer|jeu|ven|sam|dim)(?:\.|di|credi|redi|edi|anche)?\)(?=\s*(?:$|\|))', re.I)
+
+
 def fetch():
     today = today_zurich()
     try:
@@ -229,7 +233,7 @@ def fetch():
     for e in vevents:
         if e['all_day'] or not e['start'] or e['start'].date() < today:
             continue
-        summary = clean(e['summary'])
+        summary = _WEEKDAY_TAG.sub('', clean(e['summary'])).strip()   # 'Le Messie de Haendel (mer.)'
         if _YOUNG_RE.search(f"{summary} {e['description'][:200]}"):
             skipped['young audience'] = skipped.get('young audience', 0) + 1
             continue
@@ -295,7 +299,8 @@ def fetch():
                 credits.append(('Orchestra', ORCHESTRA))      # listed by the OCL as its own concert
             try:
                 events.append(make_event(
-                    KEY, f"{c['url'].rstrip('/').rsplit('/', 1)[-1]}-{d:%Y%m%d}", c['title'], to_zurich_iso(start),
+                    KEY, f"{c['url'].rstrip('/').rsplit('/', 1)[-1]}-{d:%Y%m%d}", _WEEKDAY_TAG.sub('', c['title']).strip(),
+                    to_zurich_iso(start),
                     city=town, venueName=venue, type=kind, credits=credits, url=c['url'], ticketUrl=c['url']))
             except ValueError as err:
                 log.warning('%s: skipped %s: %s', KEY, c['url'], err)
