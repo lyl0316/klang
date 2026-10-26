@@ -137,6 +137,8 @@ export function render() {
   }
 
   function demoNote() {
+    return null; // no demo listings any more
+    // eslint-disable-next-line no-unreachable
     if (!store.pref('showDemo') || store.isDismissed('concertsDemoNote')) return null;
     return h('div', { class: 'demo-note cr-demo-note' }, icon('sparkle', 14),
       h('span', {}, 'Demo listings — real venues & works, invented performers. ', h('a', { href: '#/me/data' }, 'Import real listings')),

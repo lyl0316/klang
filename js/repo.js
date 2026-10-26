@@ -19,15 +19,14 @@ let concerts = [];
 let concertMap = new Map();
 
 export function rebuild() {
-  const demo = store.pref('showDemo') ? generateDemo() : { concerts: [], artists: [] };
+  const demo = { concerts: [], artists: [] };
   venueMap = new Map(VENUES.map((v) => [v.id, v]));
   artistMap = new Map(demo.artists.map((a) => [a.id, a]));
   const imported = store.getImports().map(normalizeImported);
-  // Real listings from the venues' own websites (data/real.js); in those cities the demo listings go.
+  // Only real listings, read from the venues' and orchestras' own websites (data/real.js).
+  void demo;
   const real = REAL.map((c) => normalizeImported(c));
-  const covered = new Set(REAL_CITIES);
-  const demoConcerts = demo.concerts.filter((c) => !covered.has(c.cityId));
-  concerts = [...demoConcerts, ...real, ...imported]
+  concerts = [...real, ...imported]
     .map((c) => ({ ...c, day: dayKeyOf(c.start) }))
     .sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
   concertMap = new Map(concerts.map((c) => [c.id, c]));

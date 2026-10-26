@@ -1,9 +1,9 @@
 // Real concert listings read from the venues' and orchestras' own websites by tools/feeds
 // (facts only, with links back). Interim data file until the daily feed loader ships;
 // in cities listed in REAL_CITIES the demo listings are no longer shown.
-export const REAL_UPDATED = "2026-10-26T08:30:43+01:00";
-export const REAL_SOURCES = [{"name": "Bühnen Bern (Berner Symphonieorchester)", "site": "https://buehnenbern.ch/", "attribution": "Source: Bühnen Bern (buehnenbern.ch)"}, {"name": "Collegium Novum Zürich", "site": "https://cnz.ch/", "attribution": "Source: Collegium Novum Zürich (cnz.ch)"}, {"name": "Grand Théâtre de Genève (Ville de Genève)", "site": "https://www.gtg.ch/", "attribution": "Source: Ville de Genève – Agenda du Grand Théâtre de Genève (opendata.swiss, via OpenAgenda). Licence: open use, source must be given."}, {"name": "Victoria Hall, Genève (Ville de Genève)", "site": "https://victoriahall.geneve.ch/", "attribution": "Source: Ville de Genève – Agenda du Victoria Hall (opendata.swiss, via OpenAgenda). Licence: open use, source must be given."}, {"name": "Luzerner Sinfonieorchester", "site": "https://sinfonieorchester.ch/", "attribution": "Source: Luzerner Sinfonieorchester (sinfonieorchester.ch)"}, {"name": "Lucerne Festival", "site": "https://www.lucernefestival.ch/", "attribution": "Source: Lucerne Festival (lucernefestival.ch)"}, {"name": "Musikkollegium Winterthur", "site": "https://www.musikkollegium.ch/", "attribution": "Source: Musikkollegium Winterthur (musikkollegium.ch)"}, {"name": "L'Orchestre de Chambre de Genève", "site": "https://locg.ch/", "attribution": "Source: L'Orchestre de Chambre de Genève (locg.ch)"}, {"name": "Opéra de Lausanne", "site": "https://www.opera-lausanne.ch/", "attribution": "Source: Opéra de Lausanne (opera-lausanne.ch)"}, {"name": "Opernhaus Zürich", "site": "https://www.opernhaus.ch/", "attribution": "Source: Opernhaus Zürich (opernhaus.ch). Facts only; details and tickets on opernhaus.ch."}, {"name": "Orchestra della Svizzera italiana", "site": "https://www.osi.swiss/", "attribution": "Source: Orchestra della Svizzera italiana (osi.swiss)"}, {"name": "Orchestre de la Suisse Romande", "site": "https://www.osr.ch/", "attribution": "Source: Orchestre de la Suisse Romande (osr.ch)"}, {"name": "Sinfonieorchester Basel", "site": "https://www.sinfonieorchesterbasel.ch/", "attribution": "Source: Sinfonieorchester Basel (sinfonieorchesterbasel.ch)"}, {"name": "Stadtcasino Basel", "site": "https://www.stadtcasino-basel.ch/", "attribution": "Source: Stadtcasino Basel (stadtcasino-basel.ch)"}, {"name": "Tonhalle Zürich", "site": "https://www.tonhalle-orchester.ch/", "attribution": "Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhallezuerich.ch)"}, {"name": "Zürcher Kammerorchester", "site": "https://zko.ch/", "attribution": "Source: Zürcher Kammerorchester (zko.ch)"}];
-export const REAL_CITIES = ["basel", "bern", "brugg", "chur", "dietikon", "engelberg", "frauenfeld", "fribourg", "geneva", "kriens", "la-chaux-de-fonds", "lausanne", "lucerne", "lugano", "schaffhausen", "sion", "vernier", "winterthur", "zug", "zurich"];
+export const REAL_UPDATED = "2026-10-26T08:27:31+01:00";
+export const REAL_SOURCES = [{"name": "argovia philharmonic", "site": "https://argoviaphil.ch/", "attribution": "Source: argovia philharmonic (argoviaphil.ch)"}, {"name": "J. S. Bach-Stiftung St. Gallen", "site": "https://bachstiftung.ch/", "attribution": "Source: J. S. Bach-Stiftung St. Gallen (bachstiftung.ch)"}, {"name": "Berner Kammerorchester", "site": "https://www.bko.ch/", "attribution": "Source: Berner Kammerorchester (bko.ch)"}, {"name": "Bühnen Bern (Berner Symphonieorchester)", "site": "https://buehnenbern.ch/", "attribution": "Source: Bühnen Bern (buehnenbern.ch)"}, {"name": "CAMERATA BERN", "site": "https://www.cameratabern.ch/", "attribution": "Source: CAMERATA BERN (cameratabern.ch)"}, {"name": "Casino Bern", "site": "https://www.casinobern.ch/", "attribution": "Source: Casino Bern (casinobern.ch). Facts only; details and tickets via casinobern.ch."}, {"name": "La Cité Bleue, Genève", "site": "https://lacitebleue.ch/", "attribution": "Source: La Cité Bleue (lacitebleue.ch)"}, {"name": "Collegium Novum Zürich", "site": "https://cnz.ch/", "attribution": "Source: Collegium Novum Zürich (cnz.ch)"}, {"name": "Société des Concerts de Fribourg", "site": "https://www.concertsfribourg.ch/", "attribution": "Source: Société des Concerts de Fribourg (concertsfribourg.ch)"}, {"name": "Ensemble Symphonique Neuchâtel", "site": "https://www.esn-ne.ch/", "attribution": "Source: Ensemble Symphonique Neuchâtel (esn-ne.ch)"}, {"name": "Grand Théâtre de Genève (Ville de Genève)", "site": "https://www.gtg.ch/", "attribution": "Source: Ville de Genève – Agenda du Grand Théâtre de Genève (opendata.swiss, via OpenAgenda). Licence: open use, source must be given."}, {"name": "Victoria Hall, Genève (Ville de Genève)", "site": "https://victoriahall.geneve.ch/", "attribution": "Source: Ville de Genève – Agenda du Victoria Hall (opendata.swiss, via OpenAgenda). Licence: open use, source must be given."}, {"name": "Kammerorchester Basel", "site": "https://www.kammerorchesterbasel.ch/", "attribution": "Source: Kammerorchester Basel (kammerorchesterbasel.ch). Facts only; details and tickets there."}, {"name": "Kammerphilharmonie Graubünden", "site": "https://www.kammerphilharmonie.ch/", "attribution": "Source: Kammerphilharmonie Graubünden (kammerphilharmonie.ch)"}, {"name": "Konzert und Theater St.Gallen", "site": "https://www.konzertundtheater.ch/", "attribution": "Source: Konzert und Theater St.Gallen (konzertundtheater.ch)"}, {"name": "Kultur im Podium Düdingen", "site": "https://www.kulturimpodium.ch/", "attribution": "Source: Kultur im Podium Düdingen (kulturimpodium.ch)"}, {"name": "Luzerner Sinfonieorchester", "site": "https://sinfonieorchester.ch/", "attribution": "Source: Luzerner Sinfonieorchester (sinfonieorchester.ch)"}, {"name": "Lucerne Festival", "site": "https://www.lucernefestival.ch/", "attribution": "Source: Lucerne Festival (lucernefestival.ch)"}, {"name": "Luzerner Theater", "site": "https://www.luzernertheater.ch/", "attribution": "Source: Luzerner Theater (luzernertheater.ch)"}, {"name": "Musikkollegium Winterthur", "site": "https://www.musikkollegium.ch/", "attribution": "Source: Musikkollegium Winterthur (musikkollegium.ch)"}, {"name": "Société de Musique de La Chaux-de-Fonds", "site": "https://musiquecdf.ch/", "attribution": "Source: Société de Musique de La Chaux-de-Fonds (musiquecdf.ch)"}, {"name": "Orchestre de chambre fribourgeois", "site": "https://www.ocf.ch/", "attribution": "Source: Orchestre de chambre fribourgeois (ocf.ch)"}, {"name": "L'Orchestre de Chambre de Genève", "site": "https://locg.ch/", "attribution": "Source: L'Orchestre de Chambre de Genève (locg.ch)"}, {"name": "Orchestre de Chambre de Lausanne", "site": "https://www.ocl.ch/", "attribution": "Source: Orchestre de Chambre de Lausanne (ocl.ch). Facts only; details and tickets on ocl.ch."}, {"name": "Opéra de Lausanne", "site": "https://www.opera-lausanne.ch/", "attribution": "Source: Opéra de Lausanne (opera-lausanne.ch)"}, {"name": "Opernhaus Zürich", "site": "https://www.opernhaus.ch/", "attribution": "Source: Opernhaus Zürich (opernhaus.ch). Facts only; details and tickets on opernhaus.ch."}, {"name": "Orchestra della Svizzera italiana", "site": "https://www.osi.swiss/", "attribution": "Source: Orchestra della Svizzera italiana (osi.swiss)"}, {"name": "Orchestre de la Suisse Romande", "site": "https://www.osr.ch/", "attribution": "Source: Orchestre de la Suisse Romande (osr.ch)"}, {"name": "Reformierte Kirche Zürich", "site": "https://reformiert-zuerich.ch/", "attribution": "Source: Reformierte Kirche Zürich (reformiert-zuerich.ch). Facts only; details there."}, {"name": "Sinfonieorchester Basel", "site": "https://www.sinfonieorchesterbasel.ch/", "attribution": "Source: Sinfonieorchester Basel (sinfonieorchesterbasel.ch)"}, {"name": "Sommets Musicaux de Gstaad", "site": "https://www.sommets-musicaux.com/", "attribution": "Source: Sommets Musicaux de Gstaad (sommets-musicaux.com)"}, {"name": "Stadtcasino Basel", "site": "https://www.stadtcasino-basel.ch/", "attribution": "Source: Stadtcasino Basel (stadtcasino-basel.ch)"}, {"name": "Theater Casino Zug", "site": "https://www.theatercasino.ch/", "attribution": "Source: Theater Casino Zug (theatercasino.ch)"}, {"name": "Tonhalle Zürich", "site": "https://www.tonhalle-orchester.ch/", "attribution": "Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhallezuerich.ch)"}, {"name": "Zürcher Kammerorchester", "site": "https://zko.ch/", "attribution": "Source: Zürcher Kammerorchester (zko.ch)"}, {"name": "Zuger Sinfonietta", "site": "https://zugersinfonietta.ch/", "attribution": "Source: Zuger Sinfonietta (zugersinfonietta.ch)"}];
+export const REAL_CITIES = ["aarau", "basel", "bern", "brugg", "chur", "dietikon", "dudingen", "engelberg", "frauenfeld", "fribourg", "geneva", "gstaad", "kriens", "la-chaux-de-fonds", "lausanne", "liestal", "lucerne", "lugano", "mels", "mezieres", "neuchatel", "olten", "saanen", "schaffhausen", "sion", "st-gallen", "teufen", "trogen", "vernier", "winterthur", "zug", "zurich"];
 export const REAL = [
 {
 "id": "real-geneva_victoria_hall-17557955-20261026",
@@ -42,6 +42,89 @@ export const REAL = [
 "ticketUrl": "https://migros.infomaniak.events/fr-ch/shop/migros-pour-cent-culturel-classic-2026-2027-EBGNGEVB9H",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/17557955_ara-malikian-intruso-5245285",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-kts_st_gallen-3812",
+"title": "Hoffmanns Erzählungen",
+"series": "Grosses Haus",
+"start": "2026-10-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Zlabinger"
+},
+{
+"role": "Director",
+"name": "Guta Rau"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Eva Langeland Gjerde"
+},
+{
+"role": "Performer",
+"name": "Marie Lombard"
+},
+{
+"role": "Performer",
+"name": "Andrew Foster-Williams"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Gloriela Villalobos"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Hoffmanns Erzählungen"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=475&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/hoffmanns-erzaehlungen/3812/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-zko-19498",
@@ -123,6 +206,40 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-reformiert_zuerich-14475",
+"title": "Orgelspiele Herbstzyklus",
+"series": null,
+"start": "2026-10-28T18:30:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelspiele-herbstzyklus-14475/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelspiele-herbstzyklus-14475/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-14361",
+"title": "Belenus Quartett: «Wildäpfel»",
+"series": null,
+"start": "2026-10-28T19:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Lavaterhaus, Lavatersaal",
+"type": "chamber",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/belenus-quartett-wildapfel-14361/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/belenus-quartett-wildapfel-14361/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2056333",
 "title": "Ara Malikian – The Explosive Violinist",
 "series": null,
@@ -195,6 +312,109 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15286&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/ein-sommernachtstraum/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kultur_im_podium-2026-10-28-falstaff",
+"title": "Falstaff",
+"series": "Kultur im Podium",
+"start": "2026-10-28T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Theater Orchester Biel Solothurn (TOBS)"
+},
+{
+"role": "Conductor",
+"name": "Franco Trinca"
+}
+],
+"program": [
+{
+"composer": "Michael William Balfe",
+"title": "Falstaff"
+}
+],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/falstaff/",
+"source": "kultur_im_podium"
+},
+{
+"id": "real-reformiert_zuerich-17201",
+"title": "Konzert Chorgasschor",
+"series": null,
+"start": "2026-10-28T19:30:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-chorgasschor-17201/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-chorgasschor-17201/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-ocl-a00a5635-0dda-4aec-8f8f-3091d8eaf6d3-ocl-ch",
+"title": "Les Grands Concerts n°2 | Christie · Le Messie de Haendel (mer.)",
+"series": "Les Grands Concerts n°2",
+"start": "2026-10-28T19:30:00+01:00",
+"durationMin": 180,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "William Christie"
+},
+{
+"role": "Soprano",
+"name": "Anna Vieira Leite"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Bethany Horak-Hallett"
+},
+{
+"role": "Countertenor",
+"name": "Hugh Cutting"
+},
+{
+"role": "Tenor",
+"name": "James Way"
+},
+{
+"role": "Bass-baritone",
+"name": "Padraic Rowan"
+},
+{
+"role": "Choir",
+"name": "Ensemble Vocal de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Haendel",
+"title": "Le Messie, HWV 56"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n2/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n2/",
+"source": "ocl"
 },
 {
 "id": "real-geneva_victoria_hall-10109530-20261028",
@@ -294,6 +514,40 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-luzerner_theater-8562",
+"title": "Mad King & Medea",
+"series": "Box",
+"start": "2026-10-28T20:00:00+01:00",
+"durationMin": 95,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Maria Radzikhovskiy"
+},
+{
+"role": "Director",
+"name": "Marie Lambert-Le Bihan"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8562",
+"sourceUrl": "https://www.luzernertheater.ch/madkingundmedea",
+"source": "luzerner_theater"
+},
+{
 "id": "real-musikkollegium-10058",
 "title": "Kafikammer - Der Trompeter als Alleinunterhalter",
 "series": "KafiDia",
@@ -314,6 +568,60 @@ export const REAL = [
 "ticketUrl": "https://www.musikkollegium.ch/programm/kafikammer-der-trompeter-als-alleinunterhalter-26-10-29-10058",
 "sourceUrl": "https://www.musikkollegium.ch/programm/kafikammer-der-trompeter-als-alleinunterhalter-26-10-29-10058",
 "source": "musikkollegium"
+},
+{
+"id": "real-kts_st_gallen-3890",
+"title": "Bach und die Söhne",
+"series": "Meisterzkylus-Konzert",
+"start": "2026-10-29T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Saxophone",
+"name": "Asya Fateyeva"
+},
+{
+"role": "Harpsichord",
+"name": "Pablo Kornfeld"
+},
+{
+"role": "Bassoon",
+"name": "Sergio Azzolini"
+},
+{
+"role": "Cello",
+"name": "Francesco Galligioni"
+},
+{
+"role": "Lute",
+"name": "Diego Cantalupi"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Triosonate Es-Dur BWV 525, Triosonate d-Moll BWV 527, Triosonate c-Moll BWV 526",
+"composerId": "bach"
+},
+{
+"composer": "Carl Philipp Emanuel Bach",
+"title": "Sonate c-Moll Wq. 78",
+"composerId": "bach"
+},
+{
+"composer": "Wilhelm Friedemann Bach",
+"title": "Sonate c-Moll, Duett Es-Dur F. 56",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=579&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/1-mzk-bach-und-soehne/3890/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-199831",
@@ -352,76 +660,59 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
-"id": "real-lso_luzern-20891",
-"title": "KLANGXCHANGE: VON ZWERGPIRATEN UND TRATSCHWELLEN…",
-"series": null,
+"id": "real-ocl-ccda64fc-8e2e-4dc6-8b1d-69ed88f2bec7-ocl-ch",
+"title": "Les Grands Concerts n°2 | Christie · Le Messie de Haendel (jeu.)",
+"series": "Les Grands Concerts n°2",
 "start": "2026-10-29T19:30:00+01:00",
-"durationMin": 120,
-"cityId": "lucerne",
-"venueName": "Schiffrestaurant Willhelm Tell",
-"type": "chamber",
+"durationMin": 180,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "vocal-opera",
 "featured": true,
 "status": "scheduled",
 "credits": [
 {
-"role": "Bass",
-"name": "Rueben Mbonambi"
+"role": "Conductor",
+"name": "William Christie"
 },
 {
-"role": "Narrator",
-"name": "Max Faatz"
+"role": "Soprano",
+"name": "Anna Vieira Leite"
 },
 {
-"role": "Trumpet",
-"name": "Philipp Hutter"
+"role": "Mezzo-soprano",
+"name": "Bethany Horak-Hallett"
 },
 {
-"role": "Trumpet",
-"name": "Mehdi Missoum"
+"role": "Countertenor",
+"name": "Hugh Cutting"
 },
 {
-"role": "Horn",
-"name": "Florian Abächerli"
+"role": "Tenor",
+"name": "James Way"
 },
 {
-"role": "Trombone",
-"name": "Simone Maffioletti"
+"role": "Bass-baritone",
+"name": "Padraic Rowan"
 },
 {
-"role": "Tuba",
-"name": "Andrin Lüchinger"
+"role": "Choir",
+"name": "Ensemble Vocal de Lausanne"
 },
 {
-"role": "Host",
-"name": "Hannah Schoepe"
-},
-{
-"role": "Host",
-"name": "Pia-Rabea Vornholt"
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
 }
 ],
 "program": [
 {
-"composer": "Arthur Sullivan",
-"title": "The Pirates of Penzance Suite (Arrangement Fen Watkin)"
-},
-{
-"workId": "wagner-dutchman",
-"composerId": "wagner"
-},
-{
-"composer": "Antonín Dvořák",
-"title": "Sinfonie Nr. 8 G-Dur op. 88 Auszüge für Blechbläserquintett (Arrangement: Craig Garner)",
-"composerId": "dvorak"
-},
-{
-"composer": "George Gershwin",
-"title": "«I Got Plenty o’ Nuttin’» aus Porgy and Bess"
+"composer": "Georg Friedrich Haendel",
+"title": "Le Messie, HWV 56"
 }
 ],
-"ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/klangxchange-kzquva",
-"sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/klangxchange-von-zwergpiraten-und-tratschwellen/",
-"source": "lso_luzern"
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n2/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n2/",
+"source": "ocl"
 },
 {
 "id": "real-musikkollegium-10057",
@@ -446,6 +737,40 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-luzerner_theater-8563",
+"title": "Mad King & Medea",
+"series": "Box",
+"start": "2026-10-29T20:00:00+01:00",
+"durationMin": 95,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Maria Radzikhovskiy"
+},
+{
+"role": "Director",
+"name": "Marie Lambert-Le Bihan"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8563",
+"sourceUrl": "https://www.luzernertheater.ch/madkingundmedea",
+"source": "luzerner_theater"
+},
+{
 "id": "real-ocg-concert-sur-le-pouce-2-20261030",
 "title": "Concert sur le pouce #2",
 "series": "Concert sur le pouce",
@@ -461,6 +786,68 @@ export const REAL = [
 "ticketUrl": "https://www.bm-geneve.ch/notice?id=h%3A%3A7f72f74a-7f48-4599-bba5-2ec555540343&posInSet=33&queryId=N-b54a6d6e-54e4-4fcd-91bd-80648d0b45be",
 "sourceUrl": "https://locg.ch/fr/calendrier/concert-sur-le-pouce-2",
 "source": "ocg"
+},
+{
+"id": "real-argovia_philharmonic-268810",
+"title": "Lunchtimekonzert",
+"series": null,
+"start": "2026-10-30T12:15:00+01:00",
+"durationMin": 45,
+"cityId": "aarau",
+"venueId": "stadtkirche-aarau",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Agata Lazarczyk"
+},
+{
+"role": "Violin",
+"name": "Martina Gallo"
+},
+{
+"role": "Viola",
+"name": "Dominik Klauser"
+},
+{
+"role": "Cello",
+"name": "Giulia Ajmone-Marsan"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Quartettsatz c-Moll D 703",
+"composerId": "schubert"
+},
+{
+"composer": "Gioachino Rossini",
+"title": "«Sonata a quattro» Nr. 3 C-Dur arr. von Ettore Bonelli",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://argoviaphil.ch/konzert/lunchtimekonzert/",
+"sourceUrl": "https://argoviaphil.ch/konzert/lunchtimekonzert/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-theater_casino_zug-a7ab3409-7744-4485-aac5-aa8192e06a5c",
+"title": "Next Generation Talents",
+"series": "Kleiner Saal",
+"start": "2026-10-30T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229820891697&productId=10229821099428",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/next-generation-talents-oct-26-1?date=a7ab3409-7744-4485-aac5-aa8192e06a5c",
+"source": "theater_casino_zug"
 },
 {
 "id": "real-opernhaus_zurich-200322",
@@ -562,11 +949,76 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-reformiert_zuerich-17088",
+"title": "Zeitspuren",
+"series": null,
+"start": "2026-10-30T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Lavaterhaus, Lavatersaal",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/zeitspuren-17088/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/zeitspuren-17088/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-berner_kammerorchester-arctic-sound",
+"title": "ARCTIC SOUND",
+"series": null,
+"start": "2026-10-30T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "yehudi-menuhin-forum",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Patrick Demenga"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Berner Kammerorchester"
+}
+],
+"program": [
+{
+"composer": "Jean Sibelius",
+"title": "Impromptu Nr. 5",
+"composerId": "sibelius"
+},
+{
+"composer": "Torstein Aagaard–Nilsen",
+"title": "Konzert Nr. 2 für Cello und Orchester “Veränderungen” (UA)"
+},
+{
+"composer": "Pjotr Ilijitsch Tschaikowsky",
+"title": "Variationen über ein Rokoko-Thema A-Dur op. 33 für Violoncello und Orchester"
+},
+{
+"composer": "Sergej Prokofjew",
+"title": "Sinfonie Nr. 1 D-Dur op. 25 (Symphonie Classique)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/en/p/classical-music-operas/classical-music/arctic-sound-7422057733141066438.html",
+"sourceUrl": "https://www.bko.ch/de/konzerte/termine/ARCTIC-SOUND.php",
+"source": "berner_kammerorchester"
+},
+{
 "id": "real-ocg-gitanes-20261030",
 "title": "Gitanes",
 "series": "Concert à l'abo",
 "start": "2026-10-30T19:30:00+01:00",
-"durationMin": 120,
+"durationMin": 70,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "orchestral",
@@ -644,6 +1096,212 @@ export const REAL = [
 "ticketUrl": "https://www.kulturticket.ch/11617/sjso-schweizer-jugend-sinfonie-orchester/event/2037",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/herbsttournee-schweizer-jugend-sinfonie-orchester-sjso-nordwaerts-2056338/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3813",
+"title": "Hoffmanns Erzählungen",
+"series": "Grosses Haus",
+"start": "2026-10-30T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Zlabinger"
+},
+{
+"role": "Director",
+"name": "Guta Rau"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Eva Langeland Gjerde"
+},
+{
+"role": "Performer",
+"name": "Marie Lombard"
+},
+{
+"role": "Performer",
+"name": "Andrew Foster-Williams"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Gloriela Villalobos"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Hoffmanns Erzählungen"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=477&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/hoffmanns-erzaehlungen/3813/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-reformiert_zuerich-3387",
+"title": "Konzert ensemble ö!",
+"series": null,
+"start": "2026-10-30T19:30:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Kirche St. Jakob",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-ensemble-o-3387/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-ensemble-o-3387/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-theater_casino_zug-2fc56da6-a9ce-4097-80db-3438dd12804b",
+"title": "Wiener Concert-Verein spielt Wiener Klassik",
+"series": "Zuger Klassik Plus",
+"start": "2026-10-30T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "William Garfield Walker"
+},
+{
+"role": "Piano",
+"name": "Margarita Höhenrieder"
+},
+{
+"role": "Piano",
+"name": "Antti Siirala"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229820847865",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/wiener-concert-verein-spielt-wiener-klassik?date=2fc56da6-a9ce-4097-80db-3438dd12804b",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-kammerphilharmonie_gr-colani-der-freischuetz-buendner-arena-cazis",
+"title": "Colani - Der Freischütz",
+"series": "Oper",
+"start": "2026-10-30T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Bündner Arena, Cazis",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Narrator",
+"name": "Lorenzo Polin"
+},
+{
+"role": "Tenor",
+"name": "Yves Ehrsam"
+},
+{
+"role": "Soprano",
+"name": "Sara-Bigna Janett"
+},
+{
+"role": "Bass",
+"name": "Radovan Jovanovic"
+},
+{
+"role": "Bass",
+"name": "Martin Roth"
+},
+{
+"role": "Conductor",
+"name": "Claudio Danuser"
+},
+{
+"role": "Director",
+"name": "Manfred Ferrari"
+},
+{
+"role": "Choir",
+"name": "Projektchor des Bündner Jägerverbandes"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Gian Marchet Colani",
+"title": "Eine Bündner Jäger-Oper in deutscher und romanischer Sprache"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/klassik-opern/oper-operette/gian-marchet-colani-7460764170633411162.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/colani-der-freischuetz-buendner-arena-cazis.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-reformiert_zuerich-15716",
+"title": "Matinee",
+"series": null,
+"start": "2026-10-31T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Neumünster",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/matinee-15716/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/matinee-15716/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-musikkollegium-9215",
@@ -748,6 +1406,142 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-bern-singt-20261031-1900",
+"title": "Messa Da Requiem – Verdi Requiem",
+"series": "Grosser Saal",
+"start": "2026-10-31T19:00:00+01:00",
+"durationMin": 90,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Kreis"
+},
+{
+"role": "Soprano",
+"name": "Rebekka Maeder"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Claude Eichenberger"
+},
+{
+"role": "Tenor",
+"name": "Bernard Richter"
+},
+{
+"role": "Bass",
+"name": "Tommi Hakala"
+},
+{
+"role": "Narrator",
+"name": "Graziella Rossi"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonie Orchester Biel Solothurn TOBS!, 300 Sänger*innen"
+}
+],
+"program": [
+{
+"workId": "verdi-requiem",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.bern-singt.ch/vorverkauf",
+"sourceUrl": "https://www.casinobern.ch/programm/bern-singt/#31-10-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-argovia_philharmonic-268895",
+"title": "3. Löwenkonzert",
+"series": "Löwenkonzert",
+"start": "2026-10-31T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Löwensaal Beinwil am See",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Clarinet",
+"name": "David Orlowsky"
+},
+{
+"role": "Ensemble",
+"name": "CHAARTS Chamber Artists"
+}
+],
+"program": [
+{
+"composer": "Henry Purcell",
+"title": "«Music for a while»"
+},
+{
+"composer": "Henry Purcell",
+"title": "«If music be the food of love»"
+},
+{
+"composer": "Henry Purcell",
+"title": "«Cold Song»"
+},
+{
+"composer": "Henry Purcell",
+"title": "«Dido’s Lament»"
+},
+{
+"composer": "Franz Schubert",
+"title": "«An den Mond»",
+"composerId": "schubert"
+},
+{
+"composer": "Antonio Vivaldi",
+"title": "«Sovente il sole»",
+"composerId": "vivaldi"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "«Song to the Moon»",
+"composerId": "dvorak"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Nocturne cis-Moll",
+"composerId": "chopin"
+},
+{
+"composer": "Claude Debussy",
+"title": "«Clair de Lune»",
+"composerId": "debussy"
+},
+{
+"composer": "Josef Gabriel Rheinberger",
+"title": "«Abendlied»"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "«Mondscheinsonate»",
+"composerId": "beethoven"
+},
+{
+"composer": "Samuel Barber",
+"title": "«Adagio»"
+},
+{
+"composer": "David Orlowsky",
+"title": "«North»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/187235/",
+"sourceUrl": "https://argoviaphil.ch/konzert/3-loewenkonzert-4/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-stadtcasino_basel-basler-gesangverein",
 "title": "Basler Gesangverein – Orchestre Musique des Lumières",
 "series": "Musiksaal",
@@ -790,7 +1584,7 @@ export const REAL = [
 "title": "Gitanes",
 "series": "Concert à l'abo",
 "start": "2026-10-31T19:30:00+01:00",
-"durationMin": 120,
+"durationMin": 70,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "orchestral",
@@ -1014,6 +1808,82 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15442&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/kammerkonzert-3/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-311",
+"title": "Morgenmusik am Reformationssonntag",
+"series": null,
+"start": "2026-11-01T11:30:00+01:00",
+"durationMin": 45,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/morgenmusik-am-reformationssonntag-311/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/morgenmusik-am-reformationssonntag-311/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-kammerphilharmonie_gr-colani-der-freischuetz-reine-victoria-stmoritz",
+"title": "Colani - Der Freischütz",
+"series": "Oper",
+"start": "2026-11-01T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Hotel Reine Victoria, St. Moritz",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Narrator",
+"name": "Lorenzo Polin"
+},
+{
+"role": "Tenor",
+"name": "Yves Ehrsam"
+},
+{
+"role": "Soprano",
+"name": "Sara-Bigna Janett"
+},
+{
+"role": "Bass",
+"name": "Radovan Jovanovic"
+},
+{
+"role": "Bass",
+"name": "Martin Roth"
+},
+{
+"role": "Conductor",
+"name": "Claudio Danuser"
+},
+{
+"role": "Director",
+"name": "Manfred Ferrari"
+},
+{
+"role": "Choir",
+"name": "Projektchor des Bündner Jägerverbandes"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Gian Marchet Colani",
+"title": "Eine Bündner Jäger-Oper in deutscher und romanischer Sprache"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/klassik-opern/oper-operette/gian-marchet-colani-7460765676904415786.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/colani-der-freischuetz-reine-victoria-stmoritz.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-stadtcasino_basel-01112026_nob",
@@ -1272,6 +2142,51 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-argovia_philharmonic-268581",
+"title": "Bildklänge",
+"series": "Serie Surprise",
+"start": "2026-11-03T12:15:00+01:00",
+"durationMin": 60,
+"cityId": "aarau",
+"venueName": "Aargauer Kunsthaus",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Sabina Curti"
+},
+{
+"role": "Clarinet",
+"name": "Eva Polgar"
+},
+{
+"role": "Harp",
+"name": "Jasmine Vollmer"
+}
+],
+"program": [
+{
+"composer": "Willhelm Albrecht Otto Popp",
+"title": "Sätze I, II und V aus den Jugend-Trios op. 505"
+},
+{
+"composer": "Claude Debussy",
+"title": "«La Fille aux cheveux de lin» aus Préludes Band I, Nr. 8",
+"composerId": "debussy"
+},
+{
+"composer": "Béla Bartók",
+"title": "Auszüge aus 44 Duos für 2 Violinen Sz. 98",
+"composerId": "bartok"
+}
+],
+"ticketUrl": "https://argoviaphil.ch/konzert/bildklaenge-4/",
+"sourceUrl": "https://argoviaphil.ch/konzert/bildklaenge-4/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-tonhalle-2070546",
 "title": "Cello Magic",
 "series": null,
@@ -1296,6 +2211,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.benedictkloeckner.de/s/n2Hy60kW",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/cello-magic-2070546/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-15579",
+"title": "Orgelmusik am Morgen",
+"series": null,
+"start": "2026-11-04T07:45:00+01:00",
+"durationMin": 15,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15579/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15579/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200187",
@@ -1433,6 +2365,28 @@ export const REAL = [
 "source": "buehnen_bern"
 },
 {
+"id": "real-kammerorchester_basel-nachtklang-im-museum-i-202611041930",
+"title": "Nachtklang im Museum",
+"series": null,
+"start": "2026-11-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Novartis Pavillon",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/193189/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/nachtklang-im-museum-i.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-tonhalle-2055193",
 "title": "Paavo Järvi & Hayato Sumino",
 "series": null,
@@ -1517,6 +2471,23 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-reformiert_zuerich-14366",
+"title": "Acoustic Oasis",
+"series": null,
+"start": "2026-11-05T18:00:00+01:00",
+"durationMin": 195,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14366/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14366/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-musikkollegium-9217",
 "title": "Bogdan Božović spielt Tschaikowsky",
 "series": "Hauskonzert",
@@ -1559,6 +2530,39 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/178324/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/bogdan-bozovic-spielt-tschaikowsky-26-11-05-9217",
 "source": "musikkollegium"
+},
+{
+"id": "real-casino_bern-grigory-sokolov-2-20261105-1930",
+"title": "Grigory Sokolov",
+"series": "Abonnementskonzert",
+"start": "2026-11-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Grigory Sokolov"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Klaviersonate Nr. 21 in B-Dur D 960",
+"composerId": "schubert"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Klaviersonate Nr. 3 in f-moll op. 5",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/grigory-sokolov-2/#05-11-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-buehnen_bern-lieben-sie-brahms-2026-11-05-1930",
@@ -1726,6 +2730,71 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-1-4-5",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-1-4-5",
 "source": "osr"
+},
+{
+"id": "real-zuger_sinfonietta-aus-meinem-leben-zug-2026-11-06",
+"title": "Aus meinem Leben",
+"series": "Mittagskonzert",
+"start": "2026-11-06T12:15:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueName": "Reformierte Kirche Zug",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Barra Quartett"
+}
+],
+"program": [],
+"ticketUrl": "https://zugersinfonietta.ch/konzert/aus-meinem-leben-zug/",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/aus-meinem-leben-zug/",
+"source": "zuger_sinfonietta"
+},
+{
+"id": "real-reformiert_zuerich-8803",
+"title": "Sax am Mittag – Kay Zhang",
+"series": null,
+"start": "2026-11-06T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/sax-am-mittag-kay-zhang-8803/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/sax-am-mittag-kay-zhang-8803/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-kts_st_gallen-4018",
+"title": "FILM·MUSIK",
+"series": null,
+"start": "2026-11-06T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=714&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/filmmusik/4018/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-zko-19831",
@@ -1940,6 +3009,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Ftonhalleorchester.ch%2Fkonzerte%2Fkalender%2F&event=5592&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/paavo-jaervi-hayato-sumino-2055195/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-13585",
+"title": "Trio Mori – Gunnarsdóttir – Guðmundsdóttir",
+"series": null,
+"start": "2026-11-06T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Lavaterhaus, Lavatersaal",
+"type": "chamber",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/trio-mori-gunnarsdottir-gumundsdottir-13585/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/trio-mori-gunnarsdottir-gumundsdottir-13585/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-osr-fam-beethoven-5-20261107",
@@ -2181,9 +3267,9 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
-"id": "real-stadtcasino_basel-07112026_kob",
-"title": "Kammerorchester Basel mit Pierre-Laurent Aimard – Einfach oder doppelt",
-"series": "Musiksaal",
+"id": "real-kammerorchester_basel-einfach-oder-doppelt-202611071930",
+"title": "Einfach oder doppelt",
+"series": null,
 "start": "2026-11-07T19:30:00+01:00",
 "durationMin": 120,
 "cityId": "basel",
@@ -2193,12 +3279,12 @@ export const REAL = [
 "status": "scheduled",
 "credits": [
 {
-"role": "Piano",
-"name": "Pierre-Laurent Aimard"
-},
-{
 "role": "Conductor",
 "name": "Pierre Bleuse"
+},
+{
+"role": "Piano",
+"name": "Pierre-Laurent Aimard"
 },
 {
 "role": "Orchestra",
@@ -2208,7 +3294,7 @@ export const REAL = [
 "program": [
 {
 "composer": "Beat Furrer",
-"title": "Neues Werk für Orchester (UA, Kompositionsauftrag)"
+"title": "Sinfonia concertante (UA, Kompositionsauftrag Kammerorchester Basel)"
 },
 {
 "composer": "Béla Bartók",
@@ -2222,25 +3308,64 @@ export const REAL = [
 }
 ],
 "ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/115340/#event",
-"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/07112026_kob/",
-"source": "stadtcasino_basel"
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/einfach-oder-doppelt.html",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-kammerphilharmonie_gr-franck-und-mendelssohn-martinskirche-chur-1",
+"title": "Franck und Mendelssohn",
+"series": "Chorkonzert",
+"start": "2026-11-07T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "Martinskirche Chur",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Aurea Marston"
+},
+{
+"role": "Tenor",
+"name": "Remy Burnens"
+},
+{
+"role": "Conductor",
+"name": "Daniela Brantschen"
+},
+{
+"role": "Choir",
+"name": "Bündner Singkreis"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "César Franck",
+"title": "Die Sieben Worte Jesu am Kreuz (1859)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/klassik-opern/klassik/konzert-buendner-singkreis-cesar-franck-felix-mendelssohn-7501191069234676654.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/franck-und-mendelssohn-martinskirche-chur-1.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-sob-12249",
 "title": "SunDay Concert",
 "series": "AMG SunDay Concerts",
 "start": "2026-11-08T11:00:00+01:00",
-"durationMin": 60,
+"durationMin": 120,
 "cityId": "basel",
 "venueId": "stadtcasino-basel",
 "type": "orchestral",
 "featured": true,
 "status": "scheduled",
 "credits": [
-{
-"role": "Violin",
-"name": "Friederike Starkloff"
-},
 {
 "role": "Conductor",
 "name": "Friederike Starkloff"
@@ -2479,10 +3604,6 @@ export const REAL = [
 "name": "Philharmonie der Solisten"
 },
 {
-"role": "Violin",
-"name": "Vladik Otaryan"
-},
-{
 "role": "Conductor",
 "name": "Vladik Otaryan"
 }
@@ -2517,6 +3638,184 @@ export const REAL = [
 "ticketUrl": "https://www.ticketcorner.ch/artist/vivaldi-die-vierjahreszeiten-philharmonie-der-solisten/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/081126_philharmonie_d_solisten_1600/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-esn_neuchatel-coeurs-vaillants-202611081700",
+"title": "Coeurs vaillants",
+"series": "Grande Série",
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Maximilian Hornung"
+},
+{
+"role": "Conductor",
+"name": "Victorien Vanoosten"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+}
+],
+"program": [
+{
+"composer": "R. Schumann",
+"title": "Ouverture de Manfred, op. 115",
+"composerId": "schumann"
+},
+{
+"composer": "E. Elgar",
+"title": "Concerto pour violoncelle, op. 85 en mi mineur"
+},
+{
+"composer": "P. I. Tchaïkovsky",
+"title": "Symphonie n°5, op. 64 en mi mineur",
+"composerId": "tchaikovsky"
+}
+],
+"ticketUrl": "https://billetterie.chaux-de-fonds.ch/selection/event/date?productId=10229848186821",
+"sourceUrl": "https://www.esn-ne.ch/concerts/coeurs-vaillants",
+"source": "esn_neuchatel"
+},
+{
+"id": "real-kammerphilharmonie_gr-franck-und-mendelssohn-martinskirche-chur-2",
+"title": "Franck und Mendelssohn",
+"series": "Chorkonzert",
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "Martinskirche Chur",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Aurea Marston"
+},
+{
+"role": "Tenor",
+"name": "Remy Burnens"
+},
+{
+"role": "Conductor",
+"name": "Daniela Brantschen"
+},
+{
+"role": "Choir",
+"name": "Bündner Singkreis"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "César Franck",
+"title": "Die Sieben Worte Jesu am Kreuz (1859)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/konzerte/chor/konzert-buendner-singkreis-cesar-franck-felix-mendelssoh-7501196301733730598.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/franck-und-mendelssohn-martinskirche-chur-2.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-reformiert_zuerich-15048",
+"title": "Geistliches Cembalokonzert",
+"series": "Chorraum",
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/musikwissenschaftliches-institut-zh-15048/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/musikwissenschaftliches-institut-zh-15048/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-10818",
+"title": "Jahreskonzert Cantus",
+"series": null,
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 150,
+"cityId": "zurich",
+"venueName": "Kirche Neumünster",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/jahreskonzert-cantus-10818/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/jahreskonzert-cantus-10818/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-15767",
+"title": "Kammermusikkonzert «Fantasia»",
+"series": null,
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Letten",
+"type": "chamber",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/kammermusikkonzert-fantasia-15767/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/kammermusikkonzert-fantasia-15767/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-653",
+"title": "Konzertreihe Predigern",
+"series": null,
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigern-653/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigern-653/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-casino_bern-sjso-herbsttournee-2026-nordwaerts-20261108-1700",
+"title": "SJSO Herbsttournee 2026 – „Nordwärts“",
+"series": "Grosser Saal",
+"start": "2026-11-08T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Izabelė Jankauskaitė"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kulturticket.ch/11617/sjso-schweizer-jugend-sinfonie-orchester/event/2038",
+"sourceUrl": "https://www.casinobern.ch/programm/sjso-herbsttournee-2026-nordwaerts/#08-11-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-geneva_victoria_hall-62051145-20261108",
@@ -2684,10 +3983,6 @@ export const REAL = [
 {
 "role": "Orchestra",
 "name": "Philharmonie der Solisten"
-},
-{
-"role": "Violin",
-"name": "Vladik Otaryan"
 },
 {
 "role": "Conductor",
@@ -2886,6 +4181,79 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocf_fribourg-8489",
+"title": "Balkan Spirit",
+"series": "Kultur im Podium",
+"start": "2026-11-10T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Ensemble",
+"name": "Quintett TRI i DVE"
+},
+{
+"role": "Soprano",
+"name": "Diana Schnürpel"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Béla Bartók",
+"title": "Rumänische Volkstänze",
+"composerId": "bartok"
+},
+{
+"composer": "Franco Cesarini",
+"title": "Bulgarian Dances op. 35b"
+},
+{
+"composer": "György Ligeti",
+"title": "Mysteries of the Macabre für Sopran und Orchester"
+},
+{
+"composer": "György Ligeti",
+"title": "Concert Românesc"
+},
+{
+"composer": "Nathan Stornetta",
+"title": "Images balkaniques für Quintett und Orchester"
+}
+],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8489",
+"source": "ocf_fribourg"
+},
+{
+"id": "real-cite_bleue-le-chant-du-sabre-2026-11-10-1930",
+"title": "Le chant du sabre",
+"series": null,
+"start": "2026-11-10T19:30:00+01:00",
+"durationMin": 85,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-chant-du-sabre",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-chant-du-sabre",
+"source": "cite_bleue"
+},
+{
 "id": "real-stadtcasino_basel-10112026_gfk",
 "title": "Quatuor Danel",
 "series": "Kammermusik Basel",
@@ -2932,6 +4300,45 @@ export const REAL = [
 "ticketUrl": "https://www.ticketino.com/de/Event/Kammermusik-Basel-QUATUOR-DANEL/215280",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/10112026_gfk/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-reformiert_zuerich-15580",
+"title": "Orgelmusik am Morgen",
+"series": null,
+"start": "2026-11-11T07:45:00+01:00",
+"durationMin": 15,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15580/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15580/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-casino_bern-vivaldi-die-vier-jahreszeiten-philharmonie-der-s-5c8ba0e7ed",
+"title": "VIVALDI – Die vier Jahreszeiten | Philharmonie der Solisten",
+"series": "Burgerratssaal",
+"start": "2026-11-11T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Philharmonie der Solisten"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketcorner.ch/artist/vivaldi-die-vierjahreszeiten-philharmonie-der-solisten/",
+"sourceUrl": "https://www.casinobern.ch/programm/vivaldi-die-vier-jahreszeiten-philharmonie-der-solisten/#11-11-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-osr-80-concours-de-geneve-2-20261111",
@@ -3060,6 +4467,45 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-casino_bern-vivaldi-die-vier-jahreszeiten-philharmonie-der-s-638cfdae20",
+"title": "VIVALDI – Die vier Jahreszeiten | Philharmonie der Solisten",
+"series": "Burgerratssaal",
+"start": "2026-11-11T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Philharmonie der Solisten"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketcorner.ch/artist/vivaldi-die-vierjahreszeiten-philharmonie-der-solisten/",
+"sourceUrl": "https://www.casinobern.ch/programm/vivaldi-die-vier-jahreszeiten-philharmonie-der-solisten/#11-11-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-reformiert_zuerich-15768",
+"title": "Herbstkonzert mit den «SingingKids»",
+"series": null,
+"start": "2026-11-12T18:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Pauluskirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/herbstkonzert-mit-den-singingkids-15768/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/herbstkonzert-mit-den-singingkids-15768/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2064418",
 "title": "Surprise mit Studierenden der ZHdK",
 "series": null,
@@ -3094,6 +4540,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5760&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/surprise-mit-studierenden-der-zhdk-2064418/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-14695",
+"title": "Mediterranean Music Festival 2026",
+"series": null,
+"start": "2026-11-12T19:00:00+01:00",
+"durationMin": 180,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/mediterranean-music-festival-2026-14695/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/mediterranean-music-festival-2026-14695/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-lso_luzern-19882",
@@ -3308,6 +4771,23 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-reformiert_zuerich-14369",
+"title": "Surprise am Mittag – tober",
+"series": null,
+"start": "2026-11-13T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/surprise-am-mittag-tober-14369/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/surprise-am-mittag-tober-14369/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-osr-80-concours-de-geneve-3-20261113",
 "title": "80e Concours de Genève – Finale de Direction d’Orchestre",
 "series": null,
@@ -3328,6 +4808,47 @@ export const REAL = [
 "ticketUrl": "https://www.concoursgeneve.ch/",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/80-concours-de-geneve-3",
 "source": "osr"
+},
+{
+"id": "real-bach_stiftung-bwv-226-der-geist-hilft-unser-schwachheit-auf-un-1c294fc9a1",
+"title": "BWV 226 «Der Geist hilft unser Schwachheit auf» und BWV 229 «Komm, Jesu, komm»",
+"series": "Bachkantate",
+"start": "2026-11-13T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Chor der J. S. Bach-Stiftung"
+},
+{
+"role": "Orchestra",
+"name": "Orchester der J. S. Bach-Stiftung"
+},
+{
+"role": "Conductor",
+"name": "Rudolf Lutz"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 226 «Der Geist hilft unser Schwachheit auf»",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 229 «Komm, Jesu, komm»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/144565/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-226-der-geist-hilft-unser-schwachheit-auf-und-bwv-229-komm-jesu-komm/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-opernhaus_zurich-199834",
@@ -3413,6 +4934,65 @@ export const REAL = [
 "ticketUrl": "https://www.ticketcorner.ch/artist/collegium-musicum-basel/collegium-musicum-basel-202627-4124761/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/1311206_cmb/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-luzerner_theater-8738",
+"title": "L'elisir d'amore [Der Liebestrank]",
+"series": null,
+"start": "2026-11-13T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Lucía Astigarraga"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Gaetano Donizetti",
+"title": "L'elisir d'amore"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8738",
+"sourceUrl": "https://www.luzernertheater.ch/lelisirdamore",
+"source": "luzerner_theater"
 },
 {
 "id": "real-tonhalle-2055215",
@@ -3512,11 +5092,33 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-reformiert_zuerich-16109",
+"title": "«Die Winterreise»",
+"series": null,
+"start": "2026-11-13T19:30:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"workId": "schubert-winterreise",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://reformiert-zuerich.ch/event/die-winterreise-16109/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/die-winterreise-16109/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-sob-12056",
 "title": "Atriumkonzert – Zuckerfee trifft Tango",
 "series": "Kammermusik",
 "start": "2026-11-14T15:00:00+01:00",
-"durationMin": 60,
+"durationMin": 120,
 "cityId": "basel",
 "venueName": "Probezentrum Picassoplatz",
 "type": "chamber",
@@ -3547,7 +5149,7 @@ export const REAL = [
 "title": "Relaxed Performance – Zuckerfee trifft Tango",
 "series": "Kammermusik",
 "start": "2026-11-14T17:30:00+01:00",
-"durationMin": 60,
+"durationMin": 120,
 "cityId": "basel",
 "venueName": "Probezentrum Picassoplatz",
 "type": "chamber",
@@ -3608,6 +5210,54 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15291&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/ein-sommernachtstraum/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-15604",
+"title": "Ensemble Sinfonietta Bern",
+"series": null,
+"start": "2026-11-14T19:15:00+01:00",
+"durationMin": 75,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "orchestral",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/ensemble-sinfonietta-bern-15604/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/ensemble-sinfonietta-bern-15604/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-concerts_fribourg-2026-11-14-danish-string-quartet",
+"title": "Danish String Quartet",
+"series": "Société des Concerts de Fribourg",
+"start": "2026-11-14T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Danish String Quartet"
+}
+],
+"program": [
+{
+"composer": "Dmitri Chostakovitch",
+"title": "Quatuor n° 14 en fa dièse majeur, op. 142"
+},
+{
+"composer": "Jonny Greenwood",
+"title": "Suite tirée de There will be blood"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.concertsfribourg.ch/fr/programme/sdc/Element/concert/c/danish-string-quartet.html",
+"source": "concerts_fribourg"
 },
 {
 "id": "real-musikkollegium-9470",
@@ -3711,6 +5361,180 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-cite_bleue-vuelvo-al-sur-2026-11-14-1930",
+"title": "Vuelvo al Sur",
+"series": null,
+"start": "2026-11-14T19:30:00+01:00",
+"durationMin": 60,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Loïc Vallaeys"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/vuelvo-al-sur",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/vuelvo-al-sur",
+"source": "cite_bleue"
+},
+{
+"id": "real-kammerphilharmonie_gr-amerikanische-taenze-gkb-auditorium-1",
+"title": "Amerikanische Tänze",
+"series": "Langer Samstag",
+"start": "2026-11-14T20:30:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "GKB Auditorium, Chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Aaron Copland",
+"title": "Appalachian Spring Suite (1945)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/festivals/kunst-kultur/langer-samstag-2026-chur-7510620883704105600.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/amerikanische-taenze-gkb-auditorium-1.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-kammerphilharmonie_gr-amerikanische-taenze-gkb-auditorium-2",
+"title": "Amerikanische Tänze",
+"series": "Langer Samstag",
+"start": "2026-11-14T21:30:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "GKB Auditorium, Chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Aaron Copland",
+"title": "Appalachian Spring Suite (1945)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/festivals/kunst-kultur/langer-samstag-2026-chur-7510620883704105600.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/amerikanische-taenze-gkb-auditorium-2.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-kammerphilharmonie_gr-amerikanische-taenze-gkb-auditorium-3",
+"title": "Amerikanische Tänze",
+"series": "Langer Samstag",
+"start": "2026-11-14T22:30:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "GKB Auditorium, Chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Aaron Copland",
+"title": "Appalachian Spring Suite (1945)"
+}
+],
+"ticketUrl": "https://eventfrog.ch/de/p/festivals/kunst-kultur/langer-samstag-2026-chur-7510620883704105600.html",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/amerikanische-taenze-gkb-auditorium-3.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-casino_bern-klanggeschichten-20261115-1100",
+"title": "Klanggeschichten",
+"series": "3. Matineekonzert",
+"start": "2026-11-15T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Dima Dimitrova"
+},
+{
+"role": "Cello",
+"name": "Eva Wyss-Simmen"
+},
+{
+"role": "Double bass",
+"name": "Nicolò Zorzi"
+},
+{
+"role": "Clarinet",
+"name": "Gábor Horváth"
+},
+{
+"role": "Bassoon",
+"name": "Filipe Castro"
+},
+{
+"role": "Trumpet",
+"name": "Renato Martins Longo"
+},
+{
+"role": "Trombone",
+"name": "Wassil Christov"
+},
+{
+"role": "Percussion",
+"name": "Peter Fleischlin"
+}
+],
+"program": [
+{
+"composer": "Alfredo Casella",
+"title": "Serenata op. 46 für Klarinette, Fagott, Trompete, Violine und Cello"
+},
+{
+"composer": "Igor Strawinsky",
+"title": "L’Histoire du Soldat"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/klanggeschichten/",
+"sourceUrl": "https://www.casinobern.ch/programm/klanggeschichten/#15-11-2026",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-199810",
 "title": "Alice im Wunderland",
 "series": "Hauptbühne",
@@ -3802,6 +5626,23 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-theater_casino_zug-b331edf9-cbbc-40cd-854e-5ddb029a8eab",
+"title": "Next Generation Talents",
+"series": "Kleiner Saal",
+"start": "2026-11-15T15:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229820891701&productId=10229821099428",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/next-generation-talents-nov-26?date=b331edf9-cbbc-40cd-854e-5ddb029a8eab",
+"source": "theater_casino_zug"
+},
+{
 "id": "real-musikkollegium-9428",
 "title": "Dichterlos - Liederabend mit Mikhail Timoshenko",
 "series": "Extrakonzert",
@@ -3835,6 +5676,62 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/163528/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/dichterlos-liederabend-mit-mikhail-timoshenko-26-11-15-9428",
 "source": "musikkollegium"
+},
+{
+"id": "real-theater_casino_zug-ec871bcb-5e8d-4c6e-ba38-c58766ac73bf",
+"title": "Die schwarze Spinne",
+"series": "Theatersaal",
+"start": "2026-11-15T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Willy Burkhard",
+"title": "Die schwarze Spinne"
+}
+],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229820847873",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/die-schwarze-spinne?date=ec871bcb-5e8d-4c6e-ba38-c58766ac73bf",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-cite_bleue-heritage-s-2026-11-15-1700",
+"title": "Héritage(s)",
+"series": null,
+"start": "2026-11-15T17:00:00+01:00",
+"durationMin": 80,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Voice",
+"name": "Lia Naviliat Cuncic"
+},
+{
+"role": "Clavicorde",
+"name": "Santiago Gervasoni"
+},
+{
+"role": "Double bass",
+"name": "Lucas Henri"
+},
+{
+"role": "Guitar",
+"name": "Paul Héroux"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/heritage-s",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/heritage-s",
+"source": "cite_bleue"
 },
 {
 "id": "real-tonhalle-2055220",
@@ -4010,6 +5907,59 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-kts_st_gallen-3903",
+"title": "Mozart zum Jubiläum",
+"series": "Sonntags um 5",
+"start": "2026-11-15T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Clarinet",
+"name": "Ignazio Pisana"
+},
+{
+"role": "Violin",
+"name": "Yuko Ishikawa"
+},
+{
+"role": "Violin",
+"name": "Nadia Saladukhina"
+},
+{
+"role": "Viola",
+"name": "Lea Gabriela Heinzer"
+},
+{
+"role": "Viola",
+"name": "Jana Stojanovic"
+},
+{
+"role": "Cello",
+"name": "Vanessa Hunt"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Streichquintett C-Dur KV 515",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Klarinettenquintett A-Dur KV 581",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=585&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2-so-um-5-mozart-zum-jubilaeum/3903/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-cnz-148",
 "title": "Sonderkonzert an der ZHdK: Laboratorium",
 "series": null,
@@ -4051,6 +6001,72 @@ export const REAL = [
 "ticketUrl": "https://www.zhdk.ch/veranstaltung/62957",
 "sourceUrl": "https://cnz.ch/sonderkonzert-zhdk",
 "source": "cnz"
+},
+{
+"id": "real-casino_bern-the-grand-romance-gala-20261115-1800",
+"title": "The Grand Romance Gala",
+"series": "Grosser Saal",
+"start": "2026-11-15T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Swan Lake",
+"title": "Danse Napolitaine · Danse Espagnole · Danse Russe · Scène finale"
+},
+{
+"composer": "Swan Lake",
+"title": "O Mio Babbino Caro"
+},
+{
+"composer": "Swan Lake",
+"title": "Quando Me’n Vò (La Bohème)"
+},
+{
+"composer": "Swan Lake",
+"title": "Habanera (Carmen)"
+},
+{
+"composer": "Swan Lake",
+"title": "Mein Liebeslied muss ein Walzer sein"
+},
+{
+"composer": "Swan Lake",
+"title": "Meine Lippen, sie küssen so heiss"
+},
+{
+"composer": "Swan Lake",
+"title": "Granada"
+},
+{
+"composer": "Swan Lake",
+"title": "La donna è mobile (Rigoletto)"
+},
+{
+"composer": "Swan Lake",
+"title": "Nessun dorma! (Turandot)"
+},
+{
+"composer": "Swan Lake",
+"title": "Torna a Surriento · ‚O Sole Mio"
+},
+{
+"composer": "Swan Lake",
+"title": "Brindisi — The Drinking Song (La Traviata)"
+},
+{
+"composer": "Swan Lake",
+"title": "Time To Say Goodbye"
+}
+],
+"ticketUrl": "https://tickets.uso.swiss/checkout/view-event/id/8521487/chk/97c1fe323c67d739ba8fa091d5397d1f/?modal_widget=true&widget=true&ref2=website&ref=website__1871989576-1787835157&_gl=1*1r99hir*_gcl_aw*R0NMLjE3ODc4MzUxNTguQ2p3S0NBand3TF9VQmhBakVpd0FFaHVUNUwxUndfeVRwZnZodS16dHZjR0paWnpuYUJPT21vdndHTnhXQTdURGhCbVJpZGRtQnN2REZCb0NLUEFRQXZEX0J3RQ..*_gcl_au*MTkzNDkyMTcxNi4xNzg3ODM1MTU3*_ga*MTg3MTk4OTU3Ni4xNzg3ODM1MTU3*_ga_1PKRLT14Q5*czE3ODc4MzUxNTckbzEkZzEkdDE3ODc4NDAxNDQkajIwJGwwJGg5MjA4MjA4MTQ.",
+"sourceUrl": "https://www.casinobern.ch/programm/the-grand-romance-gala/#15-11-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-opernhaus_zurich-200189",
@@ -4164,10 +6180,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Nils Erik Måseidvåg"
-},
-{
-"role": "Host",
 "name": "Nils Erik Måseidvåg"
 }
 ],
@@ -4285,6 +6297,45 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5702&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/jubilaeumskonzert-duo-calva-2056812/",
 "source": "tonhalle"
+},
+{
+"id": "real-kammerorchester_basel-liestal-202611171930",
+"title": "Kammerorchester Basel – Konzertreise mit Pianistin Angela Hewitt",
+"series": null,
+"start": "2026-11-17T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "liestal",
+"venueId": "stadtkirche-liestal",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://www.blkonzerte.ch/31-angela-hewitt-klavier",
+"sourceUrl": "https://www.blkonzerte.ch/31-angela-hewitt-klavier",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-reformiert_zuerich-15581",
+"title": "Orgelmusik am Morgen",
+"series": null,
+"start": "2026-11-18T07:45:00+01:00",
+"durationMin": 15,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15581/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15581/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200190",
@@ -4469,6 +6520,115 @@ export const REAL = [
 "source": "sob"
 },
 {
+"id": "real-casino_bern-roma-20261119-1000",
+"title": "Musik Punkt 10 – Respighis Rom",
+"series": "4. Symphoniekonzert – Berner Symphonieorchester",
+"start": "2026-11-19T10:00:00+01:00",
+"durationMin": 45,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jader Bignamini"
+},
+{
+"role": "Violin",
+"name": "Sergey Khachatryan"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Rhiannon Giddens / Michael Abels",
+"title": "Ouvertüre zur Oper Omar"
+},
+{
+"composer": "Jean Sibelius",
+"title": "Konzert für Violine und Orchester d-Moll op. 47 (1903 / 04, rev. 1905)",
+"composerId": "sibelius"
+},
+{
+"composer": "Ottorino Respighi",
+"title": "Fontane di Roma"
+},
+{
+"composer": "Ottorino Respighi",
+"title": "Pini di Roma"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/musik-punkt-10-respighis-rom/",
+"sourceUrl": "https://www.casinobern.ch/programm/roma/#19-11-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-reformiert_zuerich-15769",
+"title": "Orgelmusik zum Feierabend",
+"series": null,
+"start": "2026-11-19T19:00:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Pauluskirche",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15769/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15769/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-argovia_philharmonic-268474",
+"title": "2. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2026-11-19T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Voice",
+"name": "Ginesa Ortega"
+},
+{
+"role": "Dancer",
+"name": "David Romero"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Manuel de Falla",
+"title": "«El amor brujo» Suite für Orchester"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 3 Es-Dur op. 55 «Eroica»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165336/",
+"sourceUrl": "https://argoviaphil.ch/konzert/2-abo-konzert-1-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-cnz-138",
 "title": "Aschenstille",
 "series": null,
@@ -4528,6 +6688,46 @@ export const REAL = [
 "source": "cnz"
 },
 {
+"id": "real-kts_st_gallen-3912",
+"title": "Fantastique",
+"series": "Tonhallekonzert",
+"start": "2026-11-19T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Arvo Volmer"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"workId": "mozart-don-giovanni",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sinfonie Nr. 39 Es-Dur KV 543",
+"composerId": "mozart"
+},
+{
+"composer": "Hector Berlioz",
+"title": "Symphonie fantastique"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=566&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/3-thk-fantastique/3912/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-zko-19728",
 "title": "Feder und Bogen 1: Erich Kästner",
 "series": null,
@@ -4570,42 +6770,6 @@ export const REAL = [
 "name": "Romain Mayor"
 },
 {
-"role": "Nabucco",
-"name": "Nikoloz Lagvilava"
-},
-{
-"role": "Abigaille",
-"name": "María José Siri"
-},
-{
-"role": "Ismaele",
-"name": "Sahy Ratia"
-},
-{
-"role": "Zaccaria",
-"name": "Rubén Amoretti"
-},
-{
-"role": "Fenena",
-"name": "Carine Séchaye"
-},
-{
-"role": "Il Grand Sacerdote",
-"name": "Joe Bertili"
-},
-{
-"role": "Abdallo",
-"name": "Oscar Esmerode"
-},
-{
-"role": "Anna",
-"name": "Clémence Tilquin"
-},
-{
-"role": "Choir",
-"name": "Le Motet de Genève"
-},
-{
 "role": "Orchestra",
 "name": "Orchestre de la Suisse Romande"
 }
@@ -4639,10 +6803,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Droujelub Yanakiew"
-},
-{
-"role": "Violin",
 "name": "Droujelub Yanakiew"
 },
 {
@@ -4900,6 +7060,83 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-kts_st_gallen-3889",
+"title": "Lunch in Es(s)-Dur",
+"series": "Lunch-Konzert",
+"start": "2026-11-20T12:15:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Arvo Volmer"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sinfonie Nr. 39 KV 543",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=589&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/1-lunch-lunch-in-ess-dur/3889/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-kammerphilharmonie_gr-beethoven-und-yusupov-martinskirche-chur",
+"title": "Beethoven und Yusupov",
+"series": "Sinfoniekonzert",
+"start": "2026-11-20T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueName": "Martinskirche Chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Matthias Ziegler"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Coriolan-Ouvertüre in c-Moll, op. 62 (1807)",
+"composerId": "beethoven"
+},
+{
+"composer": "Benjamin Yusupov",
+"title": "Nola (1994)"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 8 in F-Dur, op. 93 (1811/12)",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/173738/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/beethoven-und-yusupov-martinskirche-chur.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-opernhaus_zurich-199863",
 "title": "Romeo und Julia",
 "series": "Hauptbühne",
@@ -4979,6 +7216,50 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-argovia_philharmonic-268476",
+"title": "2. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2026-11-20T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Voice",
+"name": "Ginesa Ortega"
+},
+{
+"role": "Dancer",
+"name": "David Romero"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Manuel de Falla",
+"title": "«El amor brujo» Suite für Orchester"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 3 Es-Dur op. 55 «Eroica»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165336/",
+"sourceUrl": "https://argoviaphil.ch/konzert/2-abo-konzert-2-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-lso_luzern-19085",
 "title": "CSS Benefizkonzert mit Alice Sara Ott",
 "series": "Sinfoniekonzerte",
@@ -5024,6 +7305,23 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-reformiert_zuerich-3674",
+"title": "Chorkonzert: Je l'ayme bien",
+"series": null,
+"start": "2026-11-20T19:30:00+01:00",
+"durationMin": 75,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/chorkonzert-je-layme-bien-3674/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/chorkonzert-je-layme-bien-3674/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-lucerne_festival-2436",
 "title": "Jörg Widmann | Antoine Tamestit | Sir András Schiff",
 "series": "Lucerne Festival Forward 2026 · Schumannliebe 1",
@@ -5052,11 +7350,6 @@ export const REAL = [
 {
 "composer": "Robert Schumann",
 "title": "Märchenerzählungen op. 132. Vier Stücke für Klarinette, Viola und Klavier",
-"composerId": "schumann"
-},
-{
-"composer": "Robert Schumann",
-"title": "Variationen über ein eigenes Thema Es-Dur WoO 24 Geistervariationen",
 "composerId": "schumann"
 },
 {
@@ -5478,6 +7771,96 @@ export const REAL = [
 "source": "lucerne_festival"
 },
 {
+"id": "real-camerata_bern-30732",
+"title": "Imagine",
+"series": "Abokonzert",
+"start": "2026-11-21T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Lily Higson-Spence"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Peter Iljitsch Tschaikowski",
+"title": "Ohne Zeit, ohne Jahreszeit"
+},
+{
+"composer": "Josef Suk",
+"title": "Serenade für Streicher in Es-Dur op. 6"
+},
+{
+"composer": "Francis Poulenc",
+"title": "Seigneur, je vous en prie"
+},
+{
+"composer": "Claude Debussy",
+"title": "Streichquartett in g-Moll op. 10",
+"composerId": "debussy"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/173563/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/imagine-1",
+"source": "camerata_bern"
+},
+{
+"id": "real-casino_bern-avec-plusieurs-instruments-20261121-1800",
+"title": "Avec plusieurs Instruments",
+"series": "Burgerratssaal",
+"start": "2026-11-21T18:00:00+01:00",
+"durationMin": 90,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Recorder",
+"name": "Maurice Steger"
+},
+{
+"role": "Trumpet",
+"name": "Rupprecht Drees"
+},
+{
+"role": "Viola da gamba",
+"name": "Rebeka Rusó"
+},
+{
+"role": "Violin",
+"name": "Katharina Heutjer"
+},
+{
+"role": "Viola",
+"name": "Wolfram Fortin"
+},
+{
+"role": "Cello",
+"name": "Bianca Riesner"
+},
+{
+"role": "Harpsichord",
+"name": "Jean Christophe Dijoux"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Freitagsakademie/shop/event/162363/#event",
+"sourceUrl": "https://www.casinobern.ch/programm/avec-plusieurs-instruments/#21-11-2026",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-200191",
 "title": "Rachmaninow – Die drei Opern",
 "series": "Hauptbühne",
@@ -5613,6 +7996,109 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-musique_cdf-3212",
+"title": "Jean-Luc Thellin orgue · Orchestre de la Haute École de Musique de Genève · Guillaume Tourniaire direction",
+"series": "Collaboration",
+"start": "2026-11-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Jean-Luc Thellin"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de la Haute École de Musique de Genève"
+},
+{
+"role": "Conductor",
+"name": "Guillaume Tourniaire"
+}
+],
+"program": [
+{
+"composer": "Gabriel Pierné",
+"title": "Paysages franciscains, poème symphonique, op. 43"
+},
+{
+"composer": "Camille Saint-Saëns",
+"title": "Symphonie n° 3 en do mineur, op. 78, « avec orgue »",
+"composerId": "saint-saens"
+},
+{
+"composer": "Francis Poulenc",
+"title": "Concerto pour orgue en sol mineur, FP93"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/jean-luc-thellin-orgueorchestre-de-la-haute-ecole-de-musique-de-geneveguillaume-tourniaire-direction/",
+"source": "musique_cdf"
+},
+{
+"id": "real-luzerner_theater-8739",
+"title": "L'elisir d'amore [Der Liebestrank]",
+"series": null,
+"start": "2026-11-21T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Lucía Astigarraga"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Gaetano Donizetti",
+"title": "L'elisir d'amore"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8739",
+"sourceUrl": "https://www.luzernertheater.ch/lelisirdamore",
+"source": "luzerner_theater"
+},
+{
 "id": "real-tonhalle-2056369",
 "title": "Promenade ins Schicksal",
 "series": null,
@@ -5646,6 +8132,23 @@ export const REAL = [
 "ticketUrl": "https://tonhallezuerich.ch/konzerte/kalender/promenade-ins-schicksal-2056369/tz/",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/promenade-ins-schicksal-2056369/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-8605",
+"title": "Vocalino Chor",
+"series": null,
+"start": "2026-11-21T20:30:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/vocalino-chor-8605/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/vocalino-chor-8605/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-lucerne_festival-2437",
@@ -5792,6 +8295,156 @@ export const REAL = [
 "source": "lucerne_festival"
 },
 {
+"id": "real-argovia_philharmonic-268489",
+"title": "2. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2026-11-22T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Voice",
+"name": "Ginesa Ortega"
+},
+{
+"role": "Dancer",
+"name": "David Romero"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Manuel de Falla",
+"title": "«El amor brujo» Suite für Orchester"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 3 Es-Dur op. 55 «Eroica»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165336/",
+"sourceUrl": "https://argoviaphil.ch/konzert/2-abo-konzert-3-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-kammerphilharmonie_gr-beethoven-und-yusupov-staefa",
+"title": "Beethoven und Yusupov",
+"series": "Sinfoniekonzert",
+"start": "2026-11-22T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Reformierte Kirche Stäfa",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Matthias Ziegler"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Coriolan-Ouvertüre in c-Moll, op. 62 (1807)",
+"composerId": "beethoven"
+},
+{
+"composer": "Benjamin Yusupov",
+"title": "Nola (1994)"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 8 in F-Dur, op. 93 (1811/12)",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.lesegesellschaft.ch/tickets",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/beethoven-und-yusupov-staefa.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-camerata_bern-30752",
+"title": "Imagine",
+"series": "Abokonzert",
+"start": "2026-11-22T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Lily Higson-Spence"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Peter Iljitsch Tschaikowski",
+"title": "Ohne Zeit, ohne Jahreszeit"
+},
+{
+"composer": "Josef Suk",
+"title": "Serenade für Streicher in Es-Dur op. 6"
+},
+{
+"composer": "Francis Poulenc",
+"title": "Seigneur, je vous en prie"
+},
+{
+"composer": "Claude Debussy",
+"title": "Streichquartett in g-Moll op. 10",
+"composerId": "debussy"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/173564/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/imagine-2",
+"source": "camerata_bern"
+},
+{
+"id": "real-reformiert_zuerich-17159",
+"title": "Konzert am Ewigkeitssonntag",
+"series": null,
+"start": "2026-11-22T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Kirche Enge",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-am-ewigkeitssonntag-17159/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-am-ewigkeitssonntag-17159/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-geneva_victoria_hall-41597957-20261122",
 "title": "La Truite de Schubert",
 "series": "Concert du dimanche",
@@ -5843,6 +8496,44 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/api/1/redirect/product?id=10229292489258",
 "sourceUrl": "https://openagenda.com/victoria-hall/events/41597957_la-truite-de-schubert",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-musique_cdf-3219",
+"title": "Martin Jaspard piano",
+"series": "Nouveaux Talents",
+"start": "2026-11-22T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Martin Jaspard"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate n° 12, op. 26",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate n° 25, op. 79",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate n° 29, op. 106 « Hammerklavier »",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-22-11-2026/",
+"source": "musique_cdf"
 },
 {
 "id": "real-stadtcasino_basel-philharmonische-orchester-basel",
@@ -6032,6 +8723,86 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-gewandhausorchester-leipzig-meister-der-romantik-20261122-1800",
+"title": "Gewandhausorchester Leipzig – Meister der Romantik",
+"series": "Migros-Kulturprozent-Classics 2026/2027 | Gewandhausorchester Leipzig",
+"start": "2026-11-22T18:00:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Gewandhausorchester Leipzig"
+},
+{
+"role": "Conductor",
+"name": "Andris Nelsons"
+},
+{
+"role": "Cello",
+"name": "Gautier Capuçon"
+}
+],
+"program": [
+{
+"composer": "Antonín Dvořák",
+"title": "Konzert für Violoncello und Orchester h-Moll op. 104",
+"composerId": "dvorak"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Sinfonie Nr. 1 c-Moll op. 68",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Programmänderungen vorbehalten.",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://www.ticket-onlineshop.com/ols/migrosclassics/de/tickets/channel/shop/areaplan/venue/event/675987",
+"sourceUrl": "https://www.casinobern.ch/programm/gewandhausorchester-leipzig-meister-der-romantik/#22-11-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-reformiert_zuerich-8606",
+"title": "Vocalino Chor",
+"series": null,
+"start": "2026-11-22T18:00:00+01:00",
+"durationMin": 150,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/vocalino-chor-8606/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/vocalino-chor-8606/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-14654",
+"title": "«Hinter den Dingen»",
+"series": null,
+"start": "2026-11-22T18:00:00+01:00",
+"durationMin": 240,
+"cityId": "zurich",
+"venueName": "Kirche St. Jakob",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/hinter-den-dingen-14654/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/hinter-den-dingen-14654/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-lucerne_festival-2439",
 "title": "Lucerne Festival Contemporary Orchestra (LFCO) | SWR Vokalensemble | Heinz Holliger",
 "series": "Lucerne Festival Forward 2026 · Schumannliebe 5",
@@ -6182,6 +8953,50 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-argovia_philharmonic-268491",
+"title": "Gastspiel Winterthur",
+"series": null,
+"start": "2026-11-24T19:00:00+01:00",
+"durationMin": 150,
+"cityId": "winterthur",
+"venueName": "Stadtsaal Winterthur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Voice",
+"name": "Ginesa Ortega"
+},
+{
+"role": "Dancer",
+"name": "David Romero"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Manuel de Falla",
+"title": "«El amor brujo» Suite für Orchester"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 3 Es-Dur op. 55 «Eroica»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/172568/",
+"sourceUrl": "https://argoviaphil.ch/konzert/gastspiel-winterthur-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-zko-19502",
 "title": "Bostridge, Bloxham & Goldscheider",
 "series": "Abo-Konzerte",
@@ -6233,6 +9048,23 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-reformiert_zuerich-15582",
+"title": "Orgelmusik am Morgen",
+"series": null,
+"start": "2026-11-25T07:45:00+01:00",
+"durationMin": 15,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15582/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-am-morgen-15582/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-osr-beethoven-2-3-20261125",
 "title": "Cycle Beethoven 2",
 "series": "Cycle Beethoven",
@@ -6268,6 +9100,52 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-2-3",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-2-3",
 "source": "osr"
+},
+{
+"id": "real-ocl-c203ede9-9a44-4a10-bd7e-bdaa64eddbbd-ocl-ch",
+"title": "Les Grands Concerts n°3 | Capuçon · Beck · Mozart / Schubert",
+"series": "Les Grands Concerts n°3",
+"start": "2026-11-25T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Arielle Beck"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Symphonie n°29 en la majeur, KV 201",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Concerto pour piano et orchestre n°9 en mi bémol majeur, KV 271, « Jeunehomme »",
+"composerId": "mozart"
+},
+{
+"composer": "Franz Schubert",
+"title": "Symphonie n°7 en si mineur, D. 759, « Inachevée »",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n3/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n3/",
+"source": "ocl"
 },
 {
 "id": "real-opera_lausanne-agrippina-20261125-2000",
@@ -6536,6 +9414,107 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-casino_bern-dovgan-eigus-20261126-1930",
+"title": "Dovgan & Eigus",
+"series": "Abonnementskonzert",
+"start": "2026-11-26T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Camerata Schweiz"
+},
+{
+"role": "Conductor",
+"name": "Howard Griffiths"
+},
+{
+"role": "Violin",
+"name": "Ilva Eigus"
+},
+{
+"role": "Piano",
+"name": "Alexandra Dovgan"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Doppelkonzert für Violine, Klavier und Streichorchester in d-Moll MWV O 4",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Pjotr Iljitsch Tschaikowsky",
+"title": "Serenade für Streichorchester C-Dur op. 48"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/dovgan-eigus/#26-11-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-kts_st_gallen-3900",
+"title": "Mosnier-Lenaerts-Mönkemeyer",
+"series": "Meisterzyklus-Konzert",
+"start": "2026-11-26T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Magalí Mosnier"
+},
+{
+"role": "Viola",
+"name": "Nils Mönkemeyer"
+},
+{
+"role": "Harp",
+"name": "Anneleen Lenaerts"
+}
+],
+"program": [
+{
+"composer": "André Jolivet",
+"title": "Pastorales de Noël"
+},
+{
+"composer": "Gabriel Fauré",
+"title": "Berceuse op. 16, Sicilienne op. 78"
+},
+{
+"composer": "Claude Debussy",
+"title": "Clair de Lune, Sonate für Flöte, Viola und Harfe",
+"composerId": "debussy"
+},
+{
+"composer": "Arnold Bax",
+"title": "Elegiac"
+},
+{
+"composer": "Jacques Ibert",
+"title": "Deux Interludes, Entr’acte"
+},
+{
+"composer": "Maurice Ravel",
+"title": "Pièce en forme de Habanera, Sonatine für Flöte, Viola und Harfe",
+"composerId": "ravel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=580&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2-mzk-mosnier-lenaerts-moenkemeyer/3900/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-tonhalle-2056708",
 "title": "Patricia Kopatchinskaja & Fazıl Say",
 "series": null,
@@ -6606,6 +9585,23 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-stadtcasino_basel-26112026_kayhan-kalhor-verschiebetermin",
+"title": "Kayhan Kalhor & Ensemble – Songs of Hope Europe Tour",
+"series": "Hans Huber-Saal",
+"start": "2026-11-26T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "stadtcasino-basel",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://www.ticketcorner.ch/event/kayhan-kalhor-stadtcasino-basel-21921810/",
+"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/26112026_kayhan-kalhor-verschiebetermin/",
+"source": "stadtcasino_basel"
+},
+{
 "id": "real-osi-175657233962741",
 "title": "Maria Dueñas",
 "series": "OSI al LAC",
@@ -6664,6 +9660,82 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-reformiert_zuerich-14370",
+"title": "Saiten am Mittag – Matthias Lincke",
+"series": null,
+"start": "2026-11-27T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/saiten-am-mittag-matthias-lincke-14370/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/saiten-am-mittag-matthias-lincke-14370/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-concerts_fribourg-2026-11-27-bbc-concert-orchestra",
+"title": "BBC Concert Orchestra",
+"series": "Société des Concerts de Fribourg",
+"start": "2026-11-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "BBC Concert Orchestra"
+},
+{
+"role": "Conductor",
+"name": "Jérôme Kuhn"
+},
+{
+"role": "Piano",
+"name": "Teo Gheorghiu"
+},
+{
+"role": "Soprano",
+"name": "Claire Booth"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Clare Presland"
+},
+{
+"role": "Tenor",
+"name": "Daniel Norman"
+}
+],
+"program": [
+{
+"composer": "Dobrinka Tabakova",
+"title": "Orpheus’ Comet"
+},
+{
+"composer": "Ralph Vaughan Williams",
+"title": "Ouverture The Wasps"
+},
+{
+"composer": "Dmitri Chostakovitch",
+"title": "Concerto pour piano n° 2 en fa majeur"
+},
+{
+"composer": "David Buckley",
+"title": "Oracle"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.concertsfribourg.ch/fr/programme/sdc/Element/concert/c/bbc-concert-orchestra.html",
+"source": "concerts_fribourg"
+},
+{
 "id": "real-osr-beethoven-2-3-20261127",
 "title": "Cycle Beethoven 2",
 "series": "Cycle Beethoven",
@@ -6699,6 +9771,110 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-2-3",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-2-3",
 "source": "osr"
+},
+{
+"id": "real-kammerorchester_basel-harmonie-ohne-ende-202611271930",
+"title": "Harmonie ohne Ende",
+"series": null,
+"start": "2026-11-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "martinskirche-basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "René Jacobs"
+},
+{
+"role": "Soprano",
+"name": "Birgitte Christensen"
+},
+{
+"role": "Alto",
+"name": "Kristina Hammarström"
+},
+{
+"role": "Tenor",
+"name": "Jan Petryka"
+},
+{
+"role": "Bass",
+"name": "Christian Senn"
+},
+{
+"role": "Ensemble",
+"name": "Zürcher Sing-Akademie"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/111952/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/harmonie-ohne-ende.html",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-cite_bleue-maria-de-buenos-aires-2026-11-27-1930",
+"title": "María de Buenos Aires",
+"series": null,
+"start": "2026-11-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "María",
+"name": "Sol García"
+},
+{
+"role": "Gorrion",
+"name": "Diego Valentín Flores"
+},
+{
+"role": "Duende",
+"name": "Sebastián Ross"
+},
+{
+"role": "Accordion & direction",
+"name": "William Sabatier"
+},
+{
+"role": "Mise en espace",
+"name": "Amélie Parias"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Terpsycordes"
+},
+{
+"role": "Violin",
+"name": "Girolamo Bottiglieri"
+},
+{
+"role": "Violin",
+"name": "Raya Raytcheva"
+},
+{
+"role": "Viola",
+"name": "Marion Rolland"
+},
+{
+"role": "Cello",
+"name": "Florestan Darbellay"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/maria-de-buenos-aires",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/maria-de-buenos-aires",
+"source": "cite_bleue"
 },
 {
 "id": "real-opernhaus_zurich-199864",
@@ -6855,10 +10031,6 @@ export const REAL = [
 "name": "Philipp Klahm"
 },
 {
-"role": "Conductor",
-"name": "Philipp Klahm"
-},
-{
 "role": "Narrator",
 "name": "Lorenz Pauli"
 },
@@ -6879,6 +10051,50 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/163336/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/werbaer-mit-lorenz-pauli-26-11-28-9289",
 "source": "musikkollegium"
+},
+{
+"id": "real-ocf_fribourg-8490",
+"title": "La symphonie des générations",
+"series": null,
+"start": "2026-11-28T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueName": "Forum Fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Soprano",
+"name": "Mathilde Louvat"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Joseph Haydn",
+"title": "Symphonie n° 100 en sol majeur (dite « Militaire »)",
+"composerId": "haydn"
+},
+{
+"composer": "Joseph Kocian",
+"title": "Création"
+},
+{
+"composer": "Henryk Mikolaj Górecki",
+"title": "Symphonie n° 3 pour soprano et orchestre"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8490",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8490",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-ocg-concertissimo-20261128",
@@ -7057,6 +10273,23 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-reformiert_zuerich-15605",
+"title": "Ensemble Sinfonietta Bern",
+"series": null,
+"start": "2026-11-28T19:15:00+01:00",
+"durationMin": 75,
+"cityId": "zurich",
+"venueId": "fraumunster-zurich",
+"type": "orchestral",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/ensemble-sinfonietta-bern-15605/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/ensemble-sinfonietta-bern-15605/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2056715",
 "title": "Abo-Konzert #2 – Licht(t)räume",
 "series": "Abo-Konzert #2",
@@ -7103,6 +10336,83 @@ export const REAL = [
 "ticketUrl": "https://shop.e-guma.ch/camerata-zuerich/de/events/2-lichttraeume-tonhalle-zuerich-1449473",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/abo-konzert-2-licht-t-raeume-2056715/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-13790",
+"title": "Adventskonzert KOA Kammerorchster Zürich-Affoltern Konzert",
+"series": null,
+"start": "2026-11-28T19:30:00+01:00",
+"durationMin": 150,
+"cityId": "zurich",
+"venueName": "Markuskirche, Seebach",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/kammerorchester-konzert-13790/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/kammerorchester-konzert-13790/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-theater_casino_zug-695502bf-844d-483c-85ee-73a4846c880e",
+"title": "Musiques sérieuses",
+"series": "Zuger Klassik Abo",
+"start": "2026-11-28T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Piano",
+"name": "Martin James Bartlett"
+},
+{
+"role": "Conductor",
+"name": "Felix Mildenberger"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770251",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/musiques-serieuses?date=695502bf-844d-483c-85ee-73a4846c880e",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-zuger_sinfonietta-musiques-serieuses-2026-11-28",
+"title": "Musiques sérieuses",
+"series": "2. Abo-Konzert",
+"start": "2026-11-28T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Felix Mildenberger"
+},
+{
+"role": "Piano",
+"name": "Martin James Bartlett"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770251",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/musiques-serieuses/",
+"source": "zuger_sinfonietta"
 },
 {
 "id": "real-osr-grande-fantaisie-20261129",
@@ -7280,6 +10590,48 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-argovia_philharmonic-268521",
+"title": "2. Kammerkonzert",
+"series": "Kammerkonzert",
+"start": "2026-11-29T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Benjamin Engeli"
+},
+{
+"role": "Ensemble",
+"name": "Musiker:innen des argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Béla Bartók",
+"title": "«Contrasts» für Violine, Klarinette und Klavier, Sz. 111",
+"composerId": "bartok"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Trio für Klarinette, Violoncello und Klavier a-Moll op. 114",
+"composerId": "brahms"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Trio für Violine, Violoncello und Klavier B-Dur op. 11 «Gassenhauer-Trio»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165380/",
+"sourceUrl": "https://argoviaphil.ch/konzert/2-kammerkonzert-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-musikkollegium-9287",
 "title": "Bach Weihnachtsoratorium",
 "series": "Adventskonzert",
@@ -7305,10 +10657,6 @@ export const REAL = [
 },
 {
 "role": "Chorus master",
-"name": "Philipp Klahm"
-},
-{
-"role": "Conductor",
 "name": "Philipp Klahm"
 },
 {
@@ -7383,6 +10731,133 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-kammerorchester_basel-zurich-202611291700",
+"title": "Kammerorchester Basel – Konzert mit René Jacobs und Solist:innen",
+"series": null,
+"start": "2026-11-29T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Musikzentrum Brunnenhof",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/zuercher_sing_akademie/shop/event/185172/#event",
+"sourceUrl": "https://442hz.com/de/ensembles/zuercher_sing_akademie/shop/event/185172/#event",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-reformiert_zuerich-17166",
+"title": "Leimbacher Konzert \"Candlelight Carol\"",
+"series": null,
+"start": "2026-11-29T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Kirche Leimbach",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/leimbacher-konzert-candlelight-carol-17166/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/leimbacher-konzert-candlelight-carol-17166/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-cite_bleue-maria-de-buenos-aires-2026-11-29-1700",
+"title": "María de Buenos Aires",
+"series": null,
+"start": "2026-11-29T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "María",
+"name": "Sol García"
+},
+{
+"role": "Gorrion",
+"name": "Diego Valentín Flores"
+},
+{
+"role": "Duende",
+"name": "Sebastián Ross"
+},
+{
+"role": "Accordion & direction",
+"name": "William Sabatier"
+},
+{
+"role": "Mise en espace",
+"name": "Amélie Parias"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Terpsycordes"
+},
+{
+"role": "Violin",
+"name": "Girolamo Bottiglieri"
+},
+{
+"role": "Violin",
+"name": "Raya Raytcheva"
+},
+{
+"role": "Viola",
+"name": "Marion Rolland"
+},
+{
+"role": "Cello",
+"name": "Florestan Darbellay"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/maria-de-buenos-aires",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/maria-de-buenos-aires",
+"source": "cite_bleue"
+},
+{
+"id": "real-zuger_sinfonietta-musiques-serieuses-2-2026-11-29",
+"title": "Musiques sérieuses",
+"series": "2. Abo-Konzert",
+"start": "2026-11-29T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Lorzensaal Cham",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Felix Mildenberger"
+},
+{
+"role": "Piano",
+"name": "Martin James Bartlett"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.drittezug.ch/selection/event/date?productId=10229800599109",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/musiques-serieuses-2/",
+"source": "zuger_sinfonietta"
+},
+{
 "id": "real-stadtcasino_basel-29112026_nob",
 "title": "Neues Orchester Basel – Nordischer Zauber",
 "series": "Musiksaal",
@@ -7395,15 +10870,15 @@ export const REAL = [
 "status": "scheduled",
 "credits": [
 {
-"role": "Cor anglais",
-"name": "Cosimo Conti"
-},
-{
 "role": "Orchestra",
 "name": "Neues Orchester Basel"
 }
 ],
 "program": [
+{
+"composer": "Cosimo Conti",
+"title": "Englischhorn"
+},
 {
 "composer": "Edvard Grieg",
 "title": "Sinfonische Tänze",
@@ -7609,6 +11084,36 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-zuger_sinfonietta-musiques-serieuses-3-2026-11-30",
+"title": "Musiques sérieuses",
+"series": "2. Abo-Konzert",
+"start": "2026-11-30T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Aegerihalle Unterägeri",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Felix Mildenberger"
+},
+{
+"role": "Piano",
+"name": "Martin James Bartlett"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketino.com/de/OrganizerShop/810976/event/zuger-sinfonietta-musiques-serieuses/214693",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/musiques-serieuses-3/",
+"source": "zuger_sinfonietta"
+},
+{
 "id": "real-geneva_victoria_hall-58400249-20261130",
 "title": "Opéra Carmen de Bizet",
 "series": null,
@@ -7741,6 +11246,118 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-casino_bern-of-night-and-light-and-the-half-light-20261130-1930",
+"title": "«Of Night and Light and the Half Light»",
+"series": "GAIA Kammerorchester & Vokalensemble tempo d’affetto",
+"start": "2026-11-30T19:30:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "GAIA Kammerorchester & Vokalensemble tempo d’affetto"
+},
+{
+"role": "Choir",
+"name": "Musizierende Vokalensemble: tempo d’affetto"
+},
+{
+"role": "Viola",
+"name": "Martin Moriarty, Julia Wawrowska"
+},
+{
+"role": "Cello",
+"name": "Nil Kocamangil, Alfredo Ferre Martínez, Chiara Samatanga"
+},
+{
+"role": "Double bass",
+"name": "Lina Humbel"
+},
+{
+"role": "Percussion",
+"name": "Zoi Argyriou"
+}
+],
+"program": [
+{
+"composer": "Peter Sculthorpe",
+"title": "aus: Sonata for Strings Nr. 3, «Jabiru Dreaming»"
+},
+{
+"composer": "Pau Casals",
+"title": "El cant dels Ocells (Song of the Birds)"
+},
+{
+"composer": "Pau Casals",
+"title": "für Solocello und Streichorchester"
+},
+{
+"composer": "Amy Beach",
+"title": "Nunc dimittis, op. 8, Nr. 1"
+},
+{
+"composer": "Amy Beach",
+"title": "für Vokalensemble"
+},
+{
+"composer": "Nunc dimittis",
+"title": "für Vokalensemble"
+},
+{
+"composer": "Tenebrae",
+"title": "für Streichorchester"
+},
+{
+"composer": "Xavier Dayer",
+"title": "Auftragswerk"
+},
+{
+"composer": "Xavier Dayer",
+"title": "Uraufführung"
+},
+{
+"composer": "Arvo Pärt",
+"title": "Cantus in Memoriam Benjamin Britten (1977",
+"composerId": "part"
+},
+{
+"composer": "Edmund Finnis",
+"title": "aus: Streichquartett Nr. 1 «Aloysius»"
+},
+{
+"composer": "To the Hands",
+"title": "für Stimmen und Streicher"
+},
+{
+"composer": "Orawa",
+"title": "für Streichorchester"
+},
+{
+"composer": "Orawa",
+"title": "Programmänderungen vorbehalten"
+},
+{
+"composer": "Orawa",
+"title": "Konzert mit Pause"
+},
+{
+"composer": "Orawa",
+"title": "Ca. 2 Stunden 15 Minuten"
+},
+{
+"composer": "Orawa",
+"title": "Apéro im Anschluss"
+}
+],
+"ticketUrl": "https://www.kulturticket.ch/20775/gaia-musikfestival/event/2100",
+"sourceUrl": "https://www.casinobern.ch/programm/of-night-and-light-and-the-half-light/#30-11-2026",
+"source": "casino_bern"
+},
+{
 "id": "real-zko-19505",
 "title": "Daniel Hope – Barocker Advent",
 "series": "Abo-Konzerte",
@@ -7809,6 +11426,55 @@ export const REAL = [
 "ticketUrl": "https://tickets.zko.ch/webshop/webticket/shop?event=1950",
 "sourceUrl": "https://zko.ch/events/daniel-hope-barocker-advent/",
 "source": "zko"
+},
+{
+"id": "real-casino_bern-scheherazade-20261202-1100",
+"title": "Scheherazade",
+"series": "Grosser Saal",
+"start": "2026-12-02T11:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Krzysztof Urbański"
+},
+{
+"role": "Violin",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Cello",
+"name": "Edgar Moreau"
+},
+{
+"role": "Piano",
+"name": "Hélène Mercier"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Konzert für Klavier, Violine, Violoncello und Orchester",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "C-Dur op. 56 «Tripelkonzert»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.casinobern.ch/programm/scheherazade/#02-12-2026",
+"sourceUrl": "https://www.casinobern.ch/programm/scheherazade/#02-12-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-opernhaus_zurich-199950",
@@ -8224,6 +11890,32 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-ocl-socits-chorales-vaudoises-20261202",
+"title": "Sociétés chorales vaudoises",
+"series": null,
+"start": "2026-12-02T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueId": "cathedrale-lausanne",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Ensemble vocal Arpège et Choeur HEP"
+},
+{
+"role": "Conductor",
+"name": "Julien Laloux"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ocl.ch/concert/socits-chorales-vaudoises/",
+"sourceUrl": "https://www.ocl.ch/concert/socits-chorales-vaudoises/",
+"source": "ocl"
+},
+{
 "id": "real-tonhalle-2055602",
 "title": "Kammermusik-Lunchkonzert",
 "series": null,
@@ -8278,6 +11970,75 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5601&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/kammermusik-lunchkonzert-2055602/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-3688",
+"title": "«Wachet auf!» Adventsmusik zur Mittageszeit",
+"series": null,
+"start": "2026-12-03T12:15:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/adventsmusik-zur-mittageszeit-3688/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/adventsmusik-zur-mittageszeit-3688/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-ocl-beef91ac-e628-4292-9444-205ae5d44e97-ocl-ch",
+"title": "Les Entractes n°1 | Beethoven Septuor op. 20",
+"series": "Les Entractes n°1",
+"start": "2026-12-03T12:30:00+01:00",
+"durationMin": 60,
+"cityId": "lausanne",
+"venueId": "salle-paderewski",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Anna Molinari"
+},
+{
+"role": "Viola",
+"name": "Eli Karanfilova"
+},
+{
+"role": "Cello",
+"name": "Indira Rahmatulla"
+},
+{
+"role": "Double bass",
+"name": "Marc-Antoine Bonanomi"
+},
+{
+"role": "Clarinet",
+"name": "Davide Bandieri"
+},
+{
+"role": "Bassoon",
+"name": "Simon Demangeat"
+},
+{
+"role": "Horn",
+"name": "Andrea Zardini"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Septuor pour cordes et vents en mi bémol majeur, op. 20",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/entracte-n1-26-27/",
+"sourceUrl": "https://www.ocl.ch/concert/entracte-n1-26-27/",
+"source": "ocl"
 },
 {
 "id": "real-tonhalle-2056733",
@@ -8426,6 +12187,40 @@ export const REAL = [
 "ticketUrl": "https://tickets.buehnenbern.ch/webshop/webticket/seatmap?eventId=2024&el=true&language=de",
 "sourceUrl": "https://buehnenbern.ch/spielplan/programm/scheherazade/",
 "source": "buehnen_bern"
+},
+{
+"id": "real-reformiert_zuerich-698",
+"title": "Konzertreihe Predigern",
+"series": null,
+"start": "2026-12-03T20:00:00+01:00",
+"durationMin": 45,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-zum-labyrinth-698/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-zum-labyrinth-698/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-14371",
+"title": "Sax am Mittag – Alejandro Latorre Cañadas",
+"series": null,
+"start": "2026-12-04T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/sax-am-mittag-alejandro-latorre-canadas-14371/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/sax-am-mittag-alejandro-latorre-canadas-14371/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200201",
@@ -8587,6 +12382,119 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161665/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/hommage-an-klaus-huber-26-12-04-9219",
 "source": "musikkollegium"
+},
+{
+"id": "real-cite_bleue-arcadelt-2026-12-04-1930",
+"title": "Arcadelt",
+"series": null,
+"start": "2026-12-04T19:30:00+01:00",
+"durationMin": 75,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Benedetta Zanotto"
+},
+{
+"role": "Soprano",
+"name": "Sofie Garcia"
+},
+{
+"role": "Countertenor",
+"name": "William Shelton"
+},
+{
+"role": "Tenor",
+"name": "Valerio Contaldo"
+},
+{
+"role": "Bass",
+"name": "Matteo Bellotto"
+},
+{
+"role": "Conductor",
+"name": "Leonardo García-Alarcón"
+},
+{
+"role": "Orchestra",
+"name": "Cappella Mediterranea"
+},
+{
+"role": "Choir",
+"name": "Chœur de Chambre de Namur"
+},
+{
+"role": "Choir",
+"name": "Thibaut Lenaerts"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/arcadelt",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/arcadelt",
+"source": "cite_bleue"
+},
+{
+"id": "real-luzerner_theater-8740",
+"title": "L'elisir d'amore [Der Liebestrank]",
+"series": null,
+"start": "2026-12-04T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Lucía Astigarraga"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Gaetano Donizetti",
+"title": "L'elisir d'amore"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8740",
+"sourceUrl": "https://www.luzernertheater.ch/lelisirdamore",
+"source": "luzerner_theater"
 },
 {
 "id": "real-buehnen_bern-scheherazade-2026-12-04-1930",
@@ -8833,6 +12741,95 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3777",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2026-12-05T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=499&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/cenerentola/3777/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-reformiert_zuerich-329",
+"title": "La Lupa | Konzert in Krypta",
+"series": "Krypta",
+"start": "2026-12-05T19:00:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/la-lupa-konzert-in-krypta-1900-h-329/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/la-lupa-konzert-in-krypta-1900-h-329/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-lso_luzern-19886",
 "title": "ODE AN DIE FREUDE – BEETHOVEN 9",
 "series": "Sinfoniekonzerte",
@@ -8887,6 +12884,52 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/ode-an-die-freude-beethoven-9-99r06c",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/ode-an-die-freude-beethoven-9/",
 "source": "lso_luzern"
+},
+{
+"id": "real-cite_bleue-prix-radu-lupu-2026-12-05-1930",
+"title": "Prix Radu Lupu",
+"series": null,
+"start": "2026-12-05T19:30:00+01:00",
+"durationMin": 60,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Edna Unseld"
+},
+{
+"role": "Piano",
+"name": "Rusudan Alavidze-Goerner"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "",
+"composerId": "mozart"
+},
+{
+"composer": "Johannes Brahms",
+"title": "",
+"composerId": "brahms"
+},
+{
+"composer": "Clara Schumann",
+"title": "",
+"composerId": "schumann"
+},
+{
+"composer": "Franz Waxmann",
+"title": ""
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/prix-radu-lupu",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/prix-radu-lupu",
+"source": "cite_bleue"
 },
 {
 "id": "real-osi-205102159182513",
@@ -9260,6 +13303,95 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-kammerorchester_basel-villars-sur-glane-202612061700",
+"title": "Kammerorchester Basel – Konzert mit René Jacobs und Solist:innen",
+"series": null,
+"start": "2026-12-06T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Paroisse Saints-Pierre-et-Paul",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://fribourg.ch/de/freiburg/veranstaltungen/2eme-concert-de-lavent/",
+"sourceUrl": "https://fribourg.ch/de/freiburg/veranstaltungen/2eme-concert-de-lavent/",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-reformiert_zuerich-17110",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2026-12-06T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-17110/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-17110/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-musique_cdf-3220",
+"title": "Sarah Strohm alto · Angus Webster piano",
+"series": "Nouveaux Talents",
+"start": "2026-12-06T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Viola",
+"name": "Sarah Strohm"
+},
+{
+"role": "Piano",
+"name": "Angus Webster"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Sonate « Arpeggione »",
+"composerId": "schubert"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Suite pour violoncelle n° 1",
+"composerId": "bach"
+},
+{
+"composer": "Max Reger",
+"title": "Suite n° 1, op. 131d"
+},
+{
+"composer": "Paul Hindemith",
+"title": "Sonate pour alto, op. 11 n° 4"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-06-12-2026/",
+"source": "musique_cdf"
+},
+{
 "id": "real-cnz-144",
 "title": "Voltaire-Konzert N° 7: Farzia Fallah im Gespräch",
 "series": null,
@@ -9355,6 +13487,52 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15445&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/kammerkonzert-4/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-musique_cdf-3202",
+"title": "Christina Landshamer soprano · Orchestre Philharmonique de Iéna · Simon Gaudenz direction",
+"series": "Grande Série",
+"start": "2026-12-08T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Christina Landshamer"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre Philharmonique de Iéna"
+},
+{
+"role": "Conductor",
+"name": "Simon Gaudenz"
+}
+],
+"program": [
+{
+"composer": "Antonín Dvořák",
+"title": "Ouverture « Othello », op. 93",
+"composerId": "dvorak"
+},
+{
+"composer": "Richard Strauss",
+"title": "Quatre derniers Lieder",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Symphonie n° 4 en mi mineur, op. 98",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/christina-landshamer-sopranoorchestre-philharmonique-de-ienasimon-gaudenz-direction/",
+"source": "musique_cdf"
 },
 {
 "id": "real-stadtcasino_basel-08122026",
@@ -9492,6 +13670,65 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-luzerner_theater-8526",
+"title": "I Capuleti e i Montecchi [Romeo und Julia]",
+"series": null,
+"start": "2026-12-09T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Choreographer",
+"name": "Christine Cyris"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Solenn' Lavanant Linke"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Vincenzo Bellini",
+"title": "I Capuleti e i Montecchi"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8526",
+"sourceUrl": "https://www.luzernertheater.ch/icapuletieimontecchi",
+"source": "luzerner_theater"
+},
+{
 "id": "real-stadtcasino_basel-09122026_kg",
 "title": "Jenaer Philhamonie",
 "series": "KG-Sinfoniekonzerte",
@@ -9531,6 +13768,174 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfoniekonzerte.ch/webshop/webticket/seatmap?eventId=204",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/09122026_kg/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-casino_bern-kopatchinskaja-say-20261209-1930",
+"title": "Kopatchinskaja & Say",
+"series": "Abonnementskonzert",
+"start": "2026-12-09T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Patricia Kopatchinskaja"
+},
+{
+"role": "Piano",
+"name": "Fazil Say"
+}
+],
+"program": [
+{
+"composer": "Karol Szymanowski",
+"title": "Mythen für Violine und Klavier op. 30"
+},
+{
+"composer": "PatKop",
+"title": "UniSolo für Violine und Klavier"
+},
+{
+"composer": "Fazıl Say",
+"title": "Sonate für Violine und Klavier Nr. 3 op. 119 «Lost Screams Sonata»"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Violinsonate Nr. 9 A-Dur op. 47 «Kreutzersonate»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/kopatchinskaja-say/#09-12-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-kts_st_gallen-3778",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2026-12-09T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=500&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/cenerentola/3778/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-ocl-ecf4ac6f-c2e0-4a8b-a197-a5149340a4b8-ocl-ch",
+"title": "Les Grands Concerts n°4 | Hannigan · Barber · Prokofiev · Ives…",
+"series": "Les Grands Concerts n°4",
+"start": "2026-12-09T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Barbara Hannigan"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Charles Ives",
+"title": "The Unanswered Question, S.50"
+},
+{
+"composer": "Ruth Crawford Seeger",
+"title": "Andante for strings, from string quartet 1931"
+},
+{
+"composer": "Samuel Barber",
+"title": "Knoxville, Summer of 1915, op. 24"
+},
+{
+"composer": "Felix Mendelssohn",
+"title": "Le Songe d'une nuit d'été, ouverture, op. 21",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Golfam Khayam",
+"title": "Seven Valleys of Love (I, II Lullaby)"
+},
+{
+"composer": "Sergueï Prokofiev",
+"title": "Symphonie n°1 en ré majeur, op. 25, « Classique »"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n4/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n4/",
+"source": "ocl"
 },
 {
 "id": "real-musikkollegium-9231",
@@ -9576,6 +13981,104 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161605/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/antje-weithaas-leo-mcfall-26-12-10-9231",
 "source": "musikkollegium"
+},
+{
+"id": "real-kts_st_gallen-3714",
+"title": "Echos",
+"series": "Grosses Haus",
+"start": "2026-12-10T19:30:00+01:00",
+"durationMin": 150,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choreographer",
+"name": "Frank Fannar Pedersen"
+},
+{
+"role": "Choreographer",
+"name": "Javier Rodríguez Cobos"
+},
+{
+"role": "Conductor",
+"name": "Thomas Herzog"
+},
+{
+"role": "Choreographer",
+"name": "Toon Theunissen"
+},
+{
+"role": "Choreographer",
+"name": "Venetia Lim Jia Yee"
+},
+{
+"role": "Choreographer",
+"name": "Andrea Lippolis"
+},
+{
+"role": "Choreographer",
+"name": "Luis Martinez Gea"
+},
+{
+"role": "Choreographer",
+"name": "Charmene Pang"
+},
+{
+"role": "Choreographer",
+"name": "Adamantia Papakyriaki"
+},
+{
+"role": "Choreographer",
+"name": "Tommaso Terribile"
+},
+{
+"role": "Choreographer",
+"name": "Emma Thesing"
+},
+{
+"role": "Choreographer",
+"name": "Ariadni Toumpeki"
+},
+{
+"role": "Choreographer",
+"name": "Ifigenia Toumpeki"
+},
+{
+"role": "Choreographer",
+"name": "Minghao Zhao"
+},
+{
+"role": "Violin",
+"name": "Linus Roth"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+},
+{
+"role": "Conductor",
+"name": "Till Zehnder"
+},
+{
+"role": "Choreographer",
+"name": "Sandra Klimek"
+},
+{
+"role": "Choreographer",
+"name": "Emily Pak"
+},
+{
+"role": "Choreographer",
+"name": "Mitch Harvey"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=669&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/echos/3714/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-stadtcasino_basel-10122026_vosiko",
@@ -9772,6 +14275,73 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-reformiert_zuerich-11295",
+"title": "Weihnachtskonzert bei Kerzenlicht",
+"series": null,
+"start": "2026-12-10T20:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": null,
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-bei-kerzenlicht-11295/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-bei-kerzenlicht-11295/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-luzerner_theater-8854",
+"title": "«Cose piccoline»",
+"series": "UG",
+"start": "2026-12-10T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Director",
+"name": "Rebecca Ockenden"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Performer",
+"name": "William Green"
+},
+{
+"role": "Performer",
+"name": "Alina Tlushch"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8854",
+"sourceUrl": "https://www.luzernertheater.ch/cosepiccoline",
+"source": "luzerner_theater"
+},
+{
 "id": "real-ocg-concert-sur-le-pouce-4-20261211",
 "title": "Concert sur le pouce #4",
 "series": "Concert sur le pouce",
@@ -9787,6 +14357,23 @@ export const REAL = [
 "ticketUrl": "https://www.bm-geneve.ch/notice?id=h%3A%3A20f23641-2981-46c5-91d7-627f38262db7&queryId=f3c18f67-8cfb-4957-bd00-33856f71e6f0&posInSet=9",
 "sourceUrl": "https://locg.ch/fr/calendrier/concert-sur-le-pouce-4",
 "source": "ocg"
+},
+{
+"id": "real-reformiert_zuerich-14372",
+"title": "Surprise am Mittag – Athanaisa Kontou",
+"series": null,
+"start": "2026-12-11T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/surprise-am-mittag-athanaisa-kontou-14372/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/surprise-am-mittag-athanaisa-kontou-14372/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200081",
@@ -9923,6 +14510,112 @@ export const REAL = [
 "ticketUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/galakonzert-freundeskreis-2055616/",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/galakonzert-freundeskreis-2055616/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3779",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2026-12-11T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=501&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/cenerentola/3779/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-reformiert_zuerich-11296",
+"title": "Weihnachtskonzert bei Kerzenlicht",
+"series": null,
+"start": "2026-12-11T20:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": null,
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-bei-kerzenlicht-11296/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-bei-kerzenlicht-11296/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-14381",
+"title": "«Jauchzet, frohlocket» Barocke Adventsmusik",
+"series": null,
+"start": "2026-12-12T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/jauchzet-frohlocket-barocke-adventsmusik-14381/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/jauchzet-frohlocket-barocke-adventsmusik-14381/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-musikkollegium-9426",
@@ -10118,6 +14811,90 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-adventskonzert-20261212-1930",
+"title": "Adventskonzert",
+"series": "Grosser Saal",
+"start": "2026-12-12T19:30:00+01:00",
+"durationMin": 105,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Concentus Chor Zürich"
+},
+{
+"role": "Orchestra",
+"name": "Orchester Conductus"
+},
+{
+"role": "Conductor",
+"name": "Donat Maron"
+},
+{
+"role": "Tenor",
+"name": "Tamás Bertalan Henter"
+},
+{
+"role": "Baritone",
+"name": "Piotr Prochera"
+}
+],
+"program": [],
+"ticketUrl": "https://www.concentus-chor-zuerich.ch/konzerte2026/",
+"sourceUrl": "https://www.casinobern.ch/programm/adventskonzert/#12-12-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-zuger_sinfonietta-weihnachtsoratorium-2-2026-12-12",
+"title": "«Jauchzet, frohlocket!»",
+"series": "Klassik Plus",
+"start": "2026-12-12T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kirche St. Jakob Cham",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Choir",
+"name": "Chor Audite Nova"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+},
+{
+"role": "Soprano",
+"name": "Cornelia Horak"
+},
+{
+"role": "Alto",
+"name": "Cornelia Sonnleithner"
+},
+{
+"role": "Tenor",
+"name": "Daniel Johannsen"
+},
+{
+"role": "Bass",
+"name": "Matthias Helm"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketino.com/de/event/-jauchzet-frohlocket-/217489",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/weihnachtsoratorium-2/",
+"source": "zuger_sinfonietta"
+},
+{
 "id": "real-lso_luzern-19891",
 "title": "ADVENTSMATINÉE MIT KIAN SOLTANI & TSCHAIKOWSKYS NUSSKNACKER",
 "series": "Sinfoniekonzerte",
@@ -10158,6 +14935,55 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-casino_bern-wiener-klassik-in-es-dur-20261213-1100",
+"title": "Wiener Klassik in Es-Dur",
+"series": "4. Matineekonzert",
+"start": "2026-12-13T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Oboe",
+"name": "Doris Mende"
+},
+{
+"role": "Clarinet",
+"name": "Calogero Presti"
+},
+{
+"role": "Bassoon",
+"name": "Monika Schindler"
+},
+{
+"role": "Horn",
+"name": "Christian Holenstein"
+},
+{
+"role": "Piano",
+"name": "Leonardo Miucci"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Klavierquintett Es-Dur KV 452",
+"composerId": "mozart"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Klavierquintett Es-Dur op. 16",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/wiener-klassik/",
+"sourceUrl": "https://www.casinobern.ch/programm/wiener-klassik-in-es-dur/#13-12-2026",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-199867",
 "title": "Romeo und Julia",
 "series": "Hauptbühne",
@@ -10191,6 +15017,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15237&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/romeo-und-julia-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-17253",
+"title": "Adventskonzert Aargauer Kantorei",
+"series": null,
+"start": "2026-12-13T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/adventskonzert-aargauer-kantorei-17253/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/adventskonzert-aargauer-kantorei-17253/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-geneva_victoria_hall-50654815-20261213",
@@ -10272,9 +15115,9 @@ export const REAL = [
 "title": "Beethoven & Goetz",
 "series": "Kammermusik Liebestrasse",
 "start": "2026-12-13T17:00:00+01:00",
-"durationMin": 75,
+"durationMin": 60,
 "cityId": "winterthur",
-"venueName": "Liebestrasse",
+"venueId": "theater-winterthur",
 "type": "chamber",
 "featured": true,
 "status": "scheduled",
@@ -10372,6 +15215,23 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-reformiert_zuerich-15755",
+"title": "Konzert Kantorei St. Peter",
+"series": null,
+"start": "2026-12-13T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-kantorei-st-peter-15755/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-kantorei-st-peter-15755/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-osr-les-noces-de-figaro-20261213",
 "title": "Les Noces de Figaro",
 "series": null,
@@ -10450,6 +15310,52 @@ export const REAL = [
 "ticketUrl": "https://www.gtg.ch/",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/les-noces-de-figaro",
 "source": "osr"
+},
+{
+"id": "real-zuger_sinfonietta-weihnachtsoratorium-2026-12-13",
+"title": "«Jauchzet, frohlocket!»",
+"series": "Klassik Plus",
+"start": "2026-12-13T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kirche St. Jakob, Cham",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+},
+{
+"role": "Soprano",
+"name": "Cornelia Horak"
+},
+{
+"role": "Alto",
+"name": "Cornelia Sonnleithner"
+},
+{
+"role": "Tenor",
+"name": "Daniel Johannsen"
+},
+{
+"role": "Bass",
+"name": "Matthias Helm"
+},
+{
+"role": "Choir",
+"name": "Chor Audite Nova"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketino.com/de/event/-jauchzet-frohlocket-/217511",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/weihnachtsoratorium/",
+"source": "zuger_sinfonietta"
 },
 {
 "id": "real-opernhaus_zurich-199953",
@@ -10573,66 +15479,6 @@ export const REAL = [
 "source": "ocg"
 },
 {
-"id": "real-stadtcasino_basel-14122026_kob",
-"title": "Kammerorchester Basel mit Isabelle Faust und Kristian Bezuidenhout – Mozartkugeln",
-"series": "Musiksaal",
-"start": "2026-12-14T19:30:00+01:00",
-"durationMin": 120,
-"cityId": "basel",
-"venueId": "stadtcasino-basel",
-"type": "orchestral",
-"featured": true,
-"status": "scheduled",
-"credits": [
-{
-"role": "Violin",
-"name": "Isabelle Faust"
-},
-{
-"role": "Fortepiano",
-"name": "Kristian Bezuidenhout"
-},
-{
-"role": "Conductor",
-"name": "Kristian Bezuidenhout"
-},
-{
-"role": "Orchestra",
-"name": "Kammerorchester Basel"
-}
-],
-"program": [
-{
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Sonate für Hammerklavier und Violine in G-Dur KV, 379",
-"composerId": "mozart"
-},
-{
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Konzert für Violine und Orchester Nr. 2 in D-Dur, KV 211",
-"composerId": "mozart"
-},
-{
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Rondo für Violine und Orchester in C-Dur, KV 373",
-"composerId": "mozart"
-},
-{
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Sinfonie Nr. 40 in g-Moll, KV 550",
-"composerId": "mozart"
-},
-{
-"composer": "Joseph Martin Kraus",
-"title": "Ouvertüre zur Schauspielmusik «Olympie» (Trauerspiel von Johan Henrik Kellgren nach Voltaire) VB 133",
-"composerId": "martin"
-}
-],
-"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/162215/#event",
-"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/14122026_kob/",
-"source": "stadtcasino_basel"
-},
-{
 "id": "real-opernhaus_zurich-200079",
 "title": "Liederabend Bryn Terfel",
 "series": "Liederabende",
@@ -10662,6 +15508,66 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15434&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/liederabend-bryn-terfel-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kammerorchester_basel-mozartkugeln-202612141930",
+"title": "Mozartkugeln",
+"series": null,
+"start": "2026-12-14T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "stadtcasino-basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Isabelle Faust"
+},
+{
+"role": "Fortepiano & direction",
+"name": "Kristian Bezuidenhout"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Kristian Bezuidenhout",
+"title": "Hammerklavier und Leitung"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sonate für Hammerklavier und Violine in G-Dur KV, 379",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Konzert für Violine und Orchester Nr. 2 in D-Dur, KV 211",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Rondo für Violine und Orchester in C-Dur, KV 373",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sinfonie Nr. 40 in g-Moll, KV 550",
+"composerId": "mozart"
+},
+{
+"composer": "Joseph Martin Kraus",
+"title": "Ouvertüre zur Schauspielmusik «Olympie» (Trauerspiel von Johan Henrik Kellgren nach Voltaire) VB 133",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/162215/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/mozartkugeln.html",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-tonhalle-2055625",
@@ -10927,6 +15833,82 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/173498/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/purcell-haydn-britten-26-12-15-9400",
 "source": "musikkollegium"
+},
+{
+"id": "real-kammerorchester_basel-mozartkugeln-extrakonzert-202612151930",
+"title": "Mozartkugeln – Extrakonzert",
+"series": null,
+"start": "2026-12-15T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "martinskirche-basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Isabelle Faust"
+},
+{
+"role": "Fortepiano & direction",
+"name": "Kristian Bezuidenhout"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/176907/",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/mozartkugeln-extrakonzert.html",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-kts_st_gallen-4133",
+"title": "Maria!",
+"series": null,
+"start": "2026-12-15T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Lokremise St.Gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Edward Mauritius Münch"
+},
+{
+"role": "Performer",
+"name": "Iryna Gintova"
+},
+{
+"role": "Performer",
+"name": "Oriana Kriszten"
+},
+{
+"role": "Performer",
+"name": "Ricardo Gaspar"
+},
+{
+"role": "Performer",
+"name": "Fernando Gomes"
+},
+{
+"role": "Performer",
+"name": "Simon Hartmann"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=732&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/maria/4133/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-lso_luzern-19897",
@@ -11366,6 +16348,56 @@ export const REAL = [
 "source": "geneva_grand_theatre"
 },
 {
+"id": "real-luzerner_theater-8855",
+"title": "«Cose piccoline»",
+"series": "UG",
+"start": "2026-12-16T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Director",
+"name": "Rebecca Ockenden"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Performer",
+"name": "William Green"
+},
+{
+"role": "Performer",
+"name": "Alina Tlushch"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8855",
+"sourceUrl": "https://www.luzernertheater.ch/cosepiccoline",
+"source": "luzerner_theater"
+},
+{
 "id": "real-tonhalle-2055632",
 "title": "Orchester-Lunchkonzert mit Jan Willem de Vriend",
 "series": "Orchester-Lunchkonzert",
@@ -11401,6 +16433,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5606&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/orchester-lunchkonzert-mit-jan-willem-de-vriend-2055632/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-3703",
+"title": "«Komm!» Adventsmusik zur Mittageszeit",
+"series": null,
+"start": "2026-12-17T12:15:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/adventsmusik-zur-mittageszeit-3703/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/adventsmusik-zur-mittageszeit-3703/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200203",
@@ -11685,6 +16734,167 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-cite_bleue-kosmos-2026-12-17-1930",
+"title": "Kósmos !",
+"series": null,
+"start": "2026-12-17T19:30:00+01:00",
+"durationMin": 75,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Dancer",
+"name": "Yume Takojima"
+},
+{
+"role": "Dancer",
+"name": "Mermoz Melchior"
+},
+{
+"role": "Voice",
+"name": "Gülay Hacer Toruk"
+},
+{
+"role": "Voice & direction",
+"name": "Emmanuel Bardon"
+},
+{
+"role": "Harp",
+"name": "Landy Andriamboavonjy"
+},
+{
+"role": "Cello",
+"name": "Valérie Dulac"
+},
+{
+"role": "Harp",
+"name": "Aliocha Regnard"
+},
+{
+"role": "Oud",
+"name": "Bayan Rida"
+},
+{
+"role": "Voice",
+"name": "Spyros Halaris"
+},
+{
+"role": "Flute",
+"name": "Léa Maquart"
+},
+{
+"role": "Voice",
+"name": "Khaled Aljaramani"
+},
+{
+"role": "Duduk, pakou & zurna",
+"name": "Artyom Minasyan"
+},
+{
+"role": "Percussion",
+"name": "Henri-Charles Caget"
+},
+{
+"role": "Percussion",
+"name": "Ismaïl Mesbahi"
+},
+{
+"role": "Emmanuel Bardon",
+"name": "Direction artistique"
+},
+{
+"role": "Henri-Charles Caget",
+"name": "Codirection et coordination musicale"
+},
+{
+"role": "Khaled Aljaramani",
+"name": "Idée originale"
+},
+{
+"role": "Mermoz Melchior",
+"name": "Chorégraphie"
+},
+{
+"role": "Emmanuel Faivre & Aurélia Frey",
+"name": "Scénographie & paysages sonores"
+},
+{
+"role": "Natalie Royer",
+"name": "Dramaturgie & regard extérieur"
+},
+{
+"role": "Stéphane Rimasauskas",
+"name": "Régisseur général"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/kosmos",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/kosmos",
+"source": "cite_bleue"
+},
+{
+"id": "real-luzerner_theater-8741",
+"title": "L'elisir d'amore [Der Liebestrank]",
+"series": null,
+"start": "2026-12-17T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Lucía Astigarraga"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Gaetano Donizetti",
+"title": "L'elisir d'amore"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8741",
+"sourceUrl": "https://www.luzernertheater.ch/lelisirdamore",
+"source": "luzerner_theater"
+},
+{
 "id": "real-osr-majestueux-brahms-20261217",
 "title": "Majestueux Brahms",
 "series": "Série S",
@@ -11803,6 +17013,75 @@ export const REAL = [
 "ticketUrl": "https://tickets.zko.ch/webshop/webticket/shop?event=1966",
 "sourceUrl": "https://zko.ch/events/zko-weihnachtskonzerte-2026-27/",
 "source": "zko"
+},
+{
+"id": "real-reformiert_zuerich-16221",
+"title": "Strom am Mittag-Konzert - Sebastian Eduardo",
+"series": null,
+"start": "2026-12-18T12:30:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Wasserkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/strom-am-mittag-konzert-16221/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/strom-am-mittag-konzert-16221/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-bach_stiftung-bwv-133-ich-freue-mich-in-dir",
+"title": "BWV 133 «Ich freue mich in dir»",
+"series": null,
+"start": "2026-12-18T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Kirche St. Mangen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Dorothee Mields"
+},
+{
+"role": "Countertenor",
+"name": "Terry Wey"
+},
+{
+"role": "Tenor",
+"name": "Joël Morand"
+},
+{
+"role": "Bass",
+"name": "Israel Martins"
+},
+{
+"role": "Choir",
+"name": "Chor der J. S. Bach-Stiftung"
+},
+{
+"role": "Orchestra",
+"name": "Orchester der J. S. Bach-Stiftung"
+},
+{
+"role": "Conductor",
+"name": "Rudolf Lutz"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 133 «Ich freue mich in dir»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/144569/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-133-ich-freue-mich-in-dir/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-osr-les-noces-de-figaro-20261218",
@@ -11987,6 +17266,58 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-kts_st_gallen-3917",
+"title": "Bachs Weihnachtsoratorium",
+"series": "Tonhallekonzert",
+"start": "2026-12-18T19:30:00+01:00",
+"durationMin": 110,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Soprano",
+"name": "Marie-Sophie Pollak"
+},
+{
+"role": "Alto",
+"name": "Ulrike Malotta"
+},
+{
+"role": "Tenor",
+"name": "Eric Finbarr Carey"
+},
+{
+"role": "Bass",
+"name": "Yannick Debus"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Weihnachtsoratorium BWV 248 (Kantaten 1, 3 und 6)",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=567&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/4-thk-weihnachtsoratorium/3917/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-tonhalle-2055630",
 "title": "Jan Willem de Vriend & Kebyart Saxophone Quartet",
 "series": null,
@@ -12047,6 +17378,111 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5561&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/jan-willem-de-vriend-kebyart-saxophone-quartet-2055630/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-16287",
+"title": "Konzert ImPuls Chor",
+"series": null,
+"start": "2026-12-18T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Markuskirche, Seebach",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-impuls-chor-16287/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-impuls-chor-16287/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-kultur_im_podium-2026-12-18-weihnachten-mit-anne-sofie-von-otter",
+"title": "Weihnachten mit Anne Sofie von Otter",
+"series": "Kultur im Podium",
+"start": "2026-12-18T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Mezzo-soprano",
+"name": "Anne Sofie von Otter"
+},
+{
+"role": "Piano",
+"name": "Bengt Forsberg"
+},
+{
+"role": "Guitar",
+"name": "Fabian Fredriksson"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/weihnachten-mit-anne-sofie-von-otter/",
+"source": "kultur_im_podium"
+},
+{
+"id": "real-argovia_philharmonic-268590",
+"title": "Weihnachtskonzert",
+"series": "Sonderkonzert",
+"start": "2026-12-18T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Gemeindesaal Möriken",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Chiara Skerath"
+},
+{
+"role": "Conductor",
+"name": "Tomas Djupsjöbacka"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "«Lascia ch’io pianga» aus der Oper «Rinaldo» HWV 7a/b",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Arie «Rejoice Greatly, O Daughter of Zion» aus dem Oratorium «Der Messias» HWV 56",
+"composerId": "handel"
+},
+{
+"composer": "Erich Wolfgang Korngold",
+"title": "Auszüge aus der Pantomime in 2 Bildern «Der Schneemann», arr. von Alexander von Zemlinsky für Orchester"
+},
+{
+"composer": "Adolphe Charles Adam",
+"title": "«O Holy Night» arr. von Douglas Gamley"
+},
+{
+"composer": "Franz Schubert",
+"title": "«Ave Maria» Hymne an die Jungfrau, orch. von Felix Weingartner",
+"composerId": "schubert"
+},
+{
+"composer": "Sing-along",
+"title": "«O du fröhliche» arr. von Wolfgang Drechsler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165404/",
+"sourceUrl": "https://argoviaphil.ch/konzert/weihnachtskonzert-15/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-zko-19676",
@@ -12123,6 +17559,105 @@ export const REAL = [
 "ticketUrl": "https://tickets.zko.ch/webshop/webticket/shop?event=1967",
 "sourceUrl": "https://zko.ch/events/zko-weihnachtskonzerte-2026/",
 "source": "zko"
+},
+{
+"id": "real-camerata_bern-30785",
+"title": "Das alte Jahr vergangen ist",
+"series": "Abokonzert",
+"start": "2026-12-19T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Erich Höbarth"
+},
+{
+"role": "Oboe",
+"name": "Simon Sommerhalder"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Das alte Jahr vergangen ist Choral in a-Moll BWV 614",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Violinkonzert in a-Moll BWV 1041",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Sinfonia für Oboe, Violine und Streicher aus der Kantate BWV 21 Ich hatte viel Bekümmernis",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Konzert für Oboe, Violine, Streicher und Basso continuo in d-Moll BWV 1060",
+"composerId": "bach"
+},
+{
+"composer": "Johann Christoph Friedrich Bach",
+"title": "Sinfonia in d-Moll für Streicher und Basso continuo WFV I/3",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Konzert für Oboe d’Amore, Streicher und Basso continuo in A-Dur BWV 1055",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/156747/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/das-alte-jahr-1",
+"source": "camerata_bern"
+},
+{
+"id": "real-casino_bern-sir-andras-schiff-3-20261219-1800",
+"title": "Sir András Schiff",
+"series": "Abonnementskonzert",
+"start": "2026-12-19T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Sir András Schiff"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Italienisches Konzert BWV 971",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Französische Ouvertüre h-Moll BWV 831",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Goldberg-Variationen BWV 988",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/sir-andras-schiff-3/#19-12-2026",
+"source": "casino_bern"
 },
 {
 "id": "real-ocg-eternel-beethoven-20261219",
@@ -12209,6 +17744,41 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kammerphilharmonie_gr-der-nussknacker-chur-19",
+"title": "Der Nussknacker",
+"series": "Weihnachtsgala",
+"start": "2026-12-19T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueId": "theater-chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Narrator",
+"name": "Tonia Maria Zindel"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Peter Tschaikowski",
+"title": "Der Nussknacker, op. 71 (1892)"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/166390/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/der-nussknacker-chur-19.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-opernhaus_zurich-199868",
 "title": "Romeo und Julia",
 "series": "Hauptbühne",
@@ -12284,16 +17854,70 @@ export const REAL = [
 {
 "role": "Conductor",
 "name": "Vlad Weverbergh"
-},
-{
-"role": "Clarinet",
-"name": "Vlad Weverbergh"
 }
 ],
 "program": [],
 "ticketUrl": "https://www.ticketcorner.ch/noapp/event/kammerorchester-basel-terra-nova-collective-stadtcasino-basel-21817873/?affiliate=MWY&utm_campaign=biderundtanner&utm_source=MWY&utm_medium=dp",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/terra_nova_collective/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-argovia_philharmonic-268592",
+"title": "Weihnachtskonzert",
+"series": "Sonderkonzert",
+"start": "2026-12-19T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Chiara Skerath"
+},
+{
+"role": "Conductor",
+"name": "Tomas Djupsjöbacka"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "«Lascia ch’io pianga» aus der Oper «Rinaldo» HWV 7a/b",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Arie «Rejoice Greatly, O Daughter of Zion» aus dem Oratorium «Der Messias» HWV 56",
+"composerId": "handel"
+},
+{
+"composer": "Erich Wolfgang Korngold",
+"title": "Auszüge aus der Pantomime in 2 Bildern «Der Schneemann», arr. von Alexander von Zemlinsky für Orchester"
+},
+{
+"composer": "Adolphe Charles Adam",
+"title": "«O Holy Night» arr. von Douglas Gamley"
+},
+{
+"composer": "Franz Schubert",
+"title": "«Ave Maria» Hymne an die Jungfrau, orch. von Felix Weingartner",
+"composerId": "schubert"
+},
+{
+"composer": "Sing-along",
+"title": "«O du fröhliche» arr. von Wolfgang Drechsler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165404/",
+"sourceUrl": "https://argoviaphil.ch/konzert/weihnachtskonzert-16/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-stadtcasino_basel-20122026",
@@ -12457,6 +18081,154 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-kts_st_gallen-3918",
+"title": "Bachs Weihnachtsoratorium",
+"series": "Tonhallekonzert",
+"start": "2026-12-20T17:00:00+01:00",
+"durationMin": 110,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Soprano",
+"name": "Marie-Sophie Pollak"
+},
+{
+"role": "Alto",
+"name": "Ulrike Malotta"
+},
+{
+"role": "Tenor",
+"name": "Eric Finbarr Carey"
+},
+{
+"role": "Bass",
+"name": "Yannick Debus"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Weihnachtsoratorium BWV 248 (Kantaten 1, 3 und 6)",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=568&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/4-thk-weihnachtsoratorium/3918/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-camerata_bern-30810",
+"title": "Das alte Jahr vergangen ist",
+"series": "Abokonzert",
+"start": "2026-12-20T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Erich Höbarth"
+},
+{
+"role": "Oboe",
+"name": "Simon Sommerhalder"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Das alte Jahr vergangen ist Choral in a-Moll BWV 614",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Violinkonzert in a-Moll BWV 1041",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Sinfonia für Oboe, Violine und Streicher aus der Kantate BWV 21 Ich hatte viel Bekümmernis",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Konzert für Oboe, Violine, Streicher und Basso continuo in d-Moll BWV 1060",
+"composerId": "bach"
+},
+{
+"composer": "Johann Christoph Friedrich Bach",
+"title": "Sinfonia in d-Moll für Streicher und Basso continuo WFV I/3",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Konzert für Oboe d’Amore, Streicher und Basso continuo in A-Dur BWV 1055",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/156750/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/das-alte-jahr-2",
+"source": "camerata_bern"
+},
+{
+"id": "real-kammerphilharmonie_gr-der-nussknacker-chur-20",
+"title": "Der Nussknacker",
+"series": "Weihnachtsgala",
+"start": "2026-12-20T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueId": "theater-chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Narrator",
+"name": "Tonia Maria Zindel"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Peter Tschaikowski",
+"title": "Der Nussknacker, op. 71 (1892)"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/166389/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/der-nussknacker-chur-20.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-opera_lausanne-giuditta-20261220-1700",
 "title": "Giuditta",
 "series": null,
@@ -12580,6 +18352,59 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-musique_cdf-3203",
+"title": "Piotr Anderszewski piano",
+"series": "Grande Série",
+"start": "2026-12-20T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Piotr Anderszewski"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Klavierstücke, op. 118, Intermezzi nos 1, 2 et 6",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Klavierstücke, op. 119, Intermezzi nos 1, 3 et 4",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Fantaisies, op. 116, Intermezzi nos 2, 4 et 5,",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Capriccio n°.3",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Intermezzi, op. 117, nos 2 et 3",
+"composerId": "brahms"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate n° 32 en ut mineur, op. 111",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/piotr-anderszewski-piano/",
+"source": "musique_cdf"
+},
+{
 "id": "real-geneva_victoria_hall-74703095-20261220",
 "title": "Violonissimo & Camerata Contrepoint – With Love – Concert de gala",
 "series": null,
@@ -12619,6 +18444,64 @@ export const REAL = [
 "ticketUrl": "https://openagenda.com/victoria-hall-client/events/74703095_violonissimo-camerata-contrepoint",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/74703095_violonissimo-camerata-contrepoint",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-argovia_philharmonic-268594",
+"title": "Weihnachtskonzert",
+"series": "Sonderkonzert",
+"start": "2026-12-20T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Chiara Skerath"
+},
+{
+"role": "Conductor",
+"name": "Tomas Djupsjöbacka"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "«Lascia ch’io pianga» aus der Oper «Rinaldo» HWV 7a/b",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Arie «Rejoice Greatly, O Daughter of Zion» aus dem Oratorium «Der Messias» HWV 56",
+"composerId": "handel"
+},
+{
+"composer": "Erich Wolfgang Korngold",
+"title": "Auszüge aus der Pantomime in 2 Bildern «Der Schneemann», arr. von Alexander von Zemlinsky für Orchester"
+},
+{
+"composer": "Adolphe Charles Adam",
+"title": "«O Holy Night» arr. von Douglas Gamley"
+},
+{
+"composer": "Franz Schubert",
+"title": "«Ave Maria» Hymne an die Jungfrau, orch. von Felix Weingartner",
+"composerId": "schubert"
+},
+{
+"composer": "Sing-along",
+"title": "«O du fröhliche» arr. von Wolfgang Drechsler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165404/",
+"sourceUrl": "https://argoviaphil.ch/konzert/weihnachtskonzert-17/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opernhaus_zurich-200279",
@@ -12725,6 +18608,23 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-reformiert_zuerich-15718",
+"title": "Weihnachtsmusik bei Kerzenlicht im Neumünster",
+"series": null,
+"start": "2026-12-21T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Neumünster",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/weihnachtsmusik-bei-kerzenlicht-im-neumunste-15718/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/weihnachtsmusik-bei-kerzenlicht-im-neumunste-15718/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-opernhaus_zurich-200259",
 "title": "2. La Scintilla Konzert",
 "series": "La Scintilla",
@@ -12764,6 +18664,112 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15466&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/scintilla-konzert-2/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3780",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2026-12-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=502&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/cenerentola/3780/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-cite_bleue-noel-a-broadway-2026-12-21-1930",
+"title": "Noël à Broadway",
+"series": null,
+"start": "2026-12-21T19:30:00+01:00",
+"durationMin": 80,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Neïma Naouri"
+},
+{
+"role": "Tenor",
+"name": "Pablo Campos"
+},
+{
+"role": "Bass-baritone",
+"name": "Damien Pass"
+},
+{
+"role": "Piano",
+"name": "Alphonse Cemin"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/noel-a-broadway",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/noel-a-broadway",
+"source": "cite_bleue"
 },
 {
 "id": "real-opera_lausanne-giuditta-20261222-1900",
@@ -13105,6 +19111,324 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kts_st_gallen-3715",
+"title": "Echos",
+"series": "Grosses Haus",
+"start": "2026-12-22T19:30:00+01:00",
+"durationMin": 150,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choreographer",
+"name": "Frank Fannar Pedersen"
+},
+{
+"role": "Choreographer",
+"name": "Javier Rodríguez Cobos"
+},
+{
+"role": "Conductor",
+"name": "Thomas Herzog"
+},
+{
+"role": "Choreographer",
+"name": "Toon Theunissen"
+},
+{
+"role": "Choreographer",
+"name": "Venetia Lim Jia Yee"
+},
+{
+"role": "Choreographer",
+"name": "Andrea Lippolis"
+},
+{
+"role": "Choreographer",
+"name": "Luis Martinez Gea"
+},
+{
+"role": "Choreographer",
+"name": "Charmene Pang"
+},
+{
+"role": "Choreographer",
+"name": "Adamantia Papakyriaki"
+},
+{
+"role": "Choreographer",
+"name": "Tommaso Terribile"
+},
+{
+"role": "Choreographer",
+"name": "Emma Thesing"
+},
+{
+"role": "Choreographer",
+"name": "Ariadni Toumpeki"
+},
+{
+"role": "Choreographer",
+"name": "Ifigenia Toumpeki"
+},
+{
+"role": "Choreographer",
+"name": "Minghao Zhao"
+},
+{
+"role": "Violin",
+"name": "Linus Roth"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+},
+{
+"role": "Conductor",
+"name": "Till Zehnder"
+},
+{
+"role": "Choreographer",
+"name": "Sandra Klimek"
+},
+{
+"role": "Choreographer",
+"name": "Emily Pak"
+},
+{
+"role": "Choreographer",
+"name": "Mitch Harvey"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=670&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/echos/3715/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-casino_bern-die-grosse-weihnachtsgala-4-20261223-1930",
+"title": "DIE GROSSE WEIHNACHTSGALA",
+"series": "Philharmonie Baden-Baden, Tschechischer Philharmonischer Chor Brno",
+"start": "2026-12-23T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Philharmonie Baden-Baden"
+},
+{
+"role": "Orchestra",
+"name": "Tschechischer Philharmonischer Chor Brno"
+},
+{
+"role": "Narrator",
+"name": "Dani Fohrler"
+},
+{
+"role": "Conductor",
+"name": "Manfred Obrecht"
+},
+{
+"role": "Soprano",
+"name": "Laura Ulloa"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Josy Santos"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Sing unto God",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Traditional",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Fröhliche Weihnacht überall!",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "O du fröhliche – Süsser die Glocken nie klingen – O Tannenbaum – Leise rieselt der Schnee – Fröhliche Weihnacht überall",
+"composerId": "handel"
+},
+{
+"composer": "Jean-Paul Martini",
+"title": "Plaisir d’Amour"
+},
+{
+"composer": "Jean-Paul Martini",
+"title": "Traditional"
+},
+{
+"composer": "Jean-Paul Martini",
+"title": "Christmas Carols"
+},
+{
+"composer": "Jean-Paul Martini",
+"title": "The First Noel – Away In A Manger – Deck The Halls – Angels From The Realms Of Glory – O Come, All Ye Faithful"
+},
+{
+"composer": "Adolphe Adam",
+"title": "O Holy Night"
+},
+{
+"composer": "Adolphe Adam",
+"title": "Traditional"
+},
+{
+"composer": "Adolphe Adam",
+"title": "The Joy Of Christmas"
+},
+{
+"composer": "Adolphe Adam",
+"title": "Deep River – Joshua Fit The Battle Of Jericho"
+},
+{
+"composer": "Karel Svoboda",
+"title": "Drei Haselnüsse für Aschenbrödel"
+},
+{
+"composer": "Karel Svoboda",
+"title": "Alan Silvestri (1950-heute)"
+},
+{
+"composer": "Karel Svoboda",
+"title": "God Bless Us Everyone"
+},
+{
+"composer": "Karel Svoboda",
+"title": "Spectacular Christmas"
+},
+{
+"composer": "Alex North & Hy Zaret",
+"title": "Unchained Melody"
+},
+{
+"composer": "Alex North & Hy Zaret",
+"title": "Ghost – Nachricht von Sam"
+},
+{
+"composer": "Anderson , Berlin & Pierpont",
+"title": "The Winter Wonder!"
+},
+{
+"composer": "Anderson , Berlin & Pierpont",
+"title": "Sleigh Ride – White Christmas – Jingle Bells"
+},
+{
+"composer": "Robert Stolz",
+"title": "Träume unterm Christbaum"
+},
+{
+"composer": "Robert Stolz",
+"title": "John Williams (1932-heute)"
+},
+{
+"composer": "Robert Stolz",
+"title": "Flying Theme from E.T."
+},
+{
+"composer": "Robert Stolz",
+"title": "José Feliciano (1945-heute)"
+},
+{
+"composer": "Robert Stolz",
+"title": "Feliz Navidad"
+},
+{
+"composer": "Franz Xaver Gruber",
+"title": "Stille Nacht"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Hallelujah Chorus",
+"composerId": "handel"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Programmänderungen vorbehalten",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.obrassoconcerts.ch/webshop/webticket/seatmap?eventId=79",
+"sourceUrl": "https://www.casinobern.ch/programm/die-grosse-weihnachtsgala-4/#23-12-2026",
+"source": "casino_bern"
+},
+{
+"id": "real-luzerner_theater-8742",
+"title": "L'elisir d'amore [Der Liebestrank]",
+"series": null,
+"start": "2026-12-23T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Lucía Astigarraga"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Hanna Jung"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Gaetano Donizetti",
+"title": "L'elisir d'amore"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8742",
+"sourceUrl": "https://www.luzernertheater.ch/lelisirdamore",
+"source": "luzerner_theater"
+},
+{
 "id": "real-opernhaus_zurich-200280",
 "title": "La traviata",
 "series": "Hauptbühne",
@@ -13349,6 +19673,58 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kammerphilharmonie_gr-der-nussknacker-zuerich",
+"title": "Der Nussknacker",
+"series": "Weihnachtsgala",
+"start": "2026-12-26T15:00:00+01:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueId": "tonhalle-zurich-kleiner-saal",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Narrator",
+"name": "Tonia Maria Zindel"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Peter Tschaikowski",
+"title": "Der Nussknacker, op. 71 (1892)"
+}
+],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/der-nussknacker-zuerich.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/der-nussknacker-zuerich.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-reformiert_zuerich-15471",
+"title": "Weihnachtskonzert KK3",
+"series": null,
+"start": "2026-12-26T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Bühl Wiedikon",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-kk3-15471/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/weihnachtskonzert-kk3-15471/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-osr-les-noces-de-figaro-20261226",
 "title": "Les Noces de Figaro",
 "series": null,
@@ -13462,6 +19838,65 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15239&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/romeo-und-julia-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-luzerner_theater-8783",
+"title": "I Capuleti e i Montecchi [Romeo und Julia]",
+"series": null,
+"start": "2026-12-26T20:00:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Choreographer",
+"name": "Christine Cyris"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Solenn' Lavanant Linke"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Vincenzo Bellini",
+"title": "I Capuleti e i Montecchi"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8783",
+"sourceUrl": "https://www.luzernertheater.ch/icapuletieimontecchi",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-200302",
@@ -13722,6 +20157,78 @@ export const REAL = [
 "ticketUrl": "https://www.actnews.ch/events/die-grosse-giuseppe-verdi-gala-2026",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/die-grosse-giuseppe-verdi-gala-2056748/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3781",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2026-12-27T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=503&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2026-12/cenerentola/3781/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-199870",
@@ -14089,6 +20596,65 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-ocf_fribourg-8491",
+"title": "The Rake’s Progress - La Carrière du libertin",
+"series": null,
+"start": "2026-12-29T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jordi Bernàcer"
+},
+{
+"role": "Director",
+"name": "Antony McDonald"
+},
+{
+"role": "Performer",
+"name": "Adam Temple Smith"
+},
+{
+"role": "Performer",
+"name": "Laurence Guillod"
+},
+{
+"role": "Performer",
+"name": "Yannis François"
+},
+{
+"role": "Performer",
+"name": "Raiven"
+},
+{
+"role": "Performer",
+"name": "Alexandre Diakoff"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+},
+{
+"role": "Choir",
+"name": "Chœur du NOF"
+}
+],
+"program": [
+{
+"composer": "Igor Stravinski",
+"title": "The Rake’s Progress"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8491",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8491",
+"source": "ocf_fribourg"
+},
+{
 "id": "real-geneva_victoria_hall-9713065-20261229",
 "title": "Le grand gala de Giuseppe Verdi – Les plus belles scènes des grands opéras de Verdi",
 "series": null,
@@ -14151,6 +20717,36 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5700&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/silvesterkonzert-mit-wayne-marshall-2055650/",
 "source": "tonhalle"
+},
+{
+"id": "real-kammerphilharmonie_gr-seid-umschlungen-millionen-kirche-scuol",
+"title": "Seid umschlungen, Millionen!",
+"series": "Winterkonzert",
+"start": "2026-12-30T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Evangelische Kirche, Scuol",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maura Wesseling"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-kirche-scuol.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-kirche-scuol.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-zko-19687",
@@ -14397,6 +20993,65 @@ export const REAL = [
 "ticketUrl": "https://www.osi.swiss/concerti/tutti-i-concerti/2026-12-31-18-00",
 "sourceUrl": "https://www.osi.swiss/concerti/tutti-i-concerti/2026-12-31-18-00",
 "source": "osi"
+},
+{
+"id": "real-ocf_fribourg-8492",
+"title": "The Rake’s Progress - La Carrière du libertin",
+"series": null,
+"start": "2026-12-31T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jordi Bernàcer"
+},
+{
+"role": "Director",
+"name": "Antony McDonald"
+},
+{
+"role": "Performer",
+"name": "Adam Temple Smith"
+},
+{
+"role": "Performer",
+"name": "Laurence Guillod"
+},
+{
+"role": "Performer",
+"name": "Yannis François"
+},
+{
+"role": "Performer",
+"name": "Raiven"
+},
+{
+"role": "Performer",
+"name": "Alexandre Diakoff"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+},
+{
+"role": "Choir",
+"name": "Chœur du NOF"
+}
+],
+"program": [
+{
+"composer": "Igor Stravinski",
+"title": "The Rake’s Progress"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8492",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8492",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-sob-12208",
@@ -14689,6 +21344,28 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kammerorchester_basel-silvester-nachtklang-4-202612312100",
+"title": "Silvester-Nachtklang",
+"series": null,
+"start": "2026-12-31T21:00:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Don Bosco Basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/188475/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/silvester-nachtklang-4.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-opernhaus_zurich-200111",
 "title": "Fuchs & Jordan",
 "series": "Hauptbühne",
@@ -14864,6 +21541,41 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-kts_st_gallen-3735",
+"title": "Neujahrskonzert 2027",
+"series": null,
+"start": "2027-01-01T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Soprano",
+"name": "Olivia Smith"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Werke von",
+"title": "P. Tschaikowski, G. Puccini, M. Glinka, E. Korngold, F. Lehár, A. Dvořák, J. Strauss u.a."
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=596&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/neujahrskonzert-27/3735/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-zko-19508",
 "title": "Neujahrskonzert mit Asya Fateyeva & Tjasha Gafner",
 "series": "Abo-Konzerte",
@@ -14960,6 +21672,36 @@ export const REAL = [
 "ticketUrl": "https://tickets.buehnenbern.ch/webshop/webticket/seatmap?eventId=2305&el=true&language=de",
 "sourceUrl": "https://buehnenbern.ch/spielplan/programm/rachmaninow-bittet-zum-tanz/",
 "source": "buehnen_bern"
+},
+{
+"id": "real-kammerphilharmonie_gr-seid-umschlungen-millionen-kirche-arosa",
+"title": "Seid umschlungen, Millionen!",
+"series": "Neujahrskonzert",
+"start": "2027-01-01T17:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Evangelische Kirche, Arosa",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maura Wesseling"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://booking.arosalenzerheide.swiss/de/Buchen-Tickets/Aktivitaeten/Neujahrskonzert_asd-24653449",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-kirche-arosa.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-sob-12207",
@@ -15359,6 +22101,36 @@ export const REAL = [
 "source": "buehnen_bern"
 },
 {
+"id": "real-kammerphilharmonie_gr-seid-umschlungen-millionen-theater-chur",
+"title": "Seid umschlungen, Millionen!",
+"series": "Neujahrskonzert",
+"start": "2027-01-02T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueId": "theater-chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maura Wesseling"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/167889/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-theater-chur.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-opernhaus_zurich-200112",
 "title": "Fuchs & Jordan",
 "series": "Hauptbühne",
@@ -15389,6 +22161,83 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-argovia_philharmonic-268605",
+"title": "Neujahrskonzert Baden",
+"series": "Sonderkonzert",
+"start": "2027-01-02T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Dulcimer",
+"name": "Jenő Lisztes"
+},
+{
+"role": "Conductor",
+"name": "Marc Kissóczy"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Emmerich Kálmán",
+"title": "Ouvertüre zur Operette «Gräfin Mariza»"
+},
+{
+"composer": "Johann Strauss II",
+"title": "Pesther Czárdás op. 23",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Lehár",
+"title": "«Gold und Silber» Walzer op. 79"
+},
+{
+"composer": "Pablo de Sarasate",
+"title": "«Zigeunerweisen» für Cimbalom und Orchester op. 20"
+},
+{
+"composer": "Hector Berlioz",
+"title": "«Rákóczy-Marsch» aus der Oper «Fausts Verdammnis» op. 24"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«G’schichten aus dem Wienerwald» Walzer op. 325",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Liszt",
+"title": "Fantasie über ungarische Volksmelodien S.123",
+"composerId": "liszt"
+},
+{
+"composer": "Johannes Brahms",
+"title": "«Ungarischer Tanz» für Orchester Nr. 1 g-Moll",
+"composerId": "brahms"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Champagner-Polka» op. 211",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Éljen a Magyar!» Polka schnell op. 332",
+"composerId": "johann-strauss"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165431/",
+"sourceUrl": "https://argoviaphil.ch/konzert/neujahrskonzert-baden-2/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-stadtcasino_basel-02012027_philharmonie_d_solisten",
 "title": "Vivaldi - Die vier Jahreszeiten – Philharmonie der Solisten",
 "series": "Musiksaal",
@@ -15396,7 +22245,7 @@ export const REAL = [
 "durationMin": 120,
 "cityId": "basel",
 "venueId": "stadtcasino-basel",
-"type": "orchestral",
+"type": "recital",
 "featured": true,
 "status": "scheduled",
 "credits": [
@@ -15405,16 +22254,87 @@ export const REAL = [
 "name": "Vladik Otaryan"
 }
 ],
-"program": [
-{
-"composer": "Antonio Vivaldi",
-"title": "Die vier Jahreszeiten",
-"composerId": "vivaldi"
-}
-],
+"program": [],
 "ticketUrl": "https://www.ticketcorner.ch/artist/vivaldi-die-vierjahreszeiten-philharmonie-der-solisten/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/02012027_philharmonie_d_solisten/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-argovia_philharmonic-268607",
+"title": "Neujahrskonzert Aarau",
+"series": "Sonderkonzert",
+"start": "2027-01-03T11:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Dulcimer",
+"name": "Jenő Lisztes"
+},
+{
+"role": "Conductor",
+"name": "Marc Kissóczy"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Emmerich Kálmán",
+"title": "Ouvertüre zur Operette «Gräfin Mariza»"
+},
+{
+"composer": "Johann Strauss II",
+"title": "Pesther Czárdás op. 23",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Lehár",
+"title": "«Gold und Silber» Walzer op. 79"
+},
+{
+"composer": "Pablo de Sarasate",
+"title": "«Zigeunerweisen» für Cimbalom und Orchester op. 20"
+},
+{
+"composer": "Hector Berlioz",
+"title": "«Rákóczy-Marsch» aus der Oper «Fausts Verdammnis» op. 24"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«G’schichten aus dem Wienerwald» Walzer op. 325",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Liszt",
+"title": "Fantasie über ungarische Volksmelodien S.123",
+"composerId": "liszt"
+},
+{
+"composer": "Johannes Brahms",
+"title": "«Ungarischer Tanz» für Orchester Nr. 1 g-Moll",
+"composerId": "brahms"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Champagner-Polka» op. 211",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Éljen a Magyar!» Polka schnell op. 332",
+"composerId": "johann-strauss"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165432/",
+"sourceUrl": "https://argoviaphil.ch/konzert/neujahrskonzert-aarau-2/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opernhaus_zurich-200283",
@@ -15559,6 +22479,246 @@ export const REAL = [
 "ticketUrl": "https://www.ticketino.com/de/seatmap/213831",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/030127_i_tempi/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-kts_st_gallen-3997",
+"title": "Neujahrskonzert 2027",
+"series": null,
+"start": "2027-01-03T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "mels",
+"venueName": "Verrucano Mels",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Soprano",
+"name": "Olivia Smith"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Werke von",
+"title": "P. Tschaikowski, G. Puccini, M. Glinka, E. Korngold, F. Lehár, A. Dvořák, J. Strauss u.a."
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/neujahrskonzert-27/3997/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/neujahrskonzert-27/3997/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-reformiert_zuerich-15771",
+"title": "Neujahrskonzert «Musik ohne Grenzen»",
+"series": null,
+"start": "2027-01-03T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Unterstrass",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/neujahrskonzert-musik-ohne-grenzen-15771/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/neujahrskonzert-musik-ohne-grenzen-15771/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-ocf_fribourg-8493",
+"title": "The Rake’s Progress - La Carrière du libertin",
+"series": null,
+"start": "2027-01-03T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jordi Bernàcer"
+},
+{
+"role": "Director",
+"name": "Antony McDonald"
+},
+{
+"role": "Performer",
+"name": "Adam Temple Smith"
+},
+{
+"role": "Performer",
+"name": "Laurence Guillod"
+},
+{
+"role": "Performer",
+"name": "Yannis François"
+},
+{
+"role": "Performer",
+"name": "Raiven"
+},
+{
+"role": "Performer",
+"name": "Alexandre Diakoff"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+},
+{
+"role": "Choir",
+"name": "Chœur du NOF"
+}
+],
+"program": [
+{
+"composer": "Igor Stravinski",
+"title": "The Rake’s Progress"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8493",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8493",
+"source": "ocf_fribourg"
+},
+{
+"id": "real-casino_bern-vivaldi-die-vier-jahreszeiten-philharmonie-der-s-43cddac55b",
+"title": "VIVALDI – Die vier Jahreszeiten | Philharmonie der Solisten",
+"series": "Burgerratssaal",
+"start": "2027-01-03T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Philharmonie der Solisten"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketcorner.ch/artist/vivaldi-die-vierjahreszeiten-philharmonie-der-solisten/",
+"sourceUrl": "https://www.casinobern.ch/programm/vivaldi-die-vier-jahreszeiten-philharmonie-der-solisten/#03-01-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-argovia_philharmonic-268609",
+"title": "Neujahrskonzert Reinach",
+"series": "Sonderkonzert",
+"start": "2027-01-03T18:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Saalbau Reinach AG",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Dulcimer",
+"name": "Jenő Lisztes"
+},
+{
+"role": "Conductor",
+"name": "Marc Kissóczy"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Emmerich Kálmán",
+"title": "Ouvertüre zur Operette «Gräfin Mariza»"
+},
+{
+"composer": "Johann Strauss II",
+"title": "Pesther Czárdás op. 23",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Lehár",
+"title": "«Gold und Silber» Walzer op. 79"
+},
+{
+"composer": "Pablo de Sarasate",
+"title": "«Zigeunerweisen» für Cimbalom und Orchester op. 20"
+},
+{
+"composer": "Hector Berlioz",
+"title": "«Rákóczy-Marsch» aus der Oper «Fausts Verdammnis» op. 24"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«G’schichten aus dem Wienerwald» Walzer op. 325",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Franz Liszt",
+"title": "Fantasie über ungarische Volksmelodien S.123",
+"composerId": "liszt"
+},
+{
+"composer": "Johannes Brahms",
+"title": "«Ungarischer Tanz» für Orchester Nr. 1 g-Moll",
+"composerId": "brahms"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Champagner-Polka» op. 211",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Johann Strauss II",
+"title": "«Éljen a Magyar!» Polka schnell op. 332",
+"composerId": "johann-strauss"
+}
+],
+"ticketUrl": "https://static.ticketpark.ch/hosts/saalbau-reinach/tickets.html",
+"sourceUrl": "https://argoviaphil.ch/konzert/neujahrskonzert-reinach-2/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-kammerphilharmonie_gr-seid-umschlungen-millionen-kloster-illanz",
+"title": "Seid umschlungen, Millionen!",
+"series": "Neujahrskonzert",
+"start": "2027-01-03T19:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kloster Ilanz",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maura Wesseling"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-kloster-illanz.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-kloster-illanz.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-opernhaus_zurich-200304",
@@ -15708,6 +22868,78 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3782",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=504&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3782/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-tonhalle-2059171",
 "title": "Philharmonie der Solisten / VIVALDI - Die vier Jahreszeiten",
 "series": null,
@@ -15825,6 +23057,43 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15309&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/la-traviata-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-ocl-345980cb-4249-4364-b05d-ba21c31e8bc9-ocl-ch",
+"title": "Les Grands Concerts n°5 | Ph. Jordan · Strauss · Schubert La Grande",
+"series": "Les Grands Concerts n°5",
+"start": "2027-01-06T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Jordan"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Richard Strauss",
+"title": "Metamorphosen, TrV 290",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Franz Schubert",
+"title": "Symphonie n°8 en do majeur, D. 944, « La Grande »",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n5/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n5/",
+"source": "ocl"
 },
 {
 "id": "real-tonhalle-2055657",
@@ -16026,6 +23295,87 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocf_fribourg-8494",
+"title": "The Rake’s Progress - La Carrière du libertin",
+"series": null,
+"start": "2027-01-07T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jordi Bernàcer"
+},
+{
+"role": "Director",
+"name": "Antony McDonald"
+},
+{
+"role": "Performer",
+"name": "Adam Temple Smith"
+},
+{
+"role": "Performer",
+"name": "Laurence Guillod"
+},
+{
+"role": "Performer",
+"name": "Yannis François"
+},
+{
+"role": "Performer",
+"name": "Raiven"
+},
+{
+"role": "Performer",
+"name": "Alexandre Diakoff"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+},
+{
+"role": "Choir",
+"name": "Chœur du NOF"
+}
+],
+"program": [
+{
+"composer": "Igor Stravinski",
+"title": "The Rake’s Progress"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8494",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8494",
+"source": "ocf_fribourg"
+},
+{
+"id": "real-casino_bern-wiener-johann-strauss-konzert-gala-5-20270107-1930",
+"title": "Wiener Johann Strauß Konzert-Gala",
+"series": "Grosser Saal",
+"start": "2027-01-07T19:30:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Name Künstler*in, Orchester, Kendlingers K&K Philharmoniker"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketcorner.ch/event/wiener-johann-strauss-konzert-gala-casino-bern-21731959/",
+"sourceUrl": "https://www.casinobern.ch/programm/wiener-johann-strauss-konzert-gala-5/#07-01-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-musikkollegium-9719",
 "title": "Zu Gast in Brugg",
 "series": null,
@@ -16161,6 +23511,101 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-bach_stiftung-bwv-143-lobe-den-herrn-meine-seele",
+"title": "BWV 143 «Lobe den Herrn, meine Seele»",
+"series": "Bachkantate",
+"start": "2027-01-08T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 143 «Lobe den Herrn, meine Seele»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168107/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-143-lobe-den-herrn-meine-seele/",
+"source": "bach_stiftung"
+},
+{
+"id": "real-kts_st_gallen-3783",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-08T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=505&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3783/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-tonhalle-2056763",
 "title": "Von Engelstimmen und Tastenzauber",
 "series": null,
@@ -16208,6 +23653,124 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Ftonhallezuerich.ch%2Fhome-tz%2Fkonzerte%2Fkalender%2F&event=5739&language=de",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/von-engelstimmen-und-tastenzauber-2056763/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-ocf_fribourg-8495",
+"title": "The Rake’s Progress - La Carrière du libertin",
+"series": null,
+"start": "2027-01-09T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jordi Bernàcer"
+},
+{
+"role": "Director",
+"name": "Antony McDonald"
+},
+{
+"role": "Performer",
+"name": "Adam Temple Smith"
+},
+{
+"role": "Performer",
+"name": "Laurence Guillod"
+},
+{
+"role": "Performer",
+"name": "Yannis François"
+},
+{
+"role": "Performer",
+"name": "Raiven"
+},
+{
+"role": "Performer",
+"name": "Alexandre Diakoff"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+},
+{
+"role": "Choir",
+"name": "Chœur du NOF"
+}
+],
+"program": [
+{
+"composer": "Igor Stravinski",
+"title": "The Rake’s Progress"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8495",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8495",
+"source": "ocf_fribourg"
+},
+{
+"id": "real-luzerner_theater-8784",
+"title": "I Capuleti e i Montecchi [Romeo und Julia]",
+"series": null,
+"start": "2027-01-09T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Choreographer",
+"name": "Christine Cyris"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Solenn' Lavanant Linke"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Vincenzo Bellini",
+"title": "I Capuleti e i Montecchi"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8784",
+"sourceUrl": "https://www.luzernertheater.ch/icapuletieimontecchi",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-200285",
@@ -16295,6 +23858,36 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15310&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/la-traviata-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-casino_bern-beethoven-9-sinfonie-3-klavierkonzert-3-20270109-1930",
+"title": "MOZART 41. Sinfonie und Klavierkonzert 20+21",
+"series": "Grosser Saal",
+"start": "2027-01-09T19:30:00+01:00",
+"durationMin": 105,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "PHILHARMONIA FRANKFURT"
+},
+{
+"role": "Conductor",
+"name": "Juri Gilbo"
+},
+{
+"role": "Piano",
+"name": "Robert Neumann"
+}
+],
+"program": [],
+"ticketUrl": "https://www.casinobern.ch/programm/beethoven-9-sinfonie-3-klavierkonzert-3/#09-01-2027",
+"sourceUrl": "https://www.casinobern.ch/programm/beethoven-9-sinfonie-3-klavierkonzert-3/#09-01-2027",
+"source": "casino_bern"
 },
 {
 "id": "real-zko-19689",
@@ -16435,6 +24028,133 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-festliche-neujahrsgala-4-20270110-1700",
+"title": "Festliche Neujahrsgala",
+"series": "Grosser Saal",
+"start": "2027-01-10T17:00:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Orchestra Filarmonica Italiana"
+},
+{
+"role": "Conductor",
+"name": "Manfred Obrecht"
+},
+{
+"role": "Soprano",
+"name": "Lucrezia Drei"
+},
+{
+"role": "Tenor",
+"name": "Riccardo Della Sciucca"
+},
+{
+"role": "Presenter",
+"name": "Heidi Maria Glössner"
+}
+],
+"program": [
+{
+"composer": "Gioacchino Rossini",
+"title": "Ouvertüre zur Oper «Il Barbiere de Siviglia»",
+"composerId": "rossini"
+},
+{
+"workId": "verdi-traviata",
+"composerId": "verdi"
+},
+{
+"composer": "Jules Massenet",
+"title": "«Meditation» aus der Oper «Thais»"
+},
+{
+"composer": "Solist",
+"title": "Cesare Carretta, Violine"
+},
+{
+"composer": "Eldo Di Lazzaro",
+"title": "Chitarra romana"
+},
+{
+"composer": "Ennio Morricone",
+"title": "Gabriel’s Oboe"
+},
+{
+"composer": "Solist",
+"title": "Marco Ambrosini, Oboe"
+},
+{
+"composer": "Johann Strauss",
+"title": "Unter Donner und Blitz, Polka schnell",
+"composerId": "johann-strauss"
+},
+{
+"composer": "Meredith Wilson",
+"title": "«Seventy-Six Trombones», Marsch aus dem Musical «The Music Man»"
+},
+{
+"composer": "Gioacchino Rossini",
+"title": "Ouvertüre zur Oper «La Gaza Ladra»",
+"composerId": "rossini"
+},
+{
+"composer": "Charles Gounod",
+"title": "«Je veux vivre» aus der Oper «Roméo et Juliette»"
+},
+{
+"workId": "jstrauss-blue-danube",
+"composerId": "johann-strauss"
+},
+{
+"workId": "verdi-traviata",
+"composerId": "verdi"
+},
+{
+"composer": "Giuseppe Verdi",
+"title": "Programmänderungen vorbehalten",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://tickets.obrassoconcerts.ch/webshop/webticket/seatmap?eventId=92",
+"sourceUrl": "https://www.casinobern.ch/programm/festliche-neujahrsgala-4/#10-01-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-musique_cdf-3211",
+"title": "Jean-Luc Thellin orgue",
+"series": "Collaboration",
+"start": "2027-01-10T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Jean-Luc Thellin"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Variations Goldberg, BWV 988 Transcription pour orgue par Jean-Luc Thellin",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/jean-luc-thellin-orgue/",
+"source": "musique_cdf"
+},
+{
 "id": "real-geneva_victoria_hall-23372228-20270110",
 "title": "Philharmonie der Solisten | VIVALDI – Les Quatre Saisons",
 "series": null,
@@ -16465,6 +24185,36 @@ export const REAL = [
 "ticketUrl": "https://www.ticketcorner.ch/event/vivaldi-die-vier-jahreszeiten-philharmonie-der-solisten-victoria-hall-21991737/",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/23372228_philharmonie-der-solisten",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-kammerphilharmonie_gr-seid-umschlungen-millionen-eventhalle-flims",
+"title": "Seid umschlungen, Millionen!",
+"series": "Neujahrskonzert",
+"start": "2027-01-10T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Eventhalle Flims",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maura Wesseling"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/183277/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/seid-umschlungen-millionen-eventhalle-flims.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-musikkollegium-9435",
@@ -16876,6 +24626,45 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-concerts_fribourg-2027-01-12-concert-du-nouvel-an-et-des-rois-frank-dupree",
+"title": "Concert du Nouvel An et des Rois - Frank Dupree",
+"series": "Société des Concerts de Fribourg",
+"start": "2027-01-12T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Frank Dupree Trio"
+},
+{
+"role": "Orchestra",
+"name": "Württembergisches Kammerorchester Heilbronn"
+}
+],
+"program": [
+{
+"composer": "Gideon Klein",
+"title": "Partita pour orchestre à cordes"
+},
+{
+"composer": "Nikolaï Kapoustine",
+"title": "Concerto pour piano n° 4, op. 56"
+},
+{
+"composer": "Modeste Moussorgski",
+"title": "Tableaux d'une exposition, arr. pour trio de jazz et orchestre de chambre par Yaron Gottfried"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.concertsfribourg.ch/fr/programme/sdc/Element/concert/c/concert-du-nouvel-an-et-des-rois-frank-dupree.html",
+"source": "concerts_fribourg"
+},
+{
 "id": "real-opernhaus_zurich-200286",
 "title": "La traviata",
 "series": "Hauptbühne",
@@ -17126,10 +24915,6 @@ export const REAL = [
 "name": "Martha Argerich"
 },
 {
-"role": "Piano",
-"name": "Mikhail Pletnev"
-},
-{
 "role": "Conductor",
 "name": "Mikhail Pletnev"
 },
@@ -17367,6 +25152,70 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-ocl-8cbefe36-7f8d-498a-96b0-74bf860f2b12-ocl-ch",
+"title": "Les Entractes n°2 | Chostakovitch Symphonie n°15 (arr. chambre)",
+"series": "Les Entractes n°2",
+"start": "2027-01-14T12:30:00+01:00",
+"durationMin": 60,
+"cityId": "lausanne",
+"venueId": "salle-paderewski",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Diana Pasko"
+},
+{
+"role": "Cello",
+"name": "Daniel Mitnitsky"
+},
+{
+"role": "Timpani",
+"name": "Arnaud Stachnick"
+},
+{
+"role": "Percussion",
+"name": "Jacques Hostettler"
+},
+{
+"role": "Percussion",
+"name": "Nicolas Suter"
+},
+{
+"role": "Piano",
+"name": "Christian Chamorel"
+}
+],
+"program": [
+{
+"composer": "Dmitri Chostakovitch",
+"title": "Symphonie n°15, arrangement pour ensemble de chambre de Viktor Derevianko"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/entracte-n2-26-27/",
+"sourceUrl": "https://www.ocl.ch/concert/entracte-n2-26-27/",
+"source": "ocl"
+},
+{
+"id": "real-reformiert_zuerich-14367",
+"title": "Acoustic Oasis",
+"series": null,
+"start": "2027-01-14T18:00:00+01:00",
+"durationMin": 195,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14367/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14367/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-lso_luzern-21029",
 "title": "MARTHA ARGERICH & FRIENDS – SCHUMANN UND RACHMANINOW",
 "series": "Klavierfestival Le Piano Symphonique",
@@ -17393,6 +25242,14 @@ export const REAL = [
 {
 "role": "Cello",
 "name": "Mischa Maisky"
+},
+{
+"role": "Violin",
+"name": "NN"
+},
+{
+"role": "Viola",
+"name": "NN"
 }
 ],
 "program": [
@@ -17424,7 +25281,7 @@ export const REAL = [
 "title": "Espagne intime",
 "series": null,
 "start": "2027-01-14T19:30:00+01:00",
-"durationMin": 120,
+"durationMin": 90,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "chamber",
@@ -17453,6 +25310,46 @@ export const REAL = [
 "ticketUrl": "https://infomaniak.events/fr-ch/shop/4LW9JPCJ1G/events/1619676",
 "sourceUrl": "https://locg.ch/fr/calendrier/espagne-intime",
 "source": "ocg"
+},
+{
+"id": "real-kts_st_gallen-3921",
+"title": "Farbenrausch",
+"series": "Tonhallekonzert",
+"start": "2027-01-14T19:30:00+01:00",
+"durationMin": 115,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Viola",
+"name": "Ricardo Gaspar"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Sergei Prokofiew",
+"title": "Sinfonie Nr. 1 D-Dur op. 25"
+},
+{
+"composer": "Béla Bartók",
+"title": "Bratschenkonzert",
+"composerId": "bartok"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=569&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/5-thk-farbenrausch/3921/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-cnz-139",
@@ -17543,6 +25440,28 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5567&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/gianandrea-noseda-hilary-hahn-2055672/",
 "source": "tonhalle"
+},
+{
+"id": "real-kammerorchester_basel-olten-202701141930",
+"title": "Kammerorchester Basel – Let's dance mit Avi Avital",
+"series": null,
+"start": "2027-01-14T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "olten",
+"venueId": "stadttheater-olten",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://www.stadttheater-olten.ch/de/exotic-inspirations-_content---1--1010--1448.html",
+"sourceUrl": "https://www.stadttheater-olten.ch/de/exotic-inspirations-_content---1--1010--1448.html",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-osi-175693300633907",
@@ -17779,6 +25698,32 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/lunchkonzert-surprise-2y2w1v",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/lunchkonzert-surprise/",
 "source": "lso_luzern"
+},
+{
+"id": "real-kts_st_gallen-3899",
+"title": "Zu Tisch mit Pietro",
+"series": "Lunch-Konzert",
+"start": "2027-01-15T12:15:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=590&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/2-lunch-zu-tisch-mit-pietro/3899/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-zko-19677",
@@ -18027,6 +25972,23 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-reformiert_zuerich-17231",
+"title": "Konzert Kammerorchester i baroccoli",
+"series": null,
+"start": "2027-01-16T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Kirche Enge",
+"type": "orchestral",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzert-kammerorchester-i-baroccoli-17231/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzert-kammerorchester-i-baroccoli-17231/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-lso_luzern-21055",
 "title": "MARTHA ARGERICH & CHARLES DUTOIT – JUBILÄUMSGALA",
 "series": "Klavierfestival Le Piano Symphonique",
@@ -18065,6 +26027,28 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/martha-argerich-charles-dutoit-jubilaumsgala-af8ssg",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/martha-argerich-charles-dutoit-jubilaeumsgala/",
 "source": "lso_luzern"
+},
+{
+"id": "real-kammerorchester_basel-dudingen-202701161930",
+"title": "Kammerorchester Basel – Konzert-Reise mit Avi Avital",
+"series": "Kultur im Podium",
+"start": "2027-01-16T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueName": "Podium",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/exotic-inspirations/",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-opernhaus_zurich-199799",
@@ -18119,10 +26103,6 @@ export const REAL = [
 "credits": [
 {
 "role": "Conductor",
-"name": "Mischa Maisky"
-},
-{
-"role": "Cello",
 "name": "Mischa Maisky"
 },
 {
@@ -18195,6 +26175,50 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/mozart-brahms",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/mozart-brahms",
 "source": "osr"
+},
+{
+"id": "real-ocf_fribourg-8501",
+"title": "Quintes et lumière",
+"series": null,
+"start": "2027-01-17T11:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Château de Courtaney",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Delphine Richard"
+},
+{
+"role": "Viola",
+"name": "Anna Vasileva"
+},
+{
+"role": "Viola",
+"name": "Clément Boudrant"
+},
+{
+"role": "Cello",
+"name": "Arthur Guignard"
+},
+{
+"role": "Horn",
+"name": "Stéphane Mooser"
+}
+],
+"program": [
+{
+"composer": "J. Haydn",
+"title": "Quatuor dit des quintes en ré mineur",
+"composerId": "haydn"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8501",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8501",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-opernhaus_zurich-199820",
@@ -18477,6 +26501,78 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3784",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-17T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=506&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3784/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-stadtcasino_basel-17012027_rs",
 "title": "Juan-José Peña Aguirre & Nicolas Comi",
 "series": "AMG Rising Stars",
@@ -18752,6 +26848,69 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-cite_bleue-stravaganza-2027-01-19-1930",
+"title": "Stravaganza !",
+"series": null,
+"start": "2027-01-19T19:30:00+01:00",
+"durationMin": 60,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maud Bessard-Morandas"
+},
+{
+"role": "Ensemble",
+"name": "Ensemble O Tempora"
+},
+{
+"role": "Violin",
+"name": "Laure Massoni"
+},
+{
+"role": "Cello",
+"name": "Simon Lefebvre"
+},
+{
+"role": "Zhéorbe",
+"name": "Daniel de Morais"
+},
+{
+"role": "Harpsichord & direction",
+"name": "Quentin Guérillot"
+}
+],
+"program": [
+{
+"composer": "Pietro Simone Agostini",
+"title": "Era così costante"
+},
+{
+"composer": "Francesco Federici",
+"title": "O cara Libertà"
+},
+{
+"composer": "Carlo Caproli",
+"title": "Di già Lilla gentile"
+},
+{
+"composer": "Mario Savioni",
+"title": "Udite le querele"
+},
+{
+"composer": "Luigi Rossi",
+"title": "Respira, core, forze radduna"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/stravaganza",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/stravaganza",
+"source": "cite_bleue"
+},
+{
 "id": "real-stadtcasino_basel-190127_gfk",
 "title": "Trio con Brio Copenhagen",
 "series": "Kammermusik Basel",
@@ -18774,10 +26933,6 @@ export const REAL = [
 {
 "role": "Piano",
 "name": "Jens Elvekjær"
-},
-{
-"role": "Piano",
-"name": "Frank Martin"
 }
 ],
 "program": [
@@ -18785,6 +26940,11 @@ export const REAL = [
 "composer": "Ludwig van Beethoven",
 "title": "Klaviertrio Nr. 1, Es-dur, op. 1, Nr. 1 (1793/94)",
 "composerId": "beethoven"
+},
+{
+"composer": "Frank Martin",
+"title": "Klaviertrio (Trio sur des mélodies populaires irlandaises) (1925)",
+"composerId": "martin"
 },
 {
 "composer": "Johannes Brahms",
@@ -18883,6 +27043,55 @@ export const REAL = [
 "source": "sob"
 },
 {
+"id": "real-casino_bern-schumann-am-rhein-20270121-1000",
+"title": "Musik Punkt 10 – Schuhmanns Rheinische",
+"series": "6. Symphoniekonzert – Berner Symphonieorchester",
+"start": "2027-01-21T10:00:00+01:00",
+"durationMin": 40,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Constantinos Carydis"
+},
+{
+"role": "Cello",
+"name": "Friedrich Thiele"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Periklis Koukos",
+"title": "Adagio für Streicher"
+},
+{
+"composer": "Robert Schumann",
+"title": "Konzert für Violoncello und Orchester a-Moll op. 129",
+"composerId": "schumann"
+},
+{
+"composer": "Minas Borboudakis",
+"title": "Katharsis für Orchester (2002, Orchesterfassung 2026, Uraufführung, Auftragswerk von Bühnen Bern)"
+},
+{
+"composer": "Robert Schumann",
+"title": "Symphonie Nr. 3 Es-Dur op. 97 «Rheinische»",
+"composerId": "schumann"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/musik-punkt-zehn-02-rheinische/",
+"sourceUrl": "https://www.casinobern.ch/programm/schumann-am-rhein/#21-01-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-tonhalle-2055686",
 "title": "tonhalleCRUSH",
 "series": null,
@@ -18913,6 +27122,68 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5681&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/tonhallecrush-2055686/",
 "source": "tonhalle"
+},
+{
+"id": "real-reformiert_zuerich-15772",
+"title": "Orgelmusik zum Feierabend",
+"series": null,
+"start": "2027-01-21T19:00:00+01:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Pauluskirche",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15772/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15772/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-argovia_philharmonic-268496",
+"title": "3. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-01-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Oboe",
+"name": "Cristina Gómez Godoy"
+},
+{
+"role": "Conductor",
+"name": "Virginia Martínez"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Richard Strauss",
+"title": "Serenade Es-Dur op. 7",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Richard Strauss",
+"title": "Konzert für Oboe und kleines Orchester D-Dur TrV 292 (AV 144)",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Amy Beach",
+"title": "Sinfonie e-Moll op. 32 «Gaelic»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165348/",
+"sourceUrl": "https://argoviaphil.ch/konzert/3-abo-konzert-1-2627/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-osr-mahler7-20270121",
@@ -18999,6 +27270,167 @@ export const REAL = [
 "ticketUrl": "https://shop.sinfonieorchesterbasel.ch/selection/event/seat?perfId=10229721078768&productId=10229721147337&lang=de",
 "sourceUrl": "https://www.sinfonieorchesterbasel.ch/de/konzerte/freiheit/12194",
 "source": "sob"
+},
+{
+"id": "real-luzerner_theater-8785",
+"title": "I Capuleti e i Montecchi [Romeo und Julia]",
+"series": null,
+"start": "2027-01-21T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Choreographer",
+"name": "Christine Cyris"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Solenn' Lavanant Linke"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Vincenzo Bellini",
+"title": "I Capuleti e i Montecchi"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8785",
+"sourceUrl": "https://www.luzernertheater.ch/icapuletieimontecchi",
+"source": "luzerner_theater"
+},
+{
+"id": "real-theater_casino_zug-78a3e9c6-ae8c-4765-a608-0ed20e5cb545",
+"title": "Idyllen und Visionen",
+"series": "Zuger Klassik Plus",
+"start": "2027-01-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Gabriela Montero"
+},
+{
+"role": "Trumpet",
+"name": "Simon Höfele"
+},
+{
+"role": "Orchestra",
+"name": "Zürcher Kammerorchester"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229820847866",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/idyllen-und-visionen?date=78a3e9c6-ae8c-4765-a608-0ed20e5cb545",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-kts_st_gallen-3785",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=507&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3785/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-buehnen_bern-schumann-am-rhein-2027-01-21-1930",
@@ -19101,6 +27533,28 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-kammerorchester_basel-rheinfelden-202701212000",
+"title": "Kammerorchester Basel – Konzerte mit Kristian Bezuidenhout und Alina Ibragimova",
+"series": null,
+"start": "2027-01-21T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Stadtkirche St. Martin",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://www.klassiksterne-rheinfelden.com/konzert-2-derschwedischemozart",
+"sourceUrl": "https://www.klassiksterne-rheinfelden.com/konzert-2-derschwedischemozart",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-osi-175694853669087",
 "title": "Tini Thing Helseth",
 "series": "OSI al DOCKS",
@@ -19191,6 +27645,102 @@ export const REAL = [
 "ticketUrl": "https://www.bm-geneve.ch/notice?id=h%3A%3Afdf24ef6-4bd1-4099-9391-0d5b59c4ae4e&queryId=f3c18f67-8cfb-4957-bd00-33856f71e6f0&posInSet=7",
 "sourceUrl": "https://locg.ch/fr/calendrier/concert-sur-le-pouce-5",
 "source": "ocg"
+},
+{
+"id": "real-kts_st_gallen-3898",
+"title": "Ladies Quartet Overseas",
+"series": null,
+"start": "2027-01-22T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "ØYA",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Yuko Ishikawa"
+},
+{
+"role": "Violin",
+"name": "Gwendoline Rouiller"
+},
+{
+"role": "Viola",
+"name": "Stefanie Sampaio de Medeiros"
+},
+{
+"role": "Cello",
+"name": "Carolin Eychmüller"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=594&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/2-afterwork-ladies-quartet-overseas/3898/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-argovia_philharmonic-268498",
+"title": "3. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-01-22T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Oboe",
+"name": "Cristina Gómez Godoy"
+},
+{
+"role": "Conductor",
+"name": "Virginia Martínez"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Richard Strauss",
+"title": "Serenade Es-Dur op. 7",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Richard Strauss",
+"title": "Konzert für Oboe und kleines Orchester D-Dur TrV 292 (AV 144)",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Amy Beach",
+"title": "Sinfonie e-Moll op. 32 «Gaelic»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165348/",
+"sourceUrl": "https://argoviaphil.ch/konzert/3-abo-konzert-2-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-reformiert_zuerich-8561",
+"title": "Alte Musik mit jungen Menschen - Kantaten-Konzert",
+"series": null,
+"start": "2027-01-22T19:30:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/alte-musik-mit-jungen-menschen-kantaten-kon-8561/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/alte-musik-mit-jungen-menschen-kantaten-kon-8561/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-stadtcasino_basel-220127_cmb",
@@ -19359,6 +27909,45 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-camerata_bern-30974",
+"title": "Distant Light",
+"series": "Abokonzert",
+"start": "2027-01-23T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Antje Weithaas"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Philippe Racine",
+"title": "presto – pensoso"
+},
+{
+"composer": "Pēteris Vasks",
+"title": "Distant Light, Violinkonzert Nr. 1"
+},
+{
+"composer": "Pjotr Iljitsch Tschaikowski",
+"title": "Serenade für Streicher in C-Dur op. 48"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/159490/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/distant-light-1",
+"source": "camerata_bern"
+},
+{
 "id": "real-tonhalle-2055683",
 "title": "Paavo Järvi & Frank Peter Zimmermann",
 "series": null,
@@ -19486,6 +28075,156 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-musique_cdf-3217",
+"title": "Oiseaux de Passage · Natalie Dessay soprano · Philippe Cassard piano",
+"series": "Collaboration",
+"start": "2027-01-23T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Natalie Dessay"
+},
+{
+"role": "Piano",
+"name": "Philippe Cassard"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Œuvre à définir",
+"composerId": "mozart"
+},
+{
+"composer": "Ernest Chausson",
+"title": "7 Mélodies, op. 2 : n° 7, Le colibri"
+},
+{
+"composer": "Maurice Ravel",
+"title": "3 Chansons, M. 69 : n° 2, «Trois beaux oiseaux du Paradis »",
+"composerId": "ravel"
+},
+{
+"composer": "Louis Beydts",
+"title": "Chansons pour les oiseaux : « La colombe poignardée »"
+},
+{
+"composer": "Francis Poulenc",
+"title": "Métamorphoses, FP 121 : n° 1, « Reine des mouettes »"
+},
+{
+"composer": "Gian Carlo Menotti",
+"title": "The Old Maid and the Thief : air de Laetitia «What a Curse for a Woman / Steal Me, Thief»"
+},
+{
+"composer": "Samuel Barber",
+"title": "Mélodies passagères, op. 27 : n° 1, « Puisque tout passe »"
+},
+{
+"composer": "André Previn",
+"title": "A Streetcar Named Desire : air de Blanche « I Want Magic »"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/oiseaux-de-passage/",
+"source": "musique_cdf"
+},
+{
+"id": "real-casino_bern-fagottissimo-20270124-1100",
+"title": "Fagottissimo",
+"series": "5. Matineekonzert",
+"start": "2027-01-24T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Bassoon",
+"name": "Monika Schindler"
+},
+{
+"role": "Bassoon",
+"name": "Daniel Casal Mota"
+},
+{
+"role": "Bassoon",
+"name": "Norihito Nishinomura"
+},
+{
+"role": "Bassoon",
+"name": "Filipe Castro"
+}
+],
+"program": [
+{
+"composer": "Geoffrey Keating",
+"title": "Dance Hall Suite"
+},
+{
+"composer": "Allan Stephenson",
+"title": "Divertimento für drei Fagotte und Kontrafagott"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/fagottissimo/",
+"sourceUrl": "https://www.casinobern.ch/programm/fagottissimo/#24-01-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-ocl-8e7fd9ef-bd46-46f6-8998-8f773e87ef78-ocl-ch",
+"title": "Les Dominicales n°2 | Koncz · Marosi · Mozart / Haydn / Schubert",
+"series": "Les Dominicales n°2",
+"start": "2027-01-24T11:00:00+01:00",
+"durationMin": 90,
+"cityId": "lausanne",
+"venueId": "salle-metropole",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Christoph Koncz"
+},
+{
+"role": "Cello",
+"name": "Joël Marosi"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Symphonie n°35 en ré majeur, KV 385, « Haffner »",
+"composerId": "mozart"
+},
+{
+"composer": "Joseph Haydn",
+"title": "Concerto pour violoncelle et orchestre en do majeur, Hob. VIIb:1",
+"composerId": "haydn"
+},
+{
+"composer": "Franz Schubert",
+"title": "Symphonie n°3 en ré majeur, D. 200",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/dominicale-n2/",
+"sourceUrl": "https://www.ocl.ch/concert/dominicale-n2/",
+"source": "ocl"
+},
+{
 "id": "real-lso_luzern-19938",
 "title": "KAMMERMUSIK-MATINÉE 3",
 "series": "Kammermusik",
@@ -19535,6 +28274,78 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/kammermusik-matinee-3-fnb2pi",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/kammermusik-matinee-3-4/",
 "source": "lso_luzern"
+},
+{
+"id": "real-kts_st_gallen-3786",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-24T14:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=508&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3786/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-200290",
@@ -19629,6 +28440,51 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-argovia_philharmonic-268500",
+"title": "3. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-01-24T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Oboe",
+"name": "Cristina Gómez Godoy"
+},
+{
+"role": "Conductor",
+"name": "Virginia Martínez"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Richard Strauss",
+"title": "Serenade Es-Dur op. 7",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Richard Strauss",
+"title": "Konzert für Oboe und kleines Orchester D-Dur TrV 292 (AV 144)",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Amy Beach",
+"title": "Sinfonie e-Moll op. 32 «Gaelic»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165348/",
+"sourceUrl": "https://argoviaphil.ch/konzert/3-abo-konzert-3-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-geneva_victoria_hall-32916428-20270124",
 "title": "Création mondiale",
 "series": "Concert du dimanche",
@@ -19654,6 +28510,71 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/api/1/redirect/product?id=10229292489260",
 "sourceUrl": "https://openagenda.com/victoria-hall/events/32916428_creation-mondiale",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-camerata_bern-30984",
+"title": "Distant Light",
+"series": "Abokonzert",
+"start": "2027-01-24T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Zentrum Paul Klee",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Antje Weithaas"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Philippe Racine",
+"title": "presto – pensoso"
+},
+{
+"composer": "Pēteris Vasks",
+"title": "Distant Light, Violinkonzert Nr. 1"
+},
+{
+"composer": "Pjotr Iljitsch Tschaikowski",
+"title": "Serenade für Streicher in C-Dur op. 48"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/159491/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/distant-light-2",
+"source": "camerata_bern"
+},
+{
+"id": "real-musique_cdf-3221",
+"title": "Juliette Mey mezzo-soprano · Karolos Zouganelis piano",
+"series": "Nouveaux Talents",
+"start": "2027-01-24T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Mezzo-soprano",
+"name": "Juliette Mey"
+},
+{
+"role": "Piano",
+"name": "Karolos Zouganelis"
+}
+],
+"program": [],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-24-01-2027/",
+"source": "musique_cdf"
 },
 {
 "id": "real-tonhalle-2055687",
@@ -19823,6 +28744,62 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-ocl-ea4f1dd5-e7d0-4f66-8902-2bfa3fb5b09b-ocl-ch",
+"title": "Les Grands Concerts n°6 | Scappucci · Feola · Mozart n°40",
+"series": "Les Grands Concerts n°6",
+"start": "2027-01-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Speranza Scappucci"
+},
+{
+"role": "Soprano",
+"name": "Rosa Feola"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Le nozze di Figaro, ouverture, KV 492",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "« Vado, ma dove? o dei! », aria pour soprano et orchestre, KV 583",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "« Bella mia fiamma—Resta, oh cara », aria pour soprano et orchestre, KV 528",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "« Alma grande e nobil core », KV 578",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Symphonie n°40 en sol mineur, KV 550",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n6/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n6/",
+"source": "ocl"
+},
+{
 "id": "real-tonhalle-2055697",
 "title": "Paavo Järvi mit Mozarts Requiem",
 "series": null,
@@ -19877,6 +28854,58 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5574&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/paavo-jaervi-mit-mozarts-requiem-2055697/",
 "source": "tonhalle"
+},
+{
+"id": "real-ocf_fribourg-8496",
+"title": "Eine Welt-Sinfonie",
+"series": "Société des Concerts de Fribourg",
+"start": "2027-01-28T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Orchestre de l’HEMU"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Soprano",
+"name": "Jeanne-Michèle Charbonnet"
+},
+{
+"role": "Choir",
+"name": "Chœur de Jade"
+},
+{
+"role": "Choir",
+"name": "Chœur Callirhoé"
+},
+{
+"role": "Choir",
+"name": "Maîtrise du Conservatoire de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Gustav Mahler",
+"title": "Symphonie n° 3 en ré mineur",
+"composerId": "mahler"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8496",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-zko-19732",
@@ -19952,10 +28981,6 @@ export const REAL = [
 "status": "scheduled",
 "credits": [
 {
-"role": "Violin",
-"name": "Ilya Gringolts"
-},
-{
 "role": "Conductor",
 "name": "Ilya Gringolts"
 },
@@ -19990,6 +29015,42 @@ export const REAL = [
 "ticketUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/mizmorim-voice-soul/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/mizmorim-voice-soul/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-esn_neuchatel-mourir-damour-202701281930",
+"title": "Mourir d'amour",
+"series": null,
+"start": "2027-01-28T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Victorien Vanoosten"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+}
+],
+"program": [
+{
+"composer": "I. Stravinsky",
+"title": "Petrouchka",
+"composerId": "stravinsky"
+},
+{
+"composer": "S. Prokofiev",
+"title": "Roméo et Juliette, op. 64, extraits du ballets"
+}
+],
+"ticketUrl": "https://billetterie.chaux-de-fonds.ch/selection/event/date?productId=10229909926600",
+"sourceUrl": "https://www.esn-ne.ch/concerts/mourir-damour",
+"source": "esn_neuchatel"
 },
 {
 "id": "real-tonhalle-2055696",
@@ -20316,6 +29377,87 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kts_st_gallen-3908",
+"title": "Sol Gabetta",
+"series": "Meisterzyklus-Konzert",
+"start": "2027-01-29T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Sol Gabetta"
+},
+{
+"role": "Piano",
+"name": "Bertrand Chamayou"
+}
+],
+"program": [
+{
+"composer": "Edvard Grieg",
+"title": "Sonate für Klavier und Violoncello a-Moll op. 36",
+"composerId": "grieg"
+},
+{
+"composer": "Sergei Rachmaninow",
+"title": "Sonate für Violoncello und Klavier g-Moll op. 19"
+},
+{
+"composer": "Witold Lutosławski",
+"title": "Grave"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=581&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/3-mzk-sol-gabetta/3908/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-sommets_musicaux-20270129-1930-eglise-de-saanen",
+"title": "Truls Mørk, Les Siècles, Renaud Capuçon",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-29T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "saanen",
+"venueName": "Église de Saanen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Truls Mørk"
+},
+{
+"role": "Orchestra",
+"name": "Les Siècles"
+},
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+}
+],
+"program": [
+{
+"composer": "R. Schumann",
+"title": "Concerto pour violoncelle en la mineur, op.129",
+"composerId": "schumann"
+},
+{
+"composer": "J. Brahms",
+"title": "Symphonie n°2 en ré majeur, op.73",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-saanen-21984247/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/vendredi-29-janvier-2027/1930-eglise-de-saanen/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-musikkollegium-9407",
 "title": "Joglo auf Schatzsuche",
 "series": "Familienkonzert ab 4 Jahren",
@@ -20413,6 +29555,67 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-sommets_musicaux-20270130-1600-chapelle-de-gstaad",
+"title": "Yo Kitamura, Naoko Sonoda",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-30T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Yo Kitamura"
+},
+{
+"role": "Piano",
+"name": "Naoko Sonoda"
+}
+],
+"program": [
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°5 en ré majeur, op.102, n°2",
+"composerId": "beethoven"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "D. Chostakovitch",
+"title": "Sonate pour violoncelle et piano en ré mineur, op.40"
+},
+{
+"composer": "M. Rostropovitch",
+"title": "Humoresque, op.5"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21985986/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/samedi-30-janvier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
+},
+{
+"id": "real-reformiert_zuerich-15632",
+"title": "Kaleidoskop Konzert \"Eusi Musig\"",
+"series": null,
+"start": "2027-01-30T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Markuskirche, Seebach",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/kaleidoskop-konzert-eusi-musig-15632/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/kaleidoskop-konzert-eusi-musig-15632/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2056820",
 "title": "Abo-Konzert #4 – Amor et Psyche",
 "series": "Abo-Konzert #4",
@@ -20455,6 +29658,126 @@ export const REAL = [
 "ticketUrl": "https://shop.e-guma.ch/camerata-zuerich/de/events/4-amor-et-psyche-tonhalle-zuerich-2679499",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/abo-konzert-4-amor-et-psyche-2056820/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-cite_bleue-carmina-latina-2027-01-30-1930",
+"title": "Carmina Latina",
+"series": null,
+"start": "2027-01-30T19:30:00+01:00",
+"durationMin": 90,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Mariana Flores"
+},
+{
+"role": "Countertenor",
+"name": "Leandro Marziotte"
+},
+{
+"role": "Tenor",
+"name": "Valerio Contaldo"
+},
+{
+"role": "Bass",
+"name": "Matteo Bellotto"
+},
+{
+"role": "Conductor",
+"name": "Leonardo García-Alarcón"
+}
+],
+"program": [
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Hanacpachap cussicuinin"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Salve Regina"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "A Belén me llego Tio"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Desvelado dueño mio"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Esta vez, Cupidillo"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Vaya de gira"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Canto Llano de la Inmaculada concepción"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "Romerico florido"
+},
+{
+"composer": "Juan Pérez de Bocanegra",
+"title": "La bomba"
+},
+{
+"composer": "Diego José de Salazar",
+"title": "Salga el torillo hosquillo"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/carmina-latina",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/carmina-latina",
+"source": "cite_bleue"
+},
+{
+"id": "real-sommets_musicaux-20270130-1930-eglise-de-saanen",
+"title": "Mao Fujita, Renaud Capuçon, Kian Soltani",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-30T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "saanen",
+"venueName": "Église de Saanen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Mao Fujita"
+},
+{
+"role": "Violin",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Cello",
+"name": "Kian Soltani"
+}
+],
+"program": [
+{
+"composer": "J. Brahms",
+"title": "Trio pour piano n°1 en si majeur, op.8",
+"composerId": "brahms"
+},
+{
+"composer": "F. Mendelssohn",
+"title": "Trio pour piano n°1 en ré mineur, op.49",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-saanen-21987728/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/samedi-30-janvier-2027/1930-eglise-de-saanen/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-stadtcasino_basel-mizmorim-eine-blume-fur-tabea",
@@ -20506,6 +29829,51 @@ export const REAL = [
 "ticketUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/mizmorim-eine-blume-fur-tabea/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/mizmorim-eine-blume-fur-tabea/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-musique_cdf-3214",
+"title": "Carte Blanche du Conservatoire de Musique Neuchâtelois · Concert des Talents",
+"series": "Collaboration",
+"start": "2027-01-31T11:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueName": "Salle Faller",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/carte-blanche-du-conservatoire-de-musique-neuchateloisconcert-des-talents/",
+"source": "musique_cdf"
+},
+{
+"id": "real-sommets_musicaux-20270131-1100-eglise-de-rougemont",
+"title": "Jing Zhao",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-31T11:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Église de Rougemont",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Jing Zhao"
+}
+],
+"program": [
+{
+"composer": "J.-S. Bach",
+"title": "Suites pour violoncelle n°2 en ré mineur, BWV1008 ; n°4 en mi bémol majeur, BWV1010 ; n°5 en do mineur, BWV1011",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://www.sommets-musicaux.com/concert/dimanche-31-janvier-2027/1100-eglise-de-rougemont/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/dimanche-31-janvier-2027/1100-eglise-de-rougemont/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-opera_lausanne-le-cochon-enchante-20270131-1100",
@@ -20616,6 +29984,44 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-musique_cdf-3215",
+"title": "Carte Blanche du Conservatoire de Musique Neuchâtelois · Histoire de Cuivres – Seyon Quartet",
+"series": "Collaboration",
+"start": "2027-01-31T14:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueName": "Salle Faller",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Histoire de Cuivres – Seyon Quartet"
+},
+{
+"role": "Trumpet",
+"name": "Vincent Pellet"
+},
+{
+"role": "Trumpet",
+"name": "Sylvain Tolk"
+},
+{
+"role": "Trombone",
+"name": "Martial Rosselet"
+},
+{
+"role": "Trombone",
+"name": "Rosario Rizzo"
+}
+],
+"program": [],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/carte-blanche-du-conservatoire-de-musique-neuchateloishistoire-de-cuivres-seyon-quartet/",
+"source": "musique_cdf"
+},
+{
 "id": "real-opernhaus_zurich-200291",
 "title": "Die Walküre",
 "series": "Hauptbühne",
@@ -20708,6 +30114,68 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-reformiert_zuerich-16107",
+"title": "Duo Grossenbacher-Miloslavskaya | Konzert",
+"series": null,
+"start": "2027-01-31T14:30:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Lavaterhaus, Lavatersaal",
+"type": "chamber",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/duo-grossenbacher-miloslavskaya-konzert-14-16107/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/duo-grossenbacher-miloslavskaya-konzert-14-16107/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-sommets_musicaux-20270131-1600-chapelle-de-gstaad",
+"title": "Hugo Svedberg, Béla Hartmann",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-31T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Hugo Svedberg"
+},
+{
+"role": "Piano",
+"name": "Béla Hartmann"
+}
+],
+"program": [
+{
+"composer": "R. Schumann",
+"title": "Adagio et Allegro en la bémol majeur, op.70",
+"composerId": "schumann"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "M. Bruch",
+"title": "Kol Nidrei op.47"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°3 en la majeur, op.69",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21989474/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/dimanche-31-janvier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-tonhalle-2059219",
 "title": "Amandine Beyer: Frozen Venice",
 "series": null,
@@ -20742,6 +30210,148 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Ftonhallezuerich.ch%2Fhome-tz%2Fkonzerte%2Fkalender%2F&event=5650&language=de",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/amandine-beyer-frozen-venice-2059219/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-musique_cdf-3216",
+"title": "Carte Blanche du Conservatoire de Musique Neuchâtelois · Lechoeur",
+"series": "Collaboration",
+"start": "2027-01-31T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Lechoeur"
+},
+{
+"role": "Soprano",
+"name": "Claudine Charnay"
+},
+{
+"role": "Conductor",
+"name": "Nicolas Farine"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Motet « komm, Jesu, komm »",
+"composerId": "bach"
+},
+{
+"composer": "Eric Whitacre",
+"title": "« Sleep »"
+},
+{
+"composer": "Alain Tissot",
+"title": "«Vesper» création mondiale"
+},
+{
+"composer": "Eric Whitacre",
+"title": "« Lux Aurumque »"
+},
+{
+"composer": "Felix Mendelssohn",
+"title": "Psaume op. 42 «Wie der Hirsch schreit »",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/carte-blanche-du-conservatoire-de-musique-neuchateloislechoeur/",
+"source": "musique_cdf"
+},
+{
+"id": "real-reformiert_zuerich-762",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-01-31T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-762/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-762/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-kts_st_gallen-3787",
+"title": "La Cenerentola",
+"series": "Grosses Haus",
+"start": "2027-01-31T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Anna Bernreitner"
+},
+{
+"role": "Choreographer",
+"name": "Steffi Wieser"
+},
+{
+"role": "Performer",
+"name": "Omar Mancini"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Pablo Ruiz"
+},
+{
+"role": "Performer",
+"name": "Theresa Steinbach"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Herrenchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "La Cenerentola",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=509&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-01/cenerentola/3787/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opera_lausanne-le-cochon-enchante-20270131-1700",
@@ -20811,6 +30421,65 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-reformiert_zuerich-15494",
+"title": "Liederabend «Zwischen den Welten»",
+"series": null,
+"start": "2027-01-31T17:00:00+01:00",
+"durationMin": 75,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/liederabend-zwischen-den-welten-15494/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/liederabend-zwischen-den-welten-15494/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-sommets_musicaux-20270131-1930-eglise-de-saanen",
+"title": "Augustin Hadelich, Mahler Chamber Orchestra",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-01-31T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "saanen",
+"venueName": "Église de Saanen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Augustin Hadelich"
+},
+{
+"role": "Orchestra",
+"name": "Mahler Chamber Orchestra"
+}
+],
+"program": [
+{
+"composer": "W. A. Mozart",
+"title": "Concerto pour violon n°1 en si bémol majeur, K.207",
+"composerId": "mozart"
+},
+{
+"composer": "W. A. Mozart",
+"title": "Symphonie n°29 en la majeur, KV201",
+"composerId": "mozart"
+},
+{
+"composer": "W. A. Mozart",
+"title": "Concerto pour violon n°5 en la majeur, K.219",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-saanen-21988266/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/dimanche-31-janvier-2027/1930-eglise-de-saanen/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-stadtcasino_basel-310127_kit_armstrong",
 "title": "Le Concert Olympique mit Kit Armstrong",
 "series": "AMG Solistenabende",
@@ -20875,6 +30544,51 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-sommets_musicaux-20270201-1600-chapelle-de-gstaad",
+"title": "Arne Zeller, Jacopo Giovannini",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-01T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Arne Zeller"
+},
+{
+"role": "Piano",
+"name": "Jacopo Giovannini"
+}
+],
+"program": [
+{
+"composer": "F. Bridge",
+"title": "Sonate pour violoncelle et piano en ré mineur (H.125)"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "R. Schumann",
+"title": "Cinq pièces dans le ton populaire, op.102",
+"composerId": "schumann"
+},
+{
+"composer": "I. Stravinsky",
+"title": "Suite Italienne pour violoncelle et piano (version arrangée par le violoncelliste Gregor Piatigorsky)",
+"composerId": "stravinsky"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21989473/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/lundi-1er-fevrier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-opernhaus_zurich-200032",
 "title": "5. Kammerkonzert",
 "series": "Kammerkonzerte",
@@ -20914,6 +30628,42 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15447&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/kammerkonzert-5/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-sommets_musicaux-20270201-1930-eglise-de-rougemont",
+"title": "Anastasia Voltchok, Charlie Siem",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-01T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Église de Rougemont",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Anastasia Voltchok"
+},
+{
+"role": "Violin",
+"name": "Charlie Siem"
+}
+],
+"program": [
+{
+"composer": "E. Grieg",
+"title": "Sonate pour violon et piano n°3 en ut mineur, op.45",
+"composerId": "grieg"
+},
+{
+"composer": "C. Franck",
+"title": "Sonate pour violon et piano en la majeur, FWV8"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-von-rougemont-21984826/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/lundi-1er-fevrier-2027/1930-eglise-de-rougemont/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-stadtcasino_basel-01022027_k128",
@@ -20994,6 +30744,51 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5625&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/serie-jeunes-petar-pejcic-2055701/",
 "source": "tonhalle"
+},
+{
+"id": "real-sommets_musicaux-20270202-1600-chapelle-de-gstaad",
+"title": "Krzysztof Michalski, Merwan Mazloum",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-02T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Krzysztof Michalski"
+},
+{
+"role": "Piano",
+"name": "Merwan Mazloum"
+}
+],
+"program": [
+{
+"composer": "F. Chopin",
+"title": "Introduction et Polonaise brillante en do majeur, op.3 «Version Rose»",
+"composerId": "chopin"
+},
+{
+"composer": "R. Schumann",
+"title": "Cinq pièces dans le ton populaire, op.102",
+"composerId": "schumann"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "C. Franck",
+"title": "Sonate pour violoncelle et piano en la majeur, FWV8"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21989479/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/mardi-2-fevrier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-stadtcasino_basel-020227_gfk",
@@ -21085,6 +30880,39 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-sommets_musicaux-20270202-1930-eglise-de-rougemont",
+"title": "Trio Wanderer",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-02T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Église de Rougemont",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Trio Wanderer"
+}
+],
+"program": [
+{
+"composer": "L. van Beethoven",
+"title": "Trio avec piano n°6 en mi bémol majeur, op.70 n°2",
+"composerId": "beethoven"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Trio pour piano n°7 en si bémol majeur, op.97, « Archiduc »",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-von-rougemont-21988482/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/mardi-2-fevrier-2027/1930-eglise-de-rougemont/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-opera_lausanne-le-cochon-enchante-20270203-1500",
 "title": "Le Cochon enchanté",
 "series": "Jeune public",
@@ -21150,6 +30978,55 @@ export const REAL = [
 "ticketUrl": "https://opl.shop.secutix.com/selection/event/date?productId=10229284098121",
 "sourceUrl": "https://www.opera-lausanne.ch/show/le-cochon-enchante/",
 "source": "opera_lausanne"
+},
+{
+"id": "real-sommets_musicaux-20270203-1600-chapelle-de-gstaad",
+"title": "Charlotte Miles, Itai Navon",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-03T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Charlotte Miles"
+},
+{
+"role": "Piano",
+"name": "Itai Navon"
+}
+],
+"program": [
+{
+"composer": "N. Boulanger",
+"title": "Trois pièces pour violoncelle et piano"
+},
+{
+"composer": "L. Janáček",
+"title": "Conte de fées"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "C. Debussy",
+"title": "Sonate pour violoncelle et piano en ré mineur (CD144 / L.135)",
+"composerId": "debussy"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°3 en la majeur, op.69",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21989478/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/mercredi-3-fevrier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-opernhaus_zurich-200292",
@@ -21287,6 +31164,39 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-sommets_musicaux-20270203-1930-eglise-de-rougemont",
+"title": "Quatuor Ebène",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-03T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Église de Rougemont",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Quatuor Ebène"
+}
+],
+"program": [
+{
+"composer": "L. van Beethoven",
+"title": "Quatuor à cordes nº7 en fa majeur, op.59 nº1, «Razumovsky»",
+"composerId": "beethoven"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Quatuor à cordes nº15 en la mineur, op.132, «Heiliger Dankgesand»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-von-rougemont-21989426/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/mercredi-3-fevrier-2027/1930-eglise-de-rougemont/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-stadtcasino_basel-030227_kg",
 "title": "Sinfonieorchester Basel",
 "series": "KG-Sinfoniekonzerte",
@@ -21372,6 +31282,32 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-ocl-socits-chorales-vaudoises-2-20270203",
+"title": "Sociétés chorales vaudoises",
+"series": null,
+"start": "2027-02-03T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueId": "cathedrale-lausanne",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Choeur Bach"
+},
+{
+"role": "Conductor",
+"name": "Romain Mayor"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ocl.ch/concert/socits-chorales-vaudoises-2/",
+"sourceUrl": "https://www.ocl.ch/concert/socits-chorales-vaudoises-2/",
+"source": "ocl"
+},
+{
 "id": "real-tonhalle-2055714",
 "title": "Orchester-Lunchkonzert mit Tugan Sokhiev",
 "series": "Orchester-Lunchkonzert",
@@ -21401,6 +31337,86 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5607&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/orchester-lunchkonzert-mit-tugan-sokhiev-2055714/",
 "source": "tonhalle"
+},
+{
+"id": "real-sommets_musicaux-20270204-1600-chapelle-de-gstaad",
+"title": "Alvaro Lozano Cames, Naoko Sonoda",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-04T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Alvaro Lozano Cames"
+},
+{
+"role": "Piano",
+"name": "Naoko Sonoda"
+}
+],
+"program": [
+{
+"composer": "R. Schumann",
+"title": "Adagio et Allegro en la bémol majeur, op.70",
+"composerId": "schumann"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°4 en do majeur, op.102, n°1",
+"composerId": "beethoven"
+},
+{
+"composer": "M. Weinberg",
+"title": "Sonate pour violoncelle et piano n°2 en sol mineur, op.63"
+},
+{
+"composer": "G. Cassadó",
+"title": "«Requiebros»"
+}
+],
+"ticketUrl": "https://www.sommets-musicaux.com/concert/jeudi-4-fevrier-2027/1600-chapelle-de-gstaad/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/jeudi-4-fevrier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
+},
+{
+"id": "real-sommets_musicaux-20270204-1930-eglise-de-rougemont",
+"title": "Benjamin Appl, Keigo Mukawa",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Église de Rougemont",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Baritone",
+"name": "Benjamin Appl"
+},
+{
+"role": "Piano",
+"name": "Keigo Mukawa"
+}
+],
+"program": [
+{
+"workId": "schubert-winterreise",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-von-rougemont-21989444/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/jeudi-4-fevrier-2027/1930-eglise-de-rougemont/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-musikkollegium-9235",
@@ -21621,6 +31637,46 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-sommets_musicaux-20270205-1600-chapelle-de-gstaad",
+"title": "Clara Dietlin, Kojiro Okada",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-05T16:00:00+01:00",
+"durationMin": 120,
+"cityId": "gstaad",
+"venueName": "Chapelle de Gstaad",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Clara Dietlin"
+},
+{
+"role": "Piano",
+"name": "Kojiro Okada"
+}
+],
+"program": [
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano nº4 en do majeur, op.102, n°1",
+"composerId": "beethoven"
+},
+{
+"composer": "S. Avramidou",
+"title": "«Molt» commande du festival"
+},
+{
+"composer": "S. Rachmaninov",
+"title": "Sonate pour violoncelle et piano en sol mineur, op.19"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kapelle-gstaad-21989498/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/vendredi-5-fevrier-2027/1600-chapelle-de-gstaad/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-musikkollegium-9239",
 "title": "Meet Claire Huangci & friends",
 "series": "Feierabend-Konzert",
@@ -21668,6 +31724,53 @@ export const REAL = [
 "ticketUrl": "https://www.musikkollegium.ch/programm/meet-claire-huangci-friends-27-02-05-9239",
 "sourceUrl": "https://www.musikkollegium.ch/programm/meet-claire-huangci-friends-27-02-05-9239",
 "source": "musikkollegium"
+},
+{
+"id": "real-sommets_musicaux-20270205-1930-eglise-de-saanen",
+"title": "Martha Argerich, Mischa Maisky",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "saanen",
+"venueName": "Église de Saanen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Martha Argerich"
+},
+{
+"role": "Cello",
+"name": "Mischa Maisky"
+}
+],
+"program": [
+{
+"composer": "L. van Beethoven",
+"title": "7 variations sur « Bei Männern, welche Liebe fühlen » sur le thème de « La flûte enchantée » de W. A. Mozart",
+"composerId": "beethoven"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°2 en sol mineur, op.5, n°2",
+"composerId": "beethoven"
+},
+{
+"composer": "L. van Beethoven",
+"title": "12 variations sur « Ein Mädchen oder Weibchen » op.66 sur le thème de « La flûte enchantée » de W. A. Mozart",
+"composerId": "beethoven"
+},
+{
+"composer": "L. van Beethoven",
+"title": "Sonate pour violoncelle et piano n°5 en ré majeur op.102, n°2",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.sommets-musicaux.com/concert/vendredi-5-fevrier-2027/1930-eglise-de-saanen/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/vendredi-5-fevrier-2027/1930-eglise-de-saanen/",
+"source": "sommets_musicaux"
 },
 {
 "id": "real-buehnen_bern-romeo-und-julia-27-2027-02-05-1930",
@@ -21898,6 +32001,135 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3868",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-02-06T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=510&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-02/susannah/3868/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-sommets_musicaux-20270206-1930-eglise-de-saanen",
+"title": "Jaemin Han, Orchestre de Chambre de Lausanne, Christoph Koncz",
+"series": "Sommets Musicaux de Gstaad",
+"start": "2027-02-06T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "saanen",
+"venueName": "Église de Saanen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Jaemin Han"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+},
+{
+"role": "Violin",
+"name": "Christoph Koncz"
+}
+],
+"program": [
+{
+"composer": "W. A. Mozart",
+"title": "Symphonie n°35 en ré majeur, KV385, «Haffner»",
+"composerId": "mozart"
+},
+{
+"composer": "J. Haydn",
+"title": "Concerto pour violoncelle et orchestre en do majeur, Hob. VIIb:1",
+"composerId": "haydn"
+},
+{
+"composer": "F. Schubert",
+"title": "Symphonie n°3 en ré majeur, D.200",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.ticketcorner.ch/fr/event/sommets-musicaux-de-gstaad-2027-kirche-saanen-21988325/",
+"sourceUrl": "https://www.sommets-musicaux.com/concert/samedi-6-fevrier-2027/1930-eglise-de-saanen/",
+"source": "sommets_musicaux"
+},
+{
 "id": "real-osr-le-voyage-a-reims-20270206",
 "title": "Le Voyage à Reims",
 "series": null,
@@ -22004,6 +32236,41 @@ export const REAL = [
 "ticketUrl": "https://www.gtg.ch/",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/le-voyage-a-reims",
 "source": "osr"
+},
+{
+"id": "real-musique_cdf-3307",
+"title": "Orphée aux Enfers",
+"series": "Collaboration",
+"start": "2027-02-06T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueName": "L’Heure Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "Haute École de Musique de Genève"
+},
+{
+"role": "Conductor",
+"name": "Philippe Hui"
+},
+{
+"role": "Director",
+"name": "Yves Coudray"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Orphée aux Enfers, opéra-bouffe"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/orphee-aux-enfers-06-02-2027/",
+"source": "musique_cdf"
 },
 {
 "id": "real-tonhalle-2063414",
@@ -22145,6 +32412,41 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5618&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/kammermusik-matinee-2055690/",
 "source": "tonhalle"
+},
+{
+"id": "real-musique_cdf-3308",
+"title": "Orphée aux Enfers",
+"series": "Collaboration",
+"start": "2027-02-07T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueName": "L’Heure Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "Haute École de Musique de Genève"
+},
+{
+"role": "Conductor",
+"name": "Philippe Hui"
+},
+{
+"role": "Director",
+"name": "Yves Coudray"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Orphée aux Enfers, opéra-bouffe"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/orphee-aux-enfers-07-02-2027/",
+"source": "musique_cdf"
 },
 {
 "id": "real-cnz-145",
@@ -22536,6 +32838,37 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-musique_cdf-3204",
+"title": "Kristian Bezuidenhout pianoforte · Julian Pregardien ténor",
+"series": "Grande Série",
+"start": "2027-02-09T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Fortepiano",
+"name": "Kristian Bezuidenhout"
+},
+{
+"role": "Tenor",
+"name": "Julian Pregardien"
+}
+],
+"program": [
+{
+"workId": "schubert-winterreise",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/kristian-bezuidenhout-pianojulian-pregardien-tenor/",
+"source": "musique_cdf"
+},
+{
 "id": "real-ocg-symphonie-africaine-20270209",
 "title": "Symphonie africaine",
 "series": null,
@@ -22815,6 +33148,44 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kammerorchester_basel-nachtklang-im-museum-ii-2-202702112000",
+"title": "Nachtklang im Museum",
+"series": null,
+"start": "2027-02-11T20:00:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Jüdisches Museum Schweiz",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Dmitry Smirnov"
+},
+{
+"role": "Viola",
+"name": "Antonio Viñuales Pérez"
+},
+{
+"role": "Cello",
+"name": "Christoph Dangel"
+},
+{
+"role": "Narrator",
+"name": "Hannah Im Hof"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/193232/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/nachtklang-im-museum-ii-2.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-opernhaus_zurich-200214",
 "title": "Roméo et Juliette",
 "series": "Hauptbühne",
@@ -22904,6 +33275,52 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15256&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/romeo-et-juliette/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3922",
+"title": "Emperor",
+"series": "Tonhallekonzert",
+"start": "2027-02-12T19:30:00+01:00",
+"durationMin": 110,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Piano",
+"name": "Stefan Vladar"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Ouvertüre zu Egmont op. 84",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Klavierkonzert Nr. 5 Es-Dur op. 73 Emperor",
+"composerId": "beethoven"
+},
+{
+"composer": "Jean Sibelius",
+"title": "Sinfonie Nr. 5 Es-Dur op. 82",
+"composerId": "sibelius"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=570&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-02/6-thk-emperor/3922/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-osr-le-voyage-a-reims-20270212",
@@ -23090,6 +33507,54 @@ export const REAL = [
 "ticketUrl": "https://tonhallezuerich.ch/konzerte/kalender/stadtharmonie-zuerich-oerlikon-seebach-2056831/tz/",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/stadtharmonie-zuerich-oerlikon-seebach-2056831/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-ocl-715cf2dd-97f7-4375-ab3c-bad65a17ff13-ocl-ch",
+"title": "Les Dominicales n°3 | Lopez-Ferrer · Spörri · Poulenc / Mozart / Sperger",
+"series": "Les Dominicales n°3",
+"start": "2027-02-14T11:00:00+01:00",
+"durationMin": 90,
+"cityId": "lausanne",
+"venueId": "salle-metropole",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "François Lopez-Ferrer"
+},
+{
+"role": "Double bass",
+"name": "Daniel Spörri"
+},
+{
+"role": "Bass",
+"name": "Raphaël Hardmeyer"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Johannes Matthias Sperger",
+"title": "« Selene, del tuo fuoco non mi parlare », récitatif et air pour basse, contrebasse obligée et orchestre"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "« Per questa bella mano », air pour basse, contrebasse obligée et orchestre, KV 612",
+"composerId": "mozart"
+},
+{
+"composer": "Francis Poulenc",
+"title": "Sinfonietta"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/dominicale-n3/",
+"sourceUrl": "https://www.ocl.ch/concert/dominicale-n3/",
+"source": "ocl"
 },
 {
 "id": "real-lso_luzern-19941",
@@ -23284,6 +33749,52 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-kts_st_gallen-3923",
+"title": "Emperor",
+"series": "Tonhallekonzert",
+"start": "2027-02-14T17:00:00+01:00",
+"durationMin": 110,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Piano",
+"name": "Stefan Vladar"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Ouvertüre zu Egmont op. 84",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Klavierkonzert Nr. 5 Es-Dur op. 73 Emperor",
+"composerId": "beethoven"
+},
+{
+"composer": "Jean Sibelius",
+"title": "Sinfonie Nr. 5 Es-Dur op. 82",
+"composerId": "sibelius"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=571&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-02/6-thk-emperor/3923/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-199932",
 "title": "Doctor Atomic",
 "series": "Hauptbühne",
@@ -23412,6 +33923,139 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kammerorchester_basel-la-chaux-de-fonds-202702171930",
+"title": "Kammerorchester Basel – Konzerte mit Fazıl Say",
+"series": "Grande Série",
+"start": "2027-02-17T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Leoš Janáček",
+"title": "Suite pour orchestre à cordes (1926)"
+},
+{
+"composer": "Dimitri Chostakovitch",
+"title": "Concerto pour piano, trompette et cordes n° 1 en do mineur, op. 35"
+},
+{
+"composer": "Fazil Say",
+"title": "Pièce de concert pour piano, trompette et cordes (2027), commande en première suisse"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "Sérénade pour cordes en mi majeur, op. 22",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/fazil-say-pianolucienne-renaudin-vary-trompetteorchestre-de-chambre-de-balebaptiste-lopez-direction-et-violon/",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-ocl-224f33a1-ea80-4501-b6a9-953835e2d488-ocl-ch",
+"title": "Les Grands Concerts n°7 | Kim · Brahms Concerto n°1 · Symphonie n°4",
+"series": "Les Grands Concerts n°7",
+"start": "2027-02-17T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Sunwook Kim"
+},
+{
+"role": "Orchestra",
+"name": "L'OCL avec l'orchestre de l'HEMU"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Concerto pour piano n°1 en ré mineur, op. 15",
+"composerId": "brahms"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Symphonie n°4 en mi mineur, op. 98",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n7/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n7/",
+"source": "ocl"
+},
+{
+"id": "real-ocf_fribourg-8497",
+"title": "L’ouïe - Concert sensation n°3",
+"series": null,
+"start": "2027-02-17T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Chin-Chao Lin"
+},
+{
+"role": "Dancer",
+"name": "Ursina Childs"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Magnus Lindberg",
+"title": "Absence"
+},
+{
+"composer": "Morton Gould",
+"title": "Tap Dance Concerto"
+},
+{
+"composer": "John Cage",
+"title": "4’33’’"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n° 7 op. 92",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8497",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8497",
+"source": "ocf_fribourg"
+},
+{
 "id": "real-lso_luzern-19904",
 "title": "VON GOTHAM ZUR AUSSTELLUNG – ELFMAN & MUSSORGSKY",
 "series": "Sinfoniekonzerte",
@@ -23449,6 +34093,58 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/von-gotham-zur-ausstellung-elfman-mussorgsky-qj5chk",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/von-gotham-zur-ausstellung-elfman-mussorgsky/",
 "source": "lso_luzern"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-kurhaus-berguen",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-17T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurhaus Bergün",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-kurhaus-berguen.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-kurhaus-berguen.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-kultursaal-lenzerheide",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-18T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kultursaal Lenzerheide",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-kultursaal-lenzerheide.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-kultursaal-lenzerheide.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-musikkollegium-9405",
@@ -23551,6 +34247,47 @@ export const REAL = [
 "source": "buehnen_bern"
 },
 {
+"id": "real-kultur_im_podium-2027-02-18-im-klang-der-neuen-welt",
+"title": "Im Klang der Neuen Welt",
+"series": "Kultur im Podium",
+"start": "2027-02-18T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Prag Symphonic Ensemble PSE"
+},
+{
+"role": "Conductor",
+"name": "Jérôme Kuhn"
+},
+{
+"role": "Cello",
+"name": "Sebastian Diezig"
+}
+],
+"program": [
+{
+"composer": "Joseph Haydn",
+"title": "Cellokonzert Nr. 1 in C-Dur",
+"composerId": "haydn"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "9. Sinfonie e-Moll op. 95 «Aus der Neuen Welt»",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/im-klang-der-neuen-welt/",
+"source": "kultur_im_podium"
+},
+{
 "id": "real-lso_luzern-19903",
 "title": "VON GOTHAM ZUR AUSSTELLUNG – ELFMAN & MUSSORGSKY",
 "series": "Sinfoniekonzerte",
@@ -23633,6 +34370,29 @@ export const REAL = [
 "ticketUrl": "https://shop.luganolac.ch/webshop/webticket/shop?event=11762",
 "sourceUrl": "https://www.osi.swiss/concerti/tutti-i-concerti/2027-02-18-20-00",
 "source": "osi"
+},
+{
+"id": "real-bach_stiftung-bwv-10-meine-seel-erhebt-den-herren",
+"title": "BWV 10 «Meine Seel erhebt den Herren»",
+"series": "Bachkantate",
+"start": "2027-02-19T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 10 «Meine Seel erhebt den Herren»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168111/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-10-meine-seel-erhebt-den-herren/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-buehnen_bern-dvoraks-siebte-2027-02-19-1930",
@@ -23731,6 +34491,32 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-zentrum-glues-vals",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-19T20:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Zentrum Glüs, Vals",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://vals.ch/event/heidi-live-in-concert/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-zentrum-glues-vals.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-opernhaus_zurich-200215",
 "title": "Roméo et Juliette",
 "series": "Hauptbühne",
@@ -23822,6 +34608,158 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-kino-raetia-thusis",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-20T16:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kino Rätia, Thusis",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://cineapp.ch/res/20889538",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-kino-raetia-thusis.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-casino_bern-mozart-requiem-2-20270220-1700",
+"title": "Mozart Requiem",
+"series": "Grosser Saal",
+"start": "2027-02-20T17:00:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Philharmonie Baden-Baden"
+},
+{
+"role": "Choir",
+"name": "Arcis-Vocalisten München"
+},
+{
+"role": "Conductor",
+"name": "Manfred Obrecht"
+},
+{
+"role": "Piano",
+"name": "Teo Gheorghiu"
+},
+{
+"role": "Soprano",
+"name": "Amelia Scicolone"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Maria Riccarda Wesseling"
+},
+{
+"role": "Tenor",
+"name": "Nikolaus Pfannkuch"
+},
+{
+"role": "Baritone",
+"name": "Thomas Gropper"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Ouvertüre zur Oper «Die Hochzeit des Figaro» KV 492",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Konzert für Klavier und Orchester Nr. 21 KV 467 «Elvira Madigan»",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Allegro maestoso",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Andante",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Allegro vivace",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Requiem in d-Moll KV 626 (1791) (~50′)",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Introitus",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Kyrie",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sequenz",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Offertorium",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Sanctus",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Benedictus",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Agnus Dei",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Communio",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Programmänderungen vorbehalten",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://www.obrassoconcerts.ch/programm/mozart-requiem",
+"sourceUrl": "https://www.casinobern.ch/programm/mozart-requiem-2/#20-02-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-199933",
 "title": "Doctor Atomic",
 "series": "Hauptbühne",
@@ -23901,6 +34839,239 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3869",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-02-20T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=511&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-02/susannah/3869/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-luzerner_theater-8786",
+"title": "I Capuleti e i Montecchi [Romeo und Julia]",
+"series": null,
+"start": "2027-02-20T19:30:00+01:00",
+"durationMin": 155,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Choreographer",
+"name": "Christine Cyris"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Patricia Jane Westley"
+},
+{
+"role": "Performer",
+"name": "Solenn' Lavanant Linke"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Vincenzo Bellini",
+"title": "I Capuleti e i Montecchi"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8786",
+"sourceUrl": "https://www.luzernertheater.ch/icapuletieimontecchi",
+"source": "luzerner_theater"
+},
+{
+"id": "real-casino_bern-metamorphosen-20270221-1100",
+"title": "Metamorphosen",
+"series": "6. Matineekonzert",
+"start": "2027-02-21T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Daniele D’Andria"
+},
+{
+"role": "Violin",
+"name": "Margarita Pavlova"
+},
+{
+"role": "Violin",
+"name": "Sandrine Canova"
+},
+{
+"role": "Violin",
+"name": "Susanna Fini"
+},
+{
+"role": "Viola",
+"name": "Johannes von Bülow"
+},
+{
+"role": "Viola",
+"name": "Yang Lu"
+},
+{
+"role": "Cello",
+"name": "Antonin Musset"
+},
+{
+"role": "Cello",
+"name": "Pierre Deppe"
+},
+{
+"role": "Double bass",
+"name": "Nicolò Zorzi"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn",
+"title": "Streichoktett Es-Dur op. 20",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Richard Strauss",
+"title": "Metamorphosen (Ausgabe für Streichseptett) TrV 290",
+"composerId": "richard-strauss"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/metamorphosen-matinee/",
+"sourceUrl": "https://www.casinobern.ch/programm/metamorphosen/#21-02-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-theater-chur",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-21T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "chur",
+"venueId": "theater-chur",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/166554/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-theater-chur.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-stadtcasino_basel-210227_i_tempi",
 "title": "Kammerorchester I TEMPI – Preisträgerkonzert",
 "series": "Musiksaal",
@@ -23941,6 +35112,53 @@ export const REAL = [
 "ticketUrl": "https://www.ticketino.com/de/seatmap/213832",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/210227_i_tempi/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-kts_st_gallen-3911",
+"title": "Tanzende Farben",
+"series": "Sonntags um 5",
+"start": "2027-02-21T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Daniela Uhlig-Ried"
+},
+{
+"role": "Violin",
+"name": "Nadia Saladukhina"
+},
+{
+"role": "Piano",
+"name": "Mischa Cheung"
+}
+],
+"program": [
+{
+"composer": "César Cui",
+"title": "5 petits duos Op. 56"
+},
+{
+"composer": "Nino Rota",
+"title": "Trio für Flöte, Violine und Klavier"
+},
+{
+"composer": "Philippe Gaubert",
+"title": "Médailles antiques für Flöte, Violine und Klavier"
+},
+{
+"composer": "Jean Françaix",
+"title": "Musique de Cour für Flöte, Violine und Klavier"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=586&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-02/3-so-um-5-tanzende-farben/3911/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-200216",
@@ -24034,6 +35252,61 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-kobekina-ong-20270221-1930",
+"title": "Kobekina & Ong",
+"series": "Abonnementskonzert",
+"start": "2027-02-21T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Anastasia Kobekina"
+},
+{
+"role": "Piano",
+"name": "Vincent Ong"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "7 Variationen für Cello und Klavier über Mozarts «Bei Männern, welche Liebe fühlen» WoO 46",
+"composerId": "beethoven"
+},
+{
+"composer": "Patricia Kopatchinskaja",
+"title": "Werk für Violoncello und Klavier"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Sonate für Violoncello und Klavier Nr. 2 op. 99",
+"composerId": "brahms"
+},
+{
+"composer": "Clara Schumann",
+"title": "Drei Romanzen op. 22",
+"composerId": "schumann"
+},
+{
+"composer": "Vladimir Kobekin",
+"title": "Fantasie über die erste Romanze von Clara Schumann für Violoncello und Klavier"
+},
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Sonate für Klavier und Violoncello Nr. 2 op. 58",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/kobekina-ong/#21-02-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-ocg-passons-aux-salons-11-20270222",
 "title": "Passons aux Salons #11",
 "series": "Passons aux Salons",
@@ -24049,6 +35322,58 @@ export const REAL = [
 "ticketUrl": "https://billetterie.locg.ch/selection/event/seat?perfId=10229796215277&productId=10229790114032&lang=fr",
 "sourceUrl": "https://locg.ch/fr/calendrier/passons-aux-salons-11",
 "source": "ocg"
+},
+{
+"id": "real-kammerorchester_basel-heiter-bis-wolkig-202702221930",
+"title": "Heiter bis wolkig",
+"series": null,
+"start": "2027-02-22T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Don Bosco Basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Trumpet",
+"name": "Lucienne Renaudin Vary"
+},
+{
+"role": "Piano",
+"name": "Fazıl Say"
+},
+{
+"role": "Violin & direction",
+"name": "Baptiste Lopez"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Leoš Janáček",
+"title": "Suite für Streichorchester"
+},
+{
+"composer": "Fazıl Say",
+"title": "«All Passports» for piano, trumpet and string orchestra, op. 128 (UA)"
+},
+{
+"composer": "Dmitri Schostakowitsch",
+"title": "Konzert für Klavier und Orchester Nr. 1 in c-Moll, op. 35 (1933) für Klavier, Trompete und Streicher"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "Serenade für Streichorchester in E-Dur, op. 22",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/175794/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/heiter-bis-wolkig.html",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-stadtcasino_basel-230227_gfk",
@@ -24455,6 +35780,23 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-theater_casino_zug-641bdf69-6034-48aa-a6a3-b9f7cdd73ba0",
+"title": "Next Generation Talents",
+"series": "Kleiner Saal",
+"start": "2027-02-25T18:00:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229820891698&productId=10229821099428",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/next-generation-talents-feb-27?date=641bdf69-6034-48aa-a6a3-b9f7cdd73ba0",
+"source": "theater_casino_zug"
+},
+{
 "id": "real-opernhaus_zurich-199987",
 "title": "La fanciulla del west",
 "series": "Hauptbühne",
@@ -24657,7 +35999,7 @@ export const REAL = [
 {
 "id": "real-ocg-hommage-marguerite-roesgen-champion-20270225",
 "title": "Hommage à Marguerite Roesgen-Champion",
-"series": null,
+"series": "Société des Concerts de Fribourg",
 "start": "2027-02-25T19:30:00+01:00",
 "durationMin": 120,
 "cityId": "fribourg",
@@ -24840,6 +36182,121 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-sala-grava-savognin",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-26T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Sala Grava, Savognin",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.valsurses.ch/de/webshop-veranstaltungen#/erlebnisse/CH1/e01a2aab-730d-4875-8491-5eec426bc883/-heidi--mit-der-kammerphilharmonie-graubuenden",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-sala-grava-savognin.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-musique_cdf-3206",
+"title": "Olivier Picon cor · Jurij Meile récitante · Les Passions de L’Âme · Meret Lüthi direction et violon",
+"series": "Grande Série",
+"start": "2027-02-26T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Horn",
+"name": "Olivier Picon"
+},
+{
+"role": "Narrator",
+"name": "Jurij Meile"
+},
+{
+"role": "Violin & direction",
+"name": "Meret Lüthi"
+},
+{
+"role": "Performer",
+"name": "Les Passions de L’Âme"
+}
+],
+"program": [
+{
+"composer": "Joseph Haydn",
+"title": "Symphonie n° 31 en ré majeur, Hob. I:31, « Mit dem Hornsignal »",
+"composerId": "haydn"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n° 3 en mi bémol majeur, op. 55, « Héroïque »",
+"composerId": "beethoven"
+},
+{
+"composer": "Wolfgang Amadeus Mozart / Franz Xaver Süssmayr",
+"title": "Concerto pour cor n° 1 en ré majeur, K. 412/514 (Rondo)",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/olivier-picon-corjurij-meile-recitanteles-passions-de-lamemeret-luthi-direction-et-violon/",
+"source": "musique_cdf"
+},
+{
+"id": "real-argovia_philharmonic-268628",
+"title": "Romeo & Julia",
+"series": "Sonderkonzert",
+"start": "2027-02-26T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "OtraDanza"
+},
+{
+"role": "Director",
+"name": "Asun Noales"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Sergei Prokofjew",
+"title": "«Romeo und Julia» op. 64, Ballett in 4 Akten, reduzierte Fassung von Tobias Leppert"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165526/",
+"sourceUrl": "https://argoviaphil.ch/konzert/romeo-julia/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-tonhalle-2055757",
 "title": "Sonic Matter: Hannu Lintu & Carolin Widmann",
 "series": "Sonic Matter",
@@ -24927,6 +36384,71 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-hotel-laudinella-st--moritz",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Hotel Laudinella, St. Moritz",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://shop.e-guma.ch/hotel-laudinella/de/events/heidi-live-in-concert-3831250",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-hotel-laudinella-st.-moritz.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-argovia_philharmonic-268630",
+"title": "Romeo & Julia",
+"series": "Sonderkonzert",
+"start": "2027-02-27T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "OtraDanza"
+},
+{
+"role": "Director",
+"name": "Asun Noales"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Sergei Prokofjew",
+"title": "«Romeo und Julia» op. 64, Ballett in 4 Akten, reduzierte Fassung von Tobias Leppert"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165526/",
+"sourceUrl": "https://argoviaphil.ch/konzert/romeo-julia-2/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-ocg-integrales-des-suites-pour-violoncelle-de-bach-20270228",
 "title": "Intégrales des Suites pour violoncelle de Bach",
 "series": null,
@@ -25003,6 +36525,108 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/konzert-fur-familien-die-kleine-hexe-lpz0ti",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/konzert-fuer-familien-die-kleine-hexe-wiederaufnahme/",
 "source": "lso_luzern"
+},
+{
+"id": "real-ocf_fribourg-8502",
+"title": "Konzertante Trios",
+"series": null,
+"start": "2027-02-28T11:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Museum Murten",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Aline Glasson"
+},
+{
+"role": "Oboe",
+"name": "Valentine Collet"
+},
+{
+"role": "Clarinet",
+"name": "Nathalie Jeandupeux"
+}
+],
+"program": [
+{
+"composer": "M. Arnold",
+"title": "Divertimento op. 37"
+},
+{
+"composer": "F. Zehm",
+"title": "Hindemith-Variationen"
+},
+{
+"composer": "L. v. Beethoven",
+"title": "Trio in C-Dur op. 87",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8502",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8502",
+"source": "ocf_fribourg"
+},
+{
+"id": "real-ocl-b24222cb-be5c-46c4-bec8-ed1689110bde-ocl-ch",
+"title": "Les Dominicales n°4 | HEMU · Beethoven en dialogue",
+"series": "Les Dominicales n°4",
+"start": "2027-02-28T11:00:00+01:00",
+"durationMin": 90,
+"cityId": "lausanne",
+"venueId": "salle-metropole",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Aurélien Azan Zielinski"
+},
+{
+"role": "Performer",
+"name": "Étudiant(e)s de musique de chambre de l'HEMU"
+},
+{
+"role": "Performer",
+"name": "Lectures de textes autour de Beethoven"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Septuor, op. 20 (1er mouvement)",
+"composerId": "beethoven"
+},
+{
+"composer": "Charlotte Sohy",
+"title": "Triptyque champêtre, op. 21"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Quatuor n°16, op. 135 (4ème mouvement)",
+"composerId": "beethoven"
+},
+{
+"composer": "Julia Wolfe",
+"title": "Four Marys pour quatuor à cordes"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Septuor, op. 20 (6ème mouvement)",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/dominicale-n4/",
+"sourceUrl": "https://www.ocl.ch/concert/dominicale-n4/",
+"source": "ocl"
 },
 {
 "id": "real-opernhaus_zurich-199935",
@@ -25160,6 +36784,99 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-luzerner_theater-8482",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-02-28T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8482",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-center-communal-trun",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-02-28T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Center communal, Trun",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/185003/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-center-communal-trun.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-stadtcasino_basel-28022027_nob",
 "title": "Neues Orchester Basel – Freiheit",
 "series": "Musiksaal",
@@ -25195,6 +36912,108 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Neues-Orchester-Basel/shop/event/175624/",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/28022027_nob/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-argovia_philharmonic-268632",
+"title": "Romeo & Julia",
+"series": "Sonderkonzert",
+"start": "2027-02-28T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "OtraDanza"
+},
+{
+"role": "Director",
+"name": "Asun Noales"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Sergei Prokofjew",
+"title": "«Romeo und Julia» op. 64, Ballett in 4 Akten, reduzierte Fassung von Tobias Leppert"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165526/",
+"sourceUrl": "https://argoviaphil.ch/konzert/romeo-julia2/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-musique_cdf-3222",
+"title": "Thomas Briant violon · Antoine de Grolée piano",
+"series": "Nouveaux Talents",
+"start": "2027-02-28T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Thomas Briant"
+},
+{
+"role": "Piano",
+"name": "Antoine de Grolée"
+}
+],
+"program": [
+{
+"composer": "Maurice Ravel",
+"title": "Sonate posthume pour violon et piano, M. 12",
+"composerId": "ravel"
+},
+{
+"composer": "George Enescu",
+"title": "Impromptu concertant pour violon et piano"
+},
+{
+"composer": "Maurice Ravel",
+"title": "Sonate pour violon et piano n° 2 en sol majeur, M. 77",
+"composerId": "ravel"
+},
+{
+"composer": "Olivier Messiaen",
+"title": "Thème et Variations pour violon et piano",
+"composerId": "messiaen"
+},
+{
+"composer": "Gabriel Fauré",
+"title": "Les Berceaux, op. 23, n° 1 (transcription pour violon et piano)"
+},
+{
+"composer": "Lili Boulanger",
+"title": "Nocturne pour violon et piano"
+},
+{
+"composer": "Thomas Briant",
+"title": "Pajarillo Caprice pour violon seul"
+},
+{
+"composer": "Maurice Ravel",
+"title": "Tzigane. Rhapsodie de concert pour violon et piano",
+"composerId": "ravel"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-28-02-2027/",
+"source": "musique_cdf"
 },
 {
 "id": "real-opernhaus_zurich-199988",
@@ -25330,6 +37149,52 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-concerts_fribourg-2027-03-01-cappella-aquileia-kristine-balanas",
+"title": "Cappella Aquileia - Kristīne Balanas",
+"series": "Société des Concerts de Fribourg",
+"start": "2027-03-01T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Cappella Aquileia"
+},
+{
+"role": "Conductor",
+"name": "Marcus Bosch"
+},
+{
+"role": "Violin",
+"name": "Kristīne Balanas"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Ouverture en ré majeur, D 26",
+"composerId": "schubert"
+},
+{
+"composer": "Jean Sibelius",
+"title": "Concerto pour violon en ré mineur, op. 47",
+"composerId": "sibelius"
+},
+{
+"composer": "Franz Schubert",
+"title": "Ouverture en ré majeur D 590",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.concertsfribourg.ch/fr/programme/sdc/Element/concert/c/cappella-aquileia-kristine-balanas.html",
+"source": "concerts_fribourg"
+},
+{
 "id": "real-tonhalle-2056894",
 "title": "María Dueñas & Andrés Orozco-Estrada",
 "series": null,
@@ -25408,6 +37273,89 @@ export const REAL = [
 "ticketUrl": "https://www.ticketino.com/de/event/masterinterpreten-opus-49-winterkonzert-mit-martha-argerich/215368",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/die-seele-spricht-beethovens-beruehmteste-violinsonaten-mit-argerich-2056852/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3870",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-03-02T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=512&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/susannah/3870/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-ocg-messe-en-si-20270302",
@@ -25806,6 +37754,67 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-ocl-8fc9f9de-d902-4ccd-9f82-c6cc176dc321-ocl-ch",
+"title": "Les Entractes n°3 | Mendelssohn Octuor · Strauss Capriccio",
+"series": "Les Entractes n°3",
+"start": "2027-03-04T12:30:00+01:00",
+"durationMin": 60,
+"cityId": "lausanne",
+"venueId": "salle-paderewski",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Alexander Grytsayenko"
+},
+{
+"role": "Violin",
+"name": "Anna Vasileva"
+},
+{
+"role": "Violin",
+"name": "Ophélie Kirch-Vadot"
+},
+{
+"role": "Violin",
+"name": "Stéphanie Décaillet"
+},
+{
+"role": "Viola",
+"name": "Eli Karanfilova"
+},
+{
+"role": "Viola",
+"name": "Izabel Markova"
+},
+{
+"role": "Cello",
+"name": "Joël Marosi"
+},
+{
+"role": "Cello",
+"name": "Daniel Mitnitsky"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn",
+"title": "Octuor pour cordes en mi bémol majeur, op. 20",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Richard Strauss",
+"title": "Capriccio, sextuor à cordes, op. 85",
+"composerId": "richard-strauss"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/entracte-n3-26-27/",
+"sourceUrl": "https://www.ocl.ch/concert/entracte-n3-26-27/",
+"source": "ocl"
+},
+{
 "id": "real-musikkollegium-9255",
 "title": "Mozart & Enescu",
 "series": "Hauskonzert",
@@ -25870,6 +37879,99 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-luzerner_theater-8669",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-03-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8669",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
+},
+{
+"id": "real-theater_casino_zug-a38ce3f4-a57d-4ce6-97b6-e6dc602ea3e2",
+"title": "INSGEHEIM",
+"series": "End-Spiel-Abo",
+"start": "2027-03-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "Reto Bieri"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229809773700&productId=10229809770267",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/insgeheim?date=a38ce3f4-a57d-4ce6-97b6-e6dc602ea3e2",
+"source": "theater_casino_zug"
+},
+{
 "id": "real-tonhalle-2056899",
 "title": "Ode an Zürich: 200 Jahre ohne Beethoven",
 "series": null,
@@ -25904,6 +38006,112 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Ftonhallezuerich.ch%2Fhome-tz%2Fkonzerte%2Fkalender%2F&event=5740&language=de",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/ode-an-zuerich-200-jahre-ohne-beethoven-2056899/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-camerata_bern-31225",
+"title": "«Insgeheim» in Zug",
+"series": "Koproduktion mit dem Theater Casino Zug",
+"start": "2027-03-04T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Clarinet",
+"name": "Reto Bieri"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229809773700&productId=10229809770267",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/insgeheim-in-zug-1",
+"source": "camerata_bern"
+},
+{
+"id": "real-zuger_sinfonietta-vents-francais-2027-03-05",
+"title": "Vents français",
+"series": "Mittagskonzert",
+"start": "2027-03-05T12:15:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueName": "Reformierte Kirche Zug",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Holzbläser*innen der Zuger Sinfonietta"
+}
+],
+"program": [],
+"ticketUrl": "https://zugersinfonietta.ch/konzert/vents-francais/",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/vents-francais/",
+"source": "zuger_sinfonietta"
+},
+{
+"id": "real-kultur_im_podium-2027-03-05-aida",
+"title": "Aida",
+"series": "Kultur im Podium",
+"start": "2027-03-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Theater Orchester Biel Solothurn (TOBS)"
+},
+{
+"role": "Conductor",
+"name": "Yannis Pouspourikas"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Aida",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/aida/",
+"source": "kultur_im_podium"
+},
+{
+"id": "real-theater_casino_zug-2f631ae8-a70b-4c8b-85ab-3429c2358496",
+"title": "INSGEHEIM",
+"series": "End-Spiel-Abo",
+"start": "2027-03-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "Reto Bieri"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229809773701&productId=10229809770267",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/insgeheim?date=2f631ae8-a70b-4c8b-85ab-3429c2358496",
+"source": "theater_casino_zug"
 },
 {
 "id": "real-opernhaus_zurich-200218",
@@ -25997,6 +38205,89 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3871",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-03-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=513&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/susannah/3871/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-stadtcasino_basel-05032027_yulianna_avdeeva",
 "title": "Yulianna Avdeeva",
 "series": "AMG Solistenabende",
@@ -26023,6 +38314,32 @@ export const REAL = [
 "ticketUrl": "https://tickets.konzerte-basel.ch/webshop/webticket/shop?event=225",
 "sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/05032027_yulianna_avdeeva/",
 "source": "stadtcasino_basel"
+},
+{
+"id": "real-camerata_bern-31306",
+"title": "«Insgeheim» in Zug",
+"series": "Koproduktion mit dem Theater Casino Zug",
+"start": "2027-03-05T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Clarinet",
+"name": "Reto Bieri"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229809773701&productId=10229809770267",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/insgeheim-in-zug-2",
+"source": "camerata_bern"
 },
 {
 "id": "real-stadtcasino_basel-06032027_la_cetra",
@@ -26166,6 +38483,48 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/ainsi-la-nuit",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/ainsi-la-nuit",
 "source": "osr"
+},
+{
+"id": "real-casino_bern-tango-20270307-1100",
+"title": "Tango!",
+"series": "7. Matineekonzert",
+"start": "2027-03-07T11:00:00+01:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Sakura Kindynis"
+},
+{
+"role": "Oboe",
+"name": "Catherine Kämper"
+},
+{
+"role": "Clarinet",
+"name": "Gábor Horváth"
+},
+{
+"role": "Bassoon",
+"name": "Norihito Nishinomura"
+},
+{
+"role": "Horn",
+"name": "Denis Dafflon"
+},
+{
+"role": "Percussion",
+"name": "Michael Meinen"
+}
+],
+"program": [],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/tango/",
+"sourceUrl": "https://www.casinobern.ch/programm/tango/#07-03-2027",
+"source": "casino_bern"
 },
 {
 "id": "real-lso_luzern-19944",
@@ -26385,6 +38744,58 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-wuerth-haus-rorschach",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-03-07T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Würth Haus Rorschach",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketino.com/de/seatmap/217514#",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-wuerth-haus-rorschach.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-camerata_bern-31112",
+"title": "Insgeheim",
+"series": "Abokonzert",
+"start": "2027-03-07T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Dampfzentrale Bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Clarinet",
+"name": "Reto Bieri"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/161412/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/insgeheim",
+"source": "camerata_bern"
+},
+{
 "id": "real-osr-la-fille-du-far-west-20270307",
 "title": "La Fille du Far West",
 "series": null,
@@ -26588,6 +38999,28 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-reformiert_zuerich-15473",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-03-07T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15473/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15473/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2056902",
 "title": "Philharmonia Orchestra London – Klangkraft",
 "series": null,
@@ -26697,6 +39130,71 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kammerorchester_basel-der-clan-202703081930",
+"title": "Der Clan",
+"series": null,
+"start": "2027-03-08T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "stadtcasino-basel",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Francesco Corti"
+},
+{
+"role": "Tenor",
+"name": "Ian Koziara"
+},
+{
+"role": "Soprano",
+"name": "Francesca Pia Vitale"
+},
+{
+"role": "Soprano",
+"name": "Chiara Skerath"
+},
+{
+"role": "Countertenor",
+"name": "Aryeh Nussbaum Cohen"
+},
+{
+"role": "Soprano",
+"name": "Florie Valiquette"
+},
+{
+"role": "Tenor",
+"name": "Alasdair Kent"
+},
+{
+"role": "Soprano",
+"name": "Désirée Giove"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Mitridate, re di Ponto, KV 87",
+"composerId": "mozart"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Konzertante Aufführung",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/147198/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/der-clan.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-tonhalle-2056771",
 "title": "Jugend Sinfonieorchester Zürich",
 "series": null,
@@ -26736,60 +39234,91 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
-"id": "real-stadtcasino_basel-080327_kob",
-"title": "Kammerorchester Basel – Der Clan",
-"series": "Musiksaal",
+"id": "real-cite_bleue-le-sacre-du-piano-2027-03-08-1930",
+"title": "Le Sacre du Piano",
+"series": null,
 "start": "2027-03-08T19:30:00+01:00",
 "durationMin": 120,
-"cityId": "basel",
-"venueId": "stadtcasino-basel",
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Cédric Pescia"
+}
+],
+"program": [
+{
+"workId": "stravinsky-rite",
+"composerId": "stravinsky"
+},
+{
+"workId": "debussy-faune",
+"composerId": "debussy"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-sacre-du-piano",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-sacre-du-piano",
+"source": "cite_bleue"
+},
+{
+"id": "real-casino_bern-philharmonia-london-klangkraft-20270308-1930",
+"title": "Philharmonia London – Klangkraft",
+"series": "Migros-Kulturprozent-Classics 2026/2027 | Philharmonia London",
+"start": "2027-03-08T19:30:00+01:00",
+"durationMin": 135,
+"cityId": "bern",
+"venueId": "casino-bern",
 "type": "orchestral",
 "featured": true,
 "status": "scheduled",
 "credits": [
 {
-"role": "Violin",
-"name": "Isabelle Faust"
-},
-{
-"role": "Fortepiano",
-"name": "Kristian Bezuidenhout"
+"role": "Orchestra",
+"name": "Philharmonia London"
 },
 {
 "role": "Conductor",
-"name": "Kristian Bezuidenhout"
+"name": "Esa-Pekka Salonen"
+},
+{
+"role": "Violin",
+"name": "Johan Dalene"
 }
 ],
 "program": [
 {
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Sonate für Hammerklavier und Violine in G-Dur KV, 379",
-"composerId": "mozart"
+"composer": "Jean Sibelius",
+"title": "Sinfonie Nr. 7 C-Dur op. 105",
+"composerId": "sibelius"
 },
 {
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Konzert für Violine und Orchester Nr. 2 in D-Dur, KV 211",
-"composerId": "mozart"
+"composer": "Jean Sibelius",
+"title": "Magnus Lindberg (1958-heute)",
+"composerId": "sibelius"
 },
 {
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Rondo für Violine und Orchester in C-Dur, KV 373",
-"composerId": "mozart"
+"composer": "Jean Sibelius",
+"title": "Konzert für Violine und Orchester Nr. 1",
+"composerId": "sibelius"
 },
 {
-"composer": "Wolfgang Amadeus Mozart",
-"title": "Sinfonie Nr. 40 in g-Moll, KV 550",
-"composerId": "mozart"
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 3 Es-Dur op. 55 «Eroica»",
+"composerId": "beethoven"
 },
 {
-"composer": "Joseph Martin Kraus",
-"title": "Ouvertüre zur Schauspielmusik «Olympie» (Trauerspiel von Johan Henrik Kellgren nach Voltaire) VB 133",
-"composerId": "martin"
+"composer": "Ludwig van Beethoven",
+"title": "Programmänderungen vorbehalten.",
+"composerId": "beethoven"
 }
 ],
-"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/147198/#event",
-"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/080327_kob/",
-"source": "stadtcasino_basel"
+"ticketUrl": "https://www.ticket-onlineshop.com/ols/migrosclassics/de/tickets/channel/shop/areaplan/venue/event/675990",
+"sourceUrl": "https://www.casinobern.ch/programm/philharmonia-london-klangkraft/#08-03-2027",
+"source": "casino_bern"
 },
 {
 "id": "real-opera_lausanne-les-capulet-et-les-montaigu-20270309-1900",
@@ -27204,6 +39733,102 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-argovia_philharmonic-268502",
+"title": "4. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-03-11T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Oliver Schnyder"
+},
+{
+"role": "Conductor",
+"name": "Douglas Bostock"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Konzert für Klavier und Orchester Nr. 2 B-Dur op. 83",
+"composerId": "brahms"
+},
+{
+"composer": "Hubert Parry",
+"title": "Sinfonie Nr. 2 F-Dur «Cambridge»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165361/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-abo-konzert-1-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-kts_st_gallen-3924",
+"title": "Beethoven 9",
+"series": "Tonhallekonzert",
+"start": "2027-03-11T19:30:00+01:00",
+"durationMin": 70,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Cornelius Meister"
+},
+{
+"role": "Soprano",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Alto",
+"name": "Jennifer Panara"
+},
+{
+"role": "Tenor",
+"name": "Dafydd Jones"
+},
+{
+"role": "Bass",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Bach-Chor St. Gallen"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 9 d-Moll op. 125",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=572&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/7-thk-beethoven-9/3924/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-cnz-140",
 "title": "Bruchlinien",
 "series": null,
@@ -27537,6 +40162,102 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-argovia_philharmonic-268504",
+"title": "4. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-03-12T19:30:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Oliver Schnyder"
+},
+{
+"role": "Conductor",
+"name": "Douglas Bostock"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Konzert für Klavier und Orchester Nr. 2 B-Dur op. 83",
+"composerId": "brahms"
+},
+{
+"composer": "Hubert Parry",
+"title": "Sinfonie Nr. 2 F-Dur «Cambridge»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165361/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-abo-konzert-2-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-kts_st_gallen-3925",
+"title": "Beethoven 9",
+"series": "Tonhallekonzert",
+"start": "2027-03-12T19:30:00+01:00",
+"durationMin": 70,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Cornelius Meister"
+},
+{
+"role": "Soprano",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Alto",
+"name": "Jennifer Panara"
+},
+{
+"role": "Tenor",
+"name": "Dafydd Jones"
+},
+{
+"role": "Bass",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Bach-Chor St. Gallen"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 9 d-Moll op. 125",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=573&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/7-thk-beethoven-9/3925/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-stadtcasino_basel-120327_cmb",
 "title": "Collegium Musicum Basel – Ella streicht Saiten",
 "series": "Musiksaal",
@@ -27584,7 +40305,7 @@ export const REAL = [
 {
 "id": "real-osr-beethoven6-20270312",
 "title": "Cycle Beethoven 3",
-"series": null,
+"series": "Grande Série",
 "start": "2027-03-12T19:30:00+01:00",
 "durationMin": 105,
 "cityId": "la-chaux-de-fonds",
@@ -27621,6 +40342,73 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven6",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven6",
 "source": "osr"
+},
+{
+"id": "real-luzerner_theater-8670",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-03-12T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8670",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-199913",
@@ -27835,6 +40623,32 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-kammerphilharmonie_gr-heidi-eventhalle-flims",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-03-13T17:00:00+01:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Eventhalle Flims",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/183283/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-eventhalle-flims.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-tonhalle-2056908",
 "title": "Sol Gabetta & Bertrand Chamayou",
 "series": null,
@@ -27935,6 +40749,46 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-argovia_philharmonic-268506",
+"title": "4. Abo-Zusatzkonzert",
+"series": "Sinfoniekonzert",
+"start": "2027-03-13T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Oliver Schnyder"
+},
+{
+"role": "Conductor",
+"name": "Douglas Bostock"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Konzert für Klavier und Orchester Nr. 2 B-Dur op. 83",
+"composerId": "brahms"
+},
+{
+"composer": "Hubert Parry",
+"title": "Sinfonie Nr. 2 F-Dur «Cambridge»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165363/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-abo-zusatzkonzert-3-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-geneva_victoria_hall-6560151-20270313",
 "title": "Orpheus Chamber Orchestra",
 "series": "Migros-Pour-cent-culturel Classics",
@@ -28002,6 +40856,156 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15507&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/rezital-jean-rondeau/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3872",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-03-14T14:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=514&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/susannah/3872/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-luzerner_theater-8671",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-03-14T15:00:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8671",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-osr-la-fille-du-far-west-20270314",
@@ -28307,6 +41311,46 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-argovia_philharmonic-268510",
+"title": "4. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-03-14T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Oliver Schnyder"
+},
+{
+"role": "Conductor",
+"name": "Douglas Bostock"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Johannes Brahms",
+"title": "Konzert für Klavier und Orchester Nr. 2 B-Dur op. 83",
+"composerId": "brahms"
+},
+{
+"composer": "Hubert Parry",
+"title": "Sinfonie Nr. 2 F-Dur «Cambridge»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165361/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-abo-konzert-4-2627/",
+"source": "argovia_philharmonic"
+},
+{
 "id": "real-musikkollegium-9445",
 "title": "Basel Horn Sound",
 "series": "Kammermusik Liebestrasse",
@@ -28321,10 +41365,6 @@ export const REAL = [
 {
 "role": "Horn",
 "name": "Florian Hasenfratz Leonie Steppe Oskar Szathmàry"
-},
-{
-"role": "Horn",
-"name": "Eloy Tamò"
 },
 {
 "role": "Piano",
@@ -28357,6 +41397,112 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/179108/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/basel-horn-so-27-03-14-9445",
 "source": "musikkollegium"
+},
+{
+"id": "real-kts_st_gallen-3915",
+"title": "Gabriela Montero",
+"series": "Meisterzyklus-Konzert",
+"start": "2027-03-14T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Gabriela Montero"
+}
+],
+"program": [
+{
+"composer": "Domenico Scarlatti",
+"title": "Sonata c-Moll K. 247"
+},
+{
+"composer": "Antonio Soler",
+"title": "Sonata cis-Moll R. 21"
+},
+{
+"composer": "Antonio Soler",
+"title": "Sonata G-Dur R. 45"
+},
+{
+"composer": "Domenico Scarlatti",
+"title": "Sonata G-Dur K. 427"
+},
+{
+"composer": "Enrique Granados",
+"title": "8 Valses Poéticos"
+},
+{
+"composer": "Isaac Albéniz",
+"title": "«Triana» aus Iberia"
+},
+{
+"composer": "Isaac Albéniz",
+"title": "«Sevilla» aus der Suite española"
+},
+{
+"composer": "Alicia de Larrocha",
+"title": "Impromptu"
+},
+{
+"composer": "Alicia de Larrocha",
+"title": "Minué Triste"
+},
+{
+"composer": "Alicia de Larrocha",
+"title": "Sueño Infantil"
+},
+{
+"composer": "Frederic Mompou",
+"title": "Cançó i dansa No. 6"
+},
+{
+"composer": "Enrique Granados",
+"title": "«Andaluza» aus 12 Danzas españolas Op. 37"
+},
+{
+"composer": "Isaac Albéniz",
+"title": "«Eritaña» aus Iberia"
+},
+{
+"composer": "Franz Liszt",
+"title": "Spanische Rhapsodie",
+"composerId": "liszt"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=582&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/4-mzk-gabriela-montero/3915/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-theater-casino-zug",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-03-14T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229820847880",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-theater-casino-zug.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-geneva_victoria_hall-14817626-20270314",
@@ -28425,6 +41571,64 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/api/1/redirect/product?id=10229292489262",
 "sourceUrl": "https://openagenda.com/victoria-hall/events/14817626_la-passion-selon-saint-matthieu-254349",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-musique_cdf-3223",
+"title": "Loewe Quartet",
+"series": "Nouveaux Talents",
+"start": "2027-03-14T17:00:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Loewe Quartet"
+},
+{
+"role": "Violin",
+"name": "Bastian Loewe"
+},
+{
+"role": "Violin",
+"name": "Livia Loewe-Berchtold"
+},
+{
+"role": "Viola",
+"name": "Juan Carlos Escobar Ossa"
+},
+{
+"role": "Cello",
+"name": "Milena Marena"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Quartettsatz en do mineur, D 703",
+"composerId": "schubert"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Quatuor à cordes, op. 18 n° 3",
+"composerId": "beethoven"
+},
+{
+"composer": "Henry Purcell",
+"title": "Fantaisies à quatre voix pour instruments à cordes n° VI-X"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "American Quartett",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-14-03-2027/",
+"source": "musique_cdf"
 },
 {
 "id": "real-opernhaus_zurich-200207",
@@ -28576,6 +41780,45 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-casino_bern-fantastique-20270316-1100",
+"title": "Fantastique",
+"series": "Grosser Saal",
+"start": "2027-03-16T11:00:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Han-Na Chang"
+},
+{
+"role": "Violin",
+"name": "Gil Shaham"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Samuel Barber",
+"title": "Konzert für Violine und Orchester op. 14"
+},
+{
+"composer": "Hector Berlioz",
+"title": "Symphonie fantastique op. 14"
+}
+],
+"ticketUrl": "https://www.casinobern.ch/programm/fantastique/#16-03-2027",
+"sourceUrl": "https://www.casinobern.ch/programm/fantastique/#16-03-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-199914",
 "title": "La clemenza di Tito",
 "series": "Hauptbühne",
@@ -28640,6 +41883,45 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3907",
+"title": "Lunch mit Sax",
+"series": "Lunch-Konzert",
+"start": "2027-03-17T12:15:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Saxophone",
+"name": "Amit Dubester"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Alexander Glazunov",
+"title": "Konzert für Saxofon und Orchester Op. 109"
+},
+{
+"composer": "Pjotr Tschaikowski",
+"title": "Serenade für Streicher"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=591&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/3-lunch-lunch-mit-sax/3907/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-199918",
 "title": "c-Moll-Messe",
 "series": "Hauptbühne",
@@ -28674,10 +41956,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Barbara Hannigan"
-},
-{
-"role": "Soprano",
 "name": "Barbara Hannigan"
 }
 ],
@@ -28848,6 +42126,151 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-cite_bleue-le-journal-intime-de-bernstein-2027-03-17-1930",
+"title": "Le journal intime de Bernstein",
+"series": null,
+"start": "2027-03-17T19:30:00+01:00",
+"durationMin": 75,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Shani Diluka"
+},
+{
+"role": "Actor",
+"name": "Charles Berling"
+}
+],
+"program": [
+{
+"composer": "Leonard Bernstein",
+"title": "Music for the Theatre, Suite: III. Interlude"
+},
+{
+"composer": "Ernest Bloch",
+"title": "From Jewish Life, B. 54",
+"composerId": "bloch"
+},
+{
+"composer": "Philip Glass",
+"title": "Mad Rush"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Nocturne n° 2, op. 9",
+"composerId": "chopin"
+},
+{
+"composer": "George Gershwin",
+"title": "Rhapsody in Blue"
+},
+{
+"composer": "Sergueï Prokofiev",
+"title": "Thème juif"
+},
+{
+"composer": "Philip Glass",
+"title": "Floë"
+},
+{
+"composer": "Leonard Bernstein",
+"title": "Tonight"
+},
+{
+"composer": "Philip Glass",
+"title": "Opening"
+},
+{
+"composer": "Leonard Bernstein",
+"title": "America"
+},
+{
+"composer": "Vincenzo Bellini",
+"title": "Casta diva, aria de l'opéra Norma"
+},
+{
+"composer": "Leonard Bernstein",
+"title": "West Side Story"
+},
+{
+"composer": "Gustav Mahler",
+"title": "",
+"composerId": "mahler"
+},
+{
+"composer": "Maurice Ravel",
+"title": "2 Mélodies hébraïques, M.A. 22",
+"composerId": "ravel"
+},
+{
+"composer": "Keith Jarrett",
+"title": "I Love You, Porgy"
+},
+{
+"composer": "Leonard Bernstein",
+"title": "Maria"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-journal-intime-de-bernstein",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/le-journal-intime-de-bernstein",
+"source": "cite_bleue"
+},
+{
+"id": "real-ocl-e6073dbb-78eb-45ff-ae0e-bb291801000c-ocl-ch",
+"title": "Les Grands Concerts n°8 | Schütz · Gafner · Mendelssohn / Mozart",
+"series": "Les Grands Concerts n°8",
+"start": "2027-03-17T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Flute",
+"name": "Karl-Heinz Schütz"
+},
+{
+"role": "Harp",
+"name": "Tjasha Gafner"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn",
+"title": "Les Hébrides, ouverture, op. 26",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Concerto pour flûte, harpe et orchestre en do majeur, KV 299",
+"composerId": "mozart"
+},
+{
+"composer": "Felix Mendelssohn",
+"title": "Symphonie n°5 en ré majeur, op. 107, « Réformation »",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n8/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n8/",
+"source": "ocl"
+},
+{
 "id": "real-tonhalle-2055780",
 "title": "Paavo Järvi & Giorgi Gigashvili",
 "series": null,
@@ -28929,6 +42352,45 @@ export const REAL = [
 "source": "stadtcasino_basel"
 },
 {
+"id": "real-casino_bern-fantastique-20270318-1000",
+"title": "Musik Punkt 10 – Berlioz‘ Symphonie fantastique",
+"series": "9. Symphoniekonzert – Berner Symphonieorchester",
+"start": "2027-03-18T10:00:00+01:00",
+"durationMin": 55,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Han-Na Chang"
+},
+{
+"role": "Violin",
+"name": "Gil Shaham"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Samuel Barber",
+"title": "Konzert für Violine und Orchester op. 14"
+},
+{
+"composer": "Hector Berlioz",
+"title": "Symphonie fantastique op. 14"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/musik-punkt-zehn-03-symphonie-fantastique/",
+"sourceUrl": "https://www.casinobern.ch/programm/fantastique/#18-03-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-tonhalle-2060118",
 "title": "Orchester-Lunchkonzert mit Paavo Järvi",
 "series": "Orchester-Lunchkonzert",
@@ -28975,6 +42437,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15474&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/konzert-zhdk-brisk-ensemblewettbewerb/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-14368",
+"title": "Acoustic Oasis",
+"series": null,
+"start": "2027-03-18T18:00:00+01:00",
+"durationMin": 195,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14368/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/acoustic-oasis-14368/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-199915",
@@ -29058,10 +42537,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Barbara Hannigan"
-},
-{
-"role": "Soprano",
 "name": "Barbara Hannigan"
 }
 ],
@@ -29338,6 +42813,29 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-bach_stiftung-bwv-44-sie-werden-euch-in-den-bann-tun",
+"title": "BWV 44 «Sie werden euch in den Bann tun»",
+"series": "Bachkantate",
+"start": "2027-03-19T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 44 «Sie werden euch in den Bann tun»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168115/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-44-sie-werden-euch-in-den-bann-tun/",
+"source": "bach_stiftung"
+},
+{
 "id": "real-opernhaus_zurich-200208",
 "title": "Rinaldo",
 "series": "Hauptbühne",
@@ -29359,6 +42857,73 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15421&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/rinaldo-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-luzerner_theater-8672",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-03-19T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8672",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-buehnen_bern-la-valse-2027-03-19-1930",
@@ -29422,10 +42987,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Barbara Hannigan"
-},
-{
-"role": "Soprano",
 "name": "Barbara Hannigan"
 }
 ],
@@ -29707,6 +43268,85 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-kts_st_gallen-3736",
+"title": "Palmsonntagskonzert",
+"series": null,
+"start": "2027-03-20T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Kirche St. Laurenzen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Uwe Münch"
+},
+{
+"role": "Choir",
+"name": "Oratorienchor St. Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Messe As-Dur D 678",
+"composerId": "schubert"
+},
+{
+"composer": "Anton Bruckner",
+"title": "Te Deum C-Dur"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/palmsonntagskonzert-27/3736/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/palmsonntagskonzert-27/3736/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-ocf_fribourg-8503",
+"title": "Beethoven en trio",
+"series": null,
+"start": "2027-03-21T11:00:00+01:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueName": "Centre Le Phénix",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Julien De Grandi"
+},
+{
+"role": "Cello",
+"name": "Arthur Guignard"
+},
+{
+"role": "Piano",
+"name": "Roh Fei Tong"
+}
+],
+"program": [
+{
+"composer": "",
+"title": "Trio op.1 n° 1 en mi bémol majeur"
+},
+{
+"composer": "",
+"title": "Trio op. 70 n° 1 en ré majeur « Geistertrio »"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8503",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8503",
+"source": "ocf_fribourg"
+},
+{
 "id": "real-musikkollegium-9450",
 "title": "Schoeck & Mendelssohn",
 "series": "Music for a While",
@@ -29771,6 +43411,23 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-reformiert_zuerich-815",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-03-21T17:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-815/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-815/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-tonhalle-2061996",
 "title": "Kosmos Kammermusik: Lisa Batiashvili & Giorgi Gigashvili",
 "series": "Kosmos Kammermusik",
@@ -29809,6 +43466,46 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5613&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/kosmos-kammermusik-giorgi-gigashvili-lisa-batiashvili-2061996/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3737",
+"title": "Palmsonntagskonzert",
+"series": null,
+"start": "2027-03-21T17:30:00+01:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Kirche St. Laurenzen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Uwe Münch"
+},
+{
+"role": "Choir",
+"name": "Oratorienchor St. Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Messe As-Dur D 678",
+"composerId": "schubert"
+},
+{
+"composer": "Anton Bruckner",
+"title": "Te Deum C-Dur"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/palmsonntagskonzert-27/3737/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-03/palmsonntagskonzert-27/3737/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-199916",
@@ -29915,9 +43612,46 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
-"id": "real-stadtcasino_basel-230327_kob",
-"title": "Kammerorchester Basel – Schumanns Passion",
-"series": "Musiksaal",
+"id": "real-casino_bern-chorkonzert-lerbermatt-20270323-1930",
+"title": "Chorkonzert Lerbermatt",
+"series": "Grosser Saal",
+"start": "2027-03-23T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Arte Frizzante"
+},
+{
+"role": "Conductor",
+"name": "Joel Zeller"
+}
+],
+"program": [
+{
+"composer": "Edvard Grieg",
+"title": "Olaf Trygvason",
+"composerId": "grieg"
+},
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Die erste Walpurgisnacht",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://www.casinobern.ch/programm/chorkonzert-lerbermatt/#23-03-2027",
+"sourceUrl": "https://www.casinobern.ch/programm/chorkonzert-lerbermatt/#23-03-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-kammerorchester_basel-schumanns-passion-202703231930",
+"title": "Schumanns Passion",
+"series": null,
 "start": "2027-03-23T19:30:00+01:00",
 "durationMin": 120,
 "cityId": "basel",
@@ -29926,6 +43660,10 @@ export const REAL = [
 "featured": true,
 "status": "scheduled",
 "credits": [
+{
+"role": "Conductor",
+"name": "Hans-Christoph Rademann"
+},
 {
 "role": "Soprano",
 "name": "Rowan Pierce"
@@ -29947,12 +43685,8 @@ export const REAL = [
 "name": "Tobias Berndt"
 },
 {
-"role": "Choir",
+"role": "Performer",
 "name": "Gaechinger Cantorey"
-},
-{
-"role": "Conductor",
-"name": "Hans-Christoph Rademann"
 },
 {
 "role": "Orchestra",
@@ -29962,13 +43696,172 @@ export const REAL = [
 "program": [
 {
 "composer": "Johann Sebastian Bach",
-"title": "Johannes-Passion, BWV 245, in der Bearbeitung von Robert Schumann (Düsseldorf 1851)",
+"title": "Johannes-Passion, BWV 245, in der Bearbeitung von Robert Schumann",
 "composerId": "bach"
 }
 ],
 "ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/175793/#event",
-"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/230327_kob/",
-"source": "stadtcasino_basel"
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/schumanns-passion.html",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-reformiert_zuerich-15774",
+"title": "Passionskonzert",
+"series": null,
+"start": "2027-03-24T19:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Pauluskirche",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/passionskonzert-15774/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/passionskonzert-15774/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-casino_bern-chorkonzert-lerbermatt-20270324-1930",
+"title": "Chorkonzert Lerbermatt",
+"series": "Grosser Saal",
+"start": "2027-03-24T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Arte Frizzante"
+},
+{
+"role": "Conductor",
+"name": "Joel Zeller"
+}
+],
+"program": [
+{
+"composer": "Edvard Grieg",
+"title": "Olaf Trygvason",
+"composerId": "grieg"
+},
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Die erste Walpurgisnacht",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://www.casinobern.ch/programm/chorkonzert-lerbermatt/#24-03-2027",
+"sourceUrl": "https://www.casinobern.ch/programm/chorkonzert-lerbermatt/#24-03-2027",
+"source": "casino_bern"
+},
+{
+"id": "real-musique_cdf-3210",
+"title": "Daniel Lozakovich violon",
+"series": "Grande Série",
+"start": "2027-03-24T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Daniel Lozakovich"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Sonate en sol mineur, BWV 1001",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Partita n° 3 en mi majeur, BWV 1006",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Partita en ré mineur, BWV 1004",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/daniel-lozakovich-violon/",
+"source": "musique_cdf"
+},
+{
+"id": "real-luzerner_theater-8673",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-03-24T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "André Baleiro"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8673",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-osr-faust-helene-20270324",
@@ -30017,6 +43910,117 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/faust-helene",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/faust-helene",
 "source": "osr"
+},
+{
+"id": "real-kultur_im_podium-2027-03-24-johannespassion",
+"title": "Johannespassion",
+"series": "Kultur im Podium",
+"start": "2027-03-24T19:30:00+01:00",
+"durationMin": 120,
+"cityId": "dudingen",
+"venueId": "podium-dudingen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Choir",
+"name": "Ensemble Vocal de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Capriccio Barockorchester Basel"
+},
+{
+"role": "Conductor",
+"name": "Pierre-Fabien Roubaty"
+},
+{
+"role": "Evangelist",
+"name": "Jörg Dürmüller"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Johannespassion",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://www.kulturimpodium.ch/abonnenemts-und-tickets/",
+"sourceUrl": "https://www.kulturimpodium.ch/johannespassion/",
+"source": "kultur_im_podium"
+},
+{
+"id": "real-cite_bleue-smile-2027-03-24-1930",
+"title": "Smile !",
+"series": null,
+"start": "2027-03-24T19:30:00+01:00",
+"durationMin": 80,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Sabine Devieilhe"
+},
+{
+"role": "Cello",
+"name": "Pauline Buet"
+},
+{
+"role": "Piano",
+"name": "David Violi"
+}
+],
+"program": [
+{
+"composer": "Marc Blitzstein",
+"title": "I wish it so"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Le poulailler"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Fêtes Galantes"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Paris, Paris, Paris"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "La grosse dame chante"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Lune d'avril"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Complainte de la Butte"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Je te veux"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Losing my mind"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Improvisation n° XV « Hommage à Edith Piaf »"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/smile",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/smile",
+"source": "cite_bleue"
 },
 {
 "id": "real-ocg-thais-20270324",
@@ -30108,10 +44112,6 @@ export const REAL = [
 {
 "role": "Conductor",
 "name": "Bogdan Božović"
-},
-{
-"role": "Host",
-"name": "Bogdan Božović"
 }
 ],
 "program": [
@@ -30147,6 +44147,58 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15423&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/rinaldo-1/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-bach_stiftung-tournee-h-moll-messe-jopa-gastspiel-2",
+"title": "Tourneekonzert: h-Moll-Messe – KKL Luzern",
+"series": null,
+"start": "2027-03-25T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "kkl-luzern",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Magdalene Harer"
+},
+{
+"role": "Alto",
+"name": "Claude Eichenberger"
+},
+{
+"role": "Tenor",
+"name": "Benedikt Kristjánsson"
+},
+{
+"role": "Bass",
+"name": "Israel Martins"
+},
+{
+"role": "Conductor",
+"name": "Rudolf Lutz"
+},
+{
+"role": "Choir",
+"name": "Chor der J. S. Bach-Stiftung"
+},
+{
+"role": "Orchestra",
+"name": "Orchester der J. S. Bach-Stiftung"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "h-Moll Messe, BWV 232",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://www.kkl-luzern.ch/events/js-bach-stiftung-st-gallen-messe-in-h-moll",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/tournee-h-moll-messe-jopa-gastspiel-2/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-tonhalle-2055803",
@@ -30239,6 +44291,77 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/faust-helene",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/faust-helene",
 "source": "osr"
+},
+{
+"id": "real-cite_bleue-smile-2027-03-25-1930",
+"title": "Smile !",
+"series": null,
+"start": "2027-03-25T19:30:00+01:00",
+"durationMin": 80,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Sabine Devieilhe"
+},
+{
+"role": "Cello",
+"name": "Pauline Buet"
+},
+{
+"role": "Piano",
+"name": "David Violi"
+}
+],
+"program": [
+{
+"composer": "Marc Blitzstein",
+"title": "I wish it so"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Le poulailler"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Fêtes Galantes"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Paris, Paris, Paris"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "La grosse dame chante"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Lune d'avril"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Complainte de la Butte"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Je te veux"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Losing my mind"
+},
+{
+"composer": "Marc Blitzstein",
+"title": "Improvisation n° XV « Hommage à Edith Piaf »"
+}
+],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/smile",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/smile",
+"source": "cite_bleue"
 },
 {
 "id": "real-tonhalle-2055804",
@@ -30404,6 +44527,23 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-reformiert_zuerich-17254",
+"title": "Passionskonzert AGK",
+"series": null,
+"start": "2027-03-27T18:30:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/passionskonzert-agk-17254/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/passionskonzert-agk-17254/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-opernhaus_zurich-200211",
 "title": "Rinaldo",
 "series": "Hauptbühne",
@@ -30486,6 +44626,48 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/natur-glaube-beethovens-pastorale-und-c-dur-mess-gouw7d",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/natur-glaube-beethovens-pastorale-und-c-dur-messe/",
 "source": "lso_luzern"
+},
+{
+"id": "real-esn_neuchatel-concert-de-paques-202703281700",
+"title": "Concert de Pâques",
+"series": null,
+"start": "2027-03-28T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "neuchatel",
+"venueId": "temple-du-bas",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano & direction",
+"name": "Victorien Vanoosten"
+},
+{
+"role": "Choir",
+"name": "Ensemble Vocal de la Collégiale de Neuchâtel"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+},
+{
+"role": "Soprano",
+"name": "Faustine Egiziano"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Annina Haug"
+},
+{
+"role": "Baritone",
+"name": "Pierre Héritier"
+}
+],
+"program": [],
+"ticketUrl": "https://www.strapontin.ch/spectacles/concert-de-paques",
+"sourceUrl": "https://www.esn-ne.ch/concerts/concert-de-paques",
+"source": "esn_neuchatel"
 },
 {
 "id": "real-stadtcasino_basel-sofia-metropolitan-orchestra",
@@ -30637,6 +44819,85 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-hayato-sumino-20270331-1930",
+"title": "Hayato Sumino",
+"series": "Abonnementskonzert",
+"start": "2027-03-31T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Piano",
+"name": "Hayato Sumino"
+}
+],
+"program": [
+{
+"composer": "Frédéric Chopin",
+"title": "Scherzo Nr. 1 h-Moll op. 20, Etüde As-Dur op. 25 Nr. 1",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Klaviersonate Nr. 2 b-Moll op. 35",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Mazurken op. 59 (Nr. 1–3)",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Etüde Ges-Dur op. 10 Nr. 5",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Etüde a-Moll op. 25 Nr. 11",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Frédéric Chopin / Hayato Sumino",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "«Raindrop» – Postludium (nach dem Prélude Des-Dur op. 28 Nr. 15)",
+"composerId": "chopin"
+},
+{
+"composer": "Frédéric Chopin",
+"title": "Improvisation über das Ostinato aus der Berceuse Des-Dur op. 57",
+"composerId": "chopin"
+},
+{
+"composer": "Hayato Sumino",
+"title": "Lydian Harp"
+},
+{
+"composer": "Hayato Sumino",
+"title": "White Keys (Auswahl)"
+},
+{
+"composer": "Hayato Sumino",
+"title": "Imaginary Polonaise"
+},
+{
+"composer": "Hayato Sumino",
+"title": "Weitere Werke von Camille Saint-Saëns, Thomas Adès und Igor Strawinsky"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/hayato-sumino/#31-03-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-musikkollegium-9247",
 "title": "Orgelkonzerte im Stadthaus",
 "series": "Hauskonzert",
@@ -30692,6 +44953,73 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/167841/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/orgelkonzerte-im-stadthaus-27-04-01-9247",
 "source": "musikkollegium"
+},
+{
+"id": "real-luzerner_theater-8674",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-04-01T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8674",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-200323",
@@ -30906,6 +45234,116 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-argovia_philharmonic-268897",
+"title": "4. Löwenkonzert",
+"series": "Löwenkonzert",
+"start": "2027-04-03T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Löwensaal Beinwil am See",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Double bass",
+"name": "Uxía Martínez Botana"
+},
+{
+"role": "Ensemble",
+"name": "CHAARTS Chamber Artists"
+}
+],
+"program": [
+{
+"composer": "Kris Bowers",
+"title": "«Main Title», I Love You»"
+},
+{
+"composer": "Boygroup BTS",
+"title": "«Dynamite»"
+},
+{
+"composer": "Gayle",
+"title": "«Abcdefu»"
+},
+{
+"composer": "Pitbull",
+"title": "«Give Me Everything»"
+},
+{
+"composer": "Taylor Swift",
+"title": "«Wildest Dreams»"
+},
+{
+"composer": "Sia",
+"title": "«Cheap Thrills»"
+},
+{
+"composer": "Maroon 5",
+"title": "«Girls Like You»"
+},
+{
+"composer": "Olivia Rodrigo",
+"title": "«pov»"
+},
+{
+"composer": "William Boyce",
+"title": "Symphony Nr. 1"
+},
+{
+"composer": "Charles Avison",
+"title": "Concerto grosso op. 5"
+},
+{
+"composer": "Georg Friedrich Händel",
+"title": "Concerto grosso op. 6/12",
+"composerId": "handel"
+},
+{
+"composer": "Henry Purcell",
+"title": "Abdelazar-Suite"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/187236/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-loewenkonzert-4/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-zuger_sinfonietta-vorhang-auf-2027-04-03",
+"title": "Vorhang auf!",
+"series": "3. Abo-Konzert",
+"start": "2027-04-03T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Lorzensaal Cham",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Simon Gaudenz"
+},
+{
+"role": "Cello",
+"name": "Emilie Richter"
+},
+{
+"role": "Narrator",
+"name": "Stefan Kurt"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.drittezug.ch/selection/event/date?productId=10229800599110",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/vorhang-auf/",
+"source": "zuger_sinfonietta"
+},
+{
 "id": "real-lso_luzern-19946",
 "title": "KAMMERMUSIK-MATINÉE 6",
 "series": "Kammermusik",
@@ -30945,6 +45383,208 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/kammermusik-matinee-6-zcmzxr",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/kammermusik-matinee-6-4/",
 "source": "lso_luzern"
+},
+{
+"id": "real-argovia_philharmonic-268523",
+"title": "3. Kammerkonzert",
+"series": "Kammerkonzert",
+"start": "2027-04-04T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Guitar",
+"name": "Pablo Sainz-Villegas"
+},
+{
+"role": "Ensemble",
+"name": "Musiker:innen des argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Luigi Boccherini",
+"title": "Gitarrenquintett D-Dur G. 448, «Fandango-Quintett»"
+},
+{
+"composer": "Isaac Albéniz",
+"title": "Tango aus der Suite «España» op. 165/2"
+},
+{
+"composer": "Astor Piazzolla",
+"title": "«Libertango»"
+},
+{
+"composer": "Astor Piazzolla",
+"title": "Café 1930 aus «L’Histoire du Tango» für Violine und Gitarre"
+},
+{
+"composer": "Astor Piazzolla",
+"title": "«La muerte del angel»"
+},
+{
+"composer": "Joaquín Rodrigo",
+"title": "Adagio aus «Concierto de Aranjuez»"
+},
+{
+"composer": "Zequinha de Abreu",
+"title": "«Tico Tico»"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165382/",
+"sourceUrl": "https://argoviaphil.ch/konzert/3-kammerkonzert-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-theater_casino_zug-9b89b0d9-601c-4707-ad5b-ea462a8f9464",
+"title": "Vorhang auf!",
+"series": "Zuger Klassik Abo",
+"start": "2027-04-04T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Cello",
+"name": "Emilie Richter"
+},
+{
+"role": "Conductor",
+"name": "Simon Gaudenz"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770252",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/vorhang-auf?date=9b89b0d9-601c-4707-ad5b-ea462a8f9464",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-zuger_sinfonietta-vorhang-auf-2-2027-04-04",
+"title": "Vorhang auf!",
+"series": "3. Abo-Konzert",
+"start": "2027-04-04T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Simon Gaudenz"
+},
+{
+"role": "Cello",
+"name": "Emilie Richter"
+},
+{
+"role": "Narrator",
+"name": "Stefan Kurt"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770252",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/vorhang-auf-2/",
+"source": "zuger_sinfonietta"
+},
+{
+"id": "real-kts_st_gallen-3873",
+"title": "Susannah",
+"series": "Grosses Haus",
+"start": "2027-04-04T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Marit Strindlund"
+},
+{
+"role": "Director",
+"name": "Max Nattkämper"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Andrew Nolen"
+},
+{
+"role": "Performer",
+"name": "Dafydd Jones"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Carlisle Floyd",
+"title": "Susannah"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=515&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/susannah/3873/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-199991",
@@ -31061,73 +45701,6 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15416&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/la-fanciulla-del-west-1/",
 "source": "opernhaus_zurich"
-},
-{
-"id": "real-stadtcasino_basel-040427_concert_olympique",
-"title": "Le Concert Olympique mit Arnold Schoenberg Chor und Kit Armstrong",
-"series": "AMG Symphonic Gems",
-"start": "2027-04-04T19:30:00+02:00",
-"durationMin": 120,
-"cityId": "basel",
-"venueId": "stadtcasino-basel",
-"type": "vocal-opera",
-"featured": true,
-"status": "scheduled",
-"credits": [
-{
-"role": "Conductor",
-"name": "Jan Caeyers"
-},
-{
-"role": "Choir",
-"name": "Arnold Schoenberg Chor"
-},
-{
-"role": "Piano",
-"name": "Kit Armstrong"
-},
-{
-"role": "Soprano",
-"name": "Lenneke Ruiten"
-},
-{
-"role": "Alto",
-"name": "Ulrike Meyer"
-},
-{
-"role": "Tenor",
-"name": "Simon Bode"
-},
-{
-"role": "Baritone",
-"name": "Äneas Humm"
-}
-],
-"program": [
-{
-"composer": "Johann Sebastian Bach",
-"title": "Präludium und Fuge Nr. 2 c-Moll BWV 847",
-"composerId": "bach"
-},
-{
-"composer": "Ludwig van Beethoven",
-"title": "3 Bagatellen aus op. 119 (Nr. 2 C-Dur, Nr. 4 A-Dur, Nr. 8 C-Dur)",
-"composerId": "beethoven"
-},
-{
-"composer": "Ludwig van Beethoven",
-"title": "Fantasie für Klavier, Chor und Orchester c-Moll op. 80",
-"composerId": "beethoven"
-},
-{
-"composer": "Ludwig van Beethoven",
-"title": "Sinfonie Nr. 9 d-Moll op. 125LE",
-"composerId": "beethoven"
-}
-],
-"ticketUrl": "https://tickets.konzerte-basel.ch/webshop/webticket/shop?event=201",
-"sourceUrl": "https://www.stadtcasino-basel.ch/de/programm/veranstaltungen/040427_concert_olympique/",
-"source": "stadtcasino_basel"
 },
 {
 "id": "real-tonhalle-2055828",
@@ -31483,6 +46056,47 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-kts_st_gallen-3926",
+"title": "Christian Poltéra",
+"series": "Tonhallekonzert",
+"start": "2027-04-08T19:30:00+02:00",
+"durationMin": 110,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Cello",
+"name": "Christian Poltéra"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Antonín Dvořák",
+"title": "Cellokonzert h-Moll op. 104",
+"composerId": "dvorak"
+},
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Sinfonie Nr. 3 a-Moll op. 56 Schottische",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=574&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/8-thk-christian-poltera/3926/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-200324",
 "title": "Die Zauberflöte",
 "series": "Hauptbühne",
@@ -31717,6 +46331,38 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-kts_st_gallen-3914",
+"title": "Schottischer Lunch",
+"series": "Lunch-Konzert",
+"start": "2027-04-09T12:15:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Sinfonie Nr. 3 Op. 56 Schottische",
+"composerId": "mendelssohn"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=592&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/4-lunch-schottischer-lunch/3914/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-geneva_victoria_hall-15905932-20270409",
 "title": "Brahms: Concerto pour piano n° 1 et Symphonie n° 4",
 "series": null,
@@ -31741,6 +46387,73 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/selection/event/date?productId=10229293710863",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/15905932_3758732",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-luzerner_theater-8675",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-04-09T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "André Baleiro"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Daniel Jenz"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8675",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-tonhalle-2056930",
@@ -31795,6 +46508,73 @@ export const REAL = [
 "ticketUrl": "https://www.ticketino.com/de/event/masterinterpreten-opus-50-jubilaeumskonzert/215389",
 "sourceUrl": "https://tonhallezuerich.ch/konzerte/kalender/jubilaeumskonzert-50-classical-highlights-2056930/tz/",
 "source": "tonhalle"
+},
+{
+"id": "real-camerata_bern-31186",
+"title": "Life Cycles",
+"series": "Abokonzert",
+"start": "2027-04-09T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Patricia Kopatchinskaja"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "PatKop",
+"title": "Ursprung der Welt für Elektronik und Musiker:innen"
+},
+{
+"composer": "Henry Purcell",
+"title": "Fantasia upon One Note, Z. 745"
+},
+{
+"composer": "György Kurtág",
+"title": "Aus: Signs, Games and Messages"
+},
+{
+"composer": "György Ligeti",
+"title": "Ramifications für 12 Solostreicher"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Adagio und Fuge, Streichquartett Nr. 27 in c-Moll KV 546",
+"composerId": "mozart"
+},
+{
+"composer": "Franz Schubert",
+"title": "Quartettsatz in c-Moll, D 703",
+"composerId": "schubert"
+},
+{
+"composer": "Erwin Schulhoff",
+"title": "Alla Tarantella aus Fünf Stücke für Streichquartett WV 68"
+},
+{
+"composer": "Robert Schumann",
+"title": "Langsam – 2. Satz aus dem Violinkonzert in d-Moll WoO 23",
+"composerId": "schumann"
+},
+{
+"composer": "Franz Schubert",
+"title": "Grab und Mond in a-Moll D 893",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/155218/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/life-cycles",
+"source": "camerata_bern"
 },
 {
 "id": "real-tonhalle-2055835",
@@ -31945,6 +46725,55 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-reminiszenzen-20270411-1100",
+"title": "Reminiszenzen",
+"series": "8. Matineekonzert",
+"start": "2027-04-11T11:00:00+02:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "György Zerkula"
+},
+{
+"role": "Violin",
+"name": "Stefan Meier"
+},
+{
+"role": "Viola",
+"name": "Julia Malkova"
+},
+{
+"role": "Cello",
+"name": "Eva Lüthi"
+},
+{
+"role": "Clarinet",
+"name": "Gábor Horváth"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Quartettsatz c-moll D 703",
+"composerId": "schubert"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Klarinettenquintett h-moll op. 115",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/reminiszenzen/",
+"sourceUrl": "https://www.casinobern.ch/programm/reminiszenzen/#11-04-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-200037",
 "title": "7. Kammerkonzert",
 "series": "Kammerkonzerte",
@@ -31960,6 +46789,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15450&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/kammerkonzert-7/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-15495",
+"title": "Liederabend «Natura Morta»",
+"series": null,
+"start": "2027-04-11T17:00:00+02:00",
+"durationMin": 75,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/liederabend-natura-morta-15495/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/liederabend-natura-morta-15495/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-tonhalle-2055837",
@@ -31992,6 +46838,50 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5589&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/rudolf-buchbinder-mit-beethoven-2055837/",
 "source": "tonhalle"
+},
+{
+"id": "real-kts_st_gallen-3916",
+"title": "Schubert um 5",
+"series": "Sonntags um 5",
+"start": "2027-04-11T17:00:00+02:00",
+"durationMin": 60,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Elena Neff Zhunke"
+},
+{
+"role": "Violin",
+"name": "Nadia Saladukhina"
+},
+{
+"role": "Viola",
+"name": "Ricardo Gaspar"
+},
+{
+"role": "Cello",
+"name": "Fernando Gomes"
+},
+{
+"role": "Cello",
+"name": "Carolin Eychmüller"
+}
+],
+"program": [
+{
+"composer": "Franz Schubert",
+"title": "Streichquintett C-Dur D 956",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=587&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/4-so-um-5-schubert-um-5/3916/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-osi-205108787444802",
@@ -32039,6 +46929,73 @@ export const REAL = [
 "source": "osi"
 },
 {
+"id": "real-camerata_bern-31192",
+"title": "«Life Cycles» in Sion",
+"series": "Gastspiel",
+"start": "2027-04-11T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "sion",
+"venueName": "NODA BCVS Sion",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Patricia Kopatchinskaja"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "PatKop",
+"title": "Ursprung der Welt für Elektronik und Musiker:innen"
+},
+{
+"composer": "Henry Purcell",
+"title": "Fantasia upon One Note, Z. 745"
+},
+{
+"composer": "György Kurtág",
+"title": "Aus: Signs, Games and Messages"
+},
+{
+"composer": "György Ligeti",
+"title": "Ramifications für 12 Solostreicher"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Streichquartett Nr. 27 in c-Moll KV 546 Adagio und Fuge",
+"composerId": "mozart"
+},
+{
+"composer": "Franz Schubert",
+"title": "Quartettsatz in c-Moll, D 703",
+"composerId": "schubert"
+},
+{
+"composer": "Erwin Schulhoff",
+"title": "Alla Tarantella aus Fünf Stücke für Streichquartett WV 68"
+},
+{
+"composer": "Robert Schumann",
+"title": "Langsam – 2. Satz aus dem Violinkonzert in d-Moll WoO 23",
+"composerId": "schumann"
+},
+{
+"composer": "Franz Schubert",
+"title": "Grab und Mond in a-Moll D 893",
+"composerId": "schubert"
+}
+],
+"ticketUrl": "https://ticketing-nodabcvs.mapado.com/event/725918-camerata-bern-p-kopatchinskaja",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/life-cycles-sion",
+"source": "camerata_bern"
+},
+{
 "id": "real-opernhaus_zurich-200270",
 "title": "Tosca",
 "series": "Hauptbühne",
@@ -32078,10 +47035,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Bogdan Božović"
-},
-{
-"role": "Violin",
 "name": "Bogdan Božović"
 },
 {
@@ -32331,6 +47284,56 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-kammerorchester_basel-kirschbluete-202704141930",
+"title": "Kirschblüte",
+"series": null,
+"start": "2027-04-14T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "stadtcasino-basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pierre Bleuse"
+},
+{
+"role": "Piano",
+"name": "Hayato Sumino"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Maurice Ravel",
+"title": "Pavane pour une Infante défunte",
+"composerId": "ravel"
+},
+{
+"composer": "Hayato Sumino",
+"title": "Neues Stück für Klavier und Orchester"
+},
+{
+"composer": "Maurice Ravel",
+"title": "Konzert für Klavier und Orchester in G-Dur",
+"composerId": "ravel"
+},
+{
+"composer": "Robert Schumann",
+"title": "Sinfonie Nr. 1 in B-Dur, op. 38 «Frühlingssinfonie»",
+"composerId": "schumann"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/157703/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/kirschbluete.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-tonhalle-2055849",
 "title": "Kammermusik-Lunchkonzert",
 "series": null,
@@ -32552,6 +47555,51 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-musique_cdf-3208",
+"title": "Sheku Kanneh-Mason violoncelle · Benjamin Grosvenor piano",
+"series": "Grande Série",
+"start": "2027-04-15T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Sheku Kanneh-Mason"
+},
+{
+"role": "Piano",
+"name": "Benjamin Grosvenor"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "7 Variations en mi bémol majeur, WoO 46",
+"composerId": "beethoven"
+},
+{
+"composer": "Nadia Boulanger",
+"title": "Trois pièces pour violoncelle et piano"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate pour violoncelle et piano n° 2 en sol mineur, op. 5",
+"composerId": "beethoven"
+},
+{
+"composer": "Sergueï Rachmaninov",
+"title": "Sonate pour violoncelle et piano en sol mineur, op. 19"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/sheku-kanneh-mason-violoncellebenjamin-grosvenor-piano/",
+"source": "musique_cdf"
+},
+{
 "id": "real-geneva_victoria_hall-51351555-20270415",
 "title": "Yulianna Avdeeva",
 "series": "Les Grands Interprètes",
@@ -32605,6 +47653,44 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-luzerner_theater-8565",
+"title": "Pirates Ahead!",
+"series": "Box",
+"start": "2027-04-15T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Paul-Boris Kertsman"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8565",
+"sourceUrl": "https://www.luzernertheater.ch/piratesahead",
+"source": "luzerner_theater"
+},
+{
 "id": "real-musikkollegium-9440",
 "title": "Sehnsucht Italien",
 "series": "Musik über Mittag",
@@ -32654,6 +47740,29 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/176605/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/sehnsucht-italien-27-04-16-9440",
 "source": "musikkollegium"
+},
+{
+"id": "real-bach_stiftung-bwv-4-christ-lag-in-todes-banden",
+"title": "BWV 4 «Christ lag in Todes Banden»",
+"series": "Bachkantate",
+"start": "2027-04-16T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 4 «Christ lag in Todes Banden»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168119/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-4-christ-lag-in-todes-banden/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-opernhaus_zurich-199994",
@@ -33105,6 +48214,58 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocf_fribourg-8498",
+"title": "Fresques sonores festives",
+"series": null,
+"start": "2027-04-18T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Orchestre des Jeunes de Fribourg"
+},
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Conductor",
+"name": "Benedikt Hayoz"
+},
+{
+"role": "Conductor",
+"name": "Simon Schmied"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Hector Berlioz",
+"title": "Symphonie funèbre et triomphale"
+},
+{
+"composer": "Richard Strauss",
+"title": "Festliches Präludium op. 61",
+"composerId": "richard-strauss"
+},
+{
+"composer": "Sergeï Prokofiev",
+"title": "Suite de Roméo et Juliette"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8498",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8498",
+"source": "ocf_fribourg"
+},
+{
 "id": "real-musikkollegium-9446",
 "title": "Mondscheinsonate",
 "series": "Kammermusik Liebestrasse",
@@ -33159,6 +48320,28 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/179109/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/mondscheinsonate-27-04-18-9446",
 "source": "musikkollegium"
+},
+{
+"id": "real-reformiert_zuerich-15474",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-04-18T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15474/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15474/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-zko-19924",
@@ -33474,6 +48657,53 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-ocl-97677148-9fab-4f2f-bb80-641440698248-ocl-ch",
+"title": "Les Entractes n°4 | Korngold Sextuor op. 10",
+"series": "Les Entractes n°4",
+"start": "2027-04-22T12:30:00+02:00",
+"durationMin": 60,
+"cityId": "lausanne",
+"venueId": "salle-paderewski",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Clémence de Forceville"
+},
+{
+"role": "Violin",
+"name": "Anna Molinari"
+},
+{
+"role": "Viola",
+"name": "Eli Karanfilova"
+},
+{
+"role": "Viola",
+"name": "Karl Wingerter"
+},
+{
+"role": "Cello",
+"name": "Indira Rahmatulla"
+},
+{
+"role": "Cello",
+"name": "Basile Ausländer"
+}
+],
+"program": [
+{
+"composer": "Erich Wolfgang Korngold",
+"title": "Sextuor à cordes en ré majeur, op. 10"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/entracte-n4-26-27/",
+"sourceUrl": "https://www.ocl.ch/concert/entracte-n4-26-27/",
+"source": "ocl"
+},
+{
 "id": "real-musikkollegium-9271",
 "title": "Kristian Bezuidenhout spielt Mozart",
 "series": "Abonnementskonzert",
@@ -33512,6 +48742,86 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/163494/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/kristian-bezuidenhout-spielt-mozart-27-04-22-9271",
 "source": "musikkollegium"
+},
+{
+"id": "real-luzerner_theater-8697",
+"title": "Pirates Ahead!",
+"series": "Box",
+"start": "2027-04-22T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Paul-Boris Kertsman"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8697",
+"sourceUrl": "https://www.luzernertheater.ch/piratesahead",
+"source": "luzerner_theater"
+},
+{
+"id": "real-musique_cdf-3209",
+"title": "Renaud Capuçon violon · Mao Fujita piano",
+"series": "Grande Série",
+"start": "2027-04-22T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Mao Fujita"
+}
+],
+"program": [
+{
+"composer": "Robert Schumann",
+"title": "Sonate pour violon et piano n° 1 en la mineur, op. 105",
+"composerId": "schumann"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Sonate pour violon et piano n° 2 en la majeur, op. 100",
+"composerId": "brahms"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate pour violon et piano n° 9 en la majeur, op. 47, « Kreutzer»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/renaud-capucon-violonmao-fujita-piano/",
+"source": "musique_cdf"
 },
 {
 "id": "real-opernhaus_zurich-200295",
@@ -33764,6 +49074,32 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-casino_bern-peter-bence-symphonic-tastenfeuerwerk-20270423-1930",
+"title": "Peter Bence Symphonic – Tastenfeuerwerk",
+"series": "Grosser Saal",
+"start": "2027-04-23T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Sinfonietta de Lausanne"
+},
+{
+"role": "Piano",
+"name": "Peter Bence"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticket-onlineshop.com/ols/migrosclassics/de/tickets/channel/shop/areaplan/venue/event/675993",
+"sourceUrl": "https://www.casinobern.ch/programm/peter-bence-symphonic-tastenfeuerwerk/#23-04-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-200296",
 "title": "Werckmeister Harmonien",
 "series": null,
@@ -33779,6 +49115,70 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15502&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/werckmeister-harmonien/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3758",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-04-24T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=492&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/alcina/3758/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-200274",
@@ -33801,6 +49201,51 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15218&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/tosca/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-argovia_philharmonic-268900",
+"title": "5. Löwenkonzert",
+"series": "Löwenkonzert",
+"start": "2027-04-24T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Löwensaal Beinwil am See",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Horn",
+"name": "Gerard Serrano Garcia"
+},
+{
+"role": "Conductor",
+"name": "Dominik Kiefer"
+},
+{
+"role": "Orchestra",
+"name": "Capriccio Barockorchester"
+}
+],
+"program": [
+{
+"composer": "Johann Nepomuk Hummel",
+"title": "Ouvertüre B-Dur op. 101"
+},
+{
+"composer": "Joseph Haydn",
+"title": "Hornkonzert Nr. 1 D-Dur, Hob. VIId/3",
+"composerId": "haydn"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sinfonie Nr. 2 D-Dur op. 36",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/187238/",
+"sourceUrl": "https://argoviaphil.ch/konzert/5-loewenkonzert-6/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opernhaus_zurich-200297",
@@ -33954,6 +49399,44 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-luzerner_theater-8698",
+"title": "Pirates Ahead!",
+"series": "Box",
+"start": "2027-04-25T15:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Paul-Boris Kertsman"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8698",
+"sourceUrl": "https://www.luzernertheater.ch/piratesahead",
+"source": "luzerner_theater"
+},
+{
 "id": "real-geneva_victoria_hall-60750717-20270425",
 "title": "Caravan",
 "series": "Concert du dimanche",
@@ -34052,6 +49535,57 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-musique_cdf-3225",
+"title": "Maciej Skrzeczkowski clavecin",
+"series": "Nouveaux Talents",
+"start": "2027-04-25T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Harpsichord",
+"name": "Maciej Skrzeczkowski"
+}
+],
+"program": [
+{
+"composer": "Louis Couperin",
+"title": "Suite en ré mineur"
+},
+{
+"composer": "Elisabeth Jacquet de la Guerre",
+"title": "Suite en la mineur"
+},
+{
+"composer": "Jean-Philippe Rameau",
+"title": "L’Agaçante"
+},
+{
+"composer": "Jean-Philippe Rameau",
+"title": "La Livri"
+},
+{
+"composer": "Jean-Philippe Rameau",
+"title": "La Dauphine"
+},
+{
+"composer": "François Couperin",
+"title": "Dix-neuvième Ordre (XIX) en ré majeur/mineur"
+},
+{
+"composer": "Jean-Baptiste Forqueray",
+"title": "Suite en sol majeur"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-25-04-2027/",
+"source": "musique_cdf"
+},
+{
 "id": "real-opera_lausanne-pelleas-et-melisande-20270425-1700",
 "title": "Pelléas et Mélisande",
 "series": null,
@@ -34124,6 +49658,46 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-kts_st_gallen-3981",
+"title": "SJSO",
+"series": null,
+"start": "2027-04-25T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Patrick Furrer"
+},
+{
+"role": "Viola",
+"name": "Lawrence Power"
+}
+],
+"program": [
+{
+"composer": "Antonín Dvořák",
+"title": "Sinfonische Dichtung Die Mittagshexe, op. 108",
+"composerId": "dvorak"
+},
+{
+"composer": "Miklós Rózsa",
+"title": "Viola Concerto, op. 37"
+},
+{
+"composer": "Igor Strawinski",
+"title": "Petruschka"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=692&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/sjso-schweizer-jugend-sinfonie-orchester/3981/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-cnz-146",
 "title": "Voltaire-Konzert N° 9: Aregnaz Martirosyan im Gespräch",
 "series": null,
@@ -34175,6 +49749,78 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15357&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/lelisir-damore/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-luzerner_theater-8483",
+"title": "Proserpina",
+"series": null,
+"start": "2027-04-25T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8483",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-200261",
@@ -34419,6 +50065,83 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-kammerorchester_basel-beste-freunde-202704281930",
+"title": "Beste Freunde",
+"series": null,
+"start": "2027-04-28T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Don Bosco Basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Giovanni Antonini"
+},
+{
+"role": "Violin",
+"name": "Dmitry Smirnov"
+},
+{
+"role": "Cello",
+"name": "Christoph Dangel"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Anton Kraft",
+"title": "Gran Duo concertante für Violine und Violoncello in d-Moll, op. 3, Nr. 1"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/143673/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/beste-freunde.html",
+"source": "kammerorchester_basel"
+},
+{
+"id": "real-luzerner_theater-8700",
+"title": "Pirates Ahead!",
+"series": "Box",
+"start": "2027-04-28T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Paul-Boris Kertsman"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Hwapyeong Gwon"
+},
+{
+"role": "Performer",
+"name": "Elena Dietrich"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8700",
+"sourceUrl": "https://www.luzernertheater.ch/piratesahead",
+"source": "luzerner_theater"
+},
+{
 "id": "real-osr-rachmaninoff-20270429",
 "title": "100% Rachmaninoff",
 "series": "Série S",
@@ -34499,6 +50222,48 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-ocl-d35fad56-43ce-48c4-896c-47ecd4d3cf0f-ocl-ch",
+"title": "L'OCL fête Beethoven – Hors-série | Récital Capuçon / Fujita",
+"series": "L'OCL fête Beethoven – Hors-série",
+"start": "2027-04-29T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueId": "salle-metropole",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Mao Fujita"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate pour violon et piano n°2 en la majeur, op. 12",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate pour violon et piano n°5 en fa majeur, op. 24, « Le Printemps »",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate pour violon et piano n°9 en la majeur, op. 47, « à Kreutzer »",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/recital-fujita-capucon/",
+"sourceUrl": "https://www.ocl.ch/concert/recital-fujita-capucon/",
+"source": "ocl"
+},
+{
 "id": "real-opernhaus_zurich-199959",
 "title": "L'elisir d'amore",
 "series": "Hauptbühne",
@@ -34562,6 +50327,151 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-luzerner_theater-8676",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-04-30T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "André Baleiro"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Brett Sprague"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8676",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
+},
+{
+"id": "real-kts_st_gallen-3927",
+"title": "Pulsierend",
+"series": "Tonhallekonzert",
+"start": "2027-04-30T19:30:00+02:00",
+"durationMin": 100,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Stockhammer"
+},
+{
+"role": "Percussion",
+"name": "Maximilian Näscher"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "John Psathas",
+"title": "Leviathan für Percussion und Orchester"
+},
+{
+"composer": "Dmitri Schostakowitsch",
+"title": "Sinfonie Nr. 1 f-Moll"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=575&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-04/9-thk-pulsierend/3927/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-casino_bern-rendezvous-mit-rachmaninow-20270430-1930",
+"title": "Rendezvous mit Rachmaninow",
+"series": "Orchestra de la Suisse Romande zu Gast",
+"start": "2027-04-30T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Tugan Sokhiev"
+},
+{
+"role": "Piano",
+"name": "Yefim Bronfman"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de la Suisse Romande"
+}
+],
+"program": [
+{
+"composer": "Sergej Rachmaninow",
+"title": "Konzert für Klavier und Orchester Nr. 3 d-Moll op. 30"
+},
+{
+"composer": "Sergej Rachmaninow",
+"title": "Symphonie Nr. 2 e-Moll op. 27"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/genf-zu-gast-in-bern/",
+"sourceUrl": "https://www.casinobern.ch/programm/rendezvous-mit-rachmaninow/#30-04-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-200299",
 "title": "Werckmeister Harmonien",
 "series": null,
@@ -34577,6 +50487,45 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15505&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/werckmeister-harmonien/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-argovia_philharmonic-268642",
+"title": "argovia philharmonic unterwegs",
+"series": "Sinfoniekonzert",
+"start": "2027-04-30T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Stadtkirche St. Martin",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Mezzo-soprano",
+"name": "Katrin Wundsam"
+},
+{
+"role": "Tenor",
+"name": "Cornel Frey"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"workId": "mahler-lied-von-der-erde",
+"composerId": "mahler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165384/",
+"sourceUrl": "https://argoviaphil.ch/konzert/argovia-philharmonic-unterwegs-5/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opera_lausanne-pelleas-et-melisande-20270430-2000",
@@ -34649,6 +50598,101 @@ export const REAL = [
 "ticketUrl": "https://opl.shop.secutix.com/selection/event/date?productId=10229284098115",
 "sourceUrl": "https://www.opera-lausanne.ch/show/pelleas-et-melisande/",
 "source": "opera_lausanne"
+},
+{
+"id": "real-argovia_philharmonic-268644",
+"title": "argovia philharmonic unterwegs",
+"series": "Sinfoniekonzert",
+"start": "2027-05-01T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Stadtsaal Zofingen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Mezzo-soprano",
+"name": "Katrin Wundsam"
+},
+{
+"role": "Tenor",
+"name": "Cornel Frey"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"workId": "mahler-lied-von-der-erde",
+"composerId": "mahler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165384/",
+"sourceUrl": "https://argoviaphil.ch/konzert/argovia-philharmonic-unterwegs-6/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-ocf_fribourg-8504",
+"title": "Espiègleries en septuor",
+"series": null,
+"start": "2027-05-02T11:00:00+02:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueName": "Musée d’art et d’histoire, Lapidaire",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Iván Zerpa"
+},
+{
+"role": "Viola",
+"name": "Ellina Khachaturyan"
+},
+{
+"role": "Cello",
+"name": "Arthur Guignard"
+},
+{
+"role": "Double bass",
+"name": "Lionel Felchlin"
+},
+{
+"role": "Clarinet",
+"name": "Lionel Andrey"
+},
+{
+"role": "Bassoon",
+"name": "Ryoko Torii"
+},
+{
+"role": "Horn",
+"name": "Denis Dafflon"
+}
+],
+"program": [
+{
+"composer": "R. Strauss",
+"title": "Till Eulenspiegel einmal anders! op. 28 (arr. Franz Hasenöhrl)"
+},
+{
+"composer": "L. v. Beethoven",
+"title": "Septuor en mi bémol majeur, op. 20",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8504",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8504",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-opernhaus_zurich-199960",
@@ -34743,6 +50787,219 @@ export const REAL = [
 "ticketUrl": "https://opl.shop.secutix.com/selection/event/date?productId=10229284098115",
 "sourceUrl": "https://www.opera-lausanne.ch/show/pelleas-et-melisande/",
 "source": "opera_lausanne"
+},
+{
+"id": "real-luzerner_theater-8701",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-02T15:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8701",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
+"id": "real-musique_cdf-3521",
+"title": "Airs Folkloriques Islandais, Danois et Écossais",
+"series": "Collaboration",
+"start": "2027-05-02T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Performer",
+"name": "Nordic Affect"
+},
+{
+"role": "Violin",
+"name": "Halla Steinunn Stefánsdóttir"
+},
+{
+"role": "Viola",
+"name": "Marie Stockmarr Becker"
+},
+{
+"role": "Viola da gamba",
+"name": "Liam Byrne"
+},
+{
+"role": "Harpsichord",
+"name": "Guðrún Óskarsdóttir"
+},
+{
+"role": "Flute",
+"name": "Ian Wilson"
+},
+{
+"role": "Performer",
+"name": "Eyjólfur Eyjólfsson"
+}
+],
+"program": [
+{
+"composer": "Airs Folkloriques",
+"title": "Islande, Danemark et Écosse"
+},
+{
+"composer": "Maja S. K. Ratkje",
+"title": "« To F »"
+},
+{
+"composer": "Matthew Locke",
+"title": "Morceau de clôture extrait de « La Tempête »"
+},
+{
+"composer": "Henry Purcell",
+"title": "« Venez, chers marins », extrait de « Didon et Énée » ; « Full Fathom Five », extrait de « La Tempête »"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/airs-folkloriques-islandais-danois-ecossais-02-05-2027/",
+"source": "musique_cdf"
+},
+{
+"id": "real-kts_st_gallen-3928",
+"title": "Pulsierend",
+"series": "Tonhallekonzert",
+"start": "2027-05-02T17:00:00+02:00",
+"durationMin": 100,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Stockhammer"
+},
+{
+"role": "Percussion",
+"name": "Maximilian Näscher"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "John Psathas",
+"title": "Leviathan für Percussion und Orchester"
+},
+{
+"composer": "Dmitri Schostakowitsch",
+"title": "Sinfonie Nr. 1 f-Moll"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=576&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/9-thk-pulsierend/3928/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-argovia_philharmonic-268647",
+"title": "argovia philharmonic unterwegs",
+"series": "Sinfoniekonzert",
+"start": "2027-05-02T17:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kloster Muri",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Mezzo-soprano",
+"name": "Katrin Wundsam"
+},
+{
+"role": "Tenor",
+"name": "Cornel Frey"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"workId": "mahler-lied-von-der-erde",
+"composerId": "mahler"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165384/",
+"sourceUrl": "https://argoviaphil.ch/konzert/argovia-philharmonic-unterwegs-7/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opernhaus_zurich-199995",
@@ -34864,6 +51121,49 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-casino_bern-orchestre-de-paris-capucon-spielt-max-richter-20270504-1930",
+"title": "Orchestre de Paris – Richter trifft Tschaikowski",
+"series": "Migros-Kulturprozent-Classics 2026/2027 | Orchestre de Paris",
+"start": "2027-05-04T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Orchestre de Paris"
+},
+{
+"role": "Conductor",
+"name": "Andrés Orozco-Estrada"
+},
+{
+"role": "Cello",
+"name": "Gautier Capuçon"
+}
+],
+"program": [
+{
+"composer": "Max Richter",
+"title": "Concerto for Cello and Orchestra (ca. 35’), Schweizer Erstaufführung"
+},
+{
+"composer": "Pjotr Iljitsch Tschaikowski",
+"title": "Sinfonie Nr. 5 e-Moll op. 64"
+},
+{
+"composer": "Pjotr Iljitsch Tschaikowski",
+"title": "Programmänderungen vorbehalten."
+}
+],
+"ticketUrl": "https://www.ticket-onlineshop.com/ols/migrosclassics/de/tickets/channel/shop/areaplan/venue/event/675996",
+"sourceUrl": "https://www.casinobern.ch/programm/orchestre-de-paris-capucon-spielt-max-richter/#04-05-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-ocg-conversations-viennoises-20270504",
 "title": "Conversations viennoises",
 "series": "Concert à l'abo",
@@ -34903,6 +51203,70 @@ export const REAL = [
 "ticketUrl": "https://billetterie.locg.ch/selection/event/date?productId=10229790114013",
 "sourceUrl": "https://locg.ch/fr/calendrier/conversations-viennoises",
 "source": "ocg"
+},
+{
+"id": "real-kts_st_gallen-3759",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-05-05T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=493&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/alcina/3759/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-tonhalle-2056979",
@@ -34965,6 +51329,78 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15229&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/le-nozze-di-figaro/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-luzerner_theater-8702",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-06T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8702",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
 },
 {
 "id": "real-tonhalle-2055860",
@@ -35244,6 +51680,42 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3980",
+"title": "Side-by-side",
+"series": null,
+"start": "2027-05-08T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Jugendsinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Antonín Dvořák",
+"title": "Sinfonie Nr. 9 e-Moll op. 95 Aus der neuen Welt",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=703&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/side-by-side/3980/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-200040",
 "title": "8. Kammerkonzert",
 "series": "Kammerkonzerte",
@@ -35466,6 +51938,72 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-musique_cdf-3224",
+"title": "Trio Archai",
+"series": "Nouveaux Talents",
+"start": "2027-05-09T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Trio Archai"
+},
+{
+"role": "Piano",
+"name": "Mar Valor"
+},
+{
+"role": "Violin",
+"name": "Ayla Sahin"
+},
+{
+"role": "Cello",
+"name": "Finn Mannion"
+}
+],
+"program": [
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Trio en si bémol majeur, KV 502",
+"composerId": "mozart"
+},
+{
+"composer": "Gabriel Fauré",
+"title": "Trio en ré mineur, op. 120"
+},
+{
+"composer": "Robert Schumann",
+"title": "Trio n° 2 en fa majeur, op. 80",
+"composerId": "schumann"
+}
+],
+"ticketUrl": "https://musiquecdf.ch/billetterie/",
+"sourceUrl": "https://musiquecdf.ch/concert/nouveau-talent-09-05-2027/",
+"source": "musique_cdf"
+},
+{
+"id": "real-reformiert_zuerich-864",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-05-09T19:30:00+02:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-864/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-864/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-opernhaus_zurich-199962",
 "title": "L'elisir d'amore",
 "series": "Hauptbühne",
@@ -35522,6 +52060,122 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocl-204b7daf-c1a5-4f69-8b6b-bcc4f2648ef1-ocl-ch",
+"title": "L'OCL fête Beethoven – n°1 | Argerich · Concerto n°2 · Symphonie n°7",
+"series": "L'OCL fête Beethoven – n°1",
+"start": "2027-05-10T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Martha Argerich"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano et orchestre n°2 en si bémol majeur, op. 19",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°7 en la majeur, op. 92",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n1/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n1/",
+"source": "ocl"
+},
+{
+"id": "real-ocl-5553edc6-79b2-4415-b9a7-a937c92c85f7-ocl-ch",
+"title": "L'OCL fête Beethoven – n°2 | Triple Concerto · Symphonie n°5",
+"series": "L'OCL fête Beethoven – n°2",
+"start": "2027-05-11T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin & direction",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Cello",
+"name": "Gautier Capuçon"
+},
+{
+"role": "Piano",
+"name": "Martha Argerich"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano, violon, violoncelle et orchestre en do majeur, op. 56, « Triple Concerto »",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°5 en do mineur, op. 67",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n2/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n2/",
+"source": "ocl"
+},
+{
+"id": "real-kts_st_gallen-3906",
+"title": "Cinema Paradiso",
+"series": null,
+"start": "2027-05-12T18:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Zur Werkstatt",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Elena Neff Zhunke"
+},
+{
+"role": "Violin",
+"name": "Gwendoline Rouiller"
+},
+{
+"role": "Cello",
+"name": "Fernando Gomes"
+}
+],
+"program": [],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=595&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/3-afterwor-cinema-paradiso/3906/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-osr-daphnis-chloe-20270512",
 "title": "Daphnis et Chloé",
 "series": "Série R",
@@ -35572,6 +52226,47 @@ export const REAL = [
 "source": "osr"
 },
 {
+"id": "real-ocl-d95a00a6-2076-4fc8-9554-cfda3edc0961-ocl-ch",
+"title": "L'OCL fête Beethoven – n°3 | Buchbinder · L'Empereur · Symphonie n°4",
+"series": "L'OCL fête Beethoven – n°3",
+"start": "2027-05-12T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Rudolf Buchbinder"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano et orchestre n°5 en mi bémol majeur, op. 73, « L'Empereur »",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°4 en si bémol majeur, op. 60",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n3/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n3/",
+"source": "ocl"
+},
+{
 "id": "real-opernhaus_zurich-199963",
 "title": "L'elisir d'amore",
 "series": "Hauptbühne",
@@ -35598,7 +52293,7 @@ export const REAL = [
 "title": "Métamorphoses",
 "series": null,
 "start": "2027-05-12T19:30:00+02:00",
-"durationMin": 120,
+"durationMin": 90,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "chamber",
@@ -35714,6 +52409,50 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3919",
+"title": "Beethoven im Quartett",
+"series": "Meisterzyklus-Konzert",
+"start": "2027-05-13T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Modigliani Quartet"
+},
+{
+"role": "Violin",
+"name": "Amaury Coeytaux"
+},
+{
+"role": "Violin",
+"name": "Loïc Rio"
+},
+{
+"role": "Viola",
+"name": "Laurent Marfaing"
+},
+{
+"role": "Cello",
+"name": "François Kieffer"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Grosse Fuge für Streichquartett B-Dur op. 133, Streichquartett Nr. 15 a-Moll op. 132",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=583&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/5-mzk-beethoven-im-quartett/3919/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-osr-daphnis-chloe-20270513",
 "title": "Daphnis et Chloé",
 "series": "Série S",
@@ -35788,6 +52527,47 @@ export const REAL = [
 "ticketUrl": "https://tickets.zko.ch/webshop/webticket/shop?event=1974",
 "sourceUrl": "https://zko.ch/events/feder-und-bogen-3-heinrich-heine/",
 "source": "zko"
+},
+{
+"id": "real-ocl-71d4c849-1cd6-4cc0-9ce3-61d2fbea8234-ocl-ch",
+"title": "L'OCL fête Beethoven – n°4 | Kozhukhin · Concerto n°1 · Eroica",
+"series": "L'OCL fête Beethoven – n°4",
+"start": "2027-05-13T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Denis Kozhukhin"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano et orchestre n°1 en do majeur, op. 15",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°3 en mi bémol majeur, op. 55, « Eroica »",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n4/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n4/",
+"source": "ocl"
 },
 {
 "id": "real-tonhalle-2055874",
@@ -35899,6 +52679,23 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-theater_casino_zug-27a28a99-5530-4c70-8ea2-88a4f95995c0",
+"title": "Next Generation Talents",
+"series": "Kleiner Saal",
+"start": "2027-05-14T18:00:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/seat?perfId=10229820891699&productId=10229821099428",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/next-generation-talents-mai-27?date=27a28a99-5530-4c70-8ea2-88a4f95995c0",
+"source": "theater_casino_zug"
+},
+{
 "id": "real-musikkollegium-9433",
 "title": "Frühlingskonzert",
 "series": "Benefizkonzert Allegro",
@@ -35969,6 +52766,47 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocl-49c6a3d7-e134-40db-b11f-bed5b868a135-ocl-ch",
+"title": "L'OCL fête Beethoven – n°5 | Sternath · Concerto n°3 · Symphonie n°8",
+"series": "L'OCL fête Beethoven – n°5",
+"start": "2027-05-14T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Lukas Sternath"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano et orchestre n°3 en do mineur, op. 37",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°8 en fa majeur, op. 93",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n5/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n5/",
+"source": "ocl"
+},
+{
 "id": "real-tonhalle-2055876",
 "title": "Paavo Järvi & Wayne Marshall",
 "series": null,
@@ -36029,6 +52867,95 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-luzerner_theater-8703",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-14T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8703",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
+"id": "real-reformiert_zuerich-1460",
+"title": "Uniorchester Bern",
+"series": null,
+"start": "2027-05-14T19:30:00+02:00",
+"durationMin": 150,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "orchestral",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/uniorchester-bern-1460/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/uniorchester-bern-1460/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-musikkollegium-9265",
 "title": "Kücük Prens",
 "series": "Freikonzert",
@@ -36062,6 +52989,64 @@ export const REAL = [
 "ticketUrl": "https://www.musikkollegium.ch/programm/kuecuek-prens-27-05-15-9265",
 "sourceUrl": "https://www.musikkollegium.ch/programm/kuecuek-prens-27-05-15-9265",
 "source": "musikkollegium"
+},
+{
+"id": "real-cite_bleue-les-quatuors-de-beethoven-1-2027-05-15-1530",
+"title": "Les quatuors de Beethoven 1",
+"series": null,
+"start": "2027-05-15T15:30:00+02:00",
+"durationMin": 150,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Quatuor Modigliani"
+},
+{
+"role": "Violin",
+"name": "Amaury Coeytaux"
+},
+{
+"role": "Violin",
+"name": "Loïc Rio"
+},
+{
+"role": "Viola",
+"name": "Laurent Marfaing"
+},
+{
+"role": "Cello",
+"name": "François Kieffer"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Arete"
+},
+{
+"role": "Violin",
+"name": "Chae-Ann Jeon"
+},
+{
+"role": "Violin",
+"name": "Eun-Joong Park"
+},
+{
+"role": "Viola",
+"name": "Yoon-Sun Jang"
+},
+{
+"role": "Cello",
+"name": "Seong-Hyeon Park"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-1",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-1",
+"source": "cite_bleue"
 },
 {
 "id": "real-tonhalle-2055873",
@@ -36147,6 +53132,105 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-ocl-dc798d1e-e782-40b5-9e7d-9ee1f88f56f9-ocl-ch",
+"title": "L'OCL fête Beethoven – n°6 | Leonskaja · Concerto n°4 · Symphonie n°2",
+"series": "L'OCL fête Beethoven – n°6",
+"start": "2027-05-15T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Piano",
+"name": "Elisabeth Leonskaja"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour piano et orchestre n°4 en sol majeur, op. 58",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°2 en ré majeur, op. 36",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n6/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n6/",
+"source": "ocl"
+},
+{
+"id": "real-cite_bleue-les-quatuors-de-beethoven-2-2027-05-15-1930",
+"title": "Les quatuors de Beethoven 2",
+"series": null,
+"start": "2027-05-15T19:30:00+02:00",
+"durationMin": 150,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Quatuor Novo"
+},
+{
+"role": "Performer",
+"name": "Kaya Kato Møller, Violon"
+},
+{
+"role": "Performer",
+"name": "Nikolai Vasili Nedergaard, Violon"
+},
+{
+"role": "Performer",
+"name": "Daniel Śledziński, Alto"
+},
+{
+"role": "Performer",
+"name": "Signe Ebstrup Bitsch, Violoncelle"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Elmire"
+},
+{
+"role": "Performer",
+"name": "David Petrlík, Violon"
+},
+{
+"role": "Performer",
+"name": "Yoan Brakha, Violon"
+},
+{
+"role": "Performer",
+"name": "Hortense Fourrier, Alto"
+},
+{
+"role": "Performer",
+"name": "Rémi Carlon, Violoncelle"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-2",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-2",
+"source": "cite_bleue"
+},
+{
 "id": "real-osi-175719205506546",
 "title": "Sol Gabetta",
 "series": "OSI a Pentecoste",
@@ -36190,6 +53274,180 @@ export const REAL = [
 "ticketUrl": "https://shop.luganolac.ch/webshop/webticket/shop?event=11844",
 "sourceUrl": "https://www.osi.swiss/concerti/tutti-i-concerti/2027-05-15-20-00",
 "source": "osi"
+},
+{
+"id": "real-cite_bleue-les-quatuors-de-beethoven-3-2027-05-16-1100",
+"title": "Les quatuors de Beethoven 3",
+"series": null,
+"start": "2027-05-16T11:00:00+02:00",
+"durationMin": 150,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Quatuor Leonkoro"
+},
+{
+"role": "Performer",
+"name": "Jonathan Schwarz, Violon"
+},
+{
+"role": "Performer",
+"name": "Emiri Kakiuchi, Violon"
+},
+{
+"role": "Performer",
+"name": "Mayu Konoe, Alto"
+},
+{
+"role": "Performer",
+"name": "Lukas Schwarz, Violoncelle"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Agate"
+},
+{
+"role": "Performer",
+"name": "Adrien Jurkovic, Violon"
+},
+{
+"role": "Performer",
+"name": "Juliette Beauchamp, Violon"
+},
+{
+"role": "Performer",
+"name": "Raphaël Pagnon, Alto"
+},
+{
+"role": "Performer",
+"name": "Simon Iachemet, Violoncelle"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-3",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-3",
+"source": "cite_bleue"
+},
+{
+"id": "real-reformiert_zuerich-15964",
+"title": "Morgenmusik",
+"series": null,
+"start": "2027-05-16T11:30:00+02:00",
+"durationMin": 45,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/morgenmusik-15964/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/morgenmusik-15964/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-cite_bleue-les-quatuors-de-beethoven-4-2027-05-16-1530",
+"title": "Les quatuors de Beethoven 4",
+"series": null,
+"start": "2027-05-16T15:30:00+02:00",
+"durationMin": 150,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Quatuor Métamorphoses"
+},
+{
+"role": "Performer",
+"name": "Mathilde Pothier, Violon"
+},
+{
+"role": "Performer",
+"name": "Pierre Liscia-Beaurenaut, Violon"
+},
+{
+"role": "Performer",
+"name": "Jean-Baptiste Souchon-Graziani, Alto"
+},
+{
+"role": "Performer",
+"name": "Madeleine Douçot, Violoncelle"
+},
+{
+"role": "Ensemble",
+"name": "Quatuor Modigliani"
+},
+{
+"role": "Performer",
+"name": "Amaury Coeytaux, Violon"
+},
+{
+"role": "Performer",
+"name": "Loïc Rio, Violon"
+},
+{
+"role": "Performer",
+"name": "Laurent Marfaing, Alto"
+},
+{
+"role": "Performer",
+"name": "François Kieffer, Violoncelle"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-4",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/les-quatuors-de-beethoven-4",
+"source": "cite_bleue"
+},
+{
+"id": "real-ocl-fc0fa16f-ebd5-49d5-ac28-cf241e1c1162-ocl-ch",
+"title": "L'OCL fête Beethoven – n°7 | Kang · Concerto violon · Pastorale",
+"series": "L'OCL fête Beethoven – n°7",
+"start": "2027-05-16T17:00:00+02:00",
+"durationMin": 150,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Violin",
+"name": "Clara-Jumi Kang"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Concerto pour violon et orchestre en ré majeur, op. 61",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°6 en fa majeur, op. 68, « Pastorale »",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n7/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n7/",
+"source": "ocl"
 },
 {
 "id": "real-osi-175719924763850",
@@ -36264,6 +53522,130 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-luzerner_theater-8677",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-05-17T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "André Baleiro"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Brett Sprague"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8677",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
+},
+{
+"id": "real-ocl-f63d7d35-0812-402e-8227-0b5c45e145a4-ocl-ch",
+"title": "L'OCL fête Beethoven – n°8 | Symphonie n°9 · Finale",
+"series": "L'OCL fête Beethoven – n°8",
+"start": "2027-05-17T19:30:00+02:00",
+"durationMin": 180,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Capuçon"
+},
+{
+"role": "Soprano",
+"name": "Chen Reiss"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Nina van Essen"
+},
+{
+"role": "Tenor",
+"name": "Sebastian Kohlhepp"
+},
+{
+"role": "Bass-baritone",
+"name": "Adám Plachetka"
+},
+{
+"role": "Choir",
+"name": "Ensemble Vocal de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°1 en do majeur, op. 21",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Symphonie n°9 en ré mineur, op. 125",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n8/",
+"sourceUrl": "https://www.ocl.ch/concert/locl-fte-beethoven-n8/",
+"source": "ocl"
+},
+{
 "id": "real-opernhaus_zurich-200276",
 "title": "Tosca",
 "series": "Hauptbühne",
@@ -36284,6 +53666,47 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15220&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/tosca/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kammerorchester_basel-gipfelstuermer-202705181930",
+"title": "Gipfelstürmer",
+"series": null,
+"start": "2027-05-18T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueId": "stadtcasino-basel",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Krzysztof Urbański"
+},
+{
+"role": "Violin",
+"name": "Nemanja Radulović"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Konzert für Violine und Orchester in D-Dur, op. 61",
+"composerId": "beethoven"
+},
+{
+"composer": "Antonín Dvořák",
+"title": "Sinfonie Nr. 7 in d-Moll, op. 70",
+"composerId": "dvorak"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/146990/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/gipfelstuermer.html",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-musikkollegium-9465",
@@ -36348,6 +53771,152 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-cite_bleue-ercole-amante-2027-05-19-1930",
+"title": "Ercole amante",
+"series": null,
+"start": "2027-05-19T19:30:00+02:00",
+"durationMin": 180,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Baritone",
+"name": "Milan Siljanov"
+},
+{
+"role": "Soprano",
+"name": "Mariana Flores"
+},
+{
+"role": "Soprano",
+"name": "Ana Vieira Leite"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Solenn’ Lavanant Linke"
+},
+{
+"role": "Tenor",
+"name": "Marcel Beekman"
+},
+{
+"role": "Tenor",
+"name": "Luigi Morassi"
+},
+{
+"role": "Soprano",
+"name": "Sophie Junker"
+},
+{
+"role": "Countertenor",
+"name": "Logan Lopez Gonzalez"
+},
+{
+"role": "Soprano",
+"name": "Maud Bessard-Morandas"
+},
+{
+"role": "Bass",
+"name": "Staffan Liljas"
+},
+{
+"role": "Orchestra",
+"name": "Cappella Mediterranea"
+},
+{
+"role": "Conductor",
+"name": "Leonardo García-Alarcón"
+},
+{
+"role": "Choir",
+"name": "Chœur de Chambre de Namur, Chœur de l’Opéra de Dijon"
+},
+{
+"role": "Choir",
+"name": "Thibaut Lenaerts et Anass Ismat"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/ercole-amante",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/ercole-amante",
+"source": "cite_bleue"
+},
+{
+"id": "real-luzerner_theater-8704",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-19T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8704",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
 "id": "real-musikkollegium-9401",
 "title": "Solist:innen der ZHdK",
 "series": "Hauskonzert",
@@ -36395,6 +53964,50 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161680/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/solistinnen-der-zhdk-27-05-20-9401",
 "source": "musikkollegium"
+},
+{
+"id": "real-ocf_fribourg-8499",
+"title": "Entre passion et mélancolie",
+"series": "Société des Concerts de Fribourg",
+"start": "2027-05-20T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Philippe Bach"
+},
+{
+"role": "Piano",
+"name": "Teo Gheorghiu"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de chambre fribourgeois"
+}
+],
+"program": [
+{
+"composer": "Jean-François Michel",
+"title": "Création (commande de l’OCF)"
+},
+{
+"composer": "Sergueï Rachmaninov",
+"title": "Concerto pour piano n° 1 op. 1 en fa dièse mineur"
+},
+{
+"composer": "Jean Sibelius",
+"title": "Symphonie n° 1 op. 39 en mi mineur",
+"composerId": "sibelius"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8499",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-cnz-141",
@@ -36492,6 +54105,28 @@ export const REAL = [
 "source": "ocg"
 },
 {
+"id": "real-zuger_sinfonietta-nordwaerts-2027-05-21",
+"title": "Nordwärts",
+"series": "Mittagskonzert",
+"start": "2027-05-21T12:15:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueName": "Reformierte Kirche Zug",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Madelaine Wibom"
+}
+],
+"program": [],
+"ticketUrl": "https://zugersinfonietta.ch/konzert/nordwaerts/",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/nordwaerts/",
+"source": "zuger_sinfonietta"
+},
+{
 "id": "real-musikkollegium-9441",
 "title": "Summer Music",
 "series": "Musik über Mittag",
@@ -36514,6 +54149,10 @@ export const REAL = [
 {
 "role": "Clarinet",
 "name": "Sérgio Fernandes Pires"
+},
+{
+"role": "Bassoon",
+"name": "N.N."
 },
 {
 "role": "Horn",
@@ -36734,6 +54373,53 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-kammerphilharmonie_gr-sault-dils-morts-kloster-ilanz",
+"title": "Il sault dils morts",
+"series": "Chorkonzert",
+"start": "2027-05-21T20:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kloster Ilanz",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maria Bognar"
+},
+{
+"role": "Conductor",
+"name": "Clau Scherrer"
+},
+{
+"role": "Choir",
+"name": "Scola da Cant Surselva"
+},
+{
+"role": "Choir",
+"name": "Cantus Firmus Surselva"
+},
+{
+"role": "Choir",
+"name": "Chor viril Ligia Grischa"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Christoph Cajöri",
+"title": "Il sault dils morts –"
+}
+],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-kloster-ilanz.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-kloster-ilanz.php",
+"source": "kammerphilharmonie_gr"
+},
+{
 "id": "real-osr-harry-potter-cine-concert-20270522",
 "title": "Harry Potter à l’École des Sorciers",
 "series": null,
@@ -36863,6 +54549,40 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-casino_bern-gala-lumneziana-2027-20270522-1930",
+"title": "Gala lumneziana",
+"series": "Grosser Saal",
+"start": "2027-05-22T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Christina Poulitsi"
+},
+{
+"role": "Bass-baritone",
+"name": "Flurin Caduff"
+},
+{
+"role": "Choir",
+"name": "Chor viril Lumnezia"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.casinobern.ch/programm/gala-lumneziana-2027/#22-05-2027",
+"sourceUrl": "https://www.casinobern.ch/programm/gala-lumneziana-2027/#22-05-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-lso_luzern-19913",
 "title": "POÈME DE L’EXTASE – RACHMANINOW 3 & JAMES GAFFIGAN",
 "series": "Sinfoniekonzerte",
@@ -36906,6 +54626,92 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-casino_bern-eine-musikalische-entdeckungsreise-20270523-1100",
+"title": "Eine musikalische Entdeckungsreise",
+"series": "9. Matineekonzert",
+"start": "2027-05-23T11:00:00+02:00",
+"durationMin": 60,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "mixed",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Sandrine Canova"
+},
+{
+"role": "Violin",
+"name": "Camille Guilpain"
+},
+{
+"role": "Viola",
+"name": "Emanuel Bütler"
+},
+{
+"role": "Cello",
+"name": "Pierre Deppe"
+},
+{
+"role": "Double bass",
+"name": "Matteo Burci"
+},
+{
+"role": "Clarinet",
+"name": "Bernhard Röthlisberger"
+},
+{
+"role": "Bassoon",
+"name": "Norihito Nishinomura"
+},
+{
+"role": "Horn",
+"name": "Denis Dafflon"
+}
+],
+"program": [
+{
+"composer": "Ludwig van Beethoven",
+"title": "Septett Es-Dur op. 20",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Schweizer Volksmusik aus der Sammlung von Hanny Christen",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "instrumentiert von Florian Walser:",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "«Das Leben ein Traum»",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "«Plaffeier Chilbimusig»",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "«Mazurka aus dem Jura»",
+"composerId": "beethoven"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "«Evviva i soci»",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/metamorphosen-matinee/",
+"sourceUrl": "https://www.casinobern.ch/programm/eine-musikalische-entdeckungsreise/#23-05-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-opernhaus_zurich-200061",
 "title": "Kinderopernorcherster",
 "series": "Hauptbühne",
@@ -36921,6 +54727,211 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15508&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/kinderopernorcherster/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3760",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-05-23T14:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=494&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/alcina/3760/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-luzerner_theater-8705",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-23T15:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8705",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
+"id": "real-kammerphilharmonie_gr-sault-dils-morts-kirche-st-peter-zuerich",
+"title": "Il sault dils morts",
+"series": "Chorkonzert",
+"start": "2027-05-23T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueId": "st-peter-zurich",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maria Bognar"
+},
+{
+"role": "Conductor",
+"name": "Clau Scherrer"
+},
+{
+"role": "Choir",
+"name": "Scola da Cant Surselva"
+},
+{
+"role": "Choir",
+"name": "Cantus Firmus Surselva"
+},
+{
+"role": "Choir",
+"name": "Chor viril Ligia Grischa"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Christoph Cajöri",
+"title": "Il sault dils morts –"
+}
+],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-kirche-st.peter-zuerich.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-kirche-st.peter-zuerich.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-reformiert_zuerich-15475",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-05-23T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15475/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15475/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-tonhalle-2055893",
@@ -36973,6 +54984,40 @@ export const REAL = [
 "ticketUrl": "https://tickets.tonhallezuerich.ch/webshop/webticket/shop?entry_page=https%3A%2F%2Fwww.tonhalle-orchester.ch%2Fkonzerte%2Fkalender%2F&event=5590&language=de",
 "sourceUrl": "https://www.tonhalle-orchester.ch/konzerte/kalender/paavo-jaervi-mit-beethovens-missa-solemnis-2055893/",
 "source": "tonhalle"
+},
+{
+"id": "real-bach_stiftung-bachsche-promenade-gastspiel-2",
+"title": "«Bach’sche Promenade» – Gastspiel",
+"series": null,
+"start": "2027-05-23T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "mels",
+"venueName": "Verrucano",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Alto",
+"name": "Elvira Bill"
+},
+{
+"role": "Tenor",
+"name": "Daniel Johannsen"
+},
+{
+"role": "Conductor",
+"name": "Rudolf Lutz"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester der J. S. Bach-Stiftung"
+}
+],
+"program": [],
+"ticketUrl": "https://bachstiftung.ch/konzerte-tickets/bachsche-promenade-gastspiel-2/",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bachsche-promenade-gastspiel-2/",
+"source": "bach_stiftung"
 },
 {
 "id": "real-musikkollegium-9467",
@@ -37121,6 +55166,89 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-kts_st_gallen-3814",
+"title": "Hoffmanns Erzählungen",
+"series": "Grosses Haus",
+"start": "2027-05-25T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Zlabinger"
+},
+{
+"role": "Director",
+"name": "Guta Rau"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Eva Langeland Gjerde"
+},
+{
+"role": "Performer",
+"name": "Marie Lombard"
+},
+{
+"role": "Performer",
+"name": "Andrew Foster-Williams"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Gloriela Villalobos"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Hoffmanns Erzählungen"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=476&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/hoffmanns-erzaehlungen/3814/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-osr-beethoven7-20270526",
 "title": "Cycle Beethoven 4",
 "series": "Cycle Beethoven",
@@ -37207,6 +55335,54 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-ocl-bf6060ab-5809-433b-bb94-b12cd03a19ae-ocl-ch",
+"title": "Les Entractes n°5 | Janáček Quatuor n°1 · Beethoven Sonate Kreutzer (quintette)",
+"series": "Les Entractes n°5",
+"start": "2027-05-27T12:30:00+02:00",
+"durationMin": 60,
+"cityId": "lausanne",
+"venueId": "salle-paderewski",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Clémence de Forceville"
+},
+{
+"role": "Violin",
+"name": "Solange Joggi"
+},
+{
+"role": "Viola",
+"name": "Eli Karanfilova"
+},
+{
+"role": "Cello",
+"name": "Joël Marosi"
+},
+{
+"role": "Cello",
+"name": "Basile Ausländer"
+}
+],
+"program": [
+{
+"composer": "Leoš Janáček",
+"title": "Quatuor à cordes n°1, « Kreutzer Sonata » (4ème mouvement)"
+},
+{
+"composer": "Ludwig van Beethoven",
+"title": "Sonate à Kreutzer n°9, op. 47 (arrangement pour quintette à cordes)",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/entracte-n5-26-27/",
+"sourceUrl": "https://www.ocl.ch/concert/entracte-n5-26-27/",
+"source": "ocl"
+},
+{
 "id": "real-opernhaus_zurich-199941",
 "title": "Don Pasquale",
 "series": "Hauptbühne",
@@ -37227,6 +55403,123 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15194&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/don-pasquale/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-luzerner_theater-8706",
+"title": "Proserpina",
+"series": null,
+"start": "2027-05-27T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8706",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
+"id": "real-argovia_philharmonic-268512",
+"title": "5. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-05-27T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Gregorio Nieto"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Fazıl Say",
+"title": "Auftragskomposition (2027)"
+},
+{
+"composer": "Camille Saint-Saëns",
+"title": "Konzert für Violoncello und Orchester Nr. 1 a-Moll op. 33",
+"composerId": "saint-saens"
+},
+{
+"composer": "Sergei Rachmaninoff",
+"title": "Sinfonie Nr. 2 e-Moll op. 27",
+"composerId": "rachmaninoff"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165370/",
+"sourceUrl": "https://argoviaphil.ch/konzert/5-abo-konzert-1-2627/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-tonhalle-2055914",
@@ -37405,6 +55698,58 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-bach_stiftung-bwv-167-ihr-menschen-ruehmet-gottes-liebe",
+"title": "BWV 167 «Ihr Menschen, rühmet Gottes Liebe»",
+"series": "Bachkantate",
+"start": "2027-05-28T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Marie Luise Werneburg"
+},
+{
+"role": "Alto",
+"name": "Elvira Bill"
+},
+{
+"role": "Tenor",
+"name": "Daniel Johannsen"
+},
+{
+"role": "Bass",
+"name": "Daniel Pérez"
+},
+{
+"role": "Choir",
+"name": "Chor der J. S. Bach-Stiftung"
+},
+{
+"role": "Orchestra",
+"name": "Orchester der J. S. Bach-Stiftung"
+},
+{
+"role": "Conductor",
+"name": "Rudolf Lutz"
+}
+],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 167 «Ihr Menschen, rühmet Gottes Liebe»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168131/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-167-ihr-menschen-ruehmet-gottes-liebe/",
+"source": "bach_stiftung"
+},
+{
 "id": "real-opernhaus_zurich-199876",
 "title": "See the music, hear the dance",
 "series": "Hauptbühne",
@@ -37441,6 +55786,51 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15274&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/see-the-music-hear-the-dance/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-argovia_philharmonic-268514",
+"title": "5. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-05-28T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Kurtheater Baden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Gregorio Nieto"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Fazıl Say",
+"title": "Auftragskomposition (2027)"
+},
+{
+"composer": "Camille Saint-Saëns",
+"title": "Konzert für Violoncello und Orchester Nr. 1 a-Moll op. 33",
+"composerId": "saint-saens"
+},
+{
+"composer": "Sergei Rachmaninoff",
+"title": "Sinfonie Nr. 2 e-Moll op. 27",
+"composerId": "rachmaninoff"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165370/",
+"sourceUrl": "https://argoviaphil.ch/konzert/5-abo-konzert-2-2627/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-tonhalle-2055916",
@@ -37550,6 +55940,89 @@ export const REAL = [
 "source": "geneva_victoria_hall"
 },
 {
+"id": "real-kts_st_gallen-3815",
+"title": "Hoffmanns Erzählungen",
+"series": "Grosses Haus",
+"start": "2027-05-28T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Zlabinger"
+},
+{
+"role": "Director",
+"name": "Guta Rau"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Eva Langeland Gjerde"
+},
+{
+"role": "Performer",
+"name": "Marie Lombard"
+},
+{
+"role": "Performer",
+"name": "Andrew Foster-Williams"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Gloriela Villalobos"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Hoffmanns Erzählungen"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=473&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/hoffmanns-erzaehlungen/3815/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opera_lausanne-don-giovanni-2-20270528-2000",
 "title": "Don Giovanni",
 "series": null,
@@ -37625,6 +56098,45 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-esn_neuchatel-cantabile-autour-de-la-saison-27-202705282000",
+"title": "V. Villard: Îles où ne prendra jamais terre op. 118",
+"series": "Autour de la saison",
+"start": "2027-05-28T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueId": "cathedrale-lausanne",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Bouvier"
+},
+{
+"role": "Choir",
+"name": "Cantabile choeur symphonique neuchâtelois"
+},
+{
+"role": "Choir",
+"name": "Choeur de la Cité de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+}
+],
+"program": [
+{
+"composer": "V. Villard",
+"title": "Îles où ne prendra jamais terre op. 118"
+}
+],
+"ticketUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"sourceUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"source": "esn_neuchatel"
+},
+{
 "id": "real-osr-destination-zoopolis-20270529",
 "title": "Destination Zoopolis",
 "series": "Série en famille",
@@ -37677,6 +56189,92 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kammerphilharmonie_gr-sault-dils-morts-pfarrkirche-domat-ems",
+"title": "Il sault dils morts",
+"series": "Chorkonzert",
+"start": "2027-05-29T20:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Pfarrkirche Mariä Himmelfahrt, Domat/Ems",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maria Bognar"
+},
+{
+"role": "Conductor",
+"name": "Clau Scherrer"
+},
+{
+"role": "Choir",
+"name": "Scola da Cant Surselva"
+},
+{
+"role": "Choir",
+"name": "Cantus Firmus Surselva"
+},
+{
+"role": "Choir",
+"name": "Chor viril Ligia Grischa"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Christoph Cajöri",
+"title": "Il sault dils morts –"
+}
+],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-pfarrkirche-domat-ems.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-pfarrkirche-domat-ems.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-esn_neuchatel-cantabile-autour-de-la-saison-27-202705292000",
+"title": "V. Villard: Îles où ne prendra jamais terre op. 118",
+"series": "Autour de la saison",
+"start": "2027-05-29T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "neuchatel",
+"venueId": "temple-du-bas",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Bouvier"
+},
+{
+"role": "Choir",
+"name": "Cantabile choeur symphonique neuchâtelois"
+},
+{
+"role": "Choir",
+"name": "Choeur de la Cité de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+}
+],
+"program": [
+{
+"composer": "V. Villard",
+"title": "Îles où ne prendra jamais terre op. 118"
+}
+],
+"ticketUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"sourceUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"source": "esn_neuchatel"
+},
+{
 "id": "real-osr-cuivres-en-liberte-20270530",
 "title": "Cuivres en liberté",
 "series": "Série Musique de chambre",
@@ -37713,6 +56311,51 @@ export const REAL = [
 "ticketUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/cuivres-en-liberte",
 "sourceUrl": "https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/cuivres-en-liberte",
 "source": "osr"
+},
+{
+"id": "real-argovia_philharmonic-268516",
+"title": "5. Abo-Konzert",
+"series": "Sinfoniekonzert",
+"start": "2027-05-30T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Gregorio Nieto"
+},
+{
+"role": "Conductor",
+"name": "Josep Vicent"
+},
+{
+"role": "Orchestra",
+"name": "argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Fazıl Say",
+"title": "Auftragskomposition (2027)"
+},
+{
+"composer": "Camille Saint-Saëns",
+"title": "Konzert für Violoncello und Orchester Nr. 1 a-Moll op. 33",
+"composerId": "saint-saens"
+},
+{
+"composer": "Sergei Rachmaninoff",
+"title": "Sinfonie Nr. 2 e-Moll op. 27",
+"composerId": "rachmaninoff"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165370/",
+"sourceUrl": "https://argoviaphil.ch/konzert/5-abo-konzert-3-2627/",
+"source": "argovia_philharmonic"
 },
 {
 "id": "real-opera_lausanne-don-giovanni-2-20270530-1700",
@@ -37788,6 +56431,170 @@ export const REAL = [
 "ticketUrl": "https://opl.shop.secutix.com/selection/event/date?productId=10229284098116",
 "sourceUrl": "https://www.opera-lausanne.ch/show/don-giovanni-2/",
 "source": "opera_lausanne"
+},
+{
+"id": "real-kammerphilharmonie_gr-sault-dils-morts-baselgia-s-martin-trun",
+"title": "Il sault dils morts",
+"series": "Chorkonzert",
+"start": "2027-05-30T17:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Baselgia Sogn Martin, Trun",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Maria Bognar"
+},
+{
+"role": "Conductor",
+"name": "Clau Scherrer"
+},
+{
+"role": "Choir",
+"name": "Scola da Cant Surselva"
+},
+{
+"role": "Choir",
+"name": "Cantus Firmus Surselva"
+},
+{
+"role": "Choir",
+"name": "Chor viril Ligia Grischa"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [
+{
+"composer": "Christoph Cajöri",
+"title": "Il sault dils morts –"
+}
+],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-baselgia-s.martin-trun.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/sault-dils-morts-baselgia-s.martin-trun.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-cite_bleue-parfums-2027-05-30-1700",
+"title": "Parfums",
+"series": null,
+"start": "2027-05-30T17:00:00+02:00",
+"durationMin": 70,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Amandine Trenc"
+},
+{
+"role": "Baritone",
+"name": "Marc Mauillon"
+},
+{
+"role": "Conductor",
+"name": "François Cardey"
+},
+{
+"role": "Violin",
+"name": "Christophe Mourault"
+},
+{
+"role": "Bass",
+"name": "Louise Bouedo"
+},
+{
+"role": "Harp",
+"name": "Louis Capeille"
+},
+{
+"role": "Harpsichord",
+"name": "Matthieu Franchin"
+},
+{
+"role": "Historien du parfum",
+"name": "Alexandre Helwani"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/parfums",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/parfums",
+"source": "cite_bleue"
+},
+{
+"id": "real-luzerner_theater-8678",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-05-30T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Brett Sprague"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8678",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
 },
 {
 "id": "real-opernhaus_zurich-199942",
@@ -37872,6 +56679,70 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15436&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/liederabend-julie-fuchs-2/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3761",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-05-31T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=495&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-05/alcina/3761/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-tonhalle-2055933",
@@ -38095,6 +56966,69 @@ export const REAL = [
 "source": "musikkollegium"
 },
 {
+"id": "real-casino_bern-regula-muhlemann-20270602-1930",
+"title": "Regula Mühlemann",
+"series": "Abonnementskonzert",
+"start": "2027-06-02T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+},
+{
+"role": "Conductor",
+"name": "Michele Spotti"
+},
+{
+"role": "Soprano",
+"name": "Regula Mühlemann"
+}
+],
+"program": [
+{
+"composer": "Aus Il barbiere di Siviglia",
+"title": "Ouvertüre und Cavatina «Una voce poco fa»"
+},
+{
+"composer": "Aus Il turco in Italia",
+"title": "Ouvertüre und Arie «I vostri cenci vi mando… Squallida veste… Caro padre»"
+},
+{
+"composer": "Aus Don Pasquale",
+"title": "Ouvertüre und Arie «Quel guardo il cavaliere… So anch’io la virtù magica»"
+},
+{
+"composer": "Aus Lucia di Lammermoor",
+"title": "Arie «Ardon gl’incensi… Spargi d’amaro pianto»"
+},
+{
+"composer": "Aus La fille du régiment",
+"title": "Arie «C’en est donc fait… Salut à la France»"
+},
+{
+"composer": "Aus I Capuleti e i Montecchi",
+"title": "Arie der Giulietta «Eccomi in lieta vesta – Oh quante volte»"
+},
+{
+"composer": "Aus Macbeth",
+"title": "«Preludio»"
+},
+{
+"composer": "Aus Sylvia",
+"title": "«Pizzicato»"
+}
+],
+"ticketUrl": "https://www.ticketmaster.ch/artist/meisterzyklus-bern-tickets/987243",
+"sourceUrl": "https://www.casinobern.ch/programm/regula-muhlemann/#02-06-2027",
+"source": "casino_bern"
+},
+{
 "id": "real-musikkollegium-9403",
 "title": "Concours Géza Anda",
 "series": "Hauskonzert",
@@ -38123,6 +57057,78 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161874/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/concours-geza-anda-27-06-03-9403",
 "source": "musikkollegium"
+},
+{
+"id": "real-luzerner_theater-8707",
+"title": "Proserpina",
+"series": null,
+"start": "2027-06-03T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8707",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
 },
 {
 "id": "real-zko-19692",
@@ -38174,6 +57180,44 @@ export const REAL = [
 "source": "zko"
 },
 {
+"id": "real-kammerorchester_basel-nachtklang-im-museum-iii-2-202706032000",
+"title": "Nachtklang im Museum",
+"series": null,
+"start": "2027-06-03T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Museum Kleines Klingental",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Matthias Müller"
+},
+{
+"role": "Viola",
+"name": "Anne-Françoise Guezingar"
+},
+{
+"role": "Cello",
+"name": "Georg Dettweiler"
+},
+{
+"role": "Piano",
+"name": "Fumi Dettweiler"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/193234/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/nachtklang-im-museum-iii-2.html",
+"source": "kammerorchester_basel"
+},
+{
 "id": "real-opernhaus_zurich-199943",
 "title": "Don Pasquale",
 "series": "Hauptbühne",
@@ -38194,6 +57238,70 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15196&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/don-pasquale/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3762",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-06-04T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=496&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/alcina/3762/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-zko-19696",
@@ -38423,6 +57531,73 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-luzerner_theater-8679",
+"title": "Der fliegende Holländer",
+"series": null,
+"start": "2027-06-05T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jonathan Bloxham"
+},
+{
+"role": "Director",
+"name": "Philipp Rosendahl"
+},
+{
+"role": "Choreographer",
+"name": "Victor Rottier"
+},
+{
+"role": "Performer",
+"name": "Egils Siliṇš"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Eyrún Unnarsdóttir"
+},
+{
+"role": "Performer",
+"name": "Brett Sprague"
+},
+{
+"role": "Performer",
+"name": "Sofía Pollak Show activity dates of SofíaPollak ( 28.02.2027 / 12.03.2027 / 19.03.2027 / 01.04.2027 / 30.04.2027 / 17.05.2027 / 30.05.2027 / 05.06.2027 )"
+},
+{
+"role": "Performer",
+"name": "Robert Maszl"
+},
+{
+"role": "Choir",
+"name": "Opernchor und Extrachor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"workId": "wagner-dutchman",
+"composerId": "wagner"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8679",
+"sourceUrl": "https://www.luzernertheater.ch/derfliegendehollaender",
+"source": "luzerner_theater"
+},
+{
 "id": "real-zko-19699",
 "title": "ZKO-Festival — Cinema Paradiso mit Ksenija Sidorova",
 "series": "ZKO-Festival",
@@ -38484,6 +57659,95 @@ export const REAL = [
 "ticketUrl": "https://tickets.zko.ch/webshop/webticket/shop?event=2010",
 "sourceUrl": "https://zko.ch/events/zko-festival-cinema-paradiso/",
 "source": "zko"
+},
+{
+"id": "real-esn_neuchatel-cantabile-autour-de-la-saison-27-202706052000",
+"title": "V. Villard: Îles où ne prendra jamais terre op. 118",
+"series": "Autour de la saison",
+"start": "2027-06-05T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueName": "Église française de Berne",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Renaud Bouvier"
+},
+{
+"role": "Choir",
+"name": "Cantabile choeur symphonique neuchâtelois"
+},
+{
+"role": "Choir",
+"name": "Choeur de la Cité de Lausanne"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+}
+],
+"program": [
+{
+"composer": "V. Villard",
+"title": "Îles où ne prendra jamais terre op. 118"
+}
+],
+"ticketUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"sourceUrl": "https://www.esn-ne.ch/concerts/cantabile-autour-de-la-saison-27",
+"source": "esn_neuchatel"
+},
+{
+"id": "real-ocf_fribourg-8505",
+"title": "Concert en mi – Quatuor A4",
+"series": null,
+"start": "2027-06-06T11:00:00+02:00",
+"durationMin": 120,
+"cityId": "mezieres",
+"venueName": "Musée du Papier Peint",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Alba Cirafici"
+},
+{
+"role": "Violin",
+"name": "Noélie Perrinjaquet"
+},
+{
+"role": "Viola",
+"name": "Nancy Benda"
+},
+{
+"role": "Cello",
+"name": "Justine Pelnena Chollet"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn",
+"title": "Capriccio et fugue",
+"composerId": "mendelssohn"
+},
+{
+"composer": "Fanny Mendelssohn",
+"title": "Quatuor à cordes en mi bémol majeur",
+"composerId": "mendelssohn"
+},
+{
+"composer": "G. Verdi",
+"title": "Quatuor à cordes en mi mineur",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8505",
+"sourceUrl": "https://www.ocf.ch/fr/concertskonzerte--archivesarchiv?event=8505",
+"source": "ocf_fribourg"
 },
 {
 "id": "real-zko-19703",
@@ -38726,13 +57990,125 @@ export const REAL = [
 "source": "opera_lausanne"
 },
 {
+"id": "real-argovia_philharmonic-268525",
+"title": "4. Kammerkonzert",
+"series": "Kammerkonzert",
+"start": "2027-06-06T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "aarau",
+"venueName": "Alte Reithalle Aarau",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin",
+"name": "Lia Brandigi"
+},
+{
+"role": "Ensemble",
+"name": "Musiker:innen des argovia philharmonic"
+}
+],
+"program": [
+{
+"composer": "Hildegard von Bingen",
+"title": "«Quia ergo Femina»"
+},
+{
+"composer": "Fanny Hensel",
+"title": "Streichquartett Es-Dur"
+},
+{
+"composer": "Claude Debussy",
+"title": "«Syrinx» für Flöte Solo L. 129",
+"composerId": "debussy"
+},
+{
+"composer": "Amy Beach",
+"title": "«Thema und Variationen» für Flöte und Streichquartett op. 80"
+},
+{
+"composer": "Fazil Say",
+"title": "«Cleopatra» für Violine Solo op. 34"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/argovia_philharmonic/shop/event/165383/",
+"sourceUrl": "https://argoviaphil.ch/konzert/4-kammerkonzert-2627/",
+"source": "argovia_philharmonic"
+},
+{
+"id": "real-kts_st_gallen-3763",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-06-06T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=497&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/alcina/3763/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-musikkollegium-9447",
 "title": "Summer Music",
 "series": "Kammermusik Liebestrasse",
 "start": "2027-06-06T17:00:00+02:00",
-"durationMin": 120,
+"durationMin": 60,
 "cityId": "winterthur",
-"venueName": null,
+"venueId": "theater-winterthur",
 "type": "chamber",
 "featured": true,
 "status": "scheduled",
@@ -38748,6 +58124,10 @@ export const REAL = [
 {
 "role": "Clarinet",
 "name": "Sérgio Fernandes Pires"
+},
+{
+"role": "Bassoon",
+"name": "N.N."
 },
 {
 "role": "Horn",
@@ -38869,10 +58249,6 @@ export const REAL = [
 },
 {
 "role": "Conductor",
-"name": "Roberto González-Monjas"
-},
-{
-"role": "Violin",
 "name": "Roberto González-Monjas"
 }
 ],
@@ -39043,10 +58419,6 @@ export const REAL = [
 {
 "role": "Conductor",
 "name": "Roberto González-Monjas"
-},
-{
-"role": "Host",
-"name": "Roberto González-Monjas"
 }
 ],
 "program": [],
@@ -39129,6 +58501,53 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/selection/event/date?productId=10229291414929",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/21316789_gli-angeli-geneve-9021211",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-casino_bern-wahlverwandtschaft-20270610-1000",
+"title": "Musik Punkt 10 – Boulanger und Prokofjew",
+"series": "11. Symphoniekonzert – Berner Symphonieorchester",
+"start": "2027-06-10T10:00:00+02:00",
+"durationMin": 45,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Alevtina Ioffe"
+},
+{
+"role": "Piano",
+"name": "Alexander Malofeev"
+},
+{
+"role": "Orchestra",
+"name": "Berner Symphonieorchester"
+}
+],
+"program": [
+{
+"composer": "Lili Boulanger",
+"title": "D’un matin de printemps"
+},
+{
+"composer": "Sergej Prokofjew",
+"title": "Konzert für Klavier und Orchester Nr. 3 C-Dur op. 26"
+},
+{
+"composer": "Lili Boulanger",
+"title": "D’un soir triste"
+},
+{
+"composer": "Sergej Prokofjew",
+"title": "Symphonie Nr. 7 cis-Moll op. 131"
+}
+],
+"ticketUrl": "https://buehnenbern.ch/spielplan/programm/boulanger-und-prokofjew/",
+"sourceUrl": "https://www.casinobern.ch/programm/wahlverwandtschaft/#10-06-2027",
+"source": "casino_bern"
 },
 {
 "id": "real-tonhalle-2055944",
@@ -39227,6 +58646,70 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15276&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/see-the-music-hear-the-dance/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3764",
+"title": "Alcina",
+"series": "Grosses Haus",
+"start": "2027-06-10T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pedro Beriso"
+},
+{
+"role": "Director",
+"name": "Maria Chagina"
+},
+{
+"role": "Performer",
+"name": "Olivia Smith"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Kali Hardwick"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Georg Friedrich Händel",
+"title": "Alcina",
+"composerId": "handel"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=498&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/alcina/3764/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-lso_luzern-20408",
@@ -39361,11 +58844,83 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-luzerner_theater-8708",
+"title": "Proserpina",
+"series": null,
+"start": "2027-06-11T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lucerne",
+"venueId": "luzerner-theater",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Jörg Halubek"
+},
+{
+"role": "Director",
+"name": "Markus Bothe"
+},
+{
+"role": "Performer",
+"name": "Elvira Margarian"
+},
+{
+"role": "Performer",
+"name": "Ani Yorentz"
+},
+{
+"role": "Performer",
+"name": "Tania Lorenzo Castro"
+},
+{
+"role": "Performer",
+"name": "Luca Bernard"
+},
+{
+"role": "Performer",
+"name": "Vladyslav Tlushch"
+},
+{
+"role": "Performer",
+"name": "Rueben Mbonambi"
+},
+{
+"role": "Performer",
+"name": "Fabian Meinen"
+},
+{
+"role": "Performer",
+"name": "Jan Veljak"
+},
+{
+"role": "Choir",
+"name": "Opernchor Luzerner Theater"
+},
+{
+"role": "Orchestra",
+"name": "Luzerner Sinfonieorchester"
+}
+],
+"program": [
+{
+"composer": "Joseph Martin Kraus",
+"title": "Proserpina",
+"composerId": "martin"
+}
+],
+"ticketUrl": "https://tickets.luzernertheater.ch/webshop/webticket/shop?event=8708",
+"sourceUrl": "https://www.luzernertheater.ch/proserpina",
+"source": "luzerner_theater"
+},
+{
 "id": "real-ocg-que-personne-ne-sache-ou-nous-sommes-20270611",
 "title": "Que personne ne sache où nous sommes",
 "series": null,
 "start": "2027-06-11T19:30:00+02:00",
-"durationMin": 120,
+"durationMin": 90,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "orchestral",
@@ -39397,6 +58952,11 @@ export const REAL = [
 {
 "composer": "Gustav Mahler",
 "title": "Lieder eines fahrenden Gesellen",
+"composerId": "mahler"
+},
+{
+"composer": "Alma Mahler",
+"title": "Sélection de quatre Lieder des livres 1 & 2 (1911 / 1915)",
 "composerId": "mahler"
 },
 {
@@ -39466,6 +59026,81 @@ export const REAL = [
 "ticketUrl": "https://tickets.buehnenbern.ch/webshop/webticket/seatmap?eventId=2210&el=true&language=de",
 "sourceUrl": "https://buehnenbern.ch/spielplan/programm/wahl-verwandtschaft/",
 "source": "buehnen_bern"
+},
+{
+"id": "real-zuger_sinfonietta-ueberraschend-anders-2027-06-11",
+"title": "Überraschend anders",
+"series": "4. Abo-Konzert",
+"start": "2027-06-11T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Aegerihalle Unterägeri",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+},
+{
+"role": "Violin",
+"name": "Soyoung Yoon"
+}
+],
+"program": [],
+"ticketUrl": "https://www.ticketino.com/de/OrganizerShop/810976/event/zuger-sinfonietta-ueberraschend-anders/217512",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/ueberraschend-anders/",
+"source": "zuger_sinfonietta"
+},
+{
+"id": "real-camerata_bern-31198",
+"title": "Mmmm...",
+"series": "Abokonzert",
+"start": "2027-06-12T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "bern",
+"venueId": "casino-bern",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Steven Isserlis"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Streichersinfonie Nr. 10 in h-Moll MWV N 10",
+"composerId": "mendelssohn"
+},
+{
+"composer": "André Messager",
+"title": "Barcarolle für Cello, Streichorchester und Harfe"
+},
+{
+"composer": "Olli Mustonen",
+"title": "Partita für Cello und Streicher (Uraufführung)"
+},
+{
+"composer": "Wolfgang Amadeus Mozart",
+"title": "Streichquintett in g-Moll KV 516",
+"composerId": "mozart"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/camerata_bern/shop/event/147442/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/mmmm",
+"source": "camerata_bern"
 },
 {
 "id": "real-musikkollegium-9434",
@@ -39592,7 +59227,7 @@ export const REAL = [
 "title": "Que personne ne sache où nous sommes",
 "series": null,
 "start": "2027-06-12T19:30:00+02:00",
-"durationMin": 120,
+"durationMin": 90,
 "cityId": "geneva",
 "venueName": "La Cité Bleue",
 "type": "orchestral",
@@ -39624,6 +59259,11 @@ export const REAL = [
 {
 "composer": "Gustav Mahler",
 "title": "Lieder eines fahrenden Gesellen",
+"composerId": "mahler"
+},
+{
+"composer": "Alma Mahler",
+"title": "Sélection de quatre Lieder des livres 1 & 2 (1911 / 1915)",
 "composerId": "mahler"
 },
 {
@@ -39690,6 +59330,47 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-concerts_fribourg-2027-06-12-sinfonietta-de-lausanne",
+"title": "Sinfonietta de Lausanne",
+"series": "Société des Concerts de Fribourg",
+"start": "2027-06-12T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "fribourg",
+"venueId": "equilibre-fribourg",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Sinfonietta de Lausanne"
+},
+{
+"role": "Conductor",
+"name": "Lucie Leguay"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Marina Viotti"
+}
+],
+"program": [
+{
+"composer": "Gustav Mahler",
+"title": "Kindertotenlieder",
+"composerId": "mahler"
+},
+{
+"composer": "Johannes Brahms",
+"title": "Symphonie n° 2 en ré majeur, op. 73",
+"composerId": "brahms"
+}
+],
+"ticketUrl": "https://www.concertsfribourg.ch/fr/abonnements-et-billets.html",
+"sourceUrl": "https://www.concertsfribourg.ch/fr/programme/sdc/Element/concert/c/sinfonietta-de-lausanne.html",
+"source": "concerts_fribourg"
+},
+{
 "id": "real-lso_luzern-19916",
 "title": "UNSER GASTSPIEL IN ENGELBERG",
 "series": "Tourneen",
@@ -39739,6 +59420,36 @@ export const REAL = [
 "ticketUrl": "https://tickets.sinfonieorchester.ch/checkout/gastspiel-in-engelberg-klassikmomente-kopie-auo5tl",
 "sourceUrl": "https://sinfonieorchester.ch/de/veranstaltung/unser-gastspiel-in-engelberg/",
 "source": "lso_luzern"
+},
+{
+"id": "real-zuger_sinfonietta-ueberraschend-anders-3-2027-06-12",
+"title": "Überraschend anders",
+"series": "4. Abo-Konzert",
+"start": "2027-06-12T19:30:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Lorzensaal Cham",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+},
+{
+"role": "Violin",
+"name": "Soyoung Yoon"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.drittezug.ch/selection/event/date?productId=10229800599111",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/ueberraschend-anders-3/",
+"source": "zuger_sinfonietta"
 },
 {
 "id": "real-osi-205110787275425",
@@ -39810,6 +59521,133 @@ export const REAL = [
 "source": "lso_luzern"
 },
 {
+"id": "real-kts_st_gallen-3816",
+"title": "Hoffmanns Erzählungen",
+"series": "Grosses Haus",
+"start": "2027-06-13T14:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "theater-st-gallen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Michael Zlabinger"
+},
+{
+"role": "Director",
+"name": "Guta Rau"
+},
+{
+"role": "Performer",
+"name": "Brian Michael Moore"
+},
+{
+"role": "Performer",
+"name": "Eva Langeland Gjerde"
+},
+{
+"role": "Performer",
+"name": "Marie Lombard"
+},
+{
+"role": "Performer",
+"name": "Andrew Foster-Williams"
+},
+{
+"role": "Performer",
+"name": "Jennifer Panara"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "Mziwamadoda Sipho Nodlayiya"
+},
+{
+"role": "Performer",
+"name": "Gloriela Villalobos"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Jacques Offenbach",
+"title": "Hoffmanns Erzählungen"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=474&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/hoffmanns-erzaehlungen/3816/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-camerata_bern-31207",
+"title": "Brugg",
+"series": "Gastspiel",
+"start": "2027-06-13T17:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Reformierte Kirche Windisch",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Cello",
+"name": "Steven Isserlis"
+},
+{
+"role": "Orchestra",
+"name": "CAMERATA BERN"
+}
+],
+"program": [
+{
+"composer": "Felix Mendelssohn Bartholdy",
+"title": "Mendelssohn Streichersinfonie Nr. 10 in h-Moll MWV N 10",
+"composerId": "mendelssohn"
+},
+{
+"composer": "John Tavener",
+"title": "Eternal Memory für Cello und Streicher"
+},
+{
+"composer": "Olli Mustonen",
+"title": "Partita für Cello und Streicher (Uraufführung)"
+},
+{
+"composer": "Peter Iljitsch Tschaikowski",
+"title": "Streichsextett in d-Moll op. 70 Souvenir de Florence"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/Stretta-Concerts/shop/event/176809/#event",
+"sourceUrl": "https://www.cameratabern.ch/konzerte/brugg",
+"source": "camerata_bern"
+},
+{
 "id": "real-geneva_victoria_hall-55434876-20270613",
 "title": "Gli Angeli Genève – De l’ombre à la forme",
 "series": null,
@@ -39845,6 +59683,66 @@ export const REAL = [
 "ticketUrl": "https://billetterie-culture.geneve.ch/selection/event/date?productId=10229291414930",
 "sourceUrl": "https://openagenda.com/victoria-hall-client/events/55434876_gli-angeli-geneve-8044674",
 "source": "geneva_victoria_hall"
+},
+{
+"id": "real-theater_casino_zug-6e9adefc-391c-456e-8160-970ca2d336ea",
+"title": "Überraschend anders",
+"series": "Zuger Klassik Abo",
+"start": "2027-06-13T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Violin",
+"name": "Soyoung Yoon"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770253",
+"sourceUrl": "https://www.theatercasino.ch/programm/veranstaltungen/ueberraschend-anders?date=6e9adefc-391c-456e-8160-970ca2d336ea",
+"source": "theater_casino_zug"
+},
+{
+"id": "real-zuger_sinfonietta-ueberraschend-anders-2-2027-06-13",
+"title": "Überraschend anders",
+"series": "4. Abo-Konzert",
+"start": "2027-06-13T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zug",
+"venueId": "theater-casino-zug",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Orchestra",
+"name": "Zuger Sinfonietta"
+},
+{
+"role": "Conductor",
+"name": "Daniel Huppert"
+},
+{
+"role": "Violin",
+"name": "Soyoung Yoon"
+}
+],
+"program": [],
+"ticketUrl": "https://kartenverkauf.theatercasino.ch/selection/event/date?productId=10229809770253",
+"sourceUrl": "https://zugersinfonietta.ch/konzert/ueberraschend-anders-2/",
+"source": "zuger_sinfonietta"
 },
 {
 "id": "real-opernhaus_zurich-200227",
@@ -40126,6 +60024,23 @@ export const REAL = [
 "ticketUrl": "https://442hz.com/de/ensembles/Musikkollegium_Winterthur/shop/event/161619/",
 "sourceUrl": "https://www.musikkollegium.ch/programm/adios-roberto-27-06-16-9283",
 "source": "musikkollegium"
+},
+{
+"id": "real-reformiert_zuerich-15779",
+"title": "Orgelmusik zum Feierabend",
+"series": null,
+"start": "2027-06-17T19:00:00+02:00",
+"durationMin": 30,
+"cityId": "zurich",
+"venueName": "Kirche Unterstrass",
+"type": "recital",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15779/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelmusik-zum-feierabend-15779/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-200228",
@@ -40480,6 +60395,90 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-esn_neuchatel-beethoven-ix-202706191930",
+"title": "Beethoven IX",
+"series": null,
+"start": "2027-06-19T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "la-chaux-de-fonds",
+"venueId": "salle-de-musique-lcdf",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Victorien Vanoosten"
+},
+{
+"role": "Ensemble",
+"name": "Nouvel Ensemble Contemporain"
+},
+{
+"role": "Choir",
+"name": "Choeur des Rameaux"
+},
+{
+"role": "Choir",
+"name": "Ensemble vocal de la Collégiale de Neuchâtel"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+},
+{
+"role": "Violin",
+"name": "Carole Haering"
+},
+{
+"role": "Viola",
+"name": "Céline Portat"
+},
+{
+"role": "Cello",
+"name": "Esther Monnat"
+},
+{
+"role": "Clarinet",
+"name": "Jean-François Lehmann"
+},
+{
+"role": "Trombone",
+"name": "Martiel Rosselet"
+},
+{
+"role": "Soprano",
+"name": "Léonie Renaud"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Carine Séchaye"
+},
+{
+"role": "Tenor",
+"name": "Bernard Richter"
+},
+{
+"role": "Baritone",
+"name": "Alexandre Beuchat"
+}
+],
+"program": [
+{
+"composer": "A. Padilla",
+"title": "Altitude - création commandée par le NEC"
+},
+{
+"composer": "L. v. Beethoven",
+"title": "Symphonie n°9 en ré mineur, op. 125",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://billetterie.chaux-de-fonds.ch/selection/event/date?productId=10229909926601",
+"sourceUrl": "https://www.esn-ne.ch/concerts/beethoven-ix",
+"source": "esn_neuchatel"
+},
+{
 "id": "real-lso_luzern-20323",
 "title": "Das Klassik Open Air auf dem Europaplatz 2027",
 "series": "Sinfoniekonzerte",
@@ -40574,6 +60573,149 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15383&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/samson-et-dalila/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-esn_neuchatel-beethoven-ix-202706201700",
+"title": "Beethoven IX",
+"series": null,
+"start": "2027-06-20T17:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Théâtre du Jura",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Victorien Vanoosten"
+},
+{
+"role": "Ensemble",
+"name": "Nouvel Ensemble Contemporain"
+},
+{
+"role": "Choir",
+"name": "Choeur des Rameaux"
+},
+{
+"role": "Choir",
+"name": "Ensemble vocal de la Collégiale de Neuchâtel"
+},
+{
+"role": "Orchestra",
+"name": "Ensemble Symphonique Neuchâtel"
+},
+{
+"role": "Violin",
+"name": "Carole Haering"
+},
+{
+"role": "Viola",
+"name": "Céline Portat"
+},
+{
+"role": "Cello",
+"name": "Esther Monnat"
+},
+{
+"role": "Clarinet",
+"name": "Jean-François Lehmann"
+},
+{
+"role": "Trombone",
+"name": "Martiel Rosselet"
+},
+{
+"role": "Soprano",
+"name": "Léonie Renaud"
+},
+{
+"role": "Mezzo-soprano",
+"name": "Carine Séchaye"
+},
+{
+"role": "Tenor",
+"name": "Bernard Richter"
+},
+{
+"role": "Baritone",
+"name": "Alexandre Beuchat"
+}
+],
+"program": [
+{
+"composer": "A. Padilla",
+"title": "Altitude - création commandée par le NEC"
+},
+{
+"composer": "L. v. Beethoven",
+"title": "Symphonie n°9 en ré mineur, op. 125",
+"composerId": "beethoven"
+}
+],
+"ticketUrl": "https://billetterie.chaux-de-fonds.ch/selection/event/date?productId=10229909926601",
+"sourceUrl": "https://www.esn-ne.ch/concerts/beethoven-ix",
+"source": "esn_neuchatel"
+},
+{
+"id": "real-kts_st_gallen-3920",
+"title": "Fantastische Gambenmusik",
+"series": "Sonntags um 5",
+"start": "2027-06-20T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueId": "tonhalle-st-gallen",
+"type": "chamber",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Ensemble",
+"name": "Barockensemble Lusingando"
+},
+{
+"role": "Cello",
+"name": "Vanessa Hunt"
+},
+{
+"role": "Violin",
+"name": "Elisabeth Kohler"
+},
+{
+"role": "Violin",
+"name": "Oriana Kriszten"
+},
+{
+"role": "Harpsichord",
+"name": "Marie-Louise Dähler"
+}
+],
+"program": [
+{
+"composer": "Antonio Bertali",
+"title": "Sonata à 4 d-Moll"
+},
+{
+"composer": "Johann Heinrich Schmelzer",
+"title": "Sonata Nr. 12 à 3"
+},
+{
+"composer": "Johann Heinrich Schmelzer",
+"title": "Lamento sopra la morte di Ferdinando III."
+},
+{
+"composer": "Anonym",
+"title": "Kremsier Gambensonate d-Moll"
+},
+{
+"composer": "Dietrich Buxtehude",
+"title": "Ander Sonata in G"
+}
+],
+"ticketUrl": "https://tickets.konzertundtheater.ch/webshop/webticket/shop?&event=588&language=de",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/5-so-um-5-fantastische-gambenmusik/3920/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-200065",
@@ -40795,6 +60937,51 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15224&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/la_boheme/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-ocl-e13fa2bd-ab34-4963-9dc1-dbcf057f24c8-ocl-ch",
+"title": "Les Grands Concerts n°9 | Carter · Isserlis · Haydn / Schumann / Schoenberg",
+"series": "Les Grands Concerts n°9",
+"start": "2027-06-23T19:30:00+02:00",
+"durationMin": 120,
+"cityId": "lausanne",
+"venueName": "Théâtre de Beaulieu",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Nicholas Carter"
+},
+{
+"role": "Cello",
+"name": "Steven Isserlis"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Joseph Haydn",
+"title": "Symphonie n°44 en mi mineur, Hob. I:44, « Trauersinfonie »",
+"composerId": "haydn"
+},
+{
+"composer": "Robert Schumann",
+"title": "Concerto pour violoncelle en la mineur, op. 129",
+"composerId": "schumann"
+},
+{
+"composer": "Arnold Schoenberg",
+"title": "Verklärte Nacht, op. 4 (version pour orchestre à cordes)"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/grand-concert-n9/",
+"sourceUrl": "https://www.ocl.ch/concert/grand-concert-n9/",
+"source": "ocl"
 },
 {
 "id": "real-tonhalle-2055962",
@@ -41150,6 +61337,23 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-reformiert_zuerich-15780",
+"title": "SerenadenKonzert «Giardino del Sud»",
+"series": null,
+"start": "2027-06-25T19:00:00+02:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Kirche Letten",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/serenadenkonzert-giardino-del-sud-15780/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/serenadenkonzert-giardino-del-sud-15780/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-osr-candide-20270625",
 "title": "Candide",
 "series": null,
@@ -41272,6 +61476,86 @@ export const REAL = [
 "source": "buehnen_bern"
 },
 {
+"id": "real-kts_st_gallen-3973",
+"title": "Otello",
+"series": null,
+"start": "2027-06-25T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3973/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3973/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-tonhalle-2057029",
 "title": "Abo-Konzert #7 – Im Spiegel der Zeit",
 "series": "Abo-Konzert #7",
@@ -41312,6 +61596,60 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-cite_bleue-il-pomo-d-oro-2027-06-26-1930",
+"title": "Il pomo d'oro",
+"series": null,
+"start": "2027-06-26T19:30:00+02:00",
+"durationMin": 90,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin & direction",
+"name": "Pablo Agudo López"
+},
+{
+"role": "Ensemble",
+"name": "Ensemble Les Impertinences"
+},
+{
+"role": "Violin",
+"name": "Emma Vignier"
+},
+{
+"role": "Viola da gamba",
+"name": "Juliette Guichard"
+},
+{
+"role": "Lute",
+"name": "Luis Eduardo López"
+},
+{
+"role": "Viola",
+"name": "Gabriel Canneva"
+},
+{
+"role": "Guitar",
+"name": "Sergio Valdeos"
+},
+{
+"role": "Piano",
+"name": "Sebastián Volco"
+},
+{
+"role": "Percussion",
+"name": "Roberto Castillo Lagrange"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/il-pomo-d-oro",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/il-pomo-d-oro",
+"source": "cite_bleue"
+},
+{
 "id": "real-opernhaus_zurich-199882",
 "title": "See the music, hear the dance",
 "series": "Hauptbühne",
@@ -41348,6 +61686,180 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15280&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/see-the-music-hear-the-dance/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3974",
+"title": "Otello",
+"series": null,
+"start": "2027-06-26T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3974/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3974/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-ocl-125e8fe8-e9fa-461b-a6a8-53c90938972d-ocl-ch",
+"title": "Les Dominicales n°5 | Bonato · Bach / Chostakovitch / Tchaïkovski",
+"series": "Les Dominicales n°5",
+"start": "2027-06-27T11:00:00+02:00",
+"durationMin": 90,
+"cityId": "lausanne",
+"venueId": "salle-metropole",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Alessandro Bonato"
+},
+{
+"role": "Violin",
+"name": "Ophélie Kirch-Vadot"
+},
+{
+"role": "Oboe",
+"name": "Beat Anderwert"
+},
+{
+"role": "Orchestra",
+"name": "Orchestre de Chambre de Lausanne"
+}
+],
+"program": [
+{
+"composer": "Dmitri Chostakovitch",
+"title": "Symphonie de chambre op. 110a"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "Concerto pour violon, hautbois et orchestre en do mineur, BWV 1060R",
+"composerId": "bach"
+},
+{
+"composer": "Piotr Illitch Tchaïkovski",
+"title": "Sérénade pour cordes en ut majeur, op. 48"
+}
+],
+"ticketUrl": "https://www.ocl.ch/concert/dominicale-n5/",
+"sourceUrl": "https://www.ocl.ch/concert/dominicale-n5/",
+"source": "ocl"
+},
+{
+"id": "real-kammerorchester_basel-nachtklang-im-museum-iv-2-202706271100",
+"title": "Nachtklang im Museum",
+"series": null,
+"start": "2027-06-27T11:00:00+02:00",
+"durationMin": 120,
+"cityId": "basel",
+"venueName": "Kunstmuseum Neubau",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Flute",
+"name": "Isabelle Schnöller"
+},
+{
+"role": "Oboe",
+"name": "Matthias Arter"
+},
+{
+"role": "Clarinet",
+"name": "Etele Dosa"
+},
+{
+"role": "Clarinet",
+"name": "Markus Niederhauser"
+},
+{
+"role": "Bassoon",
+"name": "Matthias Bühlmann"
+},
+{
+"role": "Horn",
+"name": "Konstantin Timokhine"
+},
+{
+"role": "Orchestra",
+"name": "Kammerorchester Basel"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/Kammerorchester_Basel/shop/event/193236/#event",
+"sourceUrl": "https://www.kammerorchesterbasel.ch/de/konzerte/nachtklang-im-museum-iv-2.html",
+"source": "kammerorchester_basel"
 },
 {
 "id": "real-tonhalle-2055967",
@@ -41444,6 +61956,77 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-cite_bleue-il-pomo-d-oro-2027-06-27-1700",
+"title": "Il pomo d'oro",
+"series": null,
+"start": "2027-06-27T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "geneva",
+"venueName": "La Cité Bleue",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Violin & direction",
+"name": "Pablo Agudo López"
+},
+{
+"role": "Ensemble",
+"name": "Ensemble Les Impertinences"
+},
+{
+"role": "Violin",
+"name": "Emma Vignier"
+},
+{
+"role": "Viola da gamba",
+"name": "Juliette Guichard"
+},
+{
+"role": "Lute",
+"name": "Luis Eduardo López"
+},
+{
+"role": "Viola",
+"name": "Gabriel Canneva"
+},
+{
+"role": "Guitar",
+"name": "Sergio Valdeos"
+},
+{
+"role": "Piano",
+"name": "Sebastián Volco"
+},
+{
+"role": "Percussion",
+"name": "Roberto Castillo Lagrange"
+}
+],
+"program": [],
+"ticketUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/il-pomo-d-oro",
+"sourceUrl": "https://lacitebleue.ch/fr/evenements/2026-2027/il-pomo-d-oro",
+"source": "cite_bleue"
+},
+{
+"id": "real-reformiert_zuerich-918",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-06-27T19:30:00+02:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-918/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-918/",
+"source": "reformiert_zuerich"
+},
+{
 "id": "real-opernhaus_zurich-200231",
 "title": "Samson et Dalila",
 "series": "Hauptbühne",
@@ -41518,6 +62101,86 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15294&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/ein-sommernachtstraum/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3975",
+"title": "Otello",
+"series": null,
+"start": "2027-06-29T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3975/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-06/otello/3975/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-200232",
@@ -41628,6 +62291,77 @@ export const REAL = [
 "source": "tonhalle"
 },
 {
+"id": "real-kts_st_gallen-3951",
+"title": "Festkonzert",
+"series": null,
+"start": "2027-07-01T20:00:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Kathedrale",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Soprano",
+"name": "Kali Hardwick"
+},
+{
+"role": "Alto",
+"name": "Jennifer Panara"
+},
+{
+"role": "Tenor",
+"name": "Luis Gomes"
+},
+{
+"role": "Bass",
+"name": "Jonas Jud"
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Orchestra",
+"name": "Sinfonieorchester St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Gioachino Rossini",
+"title": "Petite Messe solennelle",
+"composerId": "rossini"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/festkonzert/3951/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/festkonzert/3951/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-bach_stiftung-bwv-243-magnificat-in-d-dur",
+"title": "BWV 243 «Magnificat» in D-Dur",
+"series": null,
+"start": "2027-07-02T18:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Kirche St. Laurenzen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 243 «Magnificat» in D-Dur",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/176364/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-243-magnificat-in-d-dur/",
+"source": "bach_stiftung"
+},
+{
 "id": "real-opernhaus_zurich-200233",
 "title": "Samson et Dalila",
 "series": "Hauptbühne",
@@ -41649,6 +62383,86 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15387&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/samson-et-dalila/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3976",
+"title": "Otello",
+"series": null,
+"start": "2027-07-02T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3976/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3976/",
+"source": "kts_st_gallen"
 },
 {
 "id": "real-opernhaus_zurich-199839",
@@ -41687,6 +62501,86 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3977",
+"title": "Otello",
+"series": null,
+"start": "2027-07-03T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3977/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3977/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-199855",
 "title": "La bohème",
 "series": "Hauptbühne",
@@ -41707,6 +62601,23 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15225&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/la_boheme/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-reformiert_zuerich-15472",
+"title": "Benefizkonzert",
+"series": null,
+"start": "2027-07-04T17:00:00+02:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueName": "Thomaskirche Im Gut",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/benefizkonzert-15472/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/benefizkonzert-15472/",
+"source": "reformiert_zuerich"
 },
 {
 "id": "real-opernhaus_zurich-222801",
@@ -41818,6 +62729,86 @@ export const REAL = [
 "source": "opernhaus_zurich"
 },
 {
+"id": "real-kts_st_gallen-3978",
+"title": "Otello",
+"series": null,
+"start": "2027-07-07T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3978/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3978/",
+"source": "kts_st_gallen"
+},
+{
 "id": "real-opernhaus_zurich-199938",
 "title": "Don Carlo",
 "series": "Hauptbühne",
@@ -41862,6 +62853,112 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15388&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/samson-et-dalila/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kts_st_gallen-3979",
+"title": "Otello",
+"series": null,
+"start": "2027-07-09T20:30:00+02:00",
+"durationMin": 120,
+"cityId": "st-gallen",
+"venueName": "Klosterhof",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Pietro Rizzo"
+},
+{
+"role": "Director",
+"name": "Krystian Lada"
+},
+{
+"role": "Performer",
+"name": "Jorge Puerta"
+},
+{
+"role": "Performer",
+"name": "Sylvia D'Eramo"
+},
+{
+"role": "Performer",
+"name": "Daniel Mirosław"
+},
+{
+"role": "Performer",
+"name": "Matteo Ivan Rašić"
+},
+{
+"role": "Performer",
+"name": "Mack Wolz"
+},
+{
+"role": "Performer",
+"name": "Riccardo Botta"
+},
+{
+"role": "Performer",
+"name": "Jonas Jud"
+},
+{
+"role": "Performer",
+"name": "Felix Gygli"
+},
+{
+"role": "Performer",
+"name": "N.N."
+},
+{
+"role": "Choir",
+"name": "Chor des Theaters St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Opernchor St.Gallen"
+},
+{
+"role": "Choir",
+"name": "Kinderchor des Theaters St.Gallen"
+}
+],
+"program": [
+{
+"composer": "Giuseppe Verdi",
+"title": "Otello",
+"composerId": "verdi"
+}
+],
+"ticketUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3979/",
+"sourceUrl": "https://www.konzertundtheater.ch/programm/kalender/2027-07/otello/3979/",
+"source": "kts_st_gallen"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-tonhalle-zuerich",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-07-10T14:00:00+02:00",
+"durationMin": 120,
+"cityId": "zurich",
+"venueId": "tonhalle-zurich-kleiner-saal",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://442hz.com/de/ensembles/kaphi/shop/event/180609/",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-tonhalle-zuerich.php",
+"source": "kammerphilharmonie_gr"
 },
 {
 "id": "real-opernhaus_zurich-199857",
@@ -41924,5 +63021,302 @@ export const REAL = [
 "ticketUrl": "https://tickets.opernhaus.ch/webshop/webticket/shop?event=15213&language=de",
 "sourceUrl": "https://www.opernhaus.ch/spielplan/kalendarium/don_carlo/",
 "source": "opernhaus_zurich"
+},
+{
+"id": "real-kammerphilharmonie_gr-heidi-gemeindezentrum-schwanden",
+"title": "Heidi",
+"series": "Live in concert",
+"start": "2027-08-08T17:00:00+02:00",
+"durationMin": 120,
+"cityId": null,
+"venueName": "Gemeindezentrum Schwanden",
+"type": "orchestral",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Conductor",
+"name": "Raban Brunner"
+},
+{
+"role": "Orchestra",
+"name": "Kammerphilharmonie Graubünden"
+}
+],
+"program": [],
+"ticketUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-gemeindezentrum-schwanden.php",
+"sourceUrl": "https://www.kammerphilharmonie.ch/de/konzerte/termine/heidi-gemeindezentrum-schwanden.php",
+"source": "kammerphilharmonie_gr"
+},
+{
+"id": "real-bach_stiftung-bwv-150-nach-dir-herr-verlanget-mich",
+"title": "BWV 150 «Nach dir, Herr, verlanget mich»",
+"series": "Bachkantate",
+"start": "2027-08-20T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 150 «Nach dir, Herr, verlanget mich»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168123/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-150-nach-dir-herr-verlanget-mich/",
+"source": "bach_stiftung"
+},
+{
+"id": "real-reformiert_zuerich-15476",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-08-29T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15476/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15476/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-992",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-09-05T19:30:00+02:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-992/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-992/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-bach_stiftung-bwv-113-herr-jesu-christ-du-hoechstes-gut",
+"title": "BWV 113 «Herr Jesu Christ, du höchstes Gut»",
+"series": "Bachkantate",
+"start": "2027-09-17T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 113 «Herr Jesu Christ, du höchstes Gut»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168126/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-113-herr-jesu-christ-du-hoechstes-gut/",
+"source": "bach_stiftung"
+},
+{
+"id": "real-reformiert_zuerich-1024",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-10-03T17:00:00+02:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-1024/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-1024/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-15477",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-10-17T17:00:00+02:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15477/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15477/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-bach_stiftung-bwv-71-gott-ist-mein-koenig",
+"title": "BWV 71 «Gott ist mein König»",
+"series": "Bachkantate",
+"start": "2027-10-22T19:00:00+02:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 71 «Gott ist mein König»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168128/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-71-gott-ist-mein-koenig/",
+"source": "bach_stiftung"
+},
+{
+"id": "real-reformiert_zuerich-15965",
+"title": "Morgenmusik",
+"series": null,
+"start": "2027-11-07T11:30:00+01:00",
+"durationMin": 45,
+"cityId": "zurich",
+"venueId": "grossmunster-zurich",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/morgenmusik-15965/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/morgenmusik-15965/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-bach_stiftung-motette-bwv-118-o-jesu-christ-meins-lebens-licht-537f739b8d",
+"title": "Motette BWV 118 «O Jesu Christ, meins Lebens Licht» und BWV Anh. 159 «Ich lasse dich nicht»",
+"series": "Bachkantate",
+"start": "2027-11-19T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "trogen",
+"venueName": "Evang. Kirche Trogen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "Motette BWV 118 «O Jesu Christ, meins Lebens Licht»",
+"composerId": "bach"
+},
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV Anh. 159 «Ich lasse dich nicht»",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/168133/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/motette-bwv-118-o-jesu-christ-meins-lebens-licht-und-bwv-anh-159-ich-lasse-dich-nicht/",
+"source": "bach_stiftung"
+},
+{
+"id": "real-reformiert_zuerich-10843",
+"title": "Cantus Jahreskonzert",
+"series": null,
+"start": "2027-11-28T13:00:00+01:00",
+"durationMin": 390,
+"cityId": "zurich",
+"venueName": "Kirche Neumünster",
+"type": "vocal-opera",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/cantus-jahreskonzert-10843/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/cantus-jahreskonzert-10843/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-1090",
+"title": "Konzertreihe Predigerkirche",
+"series": null,
+"start": "2027-12-02T20:00:00+01:00",
+"durationMin": 60,
+"cityId": "zurich",
+"venueName": "Predigerkirche",
+"type": "mixed",
+"featured": false,
+"status": "scheduled",
+"credits": [],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-1090/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/konzertreihe-predigerkirche-1090/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-reformiert_zuerich-15478",
+"title": "Orgelkonzert",
+"series": null,
+"start": "2027-12-05T17:00:00+01:00",
+"durationMin": 90,
+"cityId": "zurich",
+"venueName": "Johanneskirche",
+"type": "recital",
+"featured": true,
+"status": "scheduled",
+"credits": [
+{
+"role": "Organ",
+"name": "Tobias Willi"
+}
+],
+"program": [],
+"ticketUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15478/",
+"sourceUrl": "https://reformiert-zuerich.ch/event/orgelkonzert-15478/",
+"source": "reformiert_zuerich"
+},
+{
+"id": "real-bach_stiftung-bwv-243a-magnificat-in-es-dur",
+"title": "BWV 243a Magnificat in Es-Dur",
+"series": null,
+"start": "2027-12-17T19:00:00+01:00",
+"durationMin": 120,
+"cityId": "teufen",
+"venueName": "Evang. Kirche Teufen",
+"type": "vocal-opera",
+"featured": true,
+"status": "scheduled",
+"credits": [],
+"program": [
+{
+"composer": "Johann Sebastian Bach",
+"title": "BWV 243a Magnificat in Es-Dur",
+"composerId": "bach"
+}
+],
+"ticketUrl": "https://442hz.com/de/ensembles/JSBS-StGallen/shop/event/169326/#event",
+"sourceUrl": "https://bachstiftung.ch/konzerte-tickets/bwv-243a-magnificat-in-es-dur/",
+"source": "bach_stiftung"
 }
 ];
