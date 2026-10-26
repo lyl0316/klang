@@ -6,7 +6,8 @@
   position: fixed; z-index: 40; left: 50%; transform: translateX(-50%);
   bottom: calc(10px + var(--safe-b));
   width: min(528px, calc(100% - 24px));
-  display: grid; grid-template-columns: 1fr; gap: 8px;
+  /* minmax(0, …): a long track title must ellipsize, not widen the dock past the screen */
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
   transition: gap 0.2s;
 }
 .dock .tabbar {
@@ -15,7 +16,7 @@
 }
 .dock .mini-player {
   position: relative; transform: none; left: auto; bottom: auto; width: auto;
-  grid-column: 1 / -1; order: 1;
+  grid-column: 1 / -1; order: 1; min-width: 0;
   display: flex; align-items: center; gap: 10px; text-align: left;
   min-height: 54px; padding: 8px 10px 8px 8px; border-radius: 18px;
   background: var(--glass); backdrop-filter: blur(22px) saturate(1.3); -webkit-backdrop-filter: blur(22px) saturate(1.3);
@@ -37,7 +38,7 @@
 }
 .dock-tab { color: var(--accent); }
 
-.dock.collapsed { grid-template-columns: 52px 1fr 52px; align-items: center; }
+.dock.collapsed { grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; }
 .dock.collapsed .tabbar { display: none; }
 .dock.collapsed .dock-tab, .dock.collapsed .dock-search { display: inline-flex; }
 .dock.collapsed .dock-tab { order: 0; }
