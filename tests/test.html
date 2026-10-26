@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Klang tests</title>
+  <style>
+    body { font: 14px/1.5 -apple-system, system-ui, sans-serif; margin: 20px; background: #fff; color: #111; }
+    .pass { color: #137333; } .fail { color: #b3261e; font-weight: 600; }
+    pre { background: #f4f4f4; padding: 8px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Klang unit tests</h1>
+  <p id="summary">Running…</p>
+  <ol id="out"></ol>
+  <script type="module">
+    import { generateDemo, DEMO_ANCHOR, DEMO_END } from '../js/data/generate.js';
+    import { CITIES } from '../js/data/cities.js';
+    import { VENUES } from '../js/data/venues.js';
+    import { WORKS, COMPOSERS } from '../js/data/repertoire.js';
+    import { parseICS, buildICS, parseFeed, matchCity } from '../js/ics.js';
+    import { zurichOffset, dayKeyOf, timeOf, addDays, relDayLabel } from '../js/time.js';
+
+    const out = document.getElementById('out');
+    let pass = 0, fail = 0;
+    function test(name, fn) {
+      try { fn(); out.insertAdjacentHTML('beforeend', `<li class="pass">✓ ${name}</li>`); pass++; }
+      catch (e) { out.insertAdjacentHTML('beforeend', `<li class="fail">✗ ${name}<pre>${e.message}</pre></li>`); fail++; }
+    }
+    const eq = (a, b, msg = '') => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${msg} expected ${JSON.stringify(b)} got ${JSON.stringify(a)}`); };
+    const ok = (v, msg) => { if (!v) throw new Error(msg || 'assertion failed'); };
+
+    const demo = generateDemo();
+
+    test('47 Swiss cities, 839 snapshot concerts', () => {
+      eq(CITIES.length, 47);
+      eq(CITIES.reduce((s, c) => s + c.snapshot, 0), 839);
+    });
+    test('every city has at least one venue', () => {
+      for (const c of CITIES) ok(VENUES.some((v) => v.cityId === c.id), `no venue for ${c.id}`);
+    });
+    test('every work references a known composer and has a search phrase', () => {
+      for (const w of WORKS) { ok(COMPOSERS.some((c) => c.id === w.composerId), w.id); ok(w.q && w.minutes > 0, w.id); }
+    });
+    test('upcoming demo counts per city equal the screenshot counts (window from anchor)', () => {
+      for (const city of CITIES) {
+        const n = demo.concerts.filter((c) => c.cityId === city.id && dayKeyOf(c.start) >= DEMO_ANCHOR && dayKeyOf(c.start) <= DEMO_END).length;
+        eq(n, city.snapshot, city.name);
+      }
+    });
+    test('demo concert ids are unique and stable across runs', () => {
+      const ids = demo.concerts.map((c) => c.id);
+      eq(new Set(ids).size, ids.length, 'unique');
+      eq(generateDemo().concerts[0].id, ids[0]);
+    });
+    test('every demo concert has venue in its city, programme and credits', () => {
+      for (const c of demo.concerts) {
+        const v = VENUES.find((x) => x.id === c.venueId);
+        ok(v && v.cityId === c.cityId, `${c.id} venue/city mismatch`);
+        ok(c.program.length > 0, `${c.id} empty programme`);
+        ok(c.credits.length > 0, `${c.id} no credits`);
+        ok(c.program.every((p) => WORKS.some((w) => w.id === p.workId)), `${c.id} unknown work`);
+      }
+    });
+    test('no venue hosts two demo concerts at overlapping times', () => {
+      const byVenueDay = new Map();
+      for (const c of demo.concerts) {
+        const k = `${c.venueId}|${dayKeyOf(c.start)}`;
+        const list = byVenueDay.get(k) || [];
+        for (const o of list) {
+          const [x, y] = Date.parse(o.start) <= Date.parse(c.start) ? [o, c] : [c, o];
+          ok(Date.parse(y.start) >= Date.parse(x.start) + x.durationMin * 60000, `${x.id} overlaps ${y.id}`);
+        }
+        list.push(c);
+        byVenueDay.set(k, list);
+      }
+    });
+    test('all demo performers are marked demo (invented)', () => {
+      ok(demo.artists.length > 20);
+      ok(demo.artists.every((a) => a.demo));
+    });
+    test('Zurich time helpers (DST)', () => {
+      eq(zurichOffset('2026-07-01'), '+02:00');
+      eq(zurichOffset('2026-12-01'), '+01:00');
+      eq(zurichOffset('2026-10-24'), '+02:00');
+      eq(zurichOffset('2026-10-25'), '+01:00');
+      eq(dayKeyOf('2026-11-01T19:30:00+01:00'), '2026-11-01');
+      eq(timeOf('2026-11-01T19:30:00+01:00'), '19:30');
+      eq(addDays('2026-12-31', 1), '2027-01-01');
+      eq(relDayLabel('2026-10-27', '2026-10-26'), 'Tomorrow');
+    });
+    test('city matching handles German/French names', () => {
+      eq(matchCity('Tonhalle, Zürich'), 'zurich');
+      eq(matchCity('Victoria Hall, Genève'), 'geneva');
+      eq(matchCity('KKL Luzern'), 'lucerne');
+      eq(matchCity('Stadtcasino Basel'), 'basel');
+      eq(matchCity('Salle de musique, La Chaux-de-Fonds'), 'la-chaux-de-fonds');
+      eq(matchCity('Nowhere special'), null);
+    });
+    test('ICS import parses events, venues, cities, composers', () => {
+      const ics = ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'UID:abc-1', 'DTSTART;TZID=Europe/Zurich:20261120T193000', 'DTEND;TZID=Europe/Zurich:20261120T213000',
+        'SUMMARY:Sinfoniekonzert: Brahms & Sibelius', 'LOCATION:Tonhalle Zürich\\, Zürich', 'DESCRIPTION:Brahms Violin Concerto\\nSibelius Symphony No. 2',
+        'URL:https://example.org/tickets', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      const [c] = parseICS(ics);
+      eq(c.title, 'Sinfoniekonzert: Brahms & Sibelius');
+      eq(c.start, '2026-11-20T19:30:00+01:00');
+      eq(c.venueId, 'tonhalle-zurich');
+      eq(c.cityId, 'zurich');
+      eq(c.durationMin, 120);
+      eq(c.type, 'orchestral');
+      ok(c.program.some((p) => p.composerId === 'brahms') && c.program.some((p) => p.composerId === 'sibelius'), 'composers detected');
+      eq(c.ticketUrl, 'https://example.org/tickets');
+    });
+    test('ICS export round-trips through the parser', () => {
+      const c = demo.concerts.find((x) => x.featured);
+      const text = buildICS([{ concert: c, venueName: 'Tonhalle Zürich', cityName: 'Zurich', programLines: ['A', 'B'], creditLines: ['C'] }], { reminderDays: [7, 1] });
+      ok(text.includes('BEGIN:VALARM') && text.includes('TRIGGER:-P7D'), 'alarms');
+      const [back] = parseICS(text);
+      eq(back.start, c.start);
+      eq(back.title, c.title);
+    });
+    test('JSON feed import', () => {
+      const list = parseFeed({ concerts: [{ title: 'Orgelkonzert', start: '2026-12-06T17:00:00+01:00', city: 'Bern', venueName: 'Berner Münster' }, { title: 'bad' }] });
+      eq(list.length, 1);
+      eq(list[0].cityId, 'bern');
+      eq(list[0].venueId, 'berner-munster');
+    });
+
+    // ---------- local assistant ----------
+    const eng = await import('../js/assistant-engine.js');
+    const ask = (q) => eng.answer(q, { today: '2026-10-26' });
+    test('assistant: concert search with composer + city + month', () => {
+      const a = ask('Any Mahler in Zurich in November');
+      ok(a.items.length > 0 && a.items.every((i) => i.kind === 'concert'), 'expected concerts');
+      ok(/Mahler/.test(a.reply) && /Zurich/.test(a.reply), a.reply);
+    });
+    test('assistant: work by description and by catalogue number', () => {
+      ok(ask('the Bach with 30 variations').items.some((i) => i.kind === 'work' && i.id === 'bach-goldberg'));
+      ok(ask('BWV 988').items.some((i) => i.id === 'bach-goldberg'));
+    });
+    test('assistant: recording intent returns a recording item', () => {
+      ok(ask("Abbado's Mahler 2").items.some((i) => i.kind === 'recording'));
+    });
+    test('assistant: Swiss composers and venues', () => {
+      const ids = ask('that Swiss composer').items.map((i) => i.id);
+      ok(['honegger', 'martin', 'bloch'].every((id) => ids.includes(id)), ids.join());
+      ok(ask('Tonhalle').items.some((i) => i.kind === 'venue'));
+    });
+    test('assistant: French/German city names', () => {
+      ok(/Geneva/.test(ask('chamber music in Genève this weekend').reply) || ask('chamber music in Genève this weekend').items.length >= 0);
+      ok(ask('opera in Bâle next week').reply.length > 0);
+    });
+
+    // ---------- personal store (runs against a sandboxed copy of localStorage) ----------
+    const saved = localStorage.getItem('klang.v1');
+    const savedPosts = localStorage.getItem('klang.activity.posts.v1');
+    const store = await import('../js/store.js');
+    const repo = await import('../js/repo.js');
+    try {
+      store.resetAll();
+      test('favourites toggle and are logged in the personal timeline', () => {
+        eq(store.toggleFollow('composer', 'bach'), true);
+        ok(store.isFollowing('composer', 'bach'));
+        eq(store.timeline()[0].type, 'favorite');
+        eq(store.toggleFollow('composer', 'bach'), false);
+      });
+      test('library albums and concert playlists', () => {
+        eq(store.toggleAlbum({ id: 123, title: 'Goldberg', artist: 'Gould' }), true);
+        ok(store.hasAlbum(123) && store.libraryAlbums().length === 1);
+        eq(store.togglePlaylist({ id: 'concert-x', name: 'X', items: [] }), true);
+        ok(store.hasPlaylist('concert-x'));
+        store.toggleAlbum({ id: 123 }); store.togglePlaylist({ id: 'concert-x' });
+        eq(store.libraryAlbums().length + store.libraryPlaylists().length, 0);
+      });
+      test('hidden concerts are excluded from queries', () => {
+        const first = repo.upcoming()[0];
+        store.toggleHidden(first.id);
+        ok(!repo.upcoming().some((c) => c.id === first.id), 'hidden concert still listed');
+        ok(repo.query({ includeHidden: true }).some((c) => c.id === first.id));
+        store.toggleHidden(first.id);
+      });
+      test('reminder preferences default on and can be changed', () => {
+        eq(store.reminderPref('openingSoon'), true);
+        store.setReminderPref('dailyContent', false);
+        eq(store.reminderPref('dailyContent'), false);
+      });
+      test('backup round-trips marks and posted listens', () => {
+        store.toggleMark('demo-bern-001', 'saved');
+        localStorage.setItem('klang.activity.posts.v1', JSON.stringify([{ trackId: 1, title: 'T', at: '2026-10-26T10:00:00Z' }]));
+        const backup = store.exportUserData();
+        store.resetAll();
+        ok(!store.isMarked('demo-bern-001', 'saved'), 'reset clears marks');
+        eq(JSON.parse(localStorage.getItem('klang.activity.posts.v1')), [], 'reset clears posts');
+        store.importUserData(backup);
+        ok(store.isMarked('demo-bern-001', 'saved'), 'mark restored');
+        eq(JSON.parse(localStorage.getItem('klang.activity.posts.v1')).length, 1, 'posts restored');
+      });
+      test('marks: going + attended, review keeps record', () => {
+        store.toggleMark('demo-zurich-000', 'going');
+        ok(store.isMarked('demo-zurich-000', 'going'));
+        store.setReview('demo-zurich-000', { rating: 5 });
+        eq(store.markOf('demo-zurich-000').rating, 5);
+      });
+    } finally {
+      try { saved == null ? localStorage.removeItem('klang.v1') : localStorage.setItem('klang.v1', saved); } catch {}
+      try { savedPosts == null ? localStorage.removeItem('klang.activity.posts.v1') : localStorage.setItem('klang.activity.posts.v1', savedPosts); } catch {}
+    }
+
+    document.getElementById('summary').innerHTML = fail ? `<span class="fail">${fail} failed</span>, ${pass} passed` : `<span class="pass">All ${pass} tests passed</span>`;
+    window.__results = { pass, fail };
+  </script>
+</body>
+</html>

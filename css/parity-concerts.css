@@ -1,0 +1,374 @@
+/* Sheng-parity overrides for the concerts group (loaded last).
+   Concerts tab (.concerts-page, .cr-*) and concert detail (.cp-*). Sizes are Sheng's iOS points
+   measured from the reference screenshots (1 CSS px = 1 pt on a phone). */
+
+/* colour tokens: Sheng's dark greys; light mode falls back to Klang's warm light palette */
+:root {
+  --p-surf: #1a1a1c; --p-band: #1b1b1d; --p-tile: #262628; --p-fill: #2c2c2e; --p-fill2: #3a3a3d; --p-off: #48484c;
+  --p-t1: #e2e2e6; --p-t2: #c8c8cc; --p-g0: #9d9da2; --p-g1: #8e8e93; --p-g2: #7c7c81; --p-g3: #6e6e73; --p-g4: #5c5c61;
+  --p-red: #cd525c; --p-red-text: #d65a64; --p-red-dim: #5a2a2f; --p-book: #2a2326; --p-reader: #0f0f11; --p-gold-dim: #c9a86a;
+  --p-fab: rgba(72, 72, 76, 0.55); --p-bubble: rgba(44, 44, 48, 0.92);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --p-surf: #ffffff; --p-band: #efece8; --p-tile: #ffffff; --p-fill: #e9e6e1; --p-fill2: #e1ddd7; --p-off: #dcd8d2;
+    --p-t1: #1f1d1b; --p-t2: #3f3b37; --p-g0: #66615b; --p-g1: #77726c; --p-g2: #8b867f; --p-g3: #a09b94; --p-g4: #aaa59e;
+    --p-red: var(--accent); --p-red-text: var(--accent); --p-red-dim: #e7b8bc; --p-book: #f7eded; --p-reader: var(--bg); --p-gold-dim: var(--gold);
+    --p-fab: rgba(255, 255, 255, 0.82); --p-bubble: rgba(255, 255, 255, 0.96);
+  }
+}
+:root[data-theme='light'] {
+  --p-surf: #ffffff; --p-band: #efece8; --p-tile: #ffffff; --p-fill: #e9e6e1; --p-fill2: #e1ddd7; --p-off: #dcd8d2;
+  --p-t1: #1f1d1b; --p-t2: #3f3b37; --p-g0: #66615b; --p-g1: #77726c; --p-g2: #8b867f; --p-g3: #a09b94; --p-g4: #aaa59e;
+  --p-red: var(--accent); --p-red-text: var(--accent); --p-red-dim: #e7b8bc; --p-book: #f7eded; --p-reader: var(--bg); --p-gold-dim: var(--gold);
+  --p-fab: rgba(255, 255, 255, 0.82); --p-bubble: rgba(255, 255, 255, 0.96);
+}
+
+/* =========================================================================================
+   Concerts tab — filter chips
+   ========================================================================================= */
+.concerts-page .list-toolbar { position: sticky; padding-bottom: 0; }
+.concerts-page .list-toolbar::after {
+  /* the hairline under the chips (it stops short of the month rail, like the card dividers) */
+  content: ''; position: absolute; left: 0; right: 34px; bottom: 0; height: 1px; background: var(--line);
+}
+.concerts-page .chip-row.cr-chips { gap: 6px; padding: 4px 16px 9px; }
+.concerts-page .chip.cr-chip {
+  height: 28px; padding: 0 10px 0 11px; gap: 5px; border-radius: 14px;
+  background: var(--p-surf); border: 1px solid var(--line); color: var(--text);
+  font-size: 12.5px; font-weight: 600; letter-spacing: -0.005em;
+}
+.concerts-page .chip.cr-chip .icon { opacity: 1; color: var(--text-2); }
+.concerts-page .chip.cr-chip .icon svg { display: block; }
+.concerts-page .chip.cr-chip .caret { color: var(--text-3); margin-left: -1px; }
+.concerts-page .chip.cr-chip .caret svg { stroke-width: 2.4; }
+.concerts-page .chip.cr-chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+.concerts-page .chip.cr-chip.active .icon { color: var(--p-fill2); }
+.concerts-page .chip.cr-chip.active .caret { color: var(--p-g1); }
+.concerts-page .chip.cr-chip:active { opacity: 0.8; }
+
+/* =========================================================================================
+   Concerts tab — list cards (flat, centred title, credits, programme)
+   ========================================================================================= */
+.concerts-page .concert-list { padding-right: 30px; }
+.concerts-page .concert-list .concert-card { padding: 16px 2px 19px; }
+.concerts-page .concert-list .cc-meta { font-size: 11px; gap: 0; color: var(--text-3); align-items: baseline; }
+.concerts-page .concert-list .cc-meta .when { flex: none; font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: -0.005em; }
+.concerts-page .concert-list .cc-meta .when .rel { color: inherit; margin-right: 3px; }
+.concerts-page .concert-list .cc-meta .when .rel.is-today { color: var(--accent-strong); }
+.concerts-page .concert-list .cc-meta .where { color: var(--text-3); font-size: 11px; }
+/* outside the Concerts list (Activity, Assistant) the flex gap sits before the dot; space it after too */
+.cc-meta .where .sep { margin-right: 5px; color: var(--text-3); }
+.concerts-page .concert-list .cc-meta .sep { margin: 0 4px 0 5px; }
+.concerts-page .concert-list .cc-status { font-size: 11px; color: var(--text-3); padding-left: 8px; }
+.cc-status .ring { display: inline-block; width: 7px; height: 7px; margin-right: 4px; border: 1px solid currentColor; border-radius: 50%; vertical-align: 0; }
+/* the demo marker isn't part of Sheng's card (demo data is disclosed at the end of the list) */
+.concerts-page .concert-list .cc-badges .tag.demo { display: none; }
+.concerts-page .concert-list .cc-badges { margin-top: 4px; }
+.concerts-page .concert-list .cc-badges .tag { font-size: 9.5px; font-weight: 500; padding: 0 5px; border-radius: 4px; background: transparent; border: 1px solid var(--line-strong); color: var(--text-3); }
+.concerts-page .concert-list .cc-title {
+  font-family: var(--sans); font-size: 16.5px; font-weight: 700; line-height: 1.3; letter-spacing: -0.012em;
+  margin: 2px 12px 1px; color: var(--text); text-wrap: balance;
+}
+.concerts-page .concert-list .cc-series { font-size: 13px; line-height: 1.35; color: var(--text-3); margin: 0 12px; }
+.concerts-page .concert-list .cc-credits { font-size: 12px; line-height: 1.45; color: var(--text-2); margin: 7px 10px 0; text-wrap: balance; }
+.concerts-page .concert-list .cc-credits b { color: inherit; font-weight: inherit; }
+.concerts-page .concert-list .cc-credits .sep { margin: 0 3px; color: var(--text-3); }
+.concerts-page .concert-list .cc-program { margin-top: 10px; font-size: 12px; line-height: 1.38; }
+.concerts-page .concert-list .cc-program .comp { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.concerts-page .concert-list .cc-program .work { font-size: 12px; line-height: 1.38; color: var(--text-2); }
+.concerts-page .concert-list .cc-program .row + .row { margin-top: 5px; }
+
+/* end of list + demo disclosure (moved out of the top of the list) */
+.concerts-page .cr-end { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+.concerts-page .cr-end > .faint { font-size: 12px; }
+.concerts-page .cr-end .demo-note { width: 100%; margin: 0; }
+
+/* =========================================================================================
+   Concerts tab — month rail (no container: grey labels + week ticks, red "you are here" bar)
+   ========================================================================================= */
+.rail.cr-rail {
+  top: 54%; right: max(2px, calc((100vw - 560px) / 2 + 2px));
+  align-items: flex-end; gap: 0; padding: 6px 4px 6px 10px; border-radius: 0;
+  background: none; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none;
+}
+.rail.cr-rail[hidden] { display: none; }
+.rail.cr-rail button.m {
+  padding: 3px 1px 2px; border-radius: 0; background: none; line-height: 1;
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.01em; color: var(--text-3); text-align: right;
+}
+.rail.cr-rail button.m.current { color: var(--text); background: none; }
+.rail.cr-rail .ticks { display: flex; flex-direction: column; align-items: flex-end; gap: 0; padding: 1px 0 3px; }
+.rail.cr-rail .ticks i { display: block; width: 6px; height: 1px; margin: 4px 1px 3px; border-radius: 1px; background: var(--text-3); opacity: 0.75; }
+.rail.cr-rail .ticks i.has { width: 6px; opacity: 0.75; }
+.rail.cr-rail .ticks i.now { width: 13px; height: 2px; margin-top: 3px; background: var(--accent-strong); opacity: 1; }
+
+/* bubble: "DEC | Slide left to pick a day / 69 events", beside the finger */
+.rail-bubble.cr-bubble {
+  right: 40px; min-width: 0; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto;
+  column-gap: 12px; align-items: center; padding: 9px 14px; border-radius: 12px;
+  background: var(--p-bubble); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.rail-bubble.cr-bubble[hidden] { display: none; }
+.rail-bubble.cr-bubble b { grid-row: 1 / span 2; font-family: var(--sans); font-size: 19px; font-weight: 800; letter-spacing: 0.02em; color: var(--text-2); }
+.rail-bubble.cr-bubble .hint { display: block; font-size: 11.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+.rail-bubble.cr-bubble .n { display: block; font-size: 11px; color: var(--text-3); white-space: nowrap; }
+
+/* =========================================================================================
+   Concert detail (.cp-page)
+   ========================================================================================= */
+/* floating back / share: lighter glass circles */
+.cp-topbar .cp-fab {
+  width: 40px; height: 40px; background: var(--p-fab); border: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* header band */
+.cp-page .cp-head { padding: calc(var(--safe-t) + 52px) 18px 14px; background: var(--p-band); }
+.cp-page .cp-title { font-size: 18px; font-weight: 700; line-height: 1.42; letter-spacing: -0.012em; }
+.cp-page .cp-series { margin-top: 0; font-size: 17.5px; font-weight: 700; line-height: 1.38; letter-spacing: -0.012em; color: var(--p-g4); }
+.cp-page .cp-when { margin-top: 9px; font-size: 13.5px; font-weight: 600; letter-spacing: 0; }
+.cp-page .cp-when-sub { margin-top: 2px; font-size: 10.5px; font-weight: 500; opacity: 0.92; }
+.cp-page .cp-where { margin-top: 7px; gap: 0 9px; font-size: 11px; font-weight: 650; line-height: 1.5; }
+.cp-page .cp-where .sep { opacity: 0.8; font-size: 12px; }
+.cp-page .cp-where a { text-decoration: none; }
+.cp-page .venue-follow .btn { width: 24px; height: 22px; margin-left: 1px; }
+.cp-page .venue-follow .btn .icon svg { width: 15px; height: 15px; }
+
+/* action bar: five ~63pt square tiles */
+.cp-page .cp-actions { grid-template-columns: repeat(5, minmax(0, 64px)); justify-content: center; gap: 11px; margin-top: 34px; }
+.cp-page .cp-act { height: 63px; gap: 6px; border-radius: 9px; background: var(--p-tile); font-size: 10px; font-weight: 700; letter-spacing: 0; --cp-sym-cut: var(--p-tile); }
+.cp-page .cp-act[disabled], .cp-page .cp-act.off { opacity: 0.32; }
+
+/* Save / Going / Attended pills */
+.cp-page .cp-marks { margin-top: 17px; }
+.cp-page .cp-marks .mark-row { gap: 9px; }
+.cp-page .cp-marks .mark-row .btn {
+  height: 39px; padding: 0 17px 0 15px; gap: 7px; border-radius: 20px;
+  background: var(--p-surf); border: 1px solid var(--line); color: var(--p-g0); font-size: 14px; font-weight: 600;
+}
+.cp-page .cp-marks .mark-row .btn .icon svg { width: 17px; height: 17px; }
+.cp-page .mark-hint { margin-top: 14px; font-size: 11px; color: var(--p-g4); }
+.cp-page .mark-hint b { font-size: 13.5px; font-weight: 500; color: var(--p-t2); margin-bottom: 2px; }
+
+/* listen carousel */
+.cp-page .cp-listen { margin-top: 30px; }
+.cp-page .cp-carousel { gap: 30px; padding: 4px calc(50% - 114px) 6px; }
+.cp-page .cp-lc { width: 228px; }
+.cp-page .cp-lc-comp { font-size: 13.5px; font-weight: 700; }
+.cp-page .cp-lc-work { font-size: 13px; line-height: 1.35; color: var(--p-t2); }
+.cp-page .cp-lc-cover { margin-top: 9px; width: 228px; height: 228px; }
+.cp-page .cp-lc-art, .cp-page .cp-lc-art-btn { width: 228px; height: 228px; border-radius: 4px; }
+.cp-page .cp-lc-meta { margin-top: 13px; }
+.cp-page .cp-lc-artist { font-size: 12.5px; font-weight: 700; }
+.cp-page .cp-lc-album { font-size: 12px; color: var(--p-gold-dim); }
+.cp-page .cp-lc-actions { gap: 52px; margin-top: 13px; }
+.cp-page .cp-lc-btn { gap: 3px; font-size: 10.5px; font-weight: 700; color: var(--p-g0); }
+.cp-page .cp-lc-btn .ring { width: 26px; height: 26px; color: var(--text); }
+.cp-page .cp-lc-listen { color: var(--accent-strong); }
+.cp-page .cp-lc-listen .ring { background: var(--accent); color: #fff; box-shadow: none; }
+.cp-page .cp-lc-listen.current .ring { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.cp-page .cp-playall { width: min(100%, 260px); height: 45px; margin-top: 24px; border-radius: 23px; background: var(--p-fill2); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
+.cp-page .cp-playlist { margin-top: 12px; gap: 9px; font-size: 12px; color: var(--p-g1); }
+.cp-page .cp-playlist input {
+  appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1.5px solid var(--p-g3); border-radius: 3px; background: transparent; display: inline-grid; place-content: center;
+}
+.cp-page .cp-playlist input:checked { background: var(--accent); border-color: var(--accent); }
+.cp-page .cp-playlist input:checked::after { content: ''; width: 7px; height: 4px; border: solid #fff; border-width: 0 0 1.6px 1.6px; transform: translateY(-1px) rotate(-45deg); }
+.cp-page .cp-playlist .n { color: var(--p-g1); }
+.cp-page .cp-credit { margin-top: 10px; font-size: 10px; opacity: 0.8; }
+
+/* red pill section labels */
+.cp-page .cp-section { margin-top: 30px; }
+.cp-page .cp-section > .pill-label { height: 33px; padding: 0 19px; border-radius: 17px; margin: 0 0 30px; font-size: 13.5px; font-weight: 700; background: var(--p-red); }
+
+/* program: centred roles table + inset works */
+.cp-page .cp-roles { grid-template-columns: minmax(0, 33fr) minmax(0, 67fr); gap: 6px 14px; font-size: 13.5px; line-height: 1.3; }
+.cp-page .cp-roles dt { color: var(--p-g0); }
+.cp-page .cp-roles dd { color: var(--p-t2); }
+.cp-page .cp-roles dd div + div { margin-top: 2px; }
+.cp-page .cp-roles a { text-decoration-color: currentColor; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+.cp-page .cp-works { margin-top: 28px; padding: 0 16px 0 18px; }
+.cp-page .cp-work { padding: 6px 0; gap: 14px; align-items: center; }
+.cp-page .cp-work + .cp-work { margin-top: 8px; }
+.cp-page .cp-work .comp { font-size: 13.5px; font-weight: 700; line-height: 1.4; }
+.cp-page .cp-work .work { font-size: 13.5px; line-height: 1.5; color: var(--p-t2); opacity: 1; }
+.cp-page .cp-work .chev { color: var(--p-g1); }
+
+/* program book */
+.cp-page .cp-bookwrap > .pill-label { margin-bottom: 18px; }
+.cp-page .cp-book { gap: 12px; }
+.cp-page .cp-rail { width: 22px; gap: 11px; }
+.cp-page .cp-rail-dot { width: 21px; height: 21px; font-size: 10.5px; border-color: var(--p-fill2); color: var(--p-g3); }
+.cp-page .cp-rail-dot.on { background: var(--p-red); border-color: var(--p-red); color: #fff; }
+.cp-page .cp-book-card { border-radius: 10px; background: var(--p-book); }
+.cp-page .cp-book-scroll { max-height: min(56vh, 440px); padding: 26px 20px 20px 22px; }
+.cp-page .cp-ch-kicker { font-size: 10.5px; font-weight: 650; letter-spacing: 0.06em; color: var(--p-red); }
+.cp-page .cp-ch-title { margin: 4px 0 10px; font-family: var(--sans); font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -0.012em; color: var(--p-red-text); }
+.cp-page .cp-ch-body { font-family: var(--sans); font-size: 14px; line-height: 1.45; color: var(--p-t1); }
+.cp-page .cp-ch-body p { margin: 0 0 10px; }
+.cp-page .cp-ch-hook { font-style: normal; color: var(--p-t2); }
+.cp-page .cp-ch + .cp-ch { margin-top: 18px; padding-top: 18px; }
+.cp-page .cp-book-scroll .cp-ch:first-child .cp-ch-title { padding-right: 0; }
+/* Sheng has no visible full-screen button (double-tap); keep it for keyboards only */
+.cp-page .cp-book-full { opacity: 0; pointer-events: none; }
+.cp-page .cp-book-full:focus-visible { opacity: 1; pointer-events: auto; }
+.cp-page .cp-book-hint { font-size: 12.5px; padding: 6px 13px; border-radius: 8px; background: rgba(20, 20, 22, 0.92); }
+/* full-screen reader: role kicker + bold sans name like Sheng */
+.cp-reader .cp-ch.full .cp-ch-kicker { color: var(--p-red); letter-spacing: 0.12em; }
+.cp-reader .cp-ch.full .cp-ch-title { font-family: var(--sans); font-weight: 700; color: var(--text); }
+.cp-reader .cp-ch.full .cp-ch-body { font-family: var(--sans); }
+.cp-reader .cp-rd-pill.on { background: var(--p-red); color: #fff; }
+
+/* podcasts */
+.cp-page .cp-podcasts > .caps-label, .cp-page .cp-artists > .caps-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.13em; color: var(--p-g0); margin-bottom: 11px; }
+.cp-page .cp-pods { gap: 8px; }
+.cp-page .cp-pod { padding: 10px 12px 10px 10px; border-radius: 11px; background: var(--p-surf); border: 0; gap: 11px; }
+.cp-page .cp-pod img, .cp-page .cp-pod .ph { width: 44px; height: 44px; border-radius: 6px; }
+.cp-page .cp-pod .t { font-size: 13px; line-height: 1.3; }
+.cp-page .cp-pod .s { font-size: 12px; color: var(--p-g1); }
+
+/* featured artists */
+.cp-page .cp-composers { gap: 14px; }
+.cp-page .cp-composer { width: 72px; gap: 7px; font-size: 11px; font-weight: 600; color: var(--p-t1); }
+.cp-page .cp-composer .avatar { width: 60px; height: 60px; font-size: 21px; }
+.cp-page .cp-performers { gap: 8px 7px; margin-top: 6px; }
+.cp-page .cp-person { height: 30px; padding: 0 3px 0 12px; border-radius: 15px; border: 0; background: var(--p-surf); font-size: 13px; color: var(--p-g0); }
+.cp-page .cp-person.plain { padding-right: 12px; }
+.cp-page .cp-person .btn { width: 26px; height: 26px; color: var(--p-g1); }
+.cp-page .cp-person .btn .icon svg { width: 14px; height: 14px; }
+
+/* report a problem, then the demo note */
+.cp-page .cp-report-wrap { margin-top: 30px; }
+.cp-page .cp-report { height: 34px; padding: 0 17px 0 13px; gap: 8px; border-radius: 17px; background: var(--p-surf); border: 1px solid var(--line); color: var(--p-g0); font-size: 13px; font-weight: 500; }
+.cp-page .cp-report .icon { color: var(--p-red); }
+.cp-page .concert-source { margin: 22px 0 0; border: 0; padding: 0 8px; justify-content: center; text-align: center; font-size: 11px; line-height: 1.45; color: var(--text-3); }
+.cp-page .concert-source > .icon { display: none; }
+
+/* =========================================================================================
+   Concerts tab — filter sheets (Date · Look back · Location · Type)
+   ========================================================================================= */
+.sheet.cr-sheet { background: var(--p-surf); }
+.sheet.cr-sheet .sheet-header { padding: 4px 18px 8px; }
+.sheet.cr-sheet .sheet-header > .icon-btn { display: none; } /* Sheng: no close button, tap outside */
+.sheet.cr-sheet .sheet-header .t { font-family: var(--sans); font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.sheet.cr-sheet .sheet-header .s { font-size: 11px; color: var(--p-g2); margin-top: 1px; }
+.sheet.cr-sheet .sheet-footer { border-top: 0; padding: 8px 18px 14px; }
+.sheet.cr-sheet .sheet-footer .btn.primary { height: 44px; border-radius: 11px; font-size: 14.5px; font-weight: 600; background: var(--p-red); border-color: var(--p-red); }
+.sheet.cr-sheet .sheet-footer .btn.primary[disabled] { opacity: 1; background: var(--p-red-dim); border-color: var(--p-red-dim); color: rgba(255, 255, 255, 0.4); }
+.sheet.cr-sheet .sheet-footer .hint { font-size: 10.5px; color: var(--p-g2); margin-top: 9px; }
+
+/* chips inside the sheets: white = included, grey = excluded */
+.sheet.cr-sheet .chip-wrap { gap: 7px 6px; }
+.sheet.cr-sheet .chip {
+  height: 28px; padding: 0 11px; gap: 5px; border-radius: 14px; font-size: 12.5px; font-weight: 500;
+  background: var(--p-fill); border-color: var(--p-fill); color: var(--p-t2);
+}
+.sheet.cr-sheet .chip .count { font-size: 11px; color: var(--p-g1); }
+.sheet.cr-sheet .chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+.sheet.cr-sheet .chip.active .count { color: var(--p-g1); opacity: 1; }
+.sheet.cr-sheet .chip.zero { opacity: 1; }
+.sheet.cr-location .chip:not(.active), .sheet.cr-type .chip:not(.active) { background: var(--p-off); border-color: var(--p-off); color: var(--p-g1); }
+.sheet.cr-location .chip:not(.active) .count { color: var(--p-g3); }
+.sheet.cr-lookback .chip:not(.active) { background: transparent; border-color: var(--line-strong); color: var(--p-t2); }
+
+/* search field with magnifier */
+.cr-search { display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; border-radius: 10px; background: var(--p-fill); color: var(--p-g1); }
+.cr-search .input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; font-size: 14px; color: var(--text); box-shadow: none; outline: none; }
+.cr-search .input::placeholder { color: var(--p-g3); }
+
+/* "Current country: Switzerland  ▭ Map ›" */
+.cr-country { margin-top: 13px; font-size: 12px; }
+.cr-country b { font-weight: 700; }
+.cr-country a { gap: 5px; color: var(--p-g1); font-size: 11.5px; }
+.cr-country .flag { width: 22px; height: 12px; border-radius: 2px; background: #d52b1e; position: relative; }
+.cr-country .flag::before, .cr-country .flag::after { content: ''; position: absolute; left: 50%; top: 50%; background: #fff; transform: translate(-50%, -50%); }
+.cr-country .flag::before { width: 7px; height: 2px; }
+.cr-country .flag::after { width: 2px; height: 7px; }
+
+/* "Select all" checkbox row */
+.cr-check { display: flex; align-items: center; gap: 12px; padding: 16px 2px 12px; margin-top: 12px; border-top: 1px solid var(--line); font-size: 13.5px; font-weight: 500; cursor: pointer; }
+.cr-check input {
+  appearance: none; -webkit-appearance: none; flex: none; width: 17px; height: 17px; margin: 0; border-radius: 4px;
+  border: 1.5px solid var(--p-g1); background: transparent; display: inline-grid; place-content: center;
+}
+.cr-check input:checked { background: var(--p-t1); border-color: var(--p-t1); }
+.cr-check input:checked::after { content: ''; width: 8px; height: 4.5px; border: solid var(--p-surf); border-width: 0 0 2px 2px; transform: translateY(-1px) rotate(-45deg); }
+
+/* calendar */
+.sheet.cr-date .caps-label { font-size: 9.5px; letter-spacing: 0.14em; margin: 6px 0 4px; color: var(--p-g2); }
+.sheet.cr-date .cal-head { margin: 4px 0 6px; }
+.sheet.cr-date .cal-head b { font-family: var(--sans); font-size: 15px; font-weight: 700; }
+.sheet.cr-date .cr-cal-nav { width: 28px; height: 28px; border-radius: 50%; background: var(--p-fill); }
+.sheet.cr-date .cr-cal-nav[disabled] { opacity: 0.35; }
+.sheet.cr-date .cal-grid { row-gap: 0; }
+.sheet.cr-date .cal-grid .wd { font-size: 9.5px; font-weight: 600; color: var(--p-g2); padding: 6px 0 8px; }
+.sheet.cr-date .cal-day { height: 37px; gap: 2px; border-radius: 9px; font-size: 13px; font-weight: 700; color: var(--text); }
+.sheet.cr-date .cal-day.past { color: var(--p-g4); font-weight: 500; }
+.sheet.cr-date .cal-day.past .dots { visibility: hidden; }
+.sheet.cr-date .cal-day .n { line-height: 1; }
+.sheet.cr-date .cal-day.today .n { width: 23px; height: 23px; background: var(--p-red); font-size: 12.5px; }
+.sheet.cr-date .cal-day .dots { gap: 2px; height: 3px; }
+.sheet.cr-date .cal-day .dots i { width: 3px; height: 3px; background: var(--p-g1); }
+.sheet.cr-date .cal-day.selected { outline: 0; }
+.sheet.cr-date .cal-day.selected::before {
+  content: ''; position: absolute; top: 1px; bottom: 1px; left: 50%; width: 38px; transform: translateX(-50%);
+  border: 1.5px solid var(--p-red); border-radius: 8px; pointer-events: none;
+}
+.sheet.cr-date .cal-day .mine { bottom: 2px; width: 12px; }
+.sheet.cr-date .cal-legend { gap: 12px; margin-top: 10px; font-size: 9.5px; color: var(--p-g2); }
+.sheet.cr-date .cal-legend .mk { color: var(--yellow); font-weight: 700; }
+.sheet.cr-date .cal-legend .past { color: var(--p-g4); }
+/* full-screen program book reader (Sheng: near-black page, only a close ×, chapter pills at the bottom) */
+.sheet.cp-reader { background: var(--p-reader); }
+.cp-reader .sheet-header .grow { visibility: hidden; }
+.cp-reader .sheet-header > .icon-btn { width: 32px; height: 32px; background: var(--p-fill); }
+.cp-reader .sheet-footer { border-top: 0; padding: 8px 0 14px; }
+.cp-reader .cp-rd-pills { padding: 2px 16px; }
+.cp-reader .cp-rd-pill { height: 32px; padding: 0 14px; border-radius: 16px; background: var(--p-surf); color: var(--p-g0); font-size: 12.5px; }
+.cp-reader .cp-ch.full { padding-top: 0; }
+.cp-reader .cp-ch.full .avatar { width: 78px; height: 78px; font-size: 26px; margin: 0 auto 14px; }
+.cp-reader .cp-ch.full .cp-ch-kicker { font-size: 10px; }
+.cp-reader .cp-ch.full .cp-ch-title { margin: 4px 0 14px; font-size: 20px; }
+.cp-reader .cp-ch.full .cp-ch-body { font-size: 14.5px; line-height: 1.55; color: var(--p-t1); }
+
+/* ---------- pull to refresh (Sheng: a small spinner opens above the first card) ---------- */
+.concerts-page .cr-ptr {
+  height: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  transition: height .22s ease;
+}
+.concerts-page .cr-ptr.dragging { transition: none; }
+.concerts-page .cr-ptr .spin {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--text-3, #8a8a8e); border-top-color: transparent;
+  opacity: var(--ptr, 0);
+  transform: rotate(calc(var(--ptr, 0) * 270deg));
+}
+.concerts-page .cr-ptr.armed .spin { opacity: 1; }
+.concerts-page .cr-ptr.busy .spin { animation: cr-ptr-spin .8s linear infinite; }
+@keyframes cr-ptr-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .concerts-page .cr-ptr.busy .spin { animation-duration: 2.4s; } }
+/* the custom pull replaces the browser's own pull-to-reload on this page */
+html:has(.concerts-page), body:has(.concerts-page) { overscroll-behavior-y: contain; }
+
+/* ---------- Versions sheet (concert-detail-11): small "Versions · All recordings" kicker above a
+   bold "Composer · Work" title, "N recordings", then a two-row rail of covers scrolling sideways ---------- */
+.sheet.versions-sheet .sheet-header .grow { display: flex; flex-direction: column-reverse; gap: 3px; }
+.sheet.versions-sheet .sheet-header .s { font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--p-g1, var(--text-3)); }
+.sheet.versions-sheet .sheet-header .t { font-size: 17px; font-weight: 700; line-height: 1.25; }
+.sheet.versions-sheet .versions-count { margin: -2px 0 12px; font-size: 12px; color: var(--p-g1, var(--text-3)); }
+.sheet.versions-sheet .versions-grid {
+  grid-template-columns: none; grid-auto-flow: column; grid-template-rows: repeat(2, auto);
+  grid-auto-columns: calc((100% - 30px) / 3.6); gap: 16px 10px;
+  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  margin: 0 -18px; padding: 2px 18px 6px; scroll-padding: 0 18px;
+}
+.sheet.versions-sheet .versions-grid::-webkit-scrollbar { display: none; }
+.sheet.versions-sheet .version-card { scroll-snap-align: start; text-align: center; }
+.sheet.versions-sheet .version-card img, .sheet.versions-sheet .version-card .ph { border-radius: 6px; }
+.sheet.versions-sheet .version-card .t { margin-top: 7px; font-size: 11.5px; font-weight: 500; color: var(--p-t2, var(--text-2)); }
+.sheet.versions-sheet .version-card .s { display: none; }
+.sheet.versions-sheet .version-card.chosen .t { color: var(--accent); font-weight: 600; }
+.sheet.versions-sheet .version-skel { width: auto; }

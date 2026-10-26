@@ -1,0 +1,137 @@
+/* Klang — typography & polish layer (loaded after app.css).
+   Display serif: Source Serif 4 (optical sizes) with Apple's New York / Georgia as fallbacks.
+   Interface: the platform sans (SF Pro on Apple devices). Figures: tabular for times, dates, counts. */
+
+:root {
+  --serif: 'Source Serif 4', ui-serif, 'New York', 'Iowan Old Style', Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, 'Helvetica Neue', Arial, sans-serif;
+  --tracking-tight: -0.012em;
+  --tracking-caps: 0.14em;
+}
+
+body {
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.003em;
+  font-feature-settings: 'kern', 'liga', 'calt';
+  text-rendering: optimizeLegibility;
+}
+
+.serif, .h1, .h2, .app-header .title.left, .entity-head .name, .home-hero .greet, .note-card h4, .work-card .t, .rail-bubble b, .stat b, .date-block .d {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Large titles (tab roots) */
+.app-header .title.left { font-size: 30px; font-weight: 650; letter-spacing: -0.02em; }
+.app-header .title { font-weight: 600; letter-spacing: -0.005em; }
+
+.h1 { font-size: 30px; font-weight: 650; line-height: 1.14; letter-spacing: -0.018em; text-wrap: balance; }
+.h2 { font-size: 21px; font-weight: 650; }
+.kicker { font-size: 10.5px; letter-spacing: var(--tracking-caps); font-weight: 650; }
+.prose { font-family: var(--serif); font-size: 16.5px; line-height: 1.62; letter-spacing: 0; text-wrap: pretty; }
+.lead { font-family: var(--serif); font-style: italic; font-size: 15.5px; color: var(--text-2); }
+
+/* Numerals */
+.cc-meta .when, .date-block, .chip .count, .result-line, .day-header .n, .cal-day, .stat b, .track-row .d, .rail button {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---------- day headers: kicker + serif date ---------- */
+.day-header {
+  padding: 18px 2px 8px;
+  align-items: flex-end;
+  background: linear-gradient(var(--bg) 78%, transparent);
+}
+.day-header .dh-main { display: flex; flex-direction: column; gap: 1px; }
+.day-header .dh-kicker {
+  font-size: 10.5px; font-weight: 650; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--text-3);
+}
+.day-header .dh-kicker.today { color: var(--accent); }
+.day-header .dh-date { font-family: var(--serif); font-size: 19px; font-weight: 600; letter-spacing: var(--tracking-tight); color: var(--text); }
+.day-header .n { font-size: 11.5px; padding-bottom: 3px; }
+
+/* ---------- concert card (Sheng-like centred title & credits) ---------- */
+.concert-card {
+  padding: 15px 16px 14px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--text) 3.5%, transparent), transparent 60%),
+    var(--surface);
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.cc-meta { font-size: 12px; gap: 7px; }
+.cc-meta .when { font-weight: 650; font-size: 12.5px; color: var(--gold); letter-spacing: 0.01em; }
+.cc-meta .when.today { color: var(--accent-strong); }
+.cc-meta .where { color: var(--text-2); }
+.cc-title {
+  font-family: var(--serif); font-size: 19.5px; font-weight: 600; line-height: 1.24; letter-spacing: -0.012em;
+  text-align: center; margin: 12px 6px 3px; text-wrap: balance;
+}
+.cc-series { text-align: center; font-family: var(--serif); font-style: italic; font-size: 13.5px; color: var(--text-3); }
+.cc-credits { text-align: center; font-size: 12.5px; line-height: 1.55; margin: 9px 4px 0; color: var(--text-2); text-wrap: balance; }
+.cc-credits b { color: var(--text-3); font-weight: 450; }
+.cc-program { margin-top: 12px; padding-top: 11px; font-size: 13.5px; line-height: 1.45; }
+.cc-program .comp { font-weight: 650; font-variant: small-caps; letter-spacing: 0.035em; font-size: 14px; }
+.cc-program .work { color: var(--text-2); }
+.cc-program .row + .row { margin-top: 8px; }
+.cc-program .work { line-height: 1.4; }
+.cc-tags { margin-top: 11px; }
+.tag { font-size: 10.5px; letter-spacing: 0.02em; border-radius: 7px; padding: 2px 8px; }
+.cc-marks { margin-top: 2px; }
+
+/* ---------- chips & toolbar ---------- */
+.chip { height: 36px; padding: 0 14px; border-radius: 18px; font-size: 13.5px; font-weight: 500; letter-spacing: -0.003em; }
+.chip .icon { opacity: 0.85; }
+.list-toolbar { padding-top: 6px; }
+.result-line { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); margin: 2px 2px 4px; }
+
+/* ---------- sheets ---------- */
+.sheet { border-radius: 26px 26px 0 0; }
+.sheet-header .t { font-family: var(--serif); font-size: 21px; font-weight: 650; letter-spacing: var(--tracking-tight); }
+.sheet-header .s { font-size: 12px; }
+.cal-head b { font-family: var(--serif); font-size: 19px; font-weight: 600; }
+.cal-day .n { font-weight: 500; }
+
+/* ---------- detail pages ---------- */
+.hero .h1 { margin-top: 6px; }
+.hero .when { font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+.section { margin-top: 30px; }
+.section-head { margin-bottom: 12px; }
+.section-head .h2::before { height: 17px; }
+.roles { font-size: 14.5px; }
+.roles dt { font-size: 13px; letter-spacing: 0.01em; }
+.prog-item .comp { font-variant: small-caps; letter-spacing: 0.035em; font-size: 14.5px; }
+.prog-item .work { font-family: var(--serif); font-size: 15.5px; color: var(--text); }
+.note-card { border-radius: 18px; padding: 18px; }
+.note-card h4 { font-size: 19px; font-weight: 600; }
+.event-row { border-radius: 14px; padding: 12px 14px; }
+.event-row .t { font-family: var(--serif); font-size: 16px; font-weight: 600; letter-spacing: var(--tracking-tight); }
+.date-block .d { font-size: 24px; font-weight: 600; }
+.entity-head .name { font-size: 29px; font-weight: 650; }
+.avatar { font-family: var(--serif); font-weight: 600; background: radial-gradient(circle at 30% 25%, var(--surface-3), var(--surface-2)); }
+.work-card { border-radius: 14px; }
+.work-card .t { font-size: 15.5px; font-weight: 600; }
+.album-card .t { font-family: var(--serif); font-size: 13.5px; font-weight: 600; }
+.stat { border-radius: 14px; }
+.stat b { font-size: 22px; font-weight: 600; }
+
+/* ---------- home ---------- */
+.home-hero .greet { font-size: 32px; font-weight: 650; letter-spacing: -0.022em; }
+.home-hero .sub { font-family: var(--serif); font-style: italic; font-size: 16px; }
+.quick a { border-radius: 18px; padding: 15px 16px; }
+.quick a b { font-family: var(--serif); font-size: 18px; font-weight: 600; letter-spacing: var(--tracking-tight); }
+
+/* ---------- tab bar ---------- */
+.tabbar a { font-size: 10px; font-weight: 550; letter-spacing: 0.01em; }
+
+/* ---------- banners ---------- */
+.demo-banner { border-radius: 14px; font-size: 12.5px; line-height: 1.5; }
+
+@media (min-width: 700px) {
+  .cc-title { font-size: 21px; }
+  .h1 { font-size: 34px; }
+}

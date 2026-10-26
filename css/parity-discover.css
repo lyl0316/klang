@@ -1,0 +1,147 @@
+/* Sheng-parity overrides for the discover group (loaded last).
+   Sizes are Sheng's, measured in points from the reference screens (1 CSS px = 1 pt). */
+
+.discover {
+  /* Sheng's Discover uses 24 pt side margins (the view itself pads 16) */
+  margin: 0 8px;
+  /* Sheng's red on this page (Concerts button, chips, ♥ Popular) is a deeper crimson than the
+     global accent; measured from the reference screens */
+  --dc-red: #c33a4c;
+  --dc-dim: color-mix(in srgb, var(--text-3) 72%, var(--bg));
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .discover { --dc-red: var(--accent); }
+}
+:root[data-theme="light"] .discover { --dc-red: var(--accent); }
+
+/* ---------- header collage + profile ---------- */
+.dc-top { height: 196px; margin: 0 -24px; }
+/* the faint horizon line that runs behind Sheng's floating covers */
+.dc-top::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 111px; height: 1px;
+  background: color-mix(in srgb, var(--line) 60%, transparent);
+}
+.dc-top.no-art::before { display: none; }
+.dc-collage {
+  -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+}
+.dc-cover { border-radius: 5px; box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(255, 255, 255, 0.07); }
+.dc-profile {
+  width: 44px; height: 44px; top: calc(var(--safe-t) + 11px);
+  right: max(20px, calc((100vw - 560px) / 2 + 20px)); color: var(--dc-red);
+}
+.dc-profile .icon svg { width: 21px; height: 21px; }
+
+/* ---------- editorial hero ---------- */
+.dc-hero { margin-top: 3px; max-width: 300px; }
+.dc-kicker {
+  gap: 7px; font-family: var(--serif); font-optical-sizing: auto; font-size: 13px; font-weight: 700;
+  line-height: 16px; letter-spacing: 0.16em; color: var(--text-2);
+}
+.dc-kicker i { font-size: 7px; color: var(--dc-red); }
+.dc-hero-title { font-size: 19px; font-weight: 600; line-height: 1.33; margin-top: 10px; text-wrap: pretty; }
+.dc-hero-dek {
+  font-size: 13px; line-height: 1.42; margin-top: 9px;
+  color: color-mix(in srgb, var(--text-2) 42%, var(--text-3));
+}
+
+/* ---------- Concerts / Assistant ---------- */
+.dc-buttons { gap: 10px; margin-top: 22px; }
+.dc-btn { min-height: 67px; border-radius: 11px; gap: 1px; padding: 10px 8px; }
+.dc-btn .l { gap: 7px; font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; }
+.dc-btn .l .icon svg { width: 17px; height: 17px; }
+.dc-btn .s { font-size: 12.5px; }
+.dc-btn.red { background: var(--dc-red); }
+.dc-btn.red .s { color: rgba(255, 255, 255, 0.9); font-weight: 600; }
+.dc-btn.dark { background: transparent; border-color: var(--line-strong); }
+.dc-orb { color: var(--dc-red); }
+.dc-orb svg { width: 20px; height: 20px; }
+
+/* ---------- sections ---------- */
+.dc-section { margin-top: 38px; }
+.dc-h2 { font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -0.012em; }
+/* Sheng sets "Today's Pick" in the system sans, bold; the other section titles are serif */
+.dc-h2.sans { font-family: var(--sans); font-size: 27px; letter-spacing: -0.005em; }
+.dc-pick { margin-top: 25px; }
+.dc-sub { font-size: 13.25px; margin: 3px 0 0; }
+
+/* ---------- Today's Pick ---------- */
+.dc-masonry { column-gap: 24px; margin-top: 17px; }
+.dc-card { padding: 17.5px 0 19px; }
+/* Sheng tops a card's first line (badge, composer or type label) at the same height */
+.dc-card > .dc-comp:first-child { margin-top: -4px; }
+.dc-badge { gap: 5px; font-size: 12.5px; font-weight: 500; line-height: 15px; margin-bottom: 8px; }
+.dc-badge.popular { color: var(--dc-red); }
+.dc-badge.gold { font-size: 12px; font-weight: 600; letter-spacing: 0.07em; gap: 7px; }
+.dc-sun {
+  flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-left: 1px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 22%, transparent), 0 0 6px color-mix(in srgb, var(--gold) 70%, transparent);
+}
+.dc-badge.age span { gap: 5px; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+.dc-comp { font-size: 19px; line-height: 1.25; letter-spacing: -0.01em; }
+.dc-work { font-size: 13.5px; line-height: 1.44; margin-top: 4px; }
+.dc-chip { height: 24px; padding: 0 9px; margin-top: 8px; gap: 5px; border-radius: 6px; font-size: 12.5px; }
+.dc-chip.red { color: var(--dc-red); border-color: color-mix(in srgb, var(--dc-red) 46%, transparent); }
+.dc-chip.white { color: color-mix(in srgb, var(--bg) 78%, var(--text)); background: color-mix(in srgb, var(--text) 94%, var(--bg)); border-color: transparent; }
+.dc-card.prog .dc-type { font-size: 11.5px; font-weight: 600; line-height: 14px; letter-spacing: 0.08em; margin: 1px 0 5px; }
+.dc-pair + .dc-pair { margin-top: 10px; }
+.dc-pair .dc-work + .dc-work { margin-top: 6px; }
+.dc-card.prog .dc-chip { margin-top: 14px; }
+.dc-city { font-size: 11.5px; line-height: 14px; margin-top: 4px; color: var(--dc-dim); }
+
+/* ---------- Widely Loved ---------- */
+.dc-loved { margin-top: 24px; }
+.dc-head-row { gap: 9px; }
+.dc-newcomers { height: 17px; padding: 0 8px; border-radius: 9px; font-size: 12px; font-weight: 500; }
+/* story-style segments: a thin progress bar over each label */
+.dc-tabs { column-gap: 6px; border-bottom: 0; margin-top: 12px; }
+.dc-tabs .dc-tab { display: flex; flex-direction: column; align-items: stretch; padding: 0 0 2px; font-size: inherit; color: inherit; }
+.dc-tabs .dc-tab::after { display: none; }
+.dc-tab .bar { display: block; height: 2px; border-radius: 1px; overflow: hidden; background: color-mix(in srgb, var(--text) 15%, transparent); }
+.dc-tab .bar i { display: block; height: 100%; width: 0; background: var(--text); border-radius: 1px; }
+.dc-tab.done .bar i { width: 100%; }
+.dc-tab.active .bar i { animation: dc-wl-progress var(--dc-advance, 6s) linear forwards; }
+.dc-loved.hold .dc-tab.active .bar i { animation-play-state: paused; }
+.dc-loved.paused .dc-tab.active .bar i { animation: none; width: 100%; }
+@keyframes dc-wl-progress { from { width: 0; } to { width: 100%; } }
+.dc-tab .lbl { display: block; margin-top: 7px; text-align: left; font-size: 12.5px; line-height: 15px; color: var(--dc-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-tab.active .lbl { color: var(--text); font-weight: 600; }
+.dc-wl-stage { display: grid; min-height: 0; }
+.dc-wl-card { grid-area: 1 / 1; visibility: hidden; padding: 13px 0 0; }
+.dc-wl-card.on { visibility: visible; }
+/* slide in (no fade, so no frame ever shows a dimmed or empty card) */
+.dc-wl-card.enter { animation: dc-wl-enter 0.3s ease-out; }
+@keyframes dc-wl-enter { from { translate: 14px 0; } to { translate: 0 0; } }
+.dc-wl-head { gap: 13px; }
+.dc-wl-head .avatar { width: 54px; height: 54px; font-size: 18px; }
+.dc-wl-title { font-size: 23px; line-height: 1.23; }
+.dc-wl-comp { font-size: 14px; margin-top: -1px; }
+.dc-wl-hook { gap: 0; margin-top: 9px; }
+.dc-wl-hook .q { flex: 0 0 22px; font-size: 21px; line-height: 1.2; margin-top: 1px; }
+.dc-wl-hook p { font-size: 16.5px; line-height: 1.55; }
+.dc-wl-count { font-size: 13px; margin-top: 12px; }
+.dc-wl-count b { font-family: var(--serif); font-size: 15px; margin-right: 1px; }
+
+/* ---------- New on Record ---------- */
+.dc-new { margin-top: 27px; }
+.h-scroll.dc-records { margin: 14px -24px 0; padding: 2px 24px 6px; gap: 10px; scroll-padding-inline: 24px; }
+.dc-album { width: 142px; }
+.dc-album .art-wrap { position: relative; display: block; }
+.dc-album .art { width: 142px; height: 142px; border-radius: 6px; }
+.dc-album .t { font-size: 13px; line-height: 17px; margin-top: 9px; }
+.dc-album .s { font-size: 12px; line-height: 16px; margin-top: 3px; }
+.dc-album.loading .art { opacity: 0.6; }
+.dc-album-state {
+  position: absolute; left: 7px; bottom: 7px; width: 24px; height: 24px; border-radius: 50%;
+  display: none; align-items: center; justify-content: center; background: var(--dc-red); color: #fff;
+}
+.dc-album[data-state='playing'] .dc-album-state, .dc-album[data-state='paused'] .dc-album-state { display: inline-flex; }
+.dc-album[data-state='paused'] .dc-album-state { opacity: 0.75; }
+
+/* page small print */
+.dc-foot { margin-top: 30px; color: var(--dc-dim); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-wl-card.enter { animation: none; }
+}

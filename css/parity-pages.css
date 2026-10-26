@@ -1,0 +1,260 @@
+/* Sheng-parity overrides for the pages group (loaded last). */
+/* Scope: composer / work / artist (+ Full Itinerary) pages from entity.js, editorials list and
+   article from editorial.js. Sizes are Sheng's points read off the reference screenshots. */
+
+/* =====================================================================
+   Entity pages (entity.js)
+   ===================================================================== */
+
+/* Sideways rails: with scroll-snap the first card snapped flush to the screen edge; Sheng keeps
+   every rail on the 16px page inset. */
+.ep-rail, .ep-grid, .ep-people, .ep-route { scroll-padding-inline: 16px; }
+
+/* ---------- head ---------- */
+.ep-av.lg { width: 72px; height: 72px; font-size: 26px; }
+.ep-av.md { width: 64px; height: 64px; font-size: 22px; }
+.ep-comp-link { gap: 10px; font-size: 15px; font-weight: 400; color: var(--text-2); }
+.ep-name { margin-top: 12px; font-size: 26px; font-weight: 700; letter-spacing: -0.012em; }
+.ep-name.work { margin-top: 8px; font-size: 24px; }
+.ep-caps { margin-top: 9px; font-size: 11.5px; letter-spacing: 0.16em; }
+.ep-chips { gap: 8px; margin-top: 12px; }
+.ep-chip { height: 30px; padding: 0 12px; border-radius: 15px; font-size: 13.5px; font-weight: 600;
+  background: color-mix(in srgb, var(--text) 4%, var(--bg)); border-color: var(--line); }
+.ep-chip.light { background: var(--text); border-color: var(--text); color: var(--bg); }
+.ep-chip.ed { background: color-mix(in srgb, var(--accent) 13%, var(--bg)); border-color: color-mix(in srgb, var(--accent) 16%, transparent); }
+.ep-chip .icon svg { width: 14px; height: 14px; }
+.ep-guide-btn { height: 30px; margin-top: 14px; padding: 0 14px; font-size: 14px; }
+/* ♡ sits in a faint ring (composer: centred under the chips; artist: next to Artist bio) */
+.ep-heart { width: 34px; height: 34px; margin-top: 10px; border: 1px solid var(--line); background: color-mix(in srgb, var(--text) 3%, var(--bg)); }
+.ep-heart .icon svg { width: 17px; height: 17px; }
+.ep-row .ep-heart { width: 32px; height: 32px; }
+
+/* ---------- section heads ---------- */
+.ep-sec { margin-top: 30px; }
+.ep-h { margin-bottom: 12px; }
+.ep-h h2 { font-size: 20px; gap: 8px; }
+.ep-h.bar h2::before { width: 3px; height: 18px; background: var(--ep-accent, var(--accent)); }
+.ep-h.serif h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+/* "Concerts 21": the count sits on the title's line, small and grey (not raised) */
+.ep-h h2 .n { align-self: center; margin-top: 2px; font-size: 13px; font-weight: 500; }
+
+/* ---------- recordings carousel ---------- */
+.ep-rail { gap: 14px; }
+.ep-album { width: 124px; }
+.ep-cover { width: 124px; height: 124px; border-radius: 6px; }
+.ep-cover img { border-radius: 6px; }
+.ep-album.chosen .ep-cover { outline: none; }
+.ep-album .t { margin-top: 8px; font-size: 13px; font-weight: 600; line-height: 1.28; }
+.ep-album .s { margin-top: 3px; font-size: 12px; }
+.ep-link { margin-top: 26px; font-size: 14px; font-weight: 600; color: var(--ep-accent, var(--accent-strong)); }
+/* iTunes credit moved to the foot of the page (Sheng has no fine print under its rails) */
+.ep-page > .ep-credit, .ep-itin-page > .ep-credit { margin: 22px 8px 0; text-align: center; font-size: 11px; line-height: 1.5; color: var(--text-3); }
+
+/* Work page: section bars and "More recordings" take the work's genre colour (Sheng: blue on Thaïs) */
+.ep-workpage { --ep-accent: var(--accent); }
+.ep-workpage.ga-symphony { --ep-accent: #e2b65c; }
+.ep-workpage.ga-concerto { --ep-accent: #e07a6a; }
+.ep-workpage.ga-orchestral { --ep-accent: #d9a05b; }
+.ep-workpage.ga-chamber { --ep-accent: #6fb39c; }
+.ep-workpage.ga-piano { --ep-accent: #93a2e6; }
+.ep-workpage.ga-solo { --ep-accent: #a3c06b; }
+.ep-workpage.ga-song { --ep-accent: #d48bb4; }
+.ep-workpage.ga-opera { --ep-accent: #7a8fdc; }
+.ep-workpage.ga-sacred { --ep-accent: #c9a86a; }
+.ep-workpage.ga-other { --ep-accent: #9a948c; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .ep-workpage .ep-link { color: color-mix(in srgb, var(--ep-accent) 62%, #000); }
+}
+:root[data-theme='light'] .ep-workpage .ep-link { color: color-mix(in srgb, var(--ep-accent) 62%, #000); }
+
+/* ---------- Report a problem ---------- */
+.ep-report-wrap { margin-top: 30px; }
+.ep-report { gap: 6px; height: 26px; padding: 0 11px 0 4px; border-radius: 13px; border-color: var(--line-strong); font-size: 12.5px; color: var(--text-3); }
+.ep-report .dot { width: 17px; height: 17px; background: var(--accent-strong); color: var(--bg); font-size: 11px; font-weight: 800; line-height: 1; }
+
+/* ---------- concert rows with date blocks ---------- */
+.ep-events { border-radius: 14px; }
+.ep-ev { gap: 8px; min-height: 60px; padding: 11px 12px 11px 4px; }
+.ep-date { width: 54px; }
+.ep-date b { font-size: 20px; font-weight: 700; }
+.ep-date .m { font-size: 10px; letter-spacing: 0.1em; }
+/* Sheng's work-page list: regular-weight titles, the city alone underneath */
+.ep-ev-main { gap: 2px; }
+.ep-ev-main .t { font-size: 15.5px; font-weight: 400; line-height: 1.3; }
+.ep-ev-main .s { font-size: 13px; }
+.ep-chev { color: var(--text-3); opacity: 0.7; }
+
+/* artist event cards: serif day, red time, bold title, flag · city · venue, no chevron */
+.ep-events.cards { gap: 10px; }
+.ep-events.cards .ep-ev { min-height: 72px; padding: 13px 14px 13px 4px; border-radius: 14px; }
+.ep-events.cards .ep-date b { font-family: var(--serif); font-size: 23px; font-weight: 500; letter-spacing: 0; }
+.ep-events.cards .ep-date .m { margin-top: 3px; }
+.ep-events.cards .ep-date .tm { margin-top: 3px; font-size: 10.5px; font-weight: 600; color: var(--accent-strong); }
+.ep-events.cards .ep-ev-main { gap: 5px; }
+.ep-events.cards .ep-ev-main .t { font-size: 15px; font-weight: 650; }
+.ep-events.cards .ep-ev-main .s { font-size: 12.5px; }
+.ep-flag { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2.5px; line-height: 0; }
+.ep-ev-main .s .cty { color: var(--text-2); }
+.ep-ev-main .s .sep { margin: 0 6px; }
+
+/* ---------- artist ---------- */
+.ep-artist .ep-av.lg { width: 76px; height: 76px; font-size: 27px; }
+.ep-artist-top { gap: 14px; }
+.ep-artist-id { gap: 7px; }
+.ep-artist-id .ep-name { font-size: 26px; line-height: 1.15; }
+.ep-tour { height: 20px; gap: 5px; padding: 0 9px; border-radius: 10px; background: #d9ab3e; color: #fff8e4; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; }
+.ep-tour i { width: 5px; height: 5px; }
+.ep-head.left .ep-caps { margin-top: 18px; }
+.ep-head.left .ep-row { margin-top: 14px; gap: 10px; }
+.ep-caps.left { margin-top: 0; font-size: 11px; }
+.ep-route { gap: 7px; margin-top: 12px; }
+.ep-stop { gap: 7px; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--surface); font-size: 13px; font-weight: 500; }
+.ep-stop b { color: var(--text); font-weight: 600; }
+.ep-route .arr { font-size: 11px; }
+.ep-note { margin: 12px 2px 16px; font-size: 11.5px; }
+.ep-itin { margin-top: 8px; padding: 14px 2px; border-top: 0; font-size: 14.5px; }
+.ep-itin .l { font-weight: 650; }
+.ep-itin .r { font-size: 13.5px; }
+.ep-person { gap: 10px; padding: 6px 14px 6px 6px; border-radius: 30px 16px 16px 30px; }
+.ep-person .avatar { width: 46px; height: 46px; font-size: 16px; }
+.ep-person p { font-size: 13px; line-height: 1.38; }
+.ep-person p b { font-weight: 700; }
+
+/* Full Itinerary page (#/artist/<id>/itinerary) */
+.ep-itin-page { padding-top: 10px; }
+.ep-itin-page .ep-sec { margin-top: 34px; }
+
+/* ---------- composer: Explore <name> ---------- */
+.ep-explore { margin-top: 46px; }
+.ep-explore-title { font-size: 28px; font-weight: 600; }
+.ep-ornament { margin: 10px 0 16px; }
+.ep-ornament i { width: 24px; }
+.ep-tabs { gap: 30px; }
+.ep-tabs button { font-size: 14px; }
+.ep-group { margin-top: 24px; }
+.ep-group-title { font-size: 17px; font-weight: 700; }
+.ep-intro { margin: 6px 0 14px; font-size: 14px; line-height: 1.58; }
+.ep-grid { gap: 10px; }
+.ep-work { min-height: 94px; padding: 12px 14px 12px; border-radius: 12px; }
+.ep-work .bar { width: 18px; }
+.ep-work .t { margin-top: 9px; font-size: 15.5px; font-weight: 600; line-height: 1.3; -webkit-line-clamp: 2; }
+.ep-work .meta { padding-top: 7px; font-size: 9.5px; letter-spacing: 0.13em; }
+.ep-work.g-opera { --bar: #7a8fdc; }
+/* Related: placeholder avatar, one serif sentence with the name in bold */
+.ep-rel-grid { gap: 10px; margin-top: 18px; }
+.ep-rel { gap: 14px; padding: 14px 12px 16px; border-radius: 14px; }
+.ep-rel-av { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--surface-3); color: var(--text-3); }
+.ep-rel-av svg path { fill: currentColor; }
+.ep-rel p { font-size: 14.5px; line-height: 1.45; }
+.ep-comp-concerts { margin-top: 40px; }
+
+/* Demo-data disclosure: kept (Klang's data differs from Sheng's) but as quiet fine print, not a box */
+.ep-demo { margin: 14px 0 0; padding: 0 2px; border: 0; border-radius: 0; font-size: 11.5px; line-height: 1.5; }
+.ep-demo .icon svg { width: 12px; height: 12px; }
+
+/* =====================================================================
+   Editorials list (editorial.js · renderList)
+   ===================================================================== */
+/* chips: selected = white pill; others = grey pill, grey label, count in the same colour */
+.ed-chips { padding-top: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.ed-chips .chip { gap: 4px; height: 28px; padding: 0 12px; border-radius: 14px; font-size: 13px; font-weight: 500;
+  background: var(--surface-2); border-color: transparent; color: var(--text-2); }
+.ed-chips .chip .count { font-size: 13px; color: inherit; }
+.ed-chips .chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+.ed-chips .chip.active .count { color: var(--bg); opacity: 1; }
+/* month headers: grey letter-spaced label over a hairline */
+.ed-month-h { margin: 0 -16px 10px; padding: 10px 18px 7px; border-bottom: 1px solid var(--line);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-3); }
+.ed-month + .ed-month { margin-top: 12px; }
+/* one card per editorial (Sheng), not one grouped list per month */
+.ed-group { display: flex; flex-direction: column; gap: 10px; background: none; border: 0; border-radius: 0; overflow: visible; }
+.ed-row { padding: 14px 12px 13px 14px; border-radius: 14px; background: color-mix(in srgb, #e2b65c 4%, var(--surface)); }
+.ed-row + .ed-row { border-top: 0; }
+.ed-row:active { background: var(--surface-2); }
+.ed-row .t { font-size: 18px; font-weight: 700; line-height: 1.25; }
+.ed-row .d { margin-top: 4px; font-size: 13.5px; line-height: 1.42; color: color-mix(in srgb, var(--text-2) 65%, var(--text-3)); }
+.ed-row .meta { gap: 5px; margin-top: 6px; font-size: 12px; }
+.ed-row .meta > span + span::before { margin-right: 5px; }
+.ed-type { font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text-2); }
+.ed-recs { font-weight: 500; }
+
+/* =====================================================================
+   Article (editorial.js · renderArticle)
+   ===================================================================== */
+/* top bar: floating glass back + red share over the text, never a bar (Sheng) */
+.app-header:has(~ #view .ed-article),
+.app-header:has(~ #view .ed-article.ed-scrolled) { background: transparent; border-bottom-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; pointer-events: none; }
+.app-header:has(~ #view .ed-article) .title,
+.app-header:has(~ #view .ed-article.ed-scrolled) .title { visibility: hidden; }
+.app-header:has(~ #view .ed-article) button, .app-header:has(~ #view .ed-article) a { pointer-events: auto; }
+.app-header:has(~ #view .ed-article) .side > .icon-btn {
+  width: 40px; height: 40px; border-radius: 50%; color: var(--text);
+  background: var(--glass); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.app-header:has(~ #view .ed-article) .side > .icon-btn.ed-share { color: var(--accent-strong); }
+
+/* header */
+.ed-actions { gap: 10px; margin: 14px 0 16px; }
+.ed-recpill { height: 30px; padding: 0 14px; font-size: 13px; }
+.ed-add { width: 30px; height: 30px; }
+.ed-title { margin: 0 4px 14px; font-size: 28px; font-weight: 600; line-height: 1.22; letter-spacing: -0.012em; }
+.ed-dek { margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: var(--text-3); }
+.ed-people-sec .caps-label { margin-bottom: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; }
+.ed-people { gap: 8px; }
+.ed-person { gap: 8px; height: 32px; padding: 0 12px 0 3px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-size: 13.5px; color: var(--text); }
+.ed-pav { width: 26px; height: 26px; }
+.ed-rule { margin: 18px 0 20px; }
+
+/* body: Sheng sets the running text in the system sans; serif stays for subheads, quotes and captions */
+.ed-body p { font-family: var(--sans); font-size: 17px; line-height: 1.5; letter-spacing: -0.005em; margin: 0 0 0.85em; hanging-punctuation: none; }
+.ed-h { margin: 1.35em 0 0.5em; font-size: 22px; font-weight: 700; line-height: 1.26; }
+.ed-body .ed-quote p { font-family: var(--serif); }
+.ed-img figcaption { font-size: 12px; }
+
+/* recording embed: cover + play disc, serif caption, performer — no card around it */
+.ed-rec { margin: 1.4em 0 1.3em; }
+.ed-rec-card { gap: 14px; align-items: center; padding: 0; border: 0; border-radius: 0; background: none; }
+.ed-rec.is-current .ed-rec-card { border-color: transparent; }
+.ed-rec-cover { width: 104px; height: 104px; border-radius: 4px; }
+.ed-rec-play { right: 6px; bottom: 6px; width: 26px; height: 26px; background: rgba(255, 255, 255, 0.92); color: #111; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.ed-rec.is-current .ed-rec-play { background: var(--accent); color: #fff; }
+.ed-rec-text { gap: 6px; }
+.ed-rec-cap { font-size: 15.5px; font-weight: 700; line-height: 1.32; }
+.ed-rec-perf { font-size: 12px; }
+.ed-rec-work { margin: 14px 0 0; font-size: 15px; line-height: 1.45; color: var(--text-2); }
+.ed-workchip { height: 30px; margin-top: 14px; padding: 0 14px; border-radius: 15px; border-color: var(--line-strong); font-size: 12.5px; color: var(--text); }
+.ed-workchip .n { flex: none; color: var(--text-3); }
+
+/* concert embed: bare rows with the red-topped date badge, then a link chip */
+.ed-live { margin: 1.3em 0 1.4em; padding: 0; border: 0; border-radius: 0; background: none; }
+.ed-concert { gap: 12px; padding: 7px 0; }
+.ed-concert + .ed-concert { border-top: 0; }
+.ed-concert > .icon { display: none; }
+.ed-concert .t { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.ed-concert .s { margin-top: 3px; font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ed-concert .s b { color: var(--text-3); font-weight: 500; }
+.ed-cbadge { width: 40px; border-radius: 7px; }
+.ed-cbadge .m { padding: 2px 0 1px; font-size: 10px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+.ed-cbadge .d { padding: 2px 0 4px; font-size: 17px; }
+.ed-live > .ed-workchip { margin-top: 12px; }
+.ed-live-none { margin: 0; font-size: 14px; }
+
+/* end matter: END · Rate this article · pills · How … uses AI ⓘ · Sources (blue links) · credit */
+.ed-end { margin: 36px 0 26px; font-size: 12px; letter-spacing: 0.32em; }
+.ed-rate-label { margin-bottom: 12px; font-size: 17px; color: var(--text-3); }
+.ed-stars { gap: 10px; }
+.ed-star { color: color-mix(in srgb, var(--text) 16%, var(--bg)); }
+.ed-star.on { color: var(--gold); }
+.ed-pills { gap: 8px; margin: 26px 0 20px; }
+.ed-pill { gap: 6px; height: 30px; padding: 0 12px; border-radius: 15px; border-color: var(--line-strong); font-size: 12.5px; color: var(--text-3); }
+.ed-pill.report { padding-left: 5px; }
+.ed-pill .dot { width: 17px; height: 17px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-strong); color: var(--bg); font-size: 11px; font-weight: 800; line-height: 1; }
+.ed-how { gap: 6px; margin: 8px auto 20px; font-family: var(--serif); font-size: 14.5px; font-weight: 700; color: var(--text-2); }
+.ed-sources { font-size: 13px; line-height: 1.45; }
+.ed-sources-h { margin-bottom: 8px; font-family: var(--serif); font-size: 14px; font-weight: 700; }
+.ed-sources ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.ed-sources a { color: #8496e4; }
+@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) .ed-sources a { color: #3554c4; } }
+:root[data-theme='light'] .ed-sources a { color: #3554c4; }
+.ed-endmatter > .ed-credit { margin: 26px 8px 0; text-align: center; font-size: 11px; }

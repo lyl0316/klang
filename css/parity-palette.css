@@ -1,0 +1,42 @@
+/* Sheng's dark palette, measured from the reference screenshots (dominant pixel colours):
+   main tabs, composer pages, articles and the Assistant sit on #161618; the concert and work
+   pages, Messages and Me's sub-pages are darker (#0e0e10); Library and the Me root are black with #1c1c1e grouped cells.
+   Dark theme only — the light-theme rules in app.css are more specific and still win. Loaded last. */
+
+:root {
+  --bg: #161618;
+  --surface: #1e1e20;
+  --surface-2: #2a2a2d;
+  --surface-3: #38383b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) body:has(#view .act-page),
+  :root:not([data-theme='light']) body:has(#view .as-page) { --bg: #161618; }
+  :root:not([data-theme='light']) body:has(#view .cp-page),
+  :root:not([data-theme='light']) body:has(#view .ep-workpage),
+  :root:not([data-theme='light']) body:has(#view > .me.nt-page),
+  :root:not([data-theme='light']) body:has(#view > .me.me-region),
+  :root:not([data-theme='light']) body:has(#view > .me.me-hidden) { --bg: #0e0e10; --surface: #1c1c1e; }
+  :root:not([data-theme='light']) body:has(#view > .lib-page),
+  :root:not([data-theme='light']) body:has(#view > [class='me']) { --bg: #000; --surface: #1c1c1e; --surface-2: #2c2c2e; }
+}
+:root[data-theme='dark'] body:has(#view .act-page),
+:root[data-theme='dark'] body:has(#view .as-page) { --bg: #161618; }
+:root[data-theme='dark'] body:has(#view .cp-page),
+:root[data-theme='dark'] body:has(#view .ep-workpage),
+:root[data-theme='dark'] body:has(#view > .me.nt-page),
+:root[data-theme='dark'] body:has(#view > .me.me-region),
+:root[data-theme='dark'] body:has(#view > .me.me-hidden) { --bg: #0e0e10; --surface: #1c1c1e; }
+:root[data-theme='dark'] body:has(#view > .lib-page),
+:root[data-theme='dark'] body:has(#view > [class='me']) { --bg: #000; --surface: #1c1c1e; --surface-2: #2c2c2e; }
+
+/* Composer portraits (js/content/portraits.js) sit over the initials and hide them once loaded. */
+.avatar, .np-composer, .ed-pav { position: relative; overflow: hidden; }
+.avatar > img.face, .np-composer > img.face, .ed-pav > img.face {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 18%; border-radius: inherit;
+  opacity: 0; transition: opacity .25s ease;
+}
+.has-face { color: transparent !important; }
+.has-face > img.face { opacity: 1; }
