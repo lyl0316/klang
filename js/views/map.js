@@ -1,13 +1,21 @@
-// Cities tab — a schematic bubble map of Switzerland (one bubble per city, sized by its
-// upcoming concerts), a card for the tapped city, and the full list of cities by size or
-// grouped by canton.
+// Cities — a schematic bubble map of Switzerland (one bubble per city, sized by its upcoming
+// concerts in the real listings), a card for the tapped city, and the full list of cities by size or
+// grouped by canton. Towns a listing names that Klang has no coordinates for (`lat` null) are listed
+// but not drawn.
 
-import { h, icon, plural } from '../util.js';
+import { h, icon } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { href, followButton, rowItem, segmented, sectionHead, venueLabel } from '../ui/components.js';
 import { SWISS_OUTLINE } from '../data/cities.js';
 import { relDayLabel, timeOf, isPast } from '../time.js';
+import { t, tn, fmtN, cityName, cantonName } from '../i18n.js';
+
+// t() for templates whose values carry their own spacing: t() with values removes spaces between Chinese
+// characters, which would turn the date "10月30日 周五" into "10月30日周五".
+const tKeep = (key, vars) => t(key).replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? String(vars[k]) : m));
+const upcomingText = (n) => (n ? tn(n, '{n} upcoming concert', '{n} upcoming concerts') : t('No upcoming concerts'));
+const cantonLabel = (code) => (code ? cantonName(code, repo.cantonName(code)) : t('Other towns'));
 
 const NS = 'http://www.w3.org/2000/svg';
 const VW = 360;
@@ -57,6 +65,7 @@ function makeProjection(cities) {
 
 export function render() {
   const cities = repo.allCities();
+  const placed = cities.filter((c) => c.lat != null && c.lon != null); // drawn on the map
   const counts = repo.cityCounts();
   const countOf = (id) => counts.get(id) || 0;
   const total = cities.reduce((sum, c) => sum + countOf(c.id), 0);
@@ -64,14 +73,14 @@ export function render() {
   if (selectedId && !repo.city(selectedId)) selectedId = null;
 
   // ---------- map ----------
-  const project = makeProjection(cities);
+  const project = makeProjection(placed);
   const outlineD = `${SWISS_OUTLINE.map(([lon, lat], i) => {
     const [x, y] = project(lon, lat);
     return `${i ? 'L' : 'M'}${r1(x)} ${r1(y)}`;
   }).join(' ')} Z`;
 
   // Largest first so small bubbles sit on top and stay tappable.
-  const nodes = cities
+  const nodes = placed
     .map((city) => {
       const [x, y] = project(city.lon, city.lat);
       const n = countOf(city.id);
@@ -85,19 +94,19 @@ export function render() {
     nd.el = svg('circle', {
       class: 'map-bubble', cx: r1(nd.x), cy: r1(nd.y), r: r1(nd.r),
       tabindex: '0', role: 'button',
-      'aria-label': `${nd.city.name}: ${nd.n ? plural(nd.n, 'upcoming concert') : 'no upcoming concerts'}`,
+      'aria-label': t('{label}: {count}', { label: cityName(nd.city), count: upcomingText(nd.n) }),
       onkeydown: (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           select(nd.id);
         }
       },
-    }, svg('title', {}, `${nd.city.name} · ${nd.n}`));
+    }, svg('title', {}, `${cityName(nd.city)} · ${fmtN(nd.n)}`));
     bubbles.append(nd.el);
   }
   const map = svg('svg', {
     viewBox: `0 0 ${VW} ${VH}`, role: 'group',
-    'aria-label': 'Schematic map of Switzerland. Bubble size shows upcoming concerts per city.',
+    'aria-label': t('Schematic map of Switzerland. Bubble size shows upcoming concerts per city.'),
   }, svg('path', { class: 'map-outline', d: outlineD }), bubbles, labels);
 
   // Tap → the smallest bubble containing the point, else the nearest bubble edge within TAP_SLOP.
@@ -126,7 +135,7 @@ export function render() {
       y: r1(inside ? nd.y : nd.y - nd.r - 3),
       dy: inside ? '0.35em' : null,
       'text-anchor': 'middle',
-    }, nd.city.name);
+    }, cityName(nd.city));
   }
 
   function paintBubbles() {
@@ -143,7 +152,7 @@ export function render() {
   function paintCard() {
     const c = repo.city(selectedId);
     if (!c) {
-      cardWrap.replaceChildren(h('p', { class: 'map-hint' }, 'Tap a bubble to see a city.'));
+      cardWrap.replaceChildren(h('p', { class: 'map-hint' }, t('Tap a bubble to see a city.')));
       return;
     }
     const n = countOf(c.id);
@@ -151,19 +160,26 @@ export function render() {
     cardWrap.replaceChildren(h('div', { class: 'city-card' },
       h('div', { class: 'top' },
         h('div', { class: 'grow' },
-          h('div', { class: 'name' }, c.name),
-          h('div', { class: 'canton' }, repo.cantonName(c.canton))),
+          h('div', { class: 'name' }, cityName(c)),
+          c.canton ? h('div', { class: 'canton' }, cantonLabel(c.canton)) : null),
         followButton('city', c.id),
-        h('button', { class: 'icon-btn', 'aria-label': 'Clear selection', onclick: () => select(null) }, icon('close', 16))),
-      h('div', { class: 'count' },
-        n ? [h('b', {}, n.toLocaleString('en-US')), ` upcoming concert${n === 1 ? '' : 's'}`] : 'No upcoming concerts'),
-      next ? h('div', { class: 'next' }, `Next: ${relDayLabel(next.day)} · ${timeOf(next.start)} · ${venueLabel(next)}`) : null,
+        h('button', { class: 'icon-btn', 'aria-label': t('Clear selection'), onclick: () => select(null) }, icon('close', 16))),
+      h('div', { class: 'count' }, n ? countLine(n) : t('No upcoming concerts')),
+      next ? h('div', { class: 'next' }, tKeep('Next: {when}', { when: `${relDayLabel(next.day)} · ${timeOf(next.start)} · ${venueLabel(next)}` })) : null,
       h('div', { class: 'btns' },
         h('a', {
           class: ['btn', 'small', n > 0 && 'primary'], href: '#/concerts',
           onclick: () => store.setFilters({ cityIds: [c.id], day: null, lookBack: false }),
-        }, icon('calendar', 15), 'Concerts'),
-        h('a', { class: 'btn small', href: href.city(c.id) }, icon('pin', 15), 'City page'))));
+        }, icon('calendar', 15), t('Concerts')),
+        h('a', { class: 'btn small', href: href.city(c.id) }, icon('pin', 15), t('City page')))));
+  }
+
+  // "**12** upcoming concerts" / "**12** 场即将上演的音乐会" — the number in bold
+  function countLine(n) {
+    const text = tn(n, '{n} upcoming concert', '{n} upcoming concerts');
+    const num = fmtN(n);
+    const at = text.indexOf(num);
+    return at < 0 ? text : [text.slice(0, at), h('b', {}, num), text.slice(at + num.length)];
   }
 
   function select(id) {
@@ -177,7 +193,7 @@ export function render() {
   const listWrap = h('div');
 
   function paintSeg() {
-    segWrap.replaceChildren(segmented([['size', 'By size'], ['canton', 'By canton']], listMode, (v) => {
+    segWrap.replaceChildren(segmented([['size', t('By size')], ['canton', t('By canton')]], listMode, (v) => {
       listMode = v;
       paintSeg();
       paintList();
@@ -188,13 +204,13 @@ export function render() {
     const n = countOf(c.id);
     const following = store.isFollowing('city', c.id);
     const row = rowItem({
-      title: following ? [c.name, ' ', icon('star', 13, 'city-star')] : c.name,
-      subtitle: listMode === 'size' ? repo.cantonName(c.canton) : null,
+      title: following ? [cityName(c), ' ', icon('star', 13, 'city-star')] : cityName(c),
+      subtitle: listMode === 'size' ? [c.canton ? cantonLabel(c.canton) : null, c.lat == null ? t('Not on the map') : null].filter(Boolean).join(' · ') || null : null,
       to: href.city(c.id),
-      right: n ? h('span', { class: 'city-count' }, n.toLocaleString('en-US')) : 'No upcoming',
+      right: n ? h('span', { class: 'city-count' }, fmtN(n)) : t('No upcoming'),
     });
     if (!n) row.classList.add('dim');
-    row.setAttribute('aria-label', `${c.name}${following ? ' (following)' : ''}: ${n ? plural(n, 'upcoming concert') : 'no upcoming concerts'}`);
+    row.setAttribute('aria-label', t('{label}: {count}', { label: following ? t('{city} (favourite)', { city: cityName(c) }) : cityName(c), count: upcomingText(n) }));
     return row;
   }
 
@@ -213,15 +229,16 @@ export function render() {
     const cantons = [...groups.entries()]
       .map(([code, list]) => ({
         code,
-        name: repo.cantonName(code),
+        name: cantonLabel(code),
         list: list.sort(bySize),
         total: list.reduce((sum, c) => sum + countOf(c.id), 0),
       }))
-      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+      // towns without a canton ("Other towns") go last
+      .sort((a, b) => !a.code - !b.code || b.total - a.total || a.name.localeCompare(b.name));
     listWrap.replaceChildren(...cantons.flatMap((k) => [
       h('div', { class: 'group-label split' },
         h('span', {}, k.name),
-        h('span', {}, k.total ? plural(k.total, 'concert') : 'No upcoming')),
+        h('span', {}, k.total ? tn(k.total, '{n} concert', '{n} concerts') : t('No upcoming'))),
       h('div', { class: 'group' }, k.list.map(cityRow)),
     ]));
   }
@@ -239,16 +256,16 @@ export function render() {
   paintList();
 
   return {
-    title: 'Cities',
+    title: t('Cities'),
     largeTitle: true,
     body: h('div', { class: 'cities' },
       h('div', { class: 'map-wrap' },
         map,
-        h('div', { class: 'map-caption' }, 'Schematic map · bubble size = upcoming concerts')),
+        h('div', { class: 'map-caption' }, t('Schematic map · bubble size = upcoming concerts'))),
       cardWrap,
       h('section', { class: 'section' },
-        sectionHead('All cities'),
-        h('p', { class: 'lead' }, `${plural(cities.length, 'city', 'cities')} · ${active} with concerts · ${plural(total, 'upcoming concert')}`),
+        sectionHead(t('All cities')),
+        h('p', { class: 'lead' }, [tn(cities.length, '{n} city', '{n} cities'), t('{n} with concerts', { n: fmtN(active) }), tn(total, '{n} upcoming concert', '{n} upcoming concerts')].join(' · ')),
         segWrap,
         listWrap)),
     cleanup: unsub,

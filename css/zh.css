@@ -1,0 +1,58 @@
+/* Simplified Chinese (简体中文) interface: fonts and typography. Active when i18n.js sets
+   <html lang="zh-Hans">. Latin text inside Chinese (names, titles) keeps the Latin faces, which come
+   first in each stack; Chinese characters fall through to PingFang SC / Songti SC (Apple) or Noto. */
+
+:root[lang|="zh"] {
+  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  /* serif headings: Source Serif for Latin, a Song face for Chinese */
+  --serif: 'Source Serif 4', ui-serif, 'New York', Georgia, 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', serif;
+  /* caps labels: CJK has no capitals, so the wide caps tracking is tightened */
+  --tracking-caps: 0.04em;
+}
+
+:root[lang|="zh"] body {
+  font-family: var(--sans);
+  line-break: strict;
+  hyphens: manual;
+  /* Chinese faces have no italics: never slant them artificially (Latin words keep their real italics) */
+  font-synthesis-style: none;
+}
+
+:root[lang|="zh"] :is(button, input, select, textarea) {
+  font-family: var(--sans);
+}
+
+/* Uppercase labels (kickers, section labels, small meta lines): no case transform (it would only shout
+   the Latin words in a Chinese label) and tighter tracking. Area stylesheets can add their own labels to
+   this list in their files with the same two declarations. */
+:root[lang|="zh"] :is(
+  .kicker, .caps-label, .group-label, .result-line, .day-header .dh-kicker, .ent-label,
+  .dc-kicker, .ed-type, .ed-quote cite, .ed-cbadge .m, .ed-colophon, .cp-ch-kicker, .cp-ch-hook b,
+  .cp-reader .sheet-header .t, .ep-caps, .ep-tour, .ep-date .m, .ep-month, .ep-group-title .r, .ep-work .meta,
+  .me-region-sum .k, .nt-kind, .np-kicker, .np-field .k, .as-who, .cc-ens .k, .rail button,
+  .entity-head .facts, .date-block .m, .work-card .s, .city-card .canton, .listen-now .k, .tag
+) {
+  text-transform: none;
+  font-variant-caps: normal;
+  letter-spacing: 0.04em;
+}
+
+/* A touch more leading for running Chinese text. */
+:root[lang|="zh"] :is(p, li, .settings-note) {
+  line-height: 1.65;
+}
+
+/* Short Chinese lines that wrap (notes under buttons, empty states): even lines, no lone character
+   on the second line. */
+:root[lang|="zh"] :is(.hint, .cp-playall-note, .empty p, .empty h3) {
+  text-wrap: balance;
+}
+/* Assistant examples: Chinese has no word breaks, so give the quoted examples the card's full width
+   and they stay on one line at iPhone width (instead of "「本周末日内瓦的室内 / 乐」"). */
+:root[lang|="zh"] .as-examples { padding-left: 0; }
+:root[lang|="zh"] .as-ex { font-size: 12px; }
+/* Interface lines set in italic serif (map and report leads, hero subtitles): upright in Chinese, so the
+   digits don't lean while the characters stand. Published titles and English long-form keep italics. */
+:root[lang|="zh"] :is(.lead, .home-hero .sub, .ed-empty p, .ep-sheet-text p.fine) {
+  font-style: normal;
+}

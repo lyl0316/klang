@@ -3,23 +3,31 @@
 //   #/editorials/<composerId>  -> renderList({ composerId })   "<Composer> · Editorials": All / Featured / Mentioned
 //   #/article/<id>             -> renderArticle({ id })
 // Content: ARTICLES from js/content/editorials.js (may still be empty — elegant empty state).
-// Recording embeds use the free iTunes Search API (metadata only) with the iTunes credit; Klang plays
-// no audio — Play all and each embed open the recording in Apple Music Classical (or Apple Music),
-// which plays it in full. Ratings, saves and the article playlist stay on this device.
-// No community features: no comments, reactions or public reviews.
+// Recording embeds use the free iTunes Search API (metadata only) with the iTunes credit. Listening:
+// a cover plays Apple's 30-second preview inside Klang (ui/preview.js) and "▶ N recordings" previews
+// every recording of the article in order; "Apple Music Classical ↗" (classicalButton) opens the
+// recording — or, in the header, the first one with the rest queued — in full there. Ratings, saves
+// and the article playlist stay on this device. No community features: no comments, reactions or
+// public reviews.
+// "Live in Switzerland" embeds list REAL upcoming concerts (repo.js); an embedded concert that is no
+// longer listed gives way to the real upcoming performances of the article's works, or to nothing.
+// Language: the interface follows i18n.t(); the articles themselves stay English for now (a short
+// note says so in Chinese); composer and city names follow the interface language.
 
-import { h, icon, toast, plural } from '../util.js';
+import { h, icon, toast } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { ARTICLES } from '../content/editorials.js';
-import { searchAlbums, albumTracks, classicalSearchURL } from '../music.js';
-import { listenLink, makePiece, workPiece, pieceURL, toPlain, onListening, playAppName, APPLE_CREDIT, refineQueued } from '../applemusic.js';
+import { searchAlbums, albumTracks, classicalSearchURL, appleMusicSearchURL, ITUNES_CREDIT } from '../music.js';
+import { makePiece, workPiece, pieceURL, toPlain, onListening, playAppName } from '../applemusic.js';
+import { previewButton, classicalButton } from '../ui/preview.js';
 import { openSaveSheet } from '../ui/save.js';
-import { searchTerm, matchWorkTracks } from '../ui/listen.js';
+import { searchTerm } from '../ui/listen.js';
 import { openSheet } from '../ui/sheet.js';
-import { href, chip, emptyState, venueLabel, cityLabel, withFace } from '../ui/components.js';
-import { openReport } from './entity.js';
-import { todayKey, dayKeyOf, timeOf, monthShort, monthLong, dayNum, yearOf, weekdayShort } from '../time.js';
+import { href, chip, emptyState, withFace } from '../ui/components.js';
+import { openReport, workTracks } from './entity.js';
+import { todayKey, dayKeyOf, timeOf, monthShort, dayNum, yearOf, weekdayShort } from '../time.js';
+import { t, tn, fmtN, isZh, cityName, composerName, composerShort, dayMonth, monthName, monthYear, yearLabel } from '../i18n.js';
 
 const SEARCH_LIMIT = 25; // same as listen.js, so one cached iTunes search serves both
 const TYPE_LABEL = { essay: 'Essay', city: 'City', 'on-a-work': 'On a work', 'on-a-form': 'On a form' };
@@ -31,10 +39,14 @@ const findArticle = (id) => articles().find((a) => String(a.id) === String(id));
 const validDay = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d);
 const byDateDesc = (a, b) =>
   String(validDay(b.date) ? b.date : '').localeCompare(String(validDay(a.date) ? a.date : '')) || String(a.title).localeCompare(String(b.title));
-const typeLabel = (t) => (t ? TYPE_LABEL[String(t).toLowerCase()] || String(t) : '');
+// English type name (the filter key); shown through t()
+const typeLabel = (x) => (x ? TYPE_LABEL[String(x).toLowerCase()] || String(x) : '');
 const articleHref = (id) => `#/article/${encodeURIComponent(id)}`;
 const safeUrl = (u) => typeof u === 'string' && /^https?:\/\//i.test(u);
 const stripMarks = (s) => String(s || '').replace(/_([^_\n]+)_/g, '$1');
+// "2 recordings" (zh: "2 个录音" — the shared '{n} recordings' means versions of one work there)
+const recordingsLabel = (n) => (isZh() ? t('Article recordings: {n}', { n: fmtN(n) }) : tn(n, '{n} recording', '{n} recordings'));
+const englishOnly = (text = 'This article is available in English only for now.') => (isZh() ? h('p', { class: 'ed-en-note' }, t(text)) : null);
 
 function recordingBlocks(a) {
   return (a.blocks || []).filter((b) => b && b.type === 'recording' && repo.work(b.workId));
@@ -73,12 +85,16 @@ function composerIdsOf(a) {
 const isFeatured = (a, cid) => (a.composerIds || [])[0] === cid;
 const mentions = (a, cid) => composerIdsOf(a).has(cid);
 
+// "Oct 27" / "10月27日", with the year when it isn't this year
 function fmtDay(d) {
   if (!validDay(d)) return '';
-  const base = `${monthShort(d)} ${dayNum(d)}`;
-  return yearOf(d) === yearOf(todayKey()) ? base : `${base}, ${yearOf(d)}`;
+  if (yearOf(d) === yearOf(todayKey())) return dayMonth(d);
+  return isZh() ? `${yearLabel(yearOf(d))}${dayMonth(d)}` : `${dayMonth(d)}, ${yearOf(d)}`;
 }
-const fmtLongDay = (d) => (validDay(d) ? `${dayNum(d)} ${monthLong(d.slice(0, 7))} ${yearOf(d)}` : '');
+const fmtLongDay = (d) => {
+  if (!validDay(d)) return '';
+  return isZh() ? `${yearLabel(yearOf(d))}${dayMonth(d)}` : `${dayNum(d)} ${monthName(d.slice(0, 7))} ${yearOf(d)}`;
+};
 
 // Inline emphasis: _italic_ -> <em>. Everything else is plain text.
 function rich(text) {
@@ -180,21 +196,21 @@ export function renderList({ composerId } = {}) {
   const comp = composerId ? repo.composer(composerId) : null;
   const all = articles().sort(byDateDesc);
   const scope = comp ? all.filter((a) => mentions(a, comp.id)) : all;
-  const title = comp ? `${comp.name} · Editorials` : 'Editorials';
+  const title = comp ? `${composerName(comp)} · ${t('Editorials')}` : t('Editorials');
   const body = h('div', { class: 'ed-list-page' });
 
   if (!all.length) {
     body.append(h('div', { class: 'ed-empty' },
       illustration('score', 'small'),
-      h('h3', {}, 'The first editorials are on their way'),
-      h('p', {}, 'Essays on works, musical forms and Switzerland’s music cities — written for Klang, with their sources — will appear here.'),
-      h('a', { class: 'btn small', href: '#/concerts' }, icon('calendar', 15), 'Browse concerts')));
+      h('h3', {}, t('The first editorials are on their way')),
+      h('p', {}, t('Essays on works, musical forms and Switzerland’s music cities — written for Klang, with their sources — will appear here.')),
+      h('a', { class: 'btn small', href: '#/concerts' }, icon('calendar', 15), t('Browse concerts'))));
     return { title, back: true, body };
   }
   if (comp && !scope.length) {
-    body.append(emptyState('book', `No editorials on ${comp.short || comp.name} yet`,
-      'New essays are added regularly. Meanwhile, the others are a good read.',
-      h('a', { class: 'btn small', href: '#/editorials' }, 'All editorials')));
+    body.append(emptyState('book', t('No editorials on {name} yet', { name: composerShort(comp) }),
+      t('New essays are added regularly. Meanwhile, the others are a good read.'),
+      h('a', { class: 'btn small', href: '#/editorials' }, t('All editorials'))));
     return { title, back: true, body };
   }
 
@@ -202,22 +218,22 @@ export function renderList({ composerId } = {}) {
   if (comp) {
     const featured = scope.filter((a) => isFeatured(a, comp.id));
     filters = [
-      { key: 'all', label: 'All', items: scope },
-      { key: 'featured', label: 'Featured', items: featured },
-      { key: 'mentioned', label: 'Mentioned', items: scope.filter((a) => !isFeatured(a, comp.id)) },
+      { key: 'all', label: t('All'), items: scope },
+      { key: 'featured', label: t('Featured'), items: featured },
+      { key: 'mentioned', label: t('Mentioned'), items: scope.filter((a) => !isFeatured(a, comp.id)) },
     ];
   } else {
-    const rank = (t) => (TYPE_ORDER.indexOf(t) + 1) || 99;
+    const rank = (x) => (TYPE_ORDER.indexOf(x) + 1) || 99;
     const types = [...new Set(scope.map((a) => typeLabel(a.type)).filter(Boolean))].sort((x, y) => rank(x) - rank(y) || x.localeCompare(y));
-    filters = [{ key: 'all', label: 'All', items: scope },
-      ...types.map((t) => ({ key: t, label: t, items: scope.filter((a) => typeLabel(a.type) === t) }))];
+    filters = [{ key: 'all', label: t('All'), items: scope },
+      ...types.map((x) => ({ key: x, label: t(x), items: scope.filter((a) => typeLabel(a.type) === x) }))];
   }
 
   const memoKey = comp ? comp.id : '';
   let active = filterMemo.get(memoKey) || 'all';
   if (!filters.some((f) => f.key === active)) active = 'all';
 
-  const chipsRow = h('div', { class: 'chip-row ed-chips', role: 'toolbar', 'aria-label': 'Filter editorials' });
+  const chipsRow = h('div', { class: 'chip-row ed-chips', role: 'toolbar', 'aria-label': t('Filter editorials') });
   const listEl = h('div', { class: 'ed-list' });
   const paint = () => {
     chipsRow.replaceChildren(...filters.map((f) => chip(f.label, {
@@ -231,12 +247,12 @@ export function renderList({ composerId } = {}) {
     })));
     const items = filters.find((f) => f.key === active).items;
     listEl.replaceChildren(...(items.length ? monthGroups(items)
-      : [h('p', { class: 'ed-none' }, active === 'featured' ? 'No editorial is centred on this composer yet.' : 'Nothing here yet.')]));
+      : [h('p', { class: 'ed-none' }, active === 'featured' ? t('No editorial is centred on this composer yet.') : t('Nothing here yet.'))]));
   };
   paint();
 
   if (filters.length > 1) body.append(chipsRow);
-  body.append(listEl);
+  body.append(...[englishOnly('Editorials are available in English only for now.'), listEl].filter(Boolean));
   return { title, back: true, body };
 }
 
@@ -249,7 +265,7 @@ function monthGroups(items) {
     g.items.push(a);
   }
   return groups.map((g) => h('section', { class: 'ed-month' },
-    h('h2', { class: 'ed-month-h' }, g.key ? `${monthLong(g.key)} ${g.key.slice(0, 4)}` : 'Undated'),
+    h('h2', { class: 'ed-month-h' }, g.key ? monthYear(g.key) : t('Undated')),
     h('div', { class: 'ed-group' }, g.items.map(articleRow))));
 }
 
@@ -260,9 +276,9 @@ function articleRow(a) {
       h('div', { class: 't' }, rich(a.title)),
       a.dek && h('div', { class: 'd' }, rich(a.dek)),
       h('div', { class: 'meta' },
-        a.type && h('span', { class: 'ed-type' }, typeLabel(a.type)),
+        a.type && h('span', { class: 'ed-type' }, t(typeLabel(a.type))),
         validDay(a.date) && h('span', { class: 'ed-date' }, fmtDay(a.date)),
-        n > 0 && h('span', { class: 'ed-recs' }, `${plural(n, 'recording')} ▸`))),
+        n > 0 && h('span', { class: 'ed-recs' }, `${recordingsLabel(n)} ▸`))),
     icon('chevron', 16, 'faint'));
 }
 
@@ -273,21 +289,19 @@ export function renderArticle({ id } = {}) {
   const a = findArticle(id);
   if (!a) {
     return {
-      title: 'Editorial',
+      title: t('Editorial'),
       back: true,
-      body: emptyState('book', 'Article not found', 'It may have been renamed or taken down.',
-        h('a', { class: 'btn small', href: '#/editorials' }, 'All editorials')),
+      body: emptyState('book', t('Article not found'), t('It may have been renamed or taken down.'),
+        h('a', { class: 'btn small', href: '#/editorials' }, t('All editorials'))),
     };
   }
 
-  // Klang plays no audio: the recordings pill (Play all) and each embed's cover and caption are
-  // real links that open the recording in Apple Music Classical (or Apple Music, chosen in Me).
   const ctx = {
     article: a,
     cards: [], // recording embeds { work, el, save }
     pieces: new Map(), // workId -> the piece its links play (updated in place once the recording is found)
-    links: new Map(), // workId -> listen links that play it
-    lookups: new Map(), // workId -> Promise<{ album, piece } | null>
+    links: new Map(), // workId -> Apple Music Classical links that play it
+    lookups: new Map(), // workId -> Promise<{ album, piece, tracks } | null>
     chain: Promise.resolve(), // lookups run one at a time
     alive: true,
   };
@@ -298,57 +312,65 @@ export function renderArticle({ id } = {}) {
   // (and the Library playlist) play one recording per work.
   const nRec = works.length;
 
-  // --- header: Play all pill + add, title, dek
-  // Play all = the first recording, with the others queued in article order (the mini player's
-  // ⏭ opens the next one in Apple Music).
+  // --- header: "▶ N recordings" (every preview in article order) + add, the first recording in
+  // full in Apple Music Classical (the others queued for the mini player's ⏭), title, dek
   const queue = works.map((w) => ctx.pieces.get(w.id));
-  const pill = nRec ? listenLink(queue[0], [plural(nRec, 'recording'), icon('play', 10)], {
-    cls: 'ed-recpill',
-    queue,
-    index: 0,
-    label: `Play all ${plural(nRec, 'recording')} from this article in ${playAppName()}`,
-  }) : null;
-  if (pill) ctx.links.set(works[0].id, [pill]);
+  let pill = null;
+  let openAll = null;
+  if (nRec) {
+    pill = previewButton({
+      cls: 'ed-recpill pv-lbl',
+      label: t('Play 30-second previews of all {n} recordings in this article', { n: fmtN(nRec) }),
+      resolve: () => Promise.all(works.map((w) => resolveWork(ctx, w).catch(() => null))).then((list) => {
+        // the first few tracks of each work, so that the run reaches every recording (an opera has dozens)
+        const q = list.flatMap((r) => (r ? r.tracks.slice(0, 4) : []));
+        return q.length ? { track: q[0], queue: q } : null;
+      }),
+    });
+    pill.dataset.label = recordingsLabel(nRec);
+    openAll = addLink(ctx, works[0], classicalButton(queue[0], { cls: 'ed-open', queue, index: 0 }));
+    openAll.dataset.label = t('Open in {app}', { app: t(playAppName()) });
+  }
 
   const titleEl = h('h1', { class: 'ed-title' }, rich(a.title));
   const head = h('header', { class: 'ed-head' },
     illustration(a.illustration),
     nRec ? h('div', { class: 'ed-actions' }, pill, addButton(a, ctx, works)) : h('div', { class: 'ed-actions-gap' }),
-    nRec ? h('p', { class: 'ed-listen-note' }, `Plays in full in ${playAppName()}`) : null,
+    openAll ? h('div', { class: 'ed-open-all' }, openAll) : null,
     titleEl,
     a.dek && h('p', { class: 'ed-dek' }, rich(a.dek)));
 
   // --- body
   const bodyEl = h('div', { class: 'ed-body' }, (a.blocks || []).map((b) => renderBlock(b, ctx)));
-  const credit = works.length ? h('p', { class: 'ed-credit' }, APPLE_CREDIT, ' ',
-    h('a', { href: classicalSearchURL(searchTerm(works[0])), target: '_blank', rel: 'noopener' }, 'Open Apple Music Classical'), '.') : null;
+  const credit = works.length ? h('p', { class: 'ed-credit' }, t(ITUNES_CREDIT), isZh() ? '' : ' ',
+    h('a', { href: classicalSearchURL(searchTerm(works[0])), target: '_blank', rel: 'noopener' }, t('Apple Music Classical')), ' · ',
+    h('a', { href: appleMusicSearchURL(searchTerm(works[0])), target: '_blank', rel: 'noopener' }, 'Apple Music'), isZh() ? '' : '.') : null;
 
   const root = h('article', { class: 'ed-article' },
     head,
+    englishOnly(),
     peopleSection(a),
     h('hr', { class: 'ed-rule' }),
     bodyEl,
     endMatter(a, credit));
 
-  // Find every recording now, in article order, so that Play all is ready when tapped.
+  // Find every recording now, in article order, so that the previews and links are ready when tapped.
   for (const w of works) resolveWork(ctx, w).catch(() => {});
 
   // Header title fades in once the big title has scrolled away (CSS in shell.css).
   const onScroll = () => root.classList.toggle('ed-scrolled', titleEl.getBoundingClientRect().bottom < 64);
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  // The recording you last opened in Apple Music lights up; the pill too while its run is playing.
-  const workIds = works.map((w) => w.id).join(' ');
+  // The recording you last opened in Apple Music lights up.
   const unListen = onListening((L) => {
     const wid = L.current?.workId;
     for (const c of ctx.cards) c.el.classList.toggle('is-current', !!wid && c.work.id === wid);
-    pill?.classList.toggle('on', L.queue.length > 1 && L.queue.map((p) => p.workId).join(' ') === workIds);
   });
   const unStore = store.subscribe((topic) => {
     if (topic === 'library') ctx.cards.forEach((c) => c.save.paint());
   });
 
-  const shareBtn = h('button', { class: 'icon-btn ed-share', type: 'button', 'aria-label': 'Share this article', onclick: () => shareArticle(a) }, icon('share', 18));
+  const shareBtn = h('button', { class: 'icon-btn ed-share', type: 'button', 'aria-label': t('Share this article'), onclick: () => shareArticle(a) }, icon('share', 18));
 
   return {
     title: stripMarks(a.title),
@@ -366,23 +388,35 @@ export function renderArticle({ id } = {}) {
 
 // ---------- recordings (Apple Music) ----------
 // A work's links start as an Apple Music search for it, then point at your version (Versions on
-// the work page; else the first recording found) at the work's first track.
+// the work page; else the first recording found) at the work's first track. Its preview plays the
+// work's own tracks on that recording, in order.
 function searchPiece(work) {
   return makePiece({ title: work.title, composer: repo.composer(work.composerId)?.name || null, workId: work.id });
 }
 
 async function lookupWork(work) {
   const albums = await searchAlbums(searchTerm(work), SEARCH_LIMIT);
-  const chosen = store.listenChoice(work.id); // the version picked on the work page, if any
-  const album = albums.find((x) => String(x.id) === String(chosen)) || albums[0] || null;
-  if (!album) return null;
-  let first = null;
-  try {
-    first = matchWorkTracks(work, (await albumTracks(album.id)).tracks)?.tracks[0] || null;
-  } catch {
-    // no track list: the links open the album
+  // the version picked on the work page, else the first of the top three whose tracks name the work
+  const chosen = albums.find((x) => String(x.id) === String(store.listenChoice(work.id)));
+  const candidates = chosen ? [chosen] : albums.slice(0, 3);
+  if (!candidates.length) return null;
+  let album = candidates[0];
+  let tracks = [];
+  for (const a of candidates) {
+    try {
+      const hit = workTracks(work, (await albumTracks(a.id)).tracks);
+      if (hit) {
+        album = a;
+        tracks = hit;
+        break;
+      }
+    } catch {
+      // no track list: the links open the album, there is no preview
+    }
   }
-  return { album, piece: workPiece(work, repo.composer(work.composerId)?.name, album, first) };
+  const composer = repo.composer(work.composerId)?.name || null;
+  for (const x of tracks) Object.assign(x, { trackId: x.id, collectionId: album.id, workId: work.id, workTitle: work.title, composer });
+  return { album, piece: workPiece(work, composer, album, tracks[0] || null), tracks: tracks.filter((x) => x.preview) };
 }
 
 function resolveWork(ctx, work) {
@@ -392,12 +426,12 @@ function resolveWork(ctx, work) {
       if (res && piece) {
         Object.assign(piece, res.piece);
         for (const link of ctx.links.get(work.id) || []) link.href = pieceURL(piece);
-        refineQueued(piece); // Play all tapped before this lookup finished: fix its ⏭ target
       }
       return res;
     });
     ctx.chain = p.catch(() => {});
     ctx.lookups.set(work.id, p);
+    p.catch(() => ctx.lookups.delete(work.id)); // offline: try again on the next tap
   }
   return ctx.lookups.get(work.id);
 }
@@ -422,13 +456,13 @@ function addButton(a, ctx, works) {
     btn.classList.toggle('on', on);
     btn.replaceChildren(icon(on ? 'check' : 'plus', 17));
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    btn.setAttribute('aria-label', on ? 'Remove this article’s playlist from your Library' : 'Add this article’s playlist to your Library');
+    btn.setAttribute('aria-label', on ? t('Remove this article’s playlist from your Library') : t('Add this article’s playlist to your Library'));
   };
   btn.addEventListener('click', () => {
     // Plain pieces (applemusic.js), so Library plays each one in Apple Music Classical.
     const items = works.map((w) => toPlain(pieceOf(ctx, w)));
     const on = store.togglePlaylist({ id, name: stripMarks(a.title), kind: 'article', articleId: a.id, items });
-    toast(on ? 'Added to Library · Playlists' : 'Removed from your Library');
+    toast(on ? t('Added to Library · Playlists') : t('Removed from your Library'));
     paint();
   });
   paint();
@@ -441,11 +475,13 @@ function peopleSection(a) {
     people = (a.composerIds || []).map((cid) => repo.composer(cid)).filter(Boolean).map((c) => ({ name: c.name, composerId: c.id }));
   }
   if (!people.length) return null;
-  return h('section', { class: 'ed-people-sec', 'aria-label': 'In this article' },
-    h('div', { class: 'caps-label' }, 'In this article'),
+  return h('section', { class: 'ed-people-sec', 'aria-label': t('In this article') },
+    h('div', { class: 'caps-label' }, t('In this article')),
     h('div', { class: 'ed-people' }, people.map((p) => {
-      const inner = [withFace(h('span', { class: 'ed-pav', 'aria-hidden': 'true' }), p.name, p.composerId, monogram(p.name)), h('span', { class: 'n' }, p.name)];
-      const to = p.composerId && repo.composer(p.composerId) ? href.composer(p.composerId)
+      const comp = p.composerId ? repo.composer(p.composerId) : null;
+      const shown = comp ? composerName(comp) : p.name;
+      const inner = [withFace(h('span', { class: 'ed-pav', 'aria-hidden': 'true' }), p.name, p.composerId, monogram(p.name)), h('span', { class: 'n' }, shown)];
+      const to = comp ? href.composer(p.composerId)
         : p.artistId && repo.artist(p.artistId) ? href.artist(p.artistId) : null;
       return to ? h('a', { class: 'ed-person', href: to }, inner) : h('span', { class: 'ed-person' }, inner);
     })));
@@ -470,7 +506,7 @@ function renderBlock(b, ctx) {
       return w ? h('div', { class: 'ed-workchip-wrap' }, workChip(w, true)) : null;
     }
     case 'concerts':
-      return concertsEmbed(b);
+      return concertsEmbed(b, ctx.article);
     case 'image':
       return safeUrl(b.src) ? h('figure', { class: 'ed-img' },
         h('img', { src: b.src, alt: b.alt || '', loading: 'lazy' }),
@@ -499,8 +535,10 @@ function saveControl(piece) {
     const on = (piece.collectionId != null && store.hasAlbum(piece.collectionId)) ||
       store.userPlaylists().some((pl) => (pl.items || []).some((it) => it.id === piece.id));
     btn.classList.toggle('on', on);
-    btn.replaceChildren(icon(on ? 'check' : 'plus', 14), on ? 'Saved' : 'Save');
-    btn.setAttribute('aria-label', `${on ? 'Saved' : 'Save'}: ${piece.title}${piece.artist ? `, ${piece.artist}` : ''} — Save to Library`);
+    btn.replaceChildren(icon(on ? 'check' : 'plus', 14), on ? t('Saved') : t('Save'));
+    btn.setAttribute('aria-label', t('{state}: {title} — Save to Library', {
+      state: on ? t('Saved') : t('Save'), title: `${piece.title}${piece.artist ? `, ${piece.artist}` : ''}`,
+    }));
   };
   paint();
   return { el: btn, paint };
@@ -514,24 +552,30 @@ function recordingEmbed(block, ctx) {
   const cap = stripMarks(block.caption || work.title);
   const ph = h('span', { class: 'ed-rec-ph' }, icon('music', 26));
   // Sheng: cover with a play disc, serif caption, performer; then the plain work line and a
-  // work chip. Cover and caption play the recording in Apple Music; "+ Save" keeps it.
-  const cover = addLink(ctx, work, listenLink(piece, [ph, h('span', { class: 'ed-rec-play' }, icon('play', 13))], {
-    cls: 'ed-rec-cover', label: `Play ${cap} in ${playAppName()}`,
-  }));
-  const capLink = addLink(ctx, work, listenLink(piece, rich(block.caption || work.title), {
-    cls: 'ed-rec-cap', label: `${cap}: play in ${playAppName()}`,
-  }));
-  const perf = h('div', { class: 'ed-rec-perf' }, 'Finding a recording…');
+  // work chip. The cover previews the recording in Klang; "Apple Music Classical ↗" plays it in
+  // full; "+ Save" keeps it.
+  const pv = previewButton({
+    cls: 'ed-pv',
+    label: t('Play a 30-second preview of {title}', { title: cap }),
+    resolve: () => resolveWork(ctx, work).then((r) => (r && r.tracks.length ? { track: r.tracks[0], queue: r.tracks } : null)),
+  });
+  const cover = h('span', { class: 'ed-rec-cover', onclick: () => pv.click() }, ph, pv);
+  const open = addLink(ctx, work, classicalButton(piece, { cls: 'ed-open' }));
+  const perf = h('div', { class: 'ed-rec-perf' }, t('Finding a recording…'));
   const save = saveControl(piece);
   const el = h('figure', { class: 'ed-rec', dataset: { work: work.id } },
-    h('div', { class: 'ed-rec-card' }, cover, h('div', { class: 'ed-rec-text' }, capLink, perf, save.el)),
-    h('figcaption', { class: 'ed-rec-work', title: comp?.name || null }, [work.title, work.catalog].filter(Boolean).join(', ')),
+    h('div', { class: 'ed-rec-card' }, cover,
+      h('div', { class: 'ed-rec-text' },
+        h('div', { class: 'ed-rec-cap' }, rich(block.caption || work.title)),
+        perf,
+        h('div', { class: 'ed-rec-btns' }, save.el, open))),
+    h('figcaption', { class: 'ed-rec-work', title: comp ? composerName(comp) : null }, [work.title, work.catalog].filter(Boolean).join(', ')),
     workChip(work));
   ctx.cards.push({ work, el, save });
 
   resolveWork(ctx, work).then((res) => {
     if (!res) {
-      perf.textContent = 'Not found on Apple Music · tap to search';
+      perf.textContent = t('Not found on Apple Music');
       return;
     }
     if (res.album.artwork) ph.replaceWith(h('img', { src: res.album.artwork, alt: '', loading: 'lazy' }));
@@ -539,41 +583,62 @@ function recordingEmbed(block, ctx) {
     perf.title = res.album.title || '';
     save.paint();
   }).catch(() => {
-    perf.textContent = 'Apple Music is not reachable right now';
+    perf.textContent = t('Apple Music is not reachable right now');
   });
   return el;
 }
 
-// Next three Swiss performances of a work (or a composer), as compact rows with a date badge.
-function concertsEmbed(block) {
+// "Live in Switzerland": the next three REAL performances, as compact rows with a date badge.
+// A block may name concerts ({ concertIds }) — those still listed and upcoming are shown; else the
+// block's work (or composer); else, so an embed never points at nothing, the article's own works.
+// With nothing announced, the block keeps a one-line note and its link chip (or disappears).
+function concertsEmbed(block, article) {
+  const today = todayKey();
   const work = block.workId ? repo.work(block.workId) : null;
   const comp = !work && block.composerId ? repo.composer(block.composerId) : null;
-  if (!work && !comp) return null;
-  const list = repo.upcoming(work ? { workId: work.id } : { composerId: comp.id });
-  const label = work ? `${work.title} · live in Switzerland` : `${comp.short || comp.name} · live in Switzerland`;
-  const to = work ? href.work(work.id) : href.composer(comp.id);
+  const named = [...(block.concertIds || []), block.concertId].filter(Boolean)
+    .map((cid) => repo.concert(cid)).filter((c) => c && c.day >= today);
+  let list = named;
+  let alt = false;
+  if (!list.length && (work || comp)) list = repo.upcoming(work ? { workId: work.id } : { composerId: comp.id });
+  if (!list.length && (block.concertIds || block.concertId || !work)) {
+    // the embedded concerts are gone: the article's works on stage instead
+    const ids = new Set([...(article?.workIds || []), ...recordingWorks(article || {}).map((w) => w.id)]);
+    list = ids.size ? repo.upcoming().filter((c) => c.program.some((p) => ids.has(p.workId))) : [];
+    alt = list.length > 0;
+  }
+  if (!work && !comp && !list.length) return null;
+  const name = work ? work.title : comp ? composerShort(comp) : null;
+  const label = name ? t('{name} · live in Switzerland', { name }) : t('Live in Switzerland');
+  const to = work ? href.work(work.id) : comp ? href.composer(comp.id) : null;
   // Sheng embeds the concert rows straight into the text, followed by a centred link chip.
-  const more = h('a', { class: 'ed-workchip', href: to },
-    h('span', { class: 'lbl' }, work ? [work.title, work.catalog].filter(Boolean).join(', ') : (comp.name || comp.short)),
-    list.length > 3 ? h('span', { class: 'n' }, `${list.length} dates`) : null,
-    h('span', { class: 'arr', 'aria-hidden': 'true' }, '→'));
+  const more = to ? h('a', { class: 'ed-workchip', href: to },
+    h('span', { class: 'lbl' }, work ? [work.title, work.catalog].filter(Boolean).join(', ') : composerName(comp)),
+    list.length > 3 && !alt ? h('span', { class: 'n' }, tn(list.length, '{n} date', '{n} dates')) : null,
+    h('span', { class: 'arr', 'aria-hidden': 'true' }, '→')) : null;
   return h('section', { class: 'ed-live', 'aria-label': label },
+    alt ? h('p', { class: 'ed-live-alt' }, t('The works in this article, on stage in Switzerland:')) : null,
     list.length
       ? h('div', { class: 'ed-live-list' }, list.slice(0, 3).map(concertRow))
-      : h('p', { class: 'ed-live-none' }, 'No Swiss dates announced yet.'),
+      : h('p', { class: 'ed-live-none' }, t('No Swiss dates announced yet.')),
     more);
 }
 
 function concertRow(c) {
   const day = c.day || dayKeyOf(c.start);
-  const where = [venueLabel(c), cityLabel(c)].filter(Boolean).join(', ');
-  const year = yearOf(day) !== yearOf(todayKey()) ? ` ${yearOf(day)}` : '';
+  const venue = repo.venue(c.venueId)?.name || c.venueName || '';
+  const where = [venue, cityName(repo.city(c.cityId))].filter(Boolean).join(isZh() ? '，' : ', ');
+  const otherYear = yearOf(day) !== yearOf(todayKey());
+  // "Thu 2027 12:15" / "2027年 周四 12:15"
+  const when = isZh()
+    ? `${otherYear ? `${yearLabel(yearOf(day))} ` : ''}${weekdayShort(day)} ${timeOf(c.start)}`
+    : `${weekdayShort(day)}${otherYear ? ` ${yearOf(day)}` : ''} ${timeOf(c.start)}`;
   return h('a', { class: ['ed-concert', c.status === 'cancelled' && 'is-cancelled'], href: href.concert(c.id) },
     h('span', { class: 'ed-cbadge', 'aria-hidden': 'true' }, h('span', { class: 'm' }, monthShort(day)), h('span', { class: 'd' }, dayNum(day))),
     h('span', { class: 'main' },
       h('span', { class: 't' }, c.title),
-      h('span', { class: 's' }, h('b', {}, `${weekdayShort(day)}${year} ${timeOf(c.start)}`), where ? ` · ${where}` : '',
-        c.status === 'cancelled' ? h('span', { class: 'tag cancelled' }, 'Cancelled') : null)),
+      h('span', { class: 's' }, h('b', {}, when), where ? ` · ${where}` : '',
+        c.status === 'cancelled' ? h('span', { class: 'tag cancelled' }, t('Cancelled')) : null)),
     icon('chevron', 14, 'faint'));
 }
 
@@ -582,30 +647,30 @@ function endMatter(a, credit) {
   const sources = (a.sources || []).filter((s) => s && (s.title || s.url));
   const title = stripMarks(a.title);
   return h('footer', { class: 'ed-endmatter' },
-    h('div', { class: 'ed-end', role: 'separator' }, 'END'),
+    h('div', { class: 'ed-end', role: 'separator' }, t('END')),
     ratingBlock(a),
     h('div', { class: 'ed-pills' },
       h('button', { class: 'ed-pill report', type: 'button', onclick: () => openReport({ kind: 'article', name: `“${title}”`, path: articleHref(a.id) }) },
-        h('span', { class: 'dot', 'aria-hidden': 'true' }, '!'), 'Report a problem'),
-      h('button', { class: 'ed-pill', type: 'button', onclick: () => openWishSheet(a) }, icon('sparkle', 14), 'Wish for a topic'),
-      h('a', { class: 'ed-pill', href: '#/editorials' }, 'Recent editorials')),
-    h('button', { class: 'ed-how', type: 'button', onclick: () => openHowSheet(a, sources.length) }, 'How Klang’s editorials use AI', icon('info', 15)),
+        h('span', { class: 'dot', 'aria-hidden': 'true' }, '!'), t('Report a problem')),
+      h('button', { class: 'ed-pill', type: 'button', onclick: () => openWishSheet(a) }, icon('sparkle', 14), t('Wish for a topic')),
+      h('a', { class: 'ed-pill', href: '#/editorials' }, t('Recent editorials'))),
+    h('button', { class: 'ed-how', type: 'button', onclick: () => openHowSheet(a, sources.length) }, t('How Klang’s editorials use AI'), icon('info', 15)),
     sources.length ? h('div', { class: 'ed-sources' },
-      h('div', { class: 'ed-sources-h' }, 'Sources:'),
+      h('div', { class: 'ed-sources-h' }, t('Sources:')),
       h('ul', {}, sources.map((s) => h('li', {}, safeUrl(s.url)
         ? h('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer' }, s.title || s.url.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0])
         : s.title)))) : null,
     credit,
-    validDay(a.date) ? h('p', { class: 'ed-colophon sr-only' }, `${typeLabel(a.type)} · Published ${fmtLongDay(a.date)}`) : null);
+    validDay(a.date) ? h('p', { class: 'ed-colophon sr-only' }, t('{type} · Published {date}', { type: t(typeLabel(a.type)), date: fmtLongDay(a.date) })) : null);
 }
 
 // "Wish for a topic": Klang has no server, so the wish is shared (or copied) like a report.
 function openWishSheet(a) {
-  const note = h('textarea', { class: 'ep-report-note', rows: '4', placeholder: 'A work, a composer, a city, a form…', 'aria-label': 'Your topic' });
+  const note = h('textarea', { class: 'ep-report-note', rows: '4', placeholder: t('A work, a composer, a city, a form…'), 'aria-label': t('Your topic') });
   const send = async () => {
     const text = note.value.trim();
     if (!text) {
-      toast('Write a topic first');
+      toast(t('Write a topic first'));
       note.focus();
       return;
     }
@@ -614,26 +679,26 @@ function openWishSheet(a) {
       if (navigator.share) await navigator.share({ title: 'Editorial wish', text: msg });
       else {
         await navigator.clipboard.writeText(msg);
-        toast('Copied to the clipboard');
+        toast(t('Copied to the clipboard'));
       }
       sheet.close();
     } catch (err) {
-      if (err?.name !== 'AbortError') toast('Couldn’t share — copy the text instead');
+      if (err?.name !== 'AbortError') toast(t('Couldn’t share — copy the text instead'));
     }
   };
   const sheet = openSheet({
-    title: 'Wish for a topic',
-    closeLabel: 'Close',
+    title: t('Wish for a topic'),
+    closeLabel: t('Close'),
     body: h('div', { class: 'ep-sheet-text' },
-      h('p', {}, 'What should the next editorial be about?'), note,
-      h('p', { class: 'fine' }, 'Klang has no server: share the wish with whoever writes for you, or keep it as a note.')),
-    footer: h('button', { class: 'btn primary block', type: 'button', onclick: send }, icon('share', 16), 'Share wish'),
+      h('p', {}, t('What should the next editorial be about?')), note,
+      h('p', { class: 'fine' }, t('Klang has no server: share the wish with whoever writes for you, or keep it as a note.'))),
+    footer: h('button', { class: 'btn primary block', type: 'button', onclick: send }, icon('share', 16), t('Share wish')),
   });
   sheet.el.classList.add('ep-sheet');
 }
 
 function ratingBlock(a) {
-  const stars = h('div', { class: 'ed-stars', role: 'radiogroup', 'aria-label': 'Rate this article' });
+  const stars = h('div', { class: 'ed-stars', role: 'radiogroup', 'aria-label': t('Rate this article') });
   const paint = () => {
     const n = store.articleRating(a.id);
     stars.replaceChildren(...[1, 2, 3, 4, 5].map((i) => h('button', {
@@ -641,28 +706,28 @@ function ratingBlock(a) {
       type: 'button',
       role: 'radio',
       'aria-checked': i === n ? 'true' : 'false',
-      'aria-label': plural(i, 'star'),
+      'aria-label': tn(i, '{n} star', '{n} stars'),
       onclick: () => {
         const next = i === store.articleRating(a.id) ? 0 : i;
         store.setArticleRating(a.id, next);
-        toast(next ? `Rated ${next} of 5 · saved on this device` : 'Rating removed');
+        toast(next ? t('Rated {n} of 5 · saved on this device', { n: next }) : t('Rating removed'));
         paint();
       },
     }, icon('star', 30))));
   };
   paint();
-  return h('div', { class: 'ed-rate' }, h('div', { class: 'ed-rate-label' }, 'Rate this article'), stars);
+  return h('div', { class: 'ed-rate' }, h('div', { class: 'ed-rate-label' }, t('Rate this article')), stars);
 }
 
 function openHowSheet(a, nSources) {
   const sheet = openSheet({
-    title: 'How Klang’s editorials use AI',
-    closeLabel: 'Close',
+    title: t('How Klang’s editorials use AI'),
+    closeLabel: t('Close'),
     body: h('div', { class: 'ed-how-body' },
-      h('p', {}, 'This editorial was written for Klang with AI assistance and checked against the sources listed at the end of the article.'),
-      h('p', {}, 'Dates, catalogue numbers and first performances follow those sources. Recordings are matched live from Apple Music, so the version you hear may differ from the one described — you can pick another version on each work page.'),
-      h('p', {}, 'Klang has no accounts and no comments. Your rating and the article playlist stay on this device.'),
-      nSources ? h('p', { class: 'faint' }, `${plural(nSources, 'source')} cited for “${stripMarks(a.title)}”.`) : null),
+      h('p', {}, t('This editorial was written for Klang with AI assistance and checked against the sources listed at the end of the article.')),
+      h('p', {}, t('Dates, catalogue numbers and first performances follow those sources. Recordings are matched live from Apple Music, so the version you hear may differ from the one described — you can pick another version on each work page.')),
+      h('p', {}, t('Klang has no accounts and no comments. Your rating and the article playlist stay on this device.')),
+      nSources ? h('p', { class: 'faint' }, tn(nSources, '{n} source cited for “{title}”.', '{n} sources cited for “{title}”.', { title: stripMarks(a.title) })) : null),
   });
   sheet.el.classList.add('ep-sheet');
 }
@@ -681,8 +746,8 @@ async function shareArticle(a) {
   }
   try {
     await navigator.clipboard.writeText(`${text}\n${url}`);
-    toast('Link copied');
+    toast(t('Link copied'));
   } catch {
-    toast('Couldn’t copy — use the address bar link');
+    toast(t('Couldn’t copy — use the address bar link'));
   }
 }

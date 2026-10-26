@@ -1,29 +1,37 @@
 // Shared "Listen" block (work pages), modelled on Sheng's Listen carousel, plus the Versions sheet
 // (also used by the concert page). Recordings ("versions") of a work come from the free iTunes
-// Search API; you choose one (remembered per work). Klang plays no audio itself: Listen and every
-// track open the piece in Apple Music Classical / Apple Music (applemusic.js), where it plays in full
-// with the listener's own subscription. Save puts the piece or its album in the Library (ui/save.js).
+// Search API; you choose one (remembered per work). Two ways to listen (ui/preview.js):
+//   ▶ Preview — Apple's 30-second preview, played inside Klang (music.js; streamed only);
+//   Apple Music Classical ↗ — the full recording in Apple Music Classical / Apple Music
+//   (applemusic.js), played with the listener's own subscription.
+// Save puts the piece or its album in the Library (ui/save.js).
 //
-// Apple terms: every block shows APPLE_CREDIT plus links to Apple Music Classical / Apple Music.
+// Apple terms: every block shows the iTunes preview credit plus links to Apple Music Classical / Apple Music.
 //
 // API:
 //   listenSection(work, { title = 'Listen' }) -> HTMLElement   (lazy: loads when scrolled near)
-//   openVersionsSheet(work, onChoose)                          (rail of all recordings)
+//   openVersionsSheet(work, onChoose, { current, firstAsDefault }) (rail of all recordings; `current`
+//                                                              = id of the recording the page shows)
+//   `work` is a repertoire work, or a stand-in for a programme line the repertoire doesn't know:
+//   { id, title, q (search text), composerName?, catalog?, keys? (catalogue keys, see catalogKeys) }
 // Extras:
-//   searchTerm(work), matchWorkTracks(work, tracks),
+//   searchTerm(work), matchWorkTracks(work, tracks), catalogKeys(text),
+//   previewQueue(tracks, { work, composer, album }) -> albumTracks() tracks ready for the preview player,
 //   chosenTracks(work) -> Promise<{ album, tracks, matched }>  (the work's tracks of the chosen version)
 //   chosenPiece(work)  -> Promise<piece>                       (that version as a playable piece)
 
-import { h, icon, clear, toast, normalize, plural } from '../util.js';
+import { h, icon, clear, toast, normalize } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
-import { searchAlbums, albumTracks, fmtDuration } from '../music.js';
+import { searchAlbums, albumTracks, fmtDuration, ITUNES_CREDIT } from '../music.js';
 import {
-  APPLE_CREDIT, albumURL, searchURL, listenLink, onListening, makePiece, workPiece, albumPiece, playApp, playAppName,
+  albumURL, searchURL, listenLink, onListening, makePiece, workPiece, albumPiece, playApp, playAppName,
 } from '../applemusic.js';
 import { openSaveSheet, saveButton } from './save.js';
 import { openSheet } from './sheet.js';
 import { sectionHead } from './components.js';
+import { previewButton, classicalButton } from './preview.js';
+import { t, tn, isZh, composerShort } from '../i18n.js';
 
 const SEARCH_LIMIT = 25; // one cached search serves both the carousel and the Versions sheet
 const CAROUSEL_MAX = 10;
@@ -35,26 +43,47 @@ export function searchTerm(work) {
   return work.q || [comp?.short, work.title].filter(Boolean).join(' ');
 }
 
+// "Beethoven · Symphony No. 5" / "贝多芬 · Symphony No. 5" (shown); composerOf() is the stored name.
 function workLabel(work) {
   const comp = repo.composer(work.composerId);
-  return [comp?.short, work.title].filter(Boolean).join(' · ');
+  return [comp ? composerShort(comp) : work.composerName, work.title].filter(Boolean).join(' · ');
 }
 
-const composerOf = (work) => repo.composer(work.composerId)?.short || null;
+const composerOf = (work) => repo.composer(work.composerId)?.short || work.composerName || null;
 
 const sameId = (a, b) => a != null && b != null && String(a) === String(b);
 
-function pickChosen(work, albums) {
-  const id = store.listenChoice(work.id);
-  return albums.find((a) => sameId(a.id, id)) || albums[0] || null;
+// Your version of the work (remembered per work), else `current` (the recording a page shows), else
+// the first one found — unless `firstAsDefault` is false.
+function pickChosen(work, albums, { current = null, firstAsDefault = true } = {}) {
+  const id = store.listenChoice(work.id) ?? current;
+  return albums.find((a) => sameId(a.id, id)) || (firstAsDefault ? albums[0] || null : null);
 }
 
 // Space-padded token string, so `includes(' op 12 ')` respects word boundaries.
 const tok = (s) => ` ${normalize(s || '').replace(/[^a-z0-9]+/g, ' ').trim()} `;
 
+// Catalogue numbers in a title as listed: "Sinfonie Nr. 6 F-Dur, op. 68" -> ['Op. 68'];
+// "Die Zauberflöte KV 620" -> ['KV 620', 'K. 620'] (Apple's track titles use either).
+const CATALOG = /\b(op(?:us|\.)?|bwv|kv|k\.|hwv|rv|hob\.?\s*[ivx]+[:/]?|d\.?|wq|woo|sz|bb|trv|mwv\s*[a-z]{0,2})\s*(\d+[a-z]?(?:\s*(?:nr\.?|no\.?)\s*\d+)?)/gi;
+export function catalogKeys(text) {
+  const out = [];
+  for (const m of String(text || '').matchAll(CATALOG)) {
+    const pre = m[1].replace(/\.$/, '').toLowerCase();
+    const num = m[2];
+    if (pre === 'd' && !/^\d{2,3}$/.test(num)) continue; // "D 960", not "D-Dur"
+    const label = /^op/.test(pre) ? `Op. ${num}` : `${m[1].replace(/\.$/, '')} ${num}`;
+    out.push(label);
+    if (pre === 'kv') out.push(`K. ${num}`);
+    if (pre === 'k') out.push(`KV ${num}`);
+  }
+  return [...new Set(out)];
+}
+
 function workKeys(work) {
   const keys = [];
   if (work.catalog) keys.push(tok(work.catalog)); // "BWV 248" -> " bwv 248 "
+  for (const k of work.keys || []) keys.push(tok(k));
   const base = (work.title || '').split(/[“”"«»《》(,:]/)[0]; // "Symphony No. 9" from longer titles
   if (base.trim().length >= 6) keys.push(tok(base));
   return keys.filter((k) => k.trim().length >= 3);
@@ -80,6 +109,25 @@ function movementLabel(title, key) {
   return title;
 }
 
+// albumTracks() tracks with a preview, as entries for the preview player (music.js preview): each keeps
+// its own title/artist and carries the piece fields (workId, composer, collectionId, trackId…) so the
+// player can open the same recording in Apple Music Classical. Build them once per recording and
+// reuse the same objects: the preview player compares tracks by identity.
+export function previewQueue(tracks, { work = null, composer = null, album = null } = {}) {
+  return (tracks || []).filter((tr) => tr && tr.preview).map((tr) => ({
+    ...tr,
+    kind: 'piece',
+    trackId: tr.id,
+    workId: work?.id || null,
+    workTitle: work?.title || null,
+    composer: composer || null,
+    collectionId: album?.id ?? null,
+    album: album?.title || tr.album || '',
+    artwork: album?.artwork || tr.artwork || null,
+    year: album?.year || '',
+  }));
+}
+
 // Tracks of the chosen recording that belong to the work, or the whole album when none match.
 // `matched` says they are the work's own tracks, so tracks[0] is its first movement.
 export async function chosenTracks(work) {
@@ -101,13 +149,15 @@ export async function chosenPiece(work) {
 const extLink = (label, url, iconName = 'external', ariaLabel = null) =>
   h('a', { class: 'btn small', href: url, target: '_blank', rel: 'noopener', 'aria-label': ariaLabel }, icon(iconName, 14), label);
 
+// Apple's terms: previews are credited and shown with a link to Apple Music.
 function creditLine(term) {
-  return h('p', { class: 'listen-credit' }, APPLE_CREDIT, ' ',
-    h('a', { href: searchURL(term, 'classical'), target: '_blank', rel: 'noopener' }, 'Search Apple Music Classical'), ' · ',
-    h('a', { href: searchURL(term, 'music'), target: '_blank', rel: 'noopener' }, 'Apple Music'), '.');
+  return h('p', { class: 'listen-credit' }, t(ITUNES_CREDIT), isZh() ? '' : ' ',
+    h('a', { href: searchURL(term, 'classical'), target: '_blank', rel: 'noopener' }, t('Search Apple Music Classical')), ' · ',
+    h('a', { href: searchURL(term, 'music'), target: '_blank', rel: 'noopener' }, 'Apple Music'));
 }
 
 const otherApp = () => (playApp() === 'music' ? 'classical' : 'music');
+
 
 // ---------- Listen section ----------
 export function listenSection(work, { title = 'Listen' } = {}) {
@@ -116,9 +166,9 @@ export function listenSection(work, { title = 'Listen' } = {}) {
   const comp = composerOf(work);
   const root = h('section', { class: 'section listen-section', dataset: { work: work.id } });
   const body = h('div', { class: 'listen-body' });
-  root.append(sectionHead(title), body);
+  root.append(sectionHead(t(title)), body);
 
-  const carousel = h('div', { class: 'h-scroll listen-carousel', 'aria-label': `Recordings of ${label}` });
+  const carousel = h('div', { class: 'h-scroll listen-carousel', 'aria-label': t('Recordings of {title}', { title: label }) });
   const now = h('div', { class: 'listen-now' });
   const trackList = h('div', { class: 'track-list' });
   const actions = h('div', { class: 'listen-actions' });
@@ -127,6 +177,7 @@ export function listenSection(work, { title = 'Listen' } = {}) {
   let chosen = null;
   let allTracks = [];
   let workMatch = null;
+  let pvTracks = []; // preview entries of the listed tracks (same objects for the preview queue)
   let mode = 'work'; // 'work' = only this work's tracks, 'album' = whole album
   let expanded = false;
   let tracksReady = false;
@@ -176,7 +227,7 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     clear(body).append(
       h('div', { class: 'h-scroll', 'aria-busy': 'true' },
         [0, 1, 2].map(() => h('div', { class: 'album-card' }, h('div', { class: 'art skeleton' }), h('div', { class: 'skeleton listen-skel-line' })))),
-      h('p', { class: 'sr-only', role: 'status' }, 'Loading recordings…'));
+      h('p', { class: 'sr-only', role: 'status' }, t('Loading recordings…')));
   }
 
   async function load() {
@@ -188,7 +239,7 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     } catch (err) {
       albums = null;
       loading = false;
-      paintError(err);
+      paintError();
       return;
     }
     loading = false;
@@ -205,33 +256,34 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     loadTracks();
   }
 
-  function paintError(err) {
+  function paintError() {
     clear(body).append(h('div', { class: 'listen-msg' },
-      h('p', {}, `Couldn’t load recordings${err?.message ? ` — ${err.message}` : ''}.`),
+      h('p', {}, t('Couldn’t load recordings.')),
       h('div', { class: 'listen-actions' },
-        h('button', { class: 'btn small', type: 'button', onclick: load }, 'Try again'),
-        extLink('Search Apple Music Classical', searchURL(term, 'classical'))),
+        h('button', { class: 'btn small', type: 'button', onclick: load }, t('Try again')),
+        extLink(t('Search Apple Music Classical'), searchURL(term, 'classical'))),
       creditLine(term)));
   }
 
   function paintEmpty() {
     clear(body).append(h('div', { class: 'listen-msg' },
-      h('p', {}, 'No recordings of this work found on Apple Music.'),
+      h('p', {}, t('No recordings of this work found on Apple Music.')),
       h('div', { class: 'listen-actions' },
-        extLink('Search Apple Music Classical', searchURL(term, 'classical')),
-        extLink('Apple Music', searchURL(term, 'music'), 'music', 'Search Apple Music')),
+        extLink(t('Search Apple Music Classical'), searchURL(term, 'classical')),
+        extLink('Apple Music', searchURL(term, 'music'), 'music', t('Search Apple Music'))),
       creditLine(term)));
   }
 
   // ----- carousel of versions -----
   function albumCard(a) {
     const on = !!chosen && sameId(a.id, chosen.id);
+    const name = `${a.artist}: ${a.title}${a.year ? `, ${a.year}` : ''}`;
     return h('button', {
       class: ['album-card', on && 'chosen'],
       type: 'button',
       dataset: { id: String(a.id) },
       'aria-pressed': on ? 'true' : 'false',
-      'aria-label': `${a.artist}: ${a.title}${a.year ? `, ${a.year}` : ''}${on ? ' (chosen version)' : ''}`,
+      'aria-label': on ? t('{name} (chosen version)', { name }) : name,
       onclick: () => {
         if (on) return;
         applyChoice(a);
@@ -248,10 +300,11 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     if (chosen && !list.some((a) => sameId(a.id, chosen.id))) list = [chosen, ...list.slice(0, CAROUSEL_MAX - 1)];
     clear(carousel).append(...list.map(albumCard));
     if (albums.length > list.length) {
-      carousel.append(h('button', { class: 'album-card', type: 'button', onclick: openVersions, 'aria-label': `All ${albums.length} versions` },
+      const all = tn(albums.length, 'All {n} version', 'All {n} versions');
+      carousel.append(h('button', { class: 'album-card', type: 'button', onclick: openVersions, 'aria-label': all },
         h('div', { class: 'art more' }, icon('list', 26)),
-        h('div', { class: 't' }, `All ${albums.length} versions`),
-        h('div', { class: 's' }, 'Choose a recording')));
+        h('div', { class: 't' }, all),
+        h('div', { class: 's' }, t('Choose a recording'))));
     }
     requestAnimationFrame(() => {
       const el = carousel.querySelector('.album-card.chosen');
@@ -264,25 +317,26 @@ export function listenSection(work, { title = 'Listen' } = {}) {
 
   function paintNow() {
     clear(now).append(
-      h('span', { class: 'k' }, 'Selected'),
+      h('span', { class: 'k' }, t('Selected')),
       h('span', { class: 'v' }, h('b', {}, chosen.artist), chosen.title ? ` · ${chosen.title}` : ''));
   }
 
-  // Listen (in the chosen app) · Save · Versions · the album in the other app
+  // ▶ Preview (here) · Apple Music Classical ↗ (full) · Save · Versions · the album in the other app
   function paintActions() {
     if (!chosen) return;
     const p = listenPiece();
-    const app = playAppName();
     const other = otherApp();
     clear(actions).append(
-      listenLink(p, [icon('play', 13), p.kind === 'album' ? 'Play album' : 'Listen'], {
-        cls: 'btn small primary',
-        label: p.kind === 'album' ? `Play the whole album in ${app}` : `Listen to ${label} (${chosen.artist}) in ${app}`,
+      previewButton({
+        resolve: () => (tracksReady && pvTracks.length ? { track: pvTracks[0], queue: pvTracks } : null),
+        cls: 'btn small',
+        label: t('Play a 30-second preview of {title}', { title: label }),
       }),
+      classicalButton(p, { cls: 'btn small' }),
       saveButton(p),
-      h('button', { class: 'btn small', type: 'button', onclick: openVersions, 'aria-label': `Versions: ${plural(albums.length, 'recording')}` },
-        icon('list', 15), 'Versions', h('span', { class: 'count' }, albums.length)),
-      extLink(playAppName(other), albumURL(chosen.id, null, other), other === 'music' ? 'music' : 'external', `Open the album in ${playAppName(other)}`));
+      h('button', { class: 'btn small', type: 'button', onclick: openVersions, 'aria-label': t('Versions: {count}', { count: tn(albums.length, '{n} recording', '{n} recordings') }) },
+        icon('list', 15), t('Versions'), h('span', { class: 'count' }, albums.length)),
+      extLink(playAppName(other), albumURL(chosen.id, null, other), other === 'music' ? 'music' : 'external', t('Open the album in {app}', { app: playAppName(other) })));
   }
 
   function openVersions() {
@@ -309,6 +363,7 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     const album = chosen;
     allTracks = [];
     workMatch = null;
+    pvTracks = [];
     mode = 'work';
     expanded = false;
     tracksReady = false;
@@ -325,51 +380,58 @@ export function listenSection(work, { title = 'Listen' } = {}) {
     } catch (err) {
       if (token !== trackToken) return;
       clear(trackList).append(h('div', { class: 'listen-msg' },
-        h('p', {}, 'Couldn’t load the tracks of this recording.'),
+        h('p', {}, t('Couldn’t load the tracks of this recording.')),
         h('div', { class: 'listen-actions' },
-          h('button', { class: 'btn small', type: 'button', onclick: loadTracks }, 'Try again'),
-          extLink('Open the album', albumURL(album.id)))));
+          h('button', { class: 'btn small', type: 'button', onclick: loadTracks }, t('Try again')),
+          extLink(t('Open the album'), albumURL(album.id)))));
     }
     paintActions();
   }
 
   function paintTracks() {
     const list = listedTracks();
+    pvTracks = previewQueue(list, { work: work.id && !String(work.id).startsWith('x-') ? work : null, composer: comp, album: chosen });
     clear(trackList);
     if (!list.length) {
-      trackList.append(h('p', { class: 'listen-msg' }, 'No tracks listed for this recording.'));
+      trackList.append(h('p', { class: 'listen-msg' }, t('No tracks listed for this recording.')));
       return;
     }
     const key = mode === 'work' && workMatch ? workMatch.key : null;
     const visible = expanded ? list : list.slice(0, TRACKS_COLLAPSED);
-    for (const t of visible) trackList.append(trackRow(t, key));
+    for (const tr of visible) trackList.append(trackRow(tr, key));
     const more = [];
     if (list.length > TRACKS_COLLAPSED) {
       more.push(h('button', { class: 'btn small', type: 'button', 'aria-expanded': expanded ? 'true' : 'false', onclick: () => { expanded = !expanded; paintTracks(); } },
-        expanded ? 'Show fewer' : `Show all ${list.length} tracks`));
+        expanded ? t('Show fewer') : tn(list.length, 'Show all {n} track', 'Show all {n} tracks')));
     }
     if (workMatch && workMatch.tracks.length < allTracks.length) {
       more.push(h('button', { class: 'btn small', type: 'button', onclick: () => { mode = mode === 'work' ? 'album' : 'work'; expanded = false; paintTracks(); paintActions(); } },
-        mode === 'work' ? `Whole album · ${allTracks.length}` : 'Only this work'));
+        mode === 'work' ? t('Whole album · {n}', { n: allTracks.length }) : t('Only this work')));
     }
     if (more.length) trackList.append(h('div', { class: 'track-more' }, more));
     paintCurrent();
   }
 
-  // Each track is a link that opens the album at that track in Apple Music Classical / Apple Music.
-  function trackRow(t, key) {
-    const name = movementLabel(t.title || '', key);
-    const inWork = !!workMatch && workMatch.tracks.includes(t);
+  // Each track: ▶ its preview here (the rest of the list follows), the name opens it in Apple Music.
+  function trackRow(tr, key) {
+    const name = movementLabel(tr.title || '', key);
+    const inWork = !!workMatch && workMatch.tracks.includes(tr);
     const p = makePiece({
-      title: t.title || name, composer: inWork ? comp : null, workId: inWork ? work.id : null,
-      artist: t.artist || chosen.artist || '', album: chosen.title || t.album || '',
-      collectionId: chosen.id, trackId: t.id, artwork: chosen.artwork || t.artwork || null, year: chosen.year || '',
+      title: tr.title || name, composer: inWork ? comp : null, workId: inWork ? work.id : null,
+      artist: tr.artist || chosen.artist || '', album: chosen.title || tr.album || '',
+      collectionId: chosen.id, trackId: tr.id, artwork: chosen.artwork || tr.artwork || null, year: chosen.year || '',
     });
-    return h('div', { class: 'track-row', dataset: { id: String(t.id) } },
-      listenLink(p, icon('play', 13), { cls: 'play', label: `Play ${name} in ${playAppName()}` }),
-      h('div', { class: 'tt', title: t.title }, name,
-        t.artist && t.artist !== chosen.artist ? h('div', { class: 'ta' }, t.artist) : null),
-      h('span', { class: 'd' }, fmtDuration(t.durationMs)));
+    const pv = pvTracks.find((x) => x.id === tr.id) || null;
+    return h('div', { class: 'track-row', dataset: { id: String(tr.id) } },
+      previewButton({
+        resolve: () => (pv ? { track: pv, queue: pvTracks.slice(pvTracks.indexOf(pv)) } : null),
+        cls: 'play',
+        label: t('Play a 30-second preview of {title}', { title: name }),
+      }),
+      listenLink(p, h('span', { class: 'tt', title: tr.title }, name,
+        tr.artist && tr.artist !== chosen.artist ? h('span', { class: 'ta' }, tr.artist) : null),
+      { cls: 'track-open', label: t('Play {title} in full in {app}', { title: name, app: playAppName() }) }),
+      h('span', { class: 'd' }, fmtDuration(tr.durationMs)));
   }
 
   // Marks the track last opened in Apple Music (Now listening), if it is one of these.
@@ -396,77 +458,101 @@ export function listenSection(work, { title = 'Listen' } = {}) {
 }
 
 // ---------- Versions sheet ----------
-// Tap a cover to make it your version (remembered per work). Under each cover: ▶ Play opens that
-// recording in Apple Music Classical / Apple Music, + Save puts it in the Library.
-export function openVersionsSheet(work, onChoose) {
+// Tap a cover to make it your version (remembered per work). Under each cover: ▶ Preview plays that
+// recording's 30-second previews here, ↗ opens it in full in Apple Music Classical / Apple Music, and
+// + Save puts it in the Library.
+export function openVersionsSheet(work, onChoose, { current = null, firstAsDefault = true } = {}) {
   const term = searchTerm(work);
   const comp = composerOf(work);
+  const known = !!work.id && !String(work.id).startsWith('x-'); // a repertoire work (not a stand-in)
   let closed = false;
   const body = h('div', { class: 'versions' },
     h('div', { class: 'versions-grid', 'aria-busy': 'true' }, Array.from({ length: 9 }, () => h('div', { class: 'skeleton version-skel' }))));
   const sheet = openSheet({
     title: workLabel(work),
-    subtitle: 'Versions · All recordings',
+    subtitle: t('Versions · All recordings'),
     body,
     footer: creditLine(term),
     onClose: () => { closed = true; },
   });
   sheet.el.classList.add('versions-sheet'); // Sheng: kicker above the title, two-row rail of covers
 
-  const playLink = (a, piece) => listenLink(piece, [icon('play', 10), h('span', {}, 'Play')], {
-    cls: 'version-act play',
-    label: `Play ${a.artist}’s recording${a.year ? ` (${a.year})` : ''} in ${playAppName()}`,
-  });
-
   const pieces = new Map(); // album id -> piece (upgraded to start at the work once its tracks are known)
+  const queues = new Map(); // album id -> preview entries of the work's tracks (else the album's first tracks)
+  const lookups = new Map(); // album id -> Promise of those entries
+
+  function tracksOf(a) {
+    const id = String(a.id);
+    if (!lookups.has(id)) {
+      lookups.set(id, albumTracks(a.id).then(({ tracks }) => {
+        const m = matchWorkTracks(work, tracks);
+        const q = previewQueue(m?.tracks?.length ? m.tracks : tracks.slice(0, 40), { work: known ? work : null, composer: comp, album: a });
+        queues.set(id, q);
+        if (m?.tracks?.length) pieces.set(id, workPiece(known ? work : { title: work.title }, comp, a, m.tracks[0]));
+        return { q, matched: !!m?.tracks?.length };
+      }).catch((err) => { lookups.delete(id); throw err; }));
+    }
+    return lookups.get(id);
+  }
+
+  const openLink = (piece) => classicalButton(piece, { cls: 'version-act open', compact: true });
+
   function versionCard(a, on) {
-    const piece = workPiece(work, comp, a, null);
+    const piece = workPiece(known ? work : { title: work.title }, comp, a, null);
     pieces.set(String(a.id), piece);
+    const who = `${a.artist}${a.year ? ` (${a.year})` : ''}`;
     return h('div', { class: ['version-card', on && 'chosen'], role: 'listitem', dataset: { id: String(a.id) } },
       h('button', {
         class: 'version-pick',
         type: 'button',
         'aria-pressed': on ? 'true' : 'false',
-        'aria-label': `${a.artist}${a.year ? `, ${a.year}` : ''}: ${a.title}${on ? ' (your version)' : ' — make it your version'}`,
+        'aria-label': t(on ? '{name} (your version)' : '{name} — make it your version', { name: `${a.artist}${a.year ? `, ${a.year}` : ''}: ${a.title}` }),
         onclick: () => {
           store.setListenChoice(work.id, a.id);
           onChoose?.(a);
           sheet.close();
-          if (!on) toast(`Your version: ${a.artist}`);
+          if (!on) toast(t('Your version: {artist}', { artist: a.artist }));
         },
       },
       a.artwork ? h('img', { src: a.artwork, alt: '', loading: 'lazy' }) : h('div', { class: 'ph' }, icon('music', 22)),
       h('div', { class: 't' }, a.artist),
       h('div', { class: 's' }, [a.year, a.title].filter(Boolean).join(' · '))),
       h('div', { class: 'version-acts' },
-        playLink(a, piece),
+        previewButton({
+          resolve: () => {
+            const q = queues.get(String(a.id));
+            if (q) return q.length ? { track: q[0], queue: q } : null;
+            return tracksOf(a).then(({ q: list }) => (list.length ? { track: list[0], queue: list } : null));
+          },
+          cls: 'version-act pv',
+          label: t('Play a 30-second preview of {name}’s recording', { name: who }),
+        }),
+        openLink(piece),
         h('button', {
           class: 'version-act save',
           type: 'button',
-          'aria-label': `Save ${a.artist}’s recording${a.year ? ` (${a.year})` : ''} to your Library`,
+          'aria-label': t('Save {name}’s recording to your Library', { name: who }),
           onclick: () => openSaveSheet(pieces.get(String(a.id)) || piece),
-        }, icon('plus', 11), h('span', {}, 'Save'))));
+        }, icon('plus', 11), h('span', {}, t('Save')))));
   }
 
   function paint(albums) {
-    const chosen = pickChosen(work, albums);
+    const chosen = pickChosen(work, albums, { current, firstAsDefault });
     clear(body).append(
-      h('p', { class: 'versions-count' }, plural(albums.length, 'recording'), ' · tap a cover to make it your version'),
+      h('p', { class: 'versions-count' }, tn(albums.length, '{n} recording · tap a cover to make it your version', '{n} recordings · tap a cover to make it your version')),
       h('div', { class: 'versions-grid', role: 'list' }, albums.map((a) => versionCard(a, sameId(a.id, chosen?.id)))));
-    // Every Play / Save starts at the work itself once that album's tracks are known: on compilation
-    // albums track 1 is often another piece. Your version first, then the rest in order, one at a time.
+    // Every Preview / Open / Save starts at the work itself once that album's tracks are known: on
+    // compilation albums track 1 is often another piece. Your version first, then the rest in order.
     const order = chosen ? [chosen, ...albums.filter((a) => !sameId(a.id, chosen.id))] : albums;
     (async () => {
       for (const a of order.slice(0, 12)) {
         if (closed) return;
-        let m = null;
-        try { m = matchWorkTracks(work, (await albumTracks(a.id)).tracks); } catch { /* keep the album link */ }
-        if (closed || !m?.tracks?.length) continue;
-        const piece = workPiece(work, comp, a, m.tracks[0]);
-        pieces.set(String(a.id), piece);
-        const old = body.querySelector(`.version-card[data-id="${CSS.escape(String(a.id))}"] .version-act.play`);
+        let matched = false;
+        try { ({ matched } = await tracksOf(a)); } catch { /* keep the album link */ }
+        if (closed || !matched) continue;
+        const old = body.querySelector(`.version-card[data-id="${CSS.escape(String(a.id))}"] .version-act.open`);
         if (!old) continue;
-        const next = playLink(a, piece);
+        const next = openLink(pieces.get(String(a.id)));
         const focused = document.activeElement === old;
         old.replaceWith(next);
         if (focused) next.focus({ preventScroll: true });
@@ -478,12 +564,12 @@ export function openVersionsSheet(work, onChoose) {
     clear(body).append(h('div', { class: 'listen-msg' },
       h('p', {}, text),
       h('div', { class: 'listen-actions' },
-        extLink('Search Apple Music Classical', searchURL(term, 'classical')),
-        extLink('Apple Music', searchURL(term, 'music'), 'music', 'Search Apple Music'))));
+        extLink(t('Search Apple Music Classical'), searchURL(term, 'classical')),
+        extLink('Apple Music', searchURL(term, 'music'), 'music', t('Search Apple Music')))));
   }
 
   searchAlbums(term, SEARCH_LIMIT)
-    .then((albums) => (albums.length ? paint(albums) : paintMessage('No recordings of this work found on Apple Music.')))
-    .catch((err) => paintMessage(`Couldn’t load recordings${err?.message ? ` — ${err.message}` : ''}.`));
+    .then((albums) => (albums.length ? paint(albums) : paintMessage(t('No recordings of this work found on Apple Music.'))))
+    .catch(() => paintMessage(t('Couldn’t load recordings.')));
   return sheet;
 }

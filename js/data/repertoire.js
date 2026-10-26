@@ -1,4 +1,4 @@
-// Composers and works used to build demo programmes and composer/work pages.
+// Composers and works: the composer/work pages, and what real programme lines are matched against (ics.js).
 // `q` is the search phrase sent to Apple's iTunes Search API to find recordings.
 // `fits` lists the concert types a work can appear in.
 // Facts here are standard reference facts (dates, catalogue numbers, approximate durations).
@@ -43,7 +43,7 @@ export const COMPOSERS = [
 ];
 
 // genre: symphony | concerto | orchestral | chamber | piano | solo | song | opera | sacred
-// fits: which demo concert types may include the work
+// fits: which concert types the work suits (used only by the test generator, js/data/generate.js)
 export const WORKS = [
   // Bach
   { id: 'bach-mass-b-minor', composerId: 'bach', title: 'Mass in B minor', catalog: 'BWV 232', year: 1749, minutes: 110, genre: 'sacred', fits: ['vocal-opera'], q: 'Bach Mass in B minor BWV 232', blurb: 'Bach assembled this Latin Mass in his last years, reworking music written over several decades.' },

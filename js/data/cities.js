@@ -1,14 +1,20 @@
 // The 47 Swiss cities from Sheng's Switzerland location filter (screenshot, 2026-10-25).
-// `snapshot` is the upcoming-concert count Sheng showed for that city; the demo
-// generator reproduces exactly these counts for the window starting DEMO_ANCHOR.
+// `snapshot` is the upcoming-concert count Sheng showed for that city on that day. It is kept only
+// for the test generator (js/data/generate.js, unit tests only); the app never shows it — Klang's counts
+// come from the real listings (js/feed.js → repo.cityCounts()).
 // Coordinates are approximate town centres (WGS84), used only for the schematic map.
+//
+// EXTRA_CITIES are further Swiss towns that the real listings contain. repo.allCities() shows the
+// 47 plus those extras that have concerts; any other town still gets a city of its own (without
+// coordinates), so no real concert is ever dropped. CITY_ALIASES lists German / French / Italian
+// (and Romansh) names so ics.matchCity() recognises "Genf", "Bâle", "Lucerna", "Bienne" …
 
 export const CANTONS = {
   AG: 'Aargau', AR: 'Appenzell Ausserrhoden', BE: 'Bern', BL: 'Basel-Landschaft',
   BS: 'Basel-Stadt', FR: 'Fribourg', GE: 'Geneva', GL: 'Glarus', GR: 'Graubünden',
-  JU: 'Jura', LU: 'Lucerne', NE: 'Neuchâtel', OW: 'Obwalden', SG: 'St. Gallen',
-  SH: 'Schaffhausen', SO: 'Solothurn', SZ: 'Schwyz', TG: 'Thurgau', TI: 'Ticino',
-  VD: 'Vaud', VS: 'Valais', ZG: 'Zug', ZH: 'Zurich',
+  JU: 'Jura', LU: 'Lucerne', NE: 'Neuchâtel', NW: 'Nidwalden', OW: 'Obwalden', SG: 'St. Gallen',
+  SH: 'Schaffhausen', SO: 'Solothurn', SZ: 'Schwyz', TG: 'Thurgau', TI: 'Ticino', UR: 'Uri',
+  AI: 'Appenzell Innerrhoden', VD: 'Vaud', VS: 'Valais', ZG: 'Zug', ZH: 'Zurich',
 };
 
 export const CITIES = [
@@ -60,6 +66,153 @@ export const CITIES = [
   { id: 'teufen', name: 'Teufen', canton: 'AR', lat: 47.39, lon: 9.387, snapshot: 0 },
   { id: 'verbier', name: 'Verbier', canton: 'VS', lat: 46.096, lon: 7.2286, snapshot: 0 },
 ];
+
+// Further Swiss towns seen in (or likely in) the real listings. Same shape as CITIES, without `snapshot`.
+export const EXTRA_CITIES = [
+  // Aargau
+  { id: 'baden', name: 'Baden', canton: 'AG', lat: 47.4733, lon: 8.3059 },
+  { id: 'beinwil-am-see', name: 'Beinwil am See', canton: 'AG', lat: 47.2604, lon: 8.2052 },
+  { id: 'lenzburg', name: 'Lenzburg', canton: 'AG', lat: 47.3884, lon: 8.1755 },
+  { id: 'moriken-wildegg', name: 'Möriken-Wildegg', canton: 'AG', lat: 47.4166, lon: 8.1789 },
+  { id: 'muri', name: 'Muri', canton: 'AG', lat: 47.2743, lon: 8.3384 },
+  { id: 'reinach-ag', name: 'Reinach AG', canton: 'AG', lat: 47.2552, lon: 8.1802 },
+  { id: 'rheinfelden', name: 'Rheinfelden', canton: 'AG', lat: 47.5546, lon: 7.794 },
+  { id: 'wettingen', name: 'Wettingen', canton: 'AG', lat: 47.466, lon: 8.316 },
+  { id: 'windisch', name: 'Windisch', canton: 'AG', lat: 47.4791, lon: 8.2183 },
+  { id: 'wohlen', name: 'Wohlen', canton: 'AG', lat: 47.351, lon: 8.278 },
+  { id: 'zofingen', name: 'Zofingen', canton: 'AG', lat: 47.2876, lon: 7.9459 },
+  // Appenzell, St. Gallen, Thurgau, Glarus
+  { id: 'appenzell', name: 'Appenzell', canton: 'AI', lat: 47.331, lon: 9.4091 },
+  { id: 'rorschach', name: 'Rorschach', canton: 'SG', lat: 47.4778, lon: 9.4903 },
+  { id: 'wil', name: 'Wil', canton: 'SG', lat: 47.4615, lon: 9.0455 },
+  { id: 'rapperswil', name: 'Rapperswil', canton: 'SG', lat: 47.2266, lon: 8.8184 },
+  { id: 'buchs-sg', name: 'Buchs SG', canton: 'SG', lat: 47.1676, lon: 9.4787 },
+  { id: 'kreuzlingen', name: 'Kreuzlingen', canton: 'TG', lat: 47.6506, lon: 9.175 },
+  { id: 'arbon', name: 'Arbon', canton: 'TG', lat: 47.5167, lon: 9.4333 },
+  { id: 'schwanden', name: 'Schwanden', canton: 'GL', lat: 46.9963, lon: 9.0742 },
+  // Basel-Landschaft, Solothurn
+  { id: 'arlesheim', name: 'Arlesheim', canton: 'BL', lat: 47.494, lon: 7.62 },
+  { id: 'muttenz', name: 'Muttenz', canton: 'BL', lat: 47.523, lon: 7.645 },
+  { id: 'binningen', name: 'Binningen', canton: 'BL', lat: 47.54, lon: 7.57 },
+  { id: 'solothurn', name: 'Solothurn', canton: 'SO', lat: 47.2088, lon: 7.5323 },
+  { id: 'grenchen', name: 'Grenchen', canton: 'SO', lat: 47.192, lon: 7.396 },
+  { id: 'dornach', name: 'Dornach', canton: 'SO', lat: 47.48, lon: 7.617 },
+  // Bern
+  { id: 'thun', name: 'Thun', canton: 'BE', lat: 46.758, lon: 7.628 },
+  { id: 'biel', name: 'Biel/Bienne', canton: 'BE', lat: 47.1368, lon: 7.2468 },
+  { id: 'burgdorf', name: 'Burgdorf', canton: 'BE', lat: 47.0567, lon: 7.6278 },
+  { id: 'langenthal', name: 'Langenthal', canton: 'BE', lat: 47.2153, lon: 7.796 },
+  { id: 'interlaken', name: 'Interlaken', canton: 'BE', lat: 46.6863, lon: 7.8632 },
+  { id: 'spiez', name: 'Spiez', canton: 'BE', lat: 46.6866, lon: 7.68 },
+  { id: 'meiringen', name: 'Meiringen', canton: 'BE', lat: 46.7271, lon: 8.1873 },
+  { id: 'lenk', name: 'Lenk', canton: 'BE', lat: 46.457, lon: 7.443 },
+  { id: 'zweisimmen', name: 'Zweisimmen', canton: 'BE', lat: 46.555, lon: 7.373 },
+  { id: 'moutier', name: 'Moutier', canton: 'BE', lat: 47.278, lon: 7.37 },
+  { id: 'saint-imier', name: 'Saint-Imier', canton: 'BE', lat: 47.153, lon: 6.997 },
+  // Central Switzerland
+  { id: 'cham', name: 'Cham', canton: 'ZG', lat: 47.1821, lon: 8.4636 },
+  { id: 'unteraegeri', name: 'Unterägeri', canton: 'ZG', lat: 47.1364, lon: 8.5856 },
+  { id: 'weggis', name: 'Weggis', canton: 'LU', lat: 47.0326, lon: 8.432 },
+  { id: 'vitznau', name: 'Vitznau', canton: 'LU', lat: 47.0101, lon: 8.4842 },
+  { id: 'sursee', name: 'Sursee', canton: 'LU', lat: 47.1714, lon: 8.111 },
+  { id: 'horw', name: 'Horw', canton: 'LU', lat: 47.017, lon: 8.31 },
+  { id: 'emmen', name: 'Emmen', canton: 'LU', lat: 47.0789, lon: 8.2733 },
+  { id: 'schwyz', name: 'Schwyz', canton: 'SZ', lat: 47.0207, lon: 8.653 },
+  { id: 'altdorf', name: 'Altdorf', canton: 'UR', lat: 46.8805, lon: 8.6444 },
+  { id: 'andermatt', name: 'Andermatt', canton: 'UR', lat: 46.636, lon: 8.594 },
+  { id: 'sarnen', name: 'Sarnen', canton: 'OW', lat: 46.896, lon: 8.2461 },
+  { id: 'stans', name: 'Stans', canton: 'NW', lat: 46.9579, lon: 8.3659 },
+  // Zurich
+  { id: 'uster', name: 'Uster', canton: 'ZH', lat: 47.3471, lon: 8.7209 },
+  { id: 'stafa', name: 'Stäfa', canton: 'ZH', lat: 47.2398, lon: 8.7237 },
+  { id: 'meilen', name: 'Meilen', canton: 'ZH', lat: 47.27, lon: 8.643 },
+  { id: 'horgen', name: 'Horgen', canton: 'ZH', lat: 47.2597, lon: 8.598 },
+  { id: 'wadenswil', name: 'Wädenswil', canton: 'ZH', lat: 47.229, lon: 8.672 },
+  { id: 'thalwil', name: 'Thalwil', canton: 'ZH', lat: 47.295, lon: 8.564 },
+  { id: 'kilchberg', name: 'Kilchberg', canton: 'ZH', lat: 47.324, lon: 8.546 },
+  { id: 'zollikon', name: 'Zollikon', canton: 'ZH', lat: 47.34, lon: 8.578 },
+  { id: 'wetzikon', name: 'Wetzikon', canton: 'ZH', lat: 47.3264, lon: 8.7978 },
+  { id: 'bulach', name: 'Bülach', canton: 'ZH', lat: 47.522, lon: 8.54 },
+  { id: 'rheinau', name: 'Rheinau', canton: 'ZH', lat: 47.632, lon: 8.602 },
+  // Graubünden
+  { id: 'st-moritz', name: 'St. Moritz', canton: 'GR', lat: 46.4908, lon: 9.8355 },
+  { id: 'davos', name: 'Davos', canton: 'GR', lat: 46.8027, lon: 9.836 },
+  { id: 'arosa', name: 'Arosa', canton: 'GR', lat: 46.7783, lon: 9.679 },
+  { id: 'bergun', name: 'Bergün', canton: 'GR', lat: 46.6296, lon: 9.7474 },
+  { id: 'cazis', name: 'Cazis', canton: 'GR', lat: 46.7514, lon: 9.43 },
+  { id: 'domat-ems', name: 'Domat/Ems', canton: 'GR', lat: 46.8346, lon: 9.4508 },
+  { id: 'flims', name: 'Flims', canton: 'GR', lat: 46.8352, lon: 9.284 },
+  { id: 'ilanz', name: 'Ilanz', canton: 'GR', lat: 46.7743, lon: 9.2047 },
+  { id: 'klosters', name: 'Klosters', canton: 'GR', lat: 46.869, lon: 9.882 },
+  { id: 'lenzerheide', name: 'Lenzerheide', canton: 'GR', lat: 46.7279, lon: 9.5584 },
+  { id: 'pontresina', name: 'Pontresina', canton: 'GR', lat: 46.49, lon: 9.901 },
+  { id: 'samedan', name: 'Samedan', canton: 'GR', lat: 46.534, lon: 9.872 },
+  { id: 'savognin', name: 'Savognin', canton: 'GR', lat: 46.5967, lon: 9.5974 },
+  { id: 'scuol', name: 'Scuol', canton: 'GR', lat: 46.7963, lon: 10.2977 },
+  { id: 'sils', name: 'Sils im Engadin', canton: 'GR', lat: 46.429, lon: 9.76 },
+  { id: 'thusis', name: 'Thusis', canton: 'GR', lat: 46.6976, lon: 9.4401 },
+  { id: 'trun', name: 'Trun', canton: 'GR', lat: 46.7426, lon: 8.9888 },
+  { id: 'vals', name: 'Vals', canton: 'GR', lat: 46.6163, lon: 9.181 },
+  { id: 'disentis', name: 'Disentis', canton: 'GR', lat: 46.703, lon: 8.853 },
+  { id: 'zuoz', name: 'Zuoz', canton: 'GR', lat: 46.602, lon: 9.959 },
+  { id: 'poschiavo', name: 'Poschiavo', canton: 'GR', lat: 46.324, lon: 10.059 },
+  // Ticino
+  { id: 'bellinzona', name: 'Bellinzona', canton: 'TI', lat: 46.1955, lon: 9.0238 },
+  { id: 'mendrisio', name: 'Mendrisio', canton: 'TI', lat: 45.8706, lon: 8.9817 },
+  { id: 'chiasso', name: 'Chiasso', canton: 'TI', lat: 45.8323, lon: 9.0311 },
+  { id: 'brissago', name: 'Brissago', canton: 'TI', lat: 46.12, lon: 8.718 },
+  // Fribourg, Neuchâtel, Jura
+  { id: 'murten', name: 'Murten', canton: 'FR', lat: 46.9283, lon: 7.1171 },
+  { id: 'bulle', name: 'Bulle', canton: 'FR', lat: 46.6193, lon: 7.057 },
+  { id: 'romont', name: 'Romont', canton: 'FR', lat: 46.6966, lon: 6.9182 },
+  { id: 'mezieres-fr', name: 'Mézières (FR)', canton: 'FR', lat: 46.68, lon: 6.926 },
+  { id: 'granges-paccot', name: 'Granges-Paccot', canton: 'FR', lat: 46.8248, lon: 7.1414 },
+  { id: 'villars-sur-glane', name: 'Villars-sur-Glâne', canton: 'FR', lat: 46.7907, lon: 7.1173 },
+  { id: 'avry-sur-matran', name: 'Avry-sur-Matran', canton: 'FR', lat: 46.788, lon: 7.068 },
+  { id: 'le-locle', name: 'Le Locle', canton: 'NE', lat: 47.056, lon: 6.749 },
+  { id: 'delemont', name: 'Delémont', canton: 'JU', lat: 47.3649, lon: 7.3445 },
+  // Vaud, Geneva
+  { id: 'vevey', name: 'Vevey', canton: 'VD', lat: 46.4628, lon: 6.8419 },
+  { id: 'nyon', name: 'Nyon', canton: 'VD', lat: 46.3833, lon: 6.2398 },
+  { id: 'morges', name: 'Morges', canton: 'VD', lat: 46.5113, lon: 6.4985 },
+  { id: 'rolle', name: 'Rolle', canton: 'VD', lat: 46.4587, lon: 6.3363 },
+  { id: 'yverdon', name: 'Yverdon-les-Bains', canton: 'VD', lat: 46.7785, lon: 6.6411 },
+  { id: 'payerne', name: 'Payerne', canton: 'VD', lat: 46.822, lon: 6.9381 },
+  { id: 'rougemont', name: 'Rougemont', canton: 'VD', lat: 46.4885, lon: 7.2075 },
+  { id: 'chateau-doex', name: 'Château-d’Œx', canton: 'VD', lat: 46.4747, lon: 7.1315 },
+  { id: 'carouge', name: 'Carouge', canton: 'GE', lat: 46.181, lon: 6.139 },
+  // Valais
+  { id: 'martigny', name: 'Martigny', canton: 'VS', lat: 46.1028, lon: 7.0727 },
+  { id: 'monthey', name: 'Monthey', canton: 'VS', lat: 46.2541, lon: 6.9542 },
+  { id: 'sierre', name: 'Sierre', canton: 'VS', lat: 46.292, lon: 7.5323 },
+  { id: 'brig', name: 'Brig', canton: 'VS', lat: 46.3167, lon: 7.9878 },
+  { id: 'zermatt', name: 'Zermatt', canton: 'VS', lat: 46.0207, lon: 7.7491 },
+  { id: 'crans-montana', name: 'Crans-Montana', canton: 'VS', lat: 46.3115, lon: 7.4813 },
+  { id: 'ernen', name: 'Ernen', canton: 'VS', lat: 46.398, lon: 8.145 },
+];
+
+// Other names of the same places (lower case, accents removed — see ics.matchCity). A city's own
+// `name` is always recognised too.
+export const CITY_ALIASES = {
+  zurich: ['zurich', 'zuerich', 'zurigo', 'zuri'], geneva: ['geneve', 'genf', 'ginevra'],
+  basel: ['bale', 'basilea'], bern: ['berne', 'berna'], lucerne: ['luzern', 'lucerna'],
+  lausanne: ['losanna'], 'st-gallen': ['st. gallen', 'st.gallen', 'st gallen', 'sankt gallen', 'saint-gall', 'san gallo'],
+  fribourg: ['freiburg im uechtland', 'freiburg i. ue.', 'friburgo'], neuchatel: ['neuenburg'], sion: ['sitten'],
+  chur: ['coire', 'coira', 'cuira'], 'la-chaux-de-fonds': ['la chaux de fonds'], 'saint-maurice': ['st-maurice', 'st. maurice'],
+  schaffhausen: ['schaffhouse', 'sciaffusa'], porrentruy: ['pruntrut'], dudingen: ['guin', 'duedingen'],
+  saanen: ['gessenay'], zug: ['zoug', 'zugo'], glarus: ['glaris'], kusnacht: ['kuesnacht'],
+  romainmotier: ['romainmotier-envy'], lugano: [], locarno: [], mezieres: ['mezieres (vd)', 'mezieres vd'],
+  // extras
+  biel: ['biel', 'bienne', 'biel/bienne', 'biel-bienne'], solothurn: ['soleure', 'soletta'], thun: ['thoune'],
+  delemont: ['delsberg'], murten: ['morat'], 'st-moritz': ['st. moritz', 'st.moritz', 'sankt moritz', 'san murezzan', 'saint-moritz'],
+  yverdon: ['yverdon', 'yverdon-les-bains'], brig: ['brigue', 'brig-glis'], sierre: ['siders'], martigny: ['martinach'],
+  'domat-ems': ['domat/ems', 'domat ems'], bergun: ['bergun/bravuogn', 'bravuogn'], lenzerheide: ['lenzerheide/lai'],
+  'mezieres-fr': ['mezieres (fr)', 'mezieres fr'], 'reinach-ag': ['reinach ag', 'reinach (ag)'], 'buchs-sg': ['buchs sg', 'buchs (sg)'],
+  muri: ['muri ag', 'muri (ag)', 'muri bei bremgarten'], rapperswil: ['rapperswil-jona', 'rapperswil sg'],
+  unteraegeri: ['unteraegeri'], sils: ['sils', 'sils/segl', 'segl', 'sils maria'], disentis: ['disentis/muster'],
+  'chateau-doex': ["chateau-d'oex", 'chateau d oex', 'chateau doex'], 'crans-montana': ['crans montana'],
+  bellinzona: ['bellinzone'], 'le-locle': ['le locle'], 'saint-imier': ['st-imier', 'st. imier'],
+};
 
 // Very rough, hand-drawn outline of Switzerland as [lon, lat] points. It is only a
 // visual backdrop for the bubble map; it is not geographically precise.

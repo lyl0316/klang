@@ -1,10 +1,17 @@
 // Shared building blocks. Views compose these; styling lives in css/app.css.
+// Interface text goes through i18n.js (English / 简体中文); concert titles, venue names, performers and
+// work titles stay as the venues publish them.
 
 import { h, icon, TYPE_LABELS, toast } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
-import { dayKeyOf, timeOf, todayKey, relDayLabel, monthShort, dayNum, yearOf, isPast, weekdayShort as weekdayShortOf } from '../time.js';
+import { dayKeyOf, timeOf, todayKey, monthShort, dayNum, yearOf, isPast, daysBetween } from '../time.js';
+import {
+  t, tn, fmtN, isZh, relDay, dayMonth, dayMonthLong, weekdayName, weekdayLong, yearLabel,
+  cityName, typeLabel, roleLabel, composerShort,
+} from '../i18n.js';
 import { portraitOf } from '../content/portraits.js';
+import { ZH_ROLES_MORE } from '../i18n/zh-concert.js';
 
 export const href = {
   concert: (id) => `#/concert/${encodeURIComponent(id)}`,
@@ -36,21 +43,69 @@ export function avatar(name, small = false, composerId = null) {
   return withFace(h('div', { class: ['avatar', small && 'sm'] }), name, composerId);
 }
 
+// Venue names stay as the venues publish them (never translated).
 export function venueLabel(c) {
-  return repo.venue(c.venueId)?.name || c.venueName || 'Venue to be announced';
+  return repo.venue(c.venueId)?.name || c.venueName || t('Venue to be announced');
 }
 
+// City in the interface language ("Zurich" / "苏黎世"); towns without a Chinese name keep their own.
 export function cityLabel(c) {
-  return repo.city(c.cityId)?.name || '';
+  return cityName(repo.city(c.cityId)) || '';
 }
+
+// A listing's role ("Conductor", "Violin & direction", an opera character …) in the interface language.
+// The one translator for roles (list cards, concert page, artist pages): Klang's shared names, a few
+// more the listings use (ZH_ROLES_MORE), play-and-lead pairs ("Violin & direction" → "小提琴兼领奏"),
+// instrument pairs ("Oboe & Cor anglais" → "双簧管、英国管") and "Tenor (Évangéliste)" → "男高音（Évangéliste）".
+// Roles nobody has translated (opera characters, German credits) stay as published.
+export function roleText(role) {
+  if (!role) return '';
+  const text = String(role).trim();
+  if (!isZh()) return text;
+  const one = (x) => {
+    const r = t(x);
+    if (r !== x) return r;
+    const l = roleLabel(x);
+    if (l !== x) return l;
+    return ZH_ROLES_MORE[x] || ZH_ROLES_MORE[x.toLowerCase()] || null;
+  };
+  const whole = one(text);
+  if (whole) return whole;
+  const paren = text.match(/^(.+?)\s*\((.+)\)$/);
+  if (paren && one(paren[1])) return `${one(paren[1])}（${paren[2]}）`;
+  const parts = text.split(/\s*&\s*/);
+  if (parts.length < 2) return text;
+  const zh = parts.map(one);
+  if (zh.some((x) => !x)) return text;
+  return parts.some((p) => /^(conductor|direction)$/i.test(p)) ? zh.join('兼') : zh.join('、');
+}
+
+// A source's credit line from the feed ("Source: Casino Bern (casinobern.ch). Facts only; details and
+// tickets via casinobern.ch."): in English as published; in Chinese rebuilt from its parts
+// ("来源：Casino Bern（casinobern.ch）。此处仅列出基本信息……"). Used by the concert page and Legal.
+export function sourceCredit(attribution, name = '') {
+  const a = attribution || '';
+  if (!isZh()) return a || null;
+  const m = /^Source:\s*(.+?)\s*\(([^()]+)\)\.?\s*(.*)$/.exec(a);
+  const who = m ? `${m[1]}（${m[2]}）` : name || '';
+  if (!who) return null;
+  const rest = m ? m[3] : '';
+  const extra = [
+    /facts only/i.test(rest) ? t('Facts only; details and tickets on the organiser’s site.') : null,
+    /licen[cs]e: open use/i.test(rest) ? t('Licence: open use, source must be given.') : null,
+  ].filter(Boolean).join('');
+  return `${t('Source: {name}', { name: who })}。${extra}`;
+}
+
+// "Orchestral" / "管弦乐"
+export const concertType = (type) => typeLabel(type, TYPE_LABELS[type]) || t('Concert');
 
 export function statusTags(c) {
   const tags = [];
-  if (c.status === 'cancelled') tags.push(h('span', { class: 'tag cancelled' }, 'Cancelled'));
-  else if (isPast(c.start, c.durationMin)) tags.push(h('span', { class: 'tag ended' }, '○ Ended'));
-  if (c.featured) tags.push(h('span', { class: 'tag featured' }, '★ Featured'));
-  if (c.source === 'import' || c.source === 'feed') tags.push(h('span', { class: 'tag import' }, 'Imported'));
-  if (c.demo) tags.push(h('span', { class: 'tag demo' }, 'Demo'));
+  if (c.status === 'cancelled') tags.push(h('span', { class: 'tag cancelled' }, t('Cancelled')));
+  else if (isPast(c.start, c.durationMin)) tags.push(h('span', { class: 'tag ended' }, `○ ${t('Ended')}`));
+  if (c.featured) tags.push(h('span', { class: 'tag featured' }, `★ ${t('Featured')}`));
+  if (c.imported) tags.push(h('span', { class: 'tag import' }, t('Imported')));
   return tags;
 }
 
@@ -58,7 +113,20 @@ const MARK_LABEL = { saved: 'Saved', going: 'Going', attended: 'Attended' };
 function markDots(id) {
   const m = store.markOf(id);
   const kinds = store.MARK_KINDS.filter((k) => m[k]);
-  return kinds.length ? kinds.map((k) => h('span', { class: `tag mark ${k}` }, h('i', { class: `mark-dot ${k}` }), MARK_LABEL[k])) : null;
+  return kinds.length ? kinds.map((k) => h('span', { class: `tag mark ${k}` }, h('i', { class: `mark-dot ${k}` }), t(MARK_LABEL[k]))) : null;
+}
+
+// Sheng's list meta date: "Today Oct 26" / "Oct 28, Wed" — Chinese "今天 10月26日" / "10月28日 周三".
+// Only "Today" is red (Sheng); other years add the year.
+function whenLine(day) {
+  const today = todayKey();
+  const diff = daysBetween(today, day);
+  const rel = Math.abs(diff) <= 1 ? relDay(day, today) : null;
+  const md = dayMonth(day);
+  const otherYear = yearOf(day) !== yearOf(today);
+  if (rel) return [h('span', { class: ['rel', diff === 0 && 'is-today'] }, rel), md];
+  if (isZh()) return `${otherYear ? yearLabel(yearOf(day)) : ''}${md} ${weekdayName(day)}`;
+  return [`${md}, ${weekdayName(day)}`, otherYear ? ` ${yearOf(day)}` : ''];
 }
 
 // Concert card like Sheng's list card. opts.hideCity when the list is filtered to one city;
@@ -70,61 +138,53 @@ export function concertCard(c, { hideCity = false, showDate = false } = {}) {
   const items = repo.programItems(c);
   const byComposer = [];
   for (const it of items) {
+    const name = it.composer ? composerShort(it.composer) : it.composerShort || it.composerName;
     const last = byComposer[byComposer.length - 1];
-    if (last && last.name === it.composerShort) last.works.push(it.title);
-    else byComposer.push({ name: it.composerShort || it.composerName, works: [it.title].filter(Boolean) });
+    if (last && last.name === name) last.works.push(it.title);
+    else byComposer.push({ name, works: [it.title].filter(Boolean) });
   }
-  const credits = (c.credits || []).filter((cr) => cr.role !== 'Orchestra' && cr.role !== 'Ensemble' && cr.role !== 'Choir');
-  const ensembles = (c.credits || []).filter((cr) => cr.role === 'Orchestra' || cr.role === 'Ensemble' || cr.role === 'Choir');
-  // Sheng's list meta line: "Today Oct 26 · Venue · City" / "Oct 28, Wed · Venue · City"
-  const rel = relDayLabel(day);
-  const md = `${monthShort(day)} ${dayNum(day)}`;
-  // Sheng: only "Today" is red; "Tomorrow Oct 27" is plain bold white.
-  const whenParts = rel === 'Today' || rel === 'Tomorrow' || rel === 'Yesterday'
-    ? [h('span', { class: ['rel', rel === 'Today' && 'is-today'] }, rel), md]
-    : [`${md}, ${weekdayShortOf(day)}`, yearOf(day) !== yearOf(todayKey()) ? ` ${yearOf(day)}` : ''];
-  const status = c.status === 'cancelled' ? h('span', { class: 'cc-status cancelled' }, 'Cancelled')
-    : isPast(c.start, c.durationMin) ? h('span', { class: 'cc-status' }, h('span', { class: 'ring', 'aria-hidden': 'true' }), 'Ended') : null;
+  const ENS = new Set(['Orchestra', 'Ensemble', 'Choir']);
+  const credits = (c.credits || []).filter((cr) => !ENS.has(cr.role));
+  const ensembles = (c.credits || []).filter((cr) => ENS.has(cr.role));
+  const colon = isZh() ? '：' : ': ';
+  const status = c.status === 'cancelled' ? h('span', { class: 'cc-status cancelled' }, t('Cancelled'))
+    : isPast(c.start, c.durationMin) ? h('span', { class: 'cc-status' }, h('span', { class: 'ring', 'aria-hidden': 'true' }), t('Ended')) : null;
   return h('a', { class: ['concert-card', c.status === 'cancelled' && 'is-cancelled'], href: href.concert(c.id), dataset: { day } },
     h('div', { class: 'cc-meta' },
-      h('span', { class: ['when', isToday && 'today'] }, showDate !== 'time' ? whenParts : timeOf(c.start)),
+      h('span', { class: ['when', isToday && 'today'] }, showDate !== 'time' ? whenLine(day) : timeOf(c.start)),
       where ? h('span', { class: 'where' }, h('span', { class: 'sep', 'aria-hidden': 'true' }, '·'), where) : null,
       status),
-    h('div', { class: 'cc-badges' }, markDots(c.id), c.demo ? h('span', { class: 'tag demo' }, 'Demo') : null,
-      (c.source === 'import' || c.source === 'feed') ? h('span', { class: 'tag import' }, 'Imported') : null),
+    h('div', { class: 'cc-badges' }, markDots(c.id), c.imported ? h('span', { class: 'tag import' }, t('Imported')) : null),
     h('div', { class: 'cc-title' }, c.title),
     c.series && h('div', { class: 'cc-series' }, c.series),
     // Who plays: the orchestra / ensemble / choir gets its own labelled line (recitals have none).
     ensembles.length > 0 ? h('div', { class: 'cc-ens' },
       ensembles.map((cr, i) => [i ? h('span', { class: 'sep', 'aria-hidden': 'true' }, ' · ') : '',
-        h('span', { class: 'cr' }, h('span', { class: 'k' }, cr.role), ' ', h('span', { class: 'n' }, cr.name))])) : null,
+        h('span', { class: 'cr' }, h('span', { class: 'k' }, roleText(cr.role)), ' ', h('span', { class: 'n' }, cr.name))])) : null,
     credits.length > 0 ? h('div', { class: 'cc-credits' },
-      credits.slice(0, 8).map((cr) => [h('b', {}, `${cr.role}: `), cr.name])
+      credits.slice(0, 8).map((cr) => [h('b', {}, `${roleText(cr.role)}${colon}`), cr.name])
         .map((parts, i) => [i ? h('span', { class: 'sep' }, ' · ') : '', h('span', { class: 'cr' }, parts)])) : null,
     byComposer.length > 0 ? h('div', { class: 'cc-program' },
       byComposer.slice(0, 10).map((g) => h('div', { class: 'row' },
         h('div', { class: 'comp' }, g.name),
         g.works.map((w) => h('div', { class: 'work' }, w))))) : null,
-    h('div', { class: 'cc-tags' }, h('span', { class: 'tag' }, TYPE_LABELS[c.type] || 'Concert'), statusTags(c)));
+    h('div', { class: 'cc-tags' }, h('span', { class: 'tag' }, concertType(c.type)), statusTags(c)));
 }
 
-const WEEKDAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const MONTH_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-// Day header: small kicker (Today / Tomorrow / weekday) above a serif date ("26 October").
+// Day header: small kicker (Today / Tomorrow / weekday) above a serif date ("26 October" / "10月26日").
 export function dayHeader(dayKey, count) {
   const today = todayKey();
-  const rel = relDayLabel(dayKey, today);
+  const rel = relDay(dayKey, today);
   const isToday = dayKey === today;
-  const [y, m, d] = dayKey.split('-').map(Number);
-  const weekday = WEEKDAY_LONG[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
-  const kicker = rel === 'Today' || rel === 'Tomorrow' || rel === 'Yesterday' ? `${rel} · ${weekday}` : weekday;
-  const date = `${d} ${MONTH_LONG[m - 1]}${y !== yearOf(today) ? ` ${y}` : ''}`;
+  const weekday = weekdayLong(dayKey);
+  const kicker = rel ? `${rel} · ${weekday}` : weekday;
+  const y = yearOf(dayKey);
+  const date = y === yearOf(today) ? dayMonthLong(dayKey) : isZh() ? `${yearLabel(y)}${dayMonthLong(dayKey)}` : `${dayMonthLong(dayKey)} ${y}`;
   return h('div', { class: 'day-header', dataset: { day: dayKey } },
     h('div', { class: 'dh-main' },
       h('span', { class: ['dh-kicker', isToday && 'today'] }, kicker),
       h('span', { class: 'dh-date' }, date)),
-    count != null && h('span', { class: 'n' }, `${count} concert${count === 1 ? '' : 's'}`));
+    count != null && h('span', { class: 'n' }, tn(count, '{n} concert', '{n} concerts')));
 }
 
 // Compact row: date block + title + venue/city. Used on entity pages.
@@ -158,7 +218,7 @@ export function emptyState(iconName, title, text, action = null) {
 
 export function chip(label, { active = false, count = null, onClick = null, iconName = null, cls = '' } = {}) {
   return h('button', { class: ['chip', active && 'active', count === 0 && 'zero', cls], onclick: onClick, 'aria-pressed': active ? 'true' : 'false' },
-    iconName && icon(iconName, 15), label, count != null && h('span', { class: 'count' }, count.toLocaleString('en-US')));
+    iconName && icon(iconName, 15), label, count != null && h('span', { class: 'count' }, fmtN(count)));
 }
 
 export function segmented(options, value, onChange) {
@@ -191,23 +251,18 @@ export function followButton(kind, id, { labelOn = 'Favourite', labelOff = 'Favo
   const paint = () => {
     const on = store.isFollowing(kind, id);
     btn.className = `btn small ${on ? 'on' : ''}`;
-    btn.replaceChildren(icon(iconName, 15), on ? labelOn : labelOff);
+    btn.replaceChildren(icon(iconName, 15), t(on ? labelOn : labelOff));
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (!(on ? labelOn : labelOff)) btn.setAttribute('aria-label', t('Favourite'));
   };
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const on = store.toggleFollow(kind, id);
-    toast(on ? 'Added to your favourites' : 'Removed from your favourites');
+    toast(t(on ? 'Added to your favourites' : 'Removed from your favourites'));
     paint();
   });
   paint();
   return btn;
-}
-
-export function demoBanner() {
-  return h('div', { class: 'demo-banner' }, icon('sparkle', 16),
-    h('div', {}, 'Showing demo concerts (real venues and works, invented performers). ',
-      h('a', { href: '#/settings' }, 'Import real listings'), ' or turn demo data off in Settings.'));
 }
 
 export function skeletonList(n = 3) {

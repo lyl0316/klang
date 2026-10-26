@@ -9,6 +9,7 @@ import sys
 from functools import partial
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PUBLIC_URL = 'https://lyl0316.github.io/klang/'
 
 
 class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
@@ -19,6 +20,27 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store')
         super().end_headers()
+
+    # Only this Mac uses the dev server. A phone on the home network (e.g. an old Home Screen icon
+    # added from http://<mac>.local:8765) is sent to the published app, which is always up to date.
+    def _from_elsewhere(self):
+        return self.client_address[0] not in ('127.0.0.1', '::1', '::ffff:127.0.0.1')
+
+    def do_GET(self):
+        if self._from_elsewhere():
+            self.send_response(302)
+            self.send_header('Location', PUBLIC_URL)
+            self.end_headers()
+            return
+        super().do_GET()
+
+    def do_HEAD(self):
+        if self._from_elsewhere():
+            self.send_response(302)
+            self.send_header('Location', PUBLIC_URL)
+            self.end_headers()
+            return
+        super().do_HEAD()
 
 
 class Server(http.server.ThreadingHTTPServer):

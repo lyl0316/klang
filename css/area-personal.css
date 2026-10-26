@@ -1,0 +1,126 @@
+/* Personal area: Activity, Library, Assistant, Me, Data & imports, mini player and Now listening.
+   Previews (▶ 30 s inside Klang) and "Apple Music Classical ↗" buttons in these screens build on
+   .pv-btn from css/listening.css. */
+
+/* ---------- preview buttons ---------- */
+/* The round ▶ ring of a row (track, playlist piece, recording card): ▶ when idle, ❚❚ + time left while
+   its preview plays (it widens into a pill). */
+.pv-btn.pv-ring {
+  width: 30px; min-width: 30px; height: 30px; padding: 0; border-radius: 15px; justify-content: center; gap: 4px; flex: none;
+  background: var(--accent-soft); color: var(--accent);
+}
+.pv-btn.pv-ring .pv-t { display: none; }
+.pv-btn.pv-ring.on { width: auto; padding: 0 10px 0 9px; background: var(--accent); color: #fff; }
+.pv-btn.pv-ring.on .pv-t { display: inline; font-size: 12px; }
+.pv-btn.pv-ring.loading .icon { animation: pv-pulse 1s ease-in-out infinite; }
+span.pv-ring.off { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 15px; opacity: 0.35; flex: none; background: var(--surface-2); color: var(--text-3); }
+@keyframes pv-pulse { 50% { opacity: 0.35; } }
+
+/* ↗ only (row-level link to the full piece in Apple Music Classical) */
+.pv-btn.pv-icon { width: 30px; height: 30px; padding: 0; border-radius: 15px; justify-content: center; flex: none; background: transparent; color: var(--accent); }
+.pv-btn.pv-icon .pv-t { display: none; }
+.pv-btn.pv-icon:active { background: var(--surface-2); }
+
+/* Play all (accent) and the sheet-level "Apple Music Classical ↗" */
+.pv-btn.pv-primary, .pv-btn.pv-lg { height: 32px; padding: 0 14px; border-radius: 16px; font-size: 13px; gap: 6px; }
+.pv-btn.pv-primary { background: var(--accent); color: #fff; }
+.pv-btn.pv-primary.on { background: var(--accent-strong); color: #fff; }
+.pv-btn.pv-lg { background: var(--surface-2); color: var(--accent); }
+.lib-actions { align-items: center; }
+.lib-play-in { text-align: center; }
+
+/* ---------- Library rows ---------- */
+.lib-tracks .track-row { gap: 8px; }
+.lib-tracks .track-row .pv-btn.pv-icon { margin-right: -4px; }
+.lib-tracks .track-row.current .pv-ring:not(.on) { background: var(--accent); color: #fff; }
+.pl-item .pv-ring { width: 32px; min-width: 32px; height: 32px; border-radius: 16px; }
+.pl-item .pv-ring.on { width: auto; }
+.pl-item .pv-icon { margin-left: -4px; }
+.pl-item.current .pv-ring:not(.on) { background: var(--accent); color: #fff; }
+
+/* ---------- Activity: listens on the timeline ---------- */
+.tl-item.tl-listen { cursor: default; }
+.tl-pv { justify-content: flex-start; gap: 6px; margin-top: 7px; }
+.tl-pv .pv-btn { height: 26px; font-size: 12px; padding: 0 10px; }
+
+/* ---------- Assistant ---------- */
+.as-cover { position: relative; }
+.as-cover .pv-ring.as-pv { position: absolute; right: 7px; bottom: 7px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); background: rgba(255, 255, 255, 0.92); color: var(--accent); }
+.as-cover .pv-ring.as-pv.on { background: var(--accent); color: #fff; }
+.as-album-actions { gap: 4px; }
+/* "↗ Apple Music Classical" on two short lines, so the full name fits the card */
+.as-album-actions .pv-btn.as-classical {
+  flex: 1; min-width: 0; height: auto; min-height: 32px; padding: 4px 9px; border-radius: 12px; font-size: 11.5px; line-height: 1.15;
+  gap: 5px; justify-content: flex-start; text-align: left; white-space: normal; background: var(--surface-2); color: var(--accent);
+}
+.as-album-actions .as-classical .pv-t { white-space: normal; overflow-wrap: anywhere; }
+.as-album-actions .as-lib { flex: none; }
+.as-np-main { text-align: left; }
+button.as-np-main { background: none; border: 0; padding: 0; color: inherit; font: inherit; }
+
+/* ---------- mini player: preview ---------- */
+.mini-player.pv .mp-pp { color: var(--accent); }
+.mini-player.pv .meta .s { font-variant-numeric: tabular-nums; }
+.mini-player.pv .progress { bottom: 4px; }
+.dock.collapsed .mini-player.pv .progress { left: 22px; right: 22px; }
+
+/* ---------- Now listening: preview transport ---------- */
+.nl-transport { flex: none; }
+.nl-transport:empty { display: none; }
+.nl-progwrap { margin-top: 14px; }
+.nl-prog { height: 4px; border-radius: 2px; background: var(--np-line); overflow: hidden; }
+.nl-prog i { display: block; height: 100%; width: 0; background: #fff; border-radius: 2px; transition: width 0.25s linear; }
+.nl-times { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11.5px; color: var(--np-text-3); font-variant-numeric: tabular-nums; }
+.nl-buttons { display: flex; align-items: center; justify-content: center; gap: 34px; margin-top: 6px; }
+.nl-pp {
+  width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; color: #111; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+}
+.nl-pp:active { transform: scale(0.96); }
+.nl-skip { width: 46px; height: 46px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.nl-skip[disabled] { opacity: 0.3; }
+.nl-skip.ghost { visibility: hidden; }
+.nl-pp:focus-visible, .nl-skip:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.nl.nl-pv .nl-actions { margin-top: 20px; }
+.nl-play.nl-full { height: 46px; background: var(--np-glass); box-shadow: none; font-size: 15px; }
+.nl-pill.nl-pv-btn { flex: 1; height: 42px; border-radius: 21px; font-size: 14px; background: var(--np-glass); color: #fff; padding: 0 14px; gap: 7px; }
+.nl-pill.nl-pv-btn.on { background: rgba(255, 255, 255, 0.24); color: #fff; }
+.nl-qmain { background: none; border: 0; font: inherit; text-align: left; width: 100%; }
+a.nl-qsave { color: var(--np-text-2); }
+
+/* ---------- Me ---------- */
+.me-abroad { margin-top: 26px; }
+.me-abroad > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  margin: 0 6px 8px; font-size: 13px; font-weight: 650; color: var(--text-2);
+}
+.me-abroad > summary::-webkit-details-marker { display: none; }
+.me-abroad > summary::after { content: '›'; font-size: 18px; color: var(--text-3); transition: transform 0.2s; margin-left: 8px; }
+.me-abroad[open] > summary::after { transform: rotate(90deg); }
+.me-abroad-n { margin-left: auto; font-weight: 400; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.me-abroad .me-gfoot { margin: 0 6px 10px; }
+.me-abroad .me-radio.off { opacity: 0.6; }
+
+.me-legal-note { font-size: 12.5px !important; color: var(--text-3) !important; }
+.me-sources { list-style: none; margin: 10px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.me-sources li { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.me-src-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 14px; font-weight: 600; }
+.me-src-top a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+.me-src-n { flex: none; font-size: 12px; font-weight: 400; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.me-src-credit { margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--text-3); overflow-wrap: anywhere; }
+.me-src-flag { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; font-size: 11.5px; color: var(--accent); }
+
+/* ---------- Data & imports ---------- */
+.row-item.me-listings .right { flex: none; }
+.me-refresh { gap: 5px; }
+.me-refresh.busy .icon { animation: me-spin 0.9s linear infinite; }
+@keyframes me-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Chinese interface ---------- */
+:root[lang|="zh"] :is(.nl-label, .act-h small, .me-glabel, .lib-h, .as-rec-head, .me-abroad > summary) {
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+:root[lang|="zh"] .pv-btn { letter-spacing: 0.01em; }
+/* Chinese has no italics: the italic serif leads and titles stand upright. */
+:root[lang|="zh"] :is(.me-legal-lead, .as-np-t, .as-hello, .as-ex, .as-hist-foot, .attended-note, .tl-quote) { font-style: normal; }

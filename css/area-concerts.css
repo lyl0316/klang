@@ -1,0 +1,83 @@
+/* Concerts tab with real listings: end-of-list source line, empty / loading states, and the Location
+   sheet's "Other countries" (Sheng's country chips, regions with their cities, the calm note for
+   countries Klang has no listings for yet). Palette tokens (--p-*) come from parity-concerts.css. */
+
+/* ---------- end of the list: where the listings come from ---------- */
+.concerts-page .cr-end .cr-source {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; max-width: 300px;
+  text-align: center; font-size: 11px; line-height: 1.45; color: var(--text-3);
+}
+.concerts-page .cr-end .cr-source .sub { display: inline-flex; align-items: center; gap: 3px; color: var(--p-g2, var(--text-3)); }
+.concerts-page .cr-end .cr-source:active { opacity: 0.7; }
+
+/* ---------- empty / loading ---------- */
+.concerts-page .concert-list > .empty { padding: 72px 24px 40px; }
+.concerts-page .concert-list > .empty p { max-width: 310px; line-height: 1.5; }
+.concerts-page .cr-loading { padding: 18px 0 0; }
+.concerts-page .cr-loading > p { margin: 0 0 12px; text-align: center; font-size: 12px; }
+
+/* ---------- Location sheet ---------- */
+/* "Current country: Switzerland        ▭ Other countries ›" */
+.cr-country.loc-country { gap: 10px; }
+.cr-country > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cr-country .cr-other {
+  flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 0 4px 6px;
+  background: none; border: 0; color: var(--p-g1); font: inherit; font-size: 11.5px; cursor: pointer;
+}
+.cr-country .cr-other .flag { display: inline-block; }
+.cr-country .cr-other .flag-globe { display: inline-flex; color: var(--p-g1); }
+.cr-country .cr-other.open { color: var(--text); }
+
+/* "Select all" row with the Map link on the right (Switzerland) */
+.cr-check-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; border-top: 1px solid var(--line); }
+.cr-check-row > .cr-check { flex: 1; min-width: 0; margin-top: 0; border-top: 0; }
+.cr-check-row > .cr-map { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--p-g1); }
+.cr-check input:indeterminate { background: var(--p-t1); border-color: var(--p-t1); }
+.cr-check input:indeterminate::after { content: ''; width: 8px; height: 2px; border-radius: 1px; background: var(--p-surf); }
+
+/* Sheng's country chips: plain grey pills, the current country white (not the excluded-city look) */
+.cr-country-chips { margin-top: 14px; }
+.sheet.cr-location .cr-country-chips .chip:not(.active) { background: var(--p-fill); border-color: var(--p-fill); color: var(--p-t2); }
+.sheet.cr-location .cr-country-chips .chip:not(.active) .count { color: var(--p-g1); }
+
+/* calm note for a country without listings */
+.cr-note {
+  display: flex; align-items: flex-start; gap: 9px; margin-top: 12px; padding: 10px 12px;
+  border-radius: 10px; background: var(--p-fill); color: var(--p-t2); font-size: 12.5px; line-height: 1.45;
+}
+.cr-note > .icon { flex: none; margin-top: 1px; color: var(--p-g1); }
+.cr-note p { margin: 0; }
+.cr-none { margin: 14px 2px 0; font-size: 12.5px; color: var(--p-g2); }
+
+/* regions (German states, US states, Japanese prefectures …): checkbox · name · "31 cities" · › */
+.cr-regions { margin-top: 2px; }
+.cr-region { border-bottom: 1px solid var(--line); }
+.cr-region-row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 2px; }
+.cr-region-row input {
+  appearance: none; -webkit-appearance: none; flex: none; width: 17px; height: 17px; margin: 0; border-radius: 4px;
+  border: 1.5px solid var(--p-g1); background: transparent; display: inline-grid; place-content: center;
+}
+.cr-region-row input:checked, .cr-region-row input:indeterminate { background: var(--p-t1); border-color: var(--p-t1); }
+.cr-region-row input:checked::after { content: ''; width: 8px; height: 4.5px; border: solid var(--p-surf); border-width: 0 0 2px 2px; transform: translateY(-1px) rotate(-45deg); }
+.cr-region-row input:indeterminate::after { content: ''; width: 8px; height: 2px; border-radius: 1px; background: var(--p-surf); }
+.cr-region-name {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; align-self: stretch;
+  padding: 0; background: none; border: 0; color: var(--text); font: inherit; text-align: left; cursor: pointer;
+}
+.cr-region-name .nm { font-size: 13.5px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cr-region-name .n { flex: none; font-size: 11px; color: var(--p-g2); }
+.cr-region-name > .icon { margin-left: auto; color: var(--p-g3); }
+.cr-region > .chip-wrap { padding: 2px 0 12px 31px; }
+.cr-sub { margin: 16px 0 8px; font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-g2); }
+/* other countries' city chips are never "excluded"-dark: they are simply empty */
+.sheet.cr-location .cr-regions .chip:not(.active), .sheet.cr-location .cr-note ~ .chip-wrap .chip:not(.active) { background: var(--p-off); border-color: var(--p-off); }
+
+/* Chinese: no capitals, tighter tracking (see css/zh.css) */
+:root[lang|="zh"] .cr-sub { text-transform: none; letter-spacing: 0.04em; font-size: 11px; }
+:root[lang|="zh"] .rail.cr-rail button.m { letter-spacing: 0; }
+:root[lang|="zh"] .rail-bubble.cr-bubble b { letter-spacing: 0; }
+
+/* concert cards: the ensemble label ("Orchestra" / "乐团") never breaks inside itself */
+.concert-card .cc-ens .k { white-space: nowrap; }
+.concert-card .cc-credits .cr > b { white-space: nowrap; }
+.concerts-page .concert-list > .empty p, .cr-note p { text-wrap: pretty; }

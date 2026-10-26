@@ -1,5 +1,9 @@
 // Date helpers. All concert times are Swiss local time (Europe/Zurich).
 // A "day key" is a 'YYYY-MM-DD' string for a calendar day in Zurich.
+// Labels (weekdayShort, monthShort, monthLong, relDayLabel, fullDateTime) follow the interface
+// language (i18n.js): "Tue" / "周二", "Sat, Nov 1" / "11月1日 周六". Times are always 24 h ("19:30").
+
+import { isZh, t, weekdayName, monthShortName, monthName, dayMonth, yearLabel } from './i18n.js';
 
 export const TZ = 'Europe/Zurich';
 
@@ -73,29 +77,29 @@ export function monthKeyOf(dayKey) {
   return dayKey.slice(0, 7);
 }
 
-const WD_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const MONTH_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-export const weekdayShort = (dayKey) => WD_SHORT[weekdayOf(dayKey)];
-export const monthShort = (dayKey) => MONTH_SHORT[Number(dayKey.slice(5, 7)) - 1];
-export const monthLong = (monthKey) => MONTH_LONG[Number(monthKey.slice(5, 7)) - 1];
+export const weekdayShort = (dayKey) => weekdayName(dayKey);
+export const monthShort = (dayKey) => monthShortName(dayKey);
+export const monthLong = (monthKey) => monthName(monthKey);
 export const dayNum = (dayKey) => Number(dayKey.slice(8, 10));
 export const yearOf = (dayKey) => Number(dayKey.slice(0, 4));
 
 // "Today" / "Tomorrow" / "Sat, Nov 1" (+ year when not the current year)
+// Chinese: "今天" / "明天" / "11月1日 周六" ("2027年1月5日 周二")
 export function relDayLabel(dayKey, today = todayKey()) {
   const diff = daysBetween(today, dayKey);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Tomorrow';
-  if (diff === -1) return 'Yesterday';
+  if (diff === 0) return t('Today');
+  if (diff === 1) return t('Tomorrow');
+  if (diff === -1) return t('Yesterday');
+  const sameYear = yearOf(dayKey) === yearOf(today);
+  if (isZh()) return `${sameYear ? '' : yearLabel(yearOf(dayKey))}${dayMonth(dayKey)} ${weekdayShort(dayKey)}`;
   const base = `${weekdayShort(dayKey)}, ${monthShort(dayKey)} ${dayNum(dayKey)}`;
-  return yearOf(dayKey) === yearOf(today) ? base : `${base}, ${yearOf(dayKey)}`;
+  return sameYear ? base : `${base}, ${yearOf(dayKey)}`;
 }
 
-// "Sun, Oct 25, 2026 · 19:30"
+// "Sun, Oct 25, 2026 · 19:30" / "2026年10月25日 周日 · 19:30"
 export function fullDateTime(iso) {
   const k = dayKeyOf(iso);
+  if (isZh()) return `${yearLabel(yearOf(k))}${dayMonth(k)} ${weekdayShort(k)} · ${timeOf(iso)}`;
   return `${weekdayShort(k)}, ${monthShort(k)} ${dayNum(k)}, ${yearOf(k)} · ${timeOf(iso)}`;
 }
 

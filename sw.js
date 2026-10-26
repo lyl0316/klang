@@ -1,8 +1,10 @@
 // Klang service worker: makes the installed app open offline.
 // Network-first for Klang's own files (so updates show immediately), with a cached fallback.
-// Google Fonts are cached; Apple (iTunes) data and artwork are never cached here. Klang plays no
-// audio: Listen opens Apple Music Classical / Apple Music.
-const CACHE = 'klang-shell-v4';
+// Google Fonts are cached; Apple (iTunes) data, artwork and the 30-second previews are never cached
+// here (previews stream from Apple; full pieces open in Apple Music Classical / Apple Music). The real
+// listings (data/concerts.json) are not precached: they are fetched network-first like any own file,
+// and feed.js also keeps a copy for an instant, offline start.
+const CACHE = 'klang-shell-v5';
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -11,6 +13,10 @@ const SHELL = [
   './icon.svg',
   './icon-180.png',
   './css/app.css',
+  './css/area-concert.css',
+  './css/area-concerts.css',
+  './css/area-pages.css',
+  './css/area-personal.css',
   './css/listening.css',
   './css/parity-concerts.css',
   './css/parity-discover.css',
@@ -19,8 +25,11 @@ const SHELL = [
   './css/parity-personal.css',
   './css/shell.css',
   './css/theme.css',
+  './css/zh.css',
   './js/applemusic.js',
   './js/assistant-engine.js',
+  './js/feed.js',
+  './js/i18n.js',
   './js/ics.js',
   './js/main.js',
   './js/music.js',
@@ -31,8 +40,16 @@ const SHELL = [
   './js/ui/components.js',
   './js/ui/listen.js',
   './js/ui/player.js',
+  './js/ui/preview.js',
   './js/ui/save.js',
   './js/ui/sheet.js',
+  './js/i18n/zh-concert.js',
+  './js/i18n/zh-concerts.js',
+  './js/i18n/zh-names.js',
+  './js/i18n/zh-pages.js',
+  './js/i18n/zh-personal.js',
+  './js/i18n/zh-player.js',
+  './js/i18n/zh-shell.js',
   './js/content/bios.js',
   './js/content/editorials.js',
   './js/content/guides-more-1.js',
@@ -42,6 +59,7 @@ const SHELL = [
   './js/content/guides.js',
   './js/content/portraits.js',
   './js/data/cities.js',
+  './js/data/countries.js',
   './js/data/generate.js',
   './js/data/names.js',
   './js/data/repertoire.js',

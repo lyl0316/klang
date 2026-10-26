@@ -140,6 +140,7 @@ export async function albumTracks(collectionId) {
       artwork: artwork(r.artworkUrl100, 300),
       durationMs: r.trackTimeMillis,
       url: r.trackViewUrl,
+      preview: r.previewUrl || null, // 30-second preview (streamed only — never cached, Apple's terms)
       disc: r.discNumber,
       track: r.trackNumber,
     }))
@@ -207,10 +208,114 @@ export const appleMusicSearchURL = (term) => `https://music.apple.com/ch/search?
 // Apple Music Classical web links (same album IDs as Apple Music; open the Classical app on iOS)
 export const classicalSearchURL = (term) => `https://classical.music.apple.com/ch/search?term=${encodeURIComponent(term)}`;
 export const classicalAlbumURL = (collectionId) => `https://classical.music.apple.com/ch/album/${collectionId}`;
-export const ITUNES_CREDIT = 'Recording details come from Apple’s iTunes Search API. Pieces play in full in Apple Music Classical or Apple Music, with your own subscription.';
+export const ITUNES_CREDIT = '30-second previews provided courtesy of iTunes. Pieces play in full in Apple Music Classical or Apple Music, with your own subscription.';
 
 export const fmtDuration = (ms) => {
   if (!ms) return '';
   const s = Math.round(ms / 1000);
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
+
+// ---------- 30-second previews, played inside Klang ----------
+// preview.play(track, queue?)  track = an albumTracks() track (needs .preview), optionally extended with
+//                              piece fields (workId, composer, collectionId…) so the UI can offer
+//                              "Open in Apple Music Classical" for the same recording.
+// preview.unlock()             call synchronously in a tap handler BEFORE awaiting anything (e.g. a
+//                              track lookup): iOS only lets audio start from a user gesture.
+// preview.toggle() / next() / stop(); preview.subscribe(fn) -> unsubscribe; previewState().
+const previewListeners = new Set();
+const audio = typeof Audio !== 'undefined' ? new Audio() : null;
+let pvTrack = null;
+let pvQueue = [];
+let pvError = null;
+const SILENCE = 'data:audio/mp4;base64,AAAAHGZ0eXBNNEEgAAACAE00QSBpc29taXNvMgAAAAhmcmVlAAAAG21kYXQhEAUgpBv/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
+
+export function previewState() {
+  const i = pvQueue.indexOf(pvTrack);
+  return {
+    track: pvTrack,
+    playing: !!audio && !!pvTrack && !audio.paused,
+    progress: audio && audio.duration ? audio.currentTime / audio.duration : 0,
+    elapsed: audio ? audio.currentTime || 0 : 0,
+    duration: audio && Number.isFinite(audio.duration) ? audio.duration : 30,
+    hasNext: i >= 0 && i < pvQueue.length - 1,
+    next: i >= 0 ? pvQueue[i + 1] || null : null,
+    error: pvError,
+  };
+}
+
+function emitPreview() {
+  const st = previewState();
+  for (const fn of previewListeners) fn(st);
+}
+
+function mediaSession(track) {
+  try {
+    if (!('mediaSession' in navigator) || !track) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title || '', artist: track.artist || '', album: track.album || '',
+      artwork: track.artwork ? [{ src: track.artwork, sizes: '300x300', type: 'image/jpeg' }] : [],
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', previewState().hasNext ? () => preview.next() : null);
+  } catch { /* optional */ }
+}
+
+export const preview = {
+  subscribe(fn) {
+    previewListeners.add(fn);
+    fn(previewState());
+    return () => previewListeners.delete(fn);
+  },
+  unlock() {
+    if (!audio || !audio.paused) return;
+    try {
+      audio.src = SILENCE;
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch { /* ignore */ }
+  },
+  play(track, queue = null) {
+    if (!audio || !track?.preview) return false;
+    if (queue) pvQueue = queue.filter((t) => t && t.preview);
+    if (!pvQueue.includes(track)) pvQueue = [track];
+    pvError = null;
+    if (pvTrack !== track || audio.src !== track.preview) {
+      pvTrack = track;
+      audio.src = track.preview;
+    }
+    const p = audio.play();
+    if (p && p.catch) p.catch((err) => { pvError = err?.name || 'error'; emitPreview(); });
+    mediaSession(track);
+    emitPreview();
+    return true;
+  },
+  toggle() {
+    if (!audio || !pvTrack) return;
+    if (audio.paused) {
+      const p = audio.play();
+      if (p && p.catch) p.catch(() => emitPreview());
+    } else audio.pause();
+  },
+  next() {
+    const i = pvQueue.indexOf(pvTrack);
+    if (i >= 0 && i < pvQueue.length - 1) preview.play(pvQueue[i + 1]);
+  },
+  stop() {
+    if (!audio) return;
+    audio.pause();
+    pvTrack = null;
+    pvQueue = [];
+    emitPreview();
+  },
+};
+
+if (audio) {
+  audio.preload = 'none';
+  for (const ev of ['play', 'pause', 'timeupdate', 'loadedmetadata']) audio.addEventListener(ev, () => { if (pvTrack) emitPreview(); });
+  audio.addEventListener('error', () => { if (pvTrack && audio.src === pvTrack.preview) { pvError = 'unavailable'; emitPreview(); } });
+  audio.addEventListener('ended', () => {
+    if (previewState().hasNext) preview.next();
+    else emitPreview();
+  });
+}
+

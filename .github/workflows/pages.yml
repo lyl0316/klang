@@ -1,0 +1,90 @@
+# Builds data/concerts.json from the venues' and orchestras' own sites (tools/feeds) and
+# deploys the whole app to GitHub Pages: on every push to main, once a day early in the
+# Swiss morning, and on demand (Actions tab -> "Build and deploy" -> Run workflow).
+#
+# Requires Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * *'   # 04:23 UTC = 05:23 CET / 06:23 CEST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    outputs:
+      check: ${{ steps.check.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Fetches every source politely (robots.txt, crawl delays, request caps). A failing
+      # source reuses its events from the published feed and does not fail this step;
+      # only a bug in build.py itself does. Pushes reuse sources fetched in the last 20 h
+      # (same reader code) so the sites are read at most about once a day.
+      - name: Fetch concert listings
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          ARGS="--out data/concerts.json"
+          if [ "$EVENT_NAME" = "push" ]; then ARGS="$ARGS --fresh-hours 20"; fi
+          python3 tools/feeds/build.py $ARGS
+
+      # Health check (tools/feeds/check.py): a website that could not be read, a source that suddenly
+      # returns nothing, or a stale feed marks this run as FAILED after deploying (GitHub then emails
+      # the repository owner; the Mac reminder in tools/feeds/mac/ shows a pop-up). The report is
+      # published as data/feed-report.json.
+      - name: Check the calendar
+        id: check
+        continue-on-error: true
+        run: |
+          python3 tools/feeds/check.py --feed data/concerts.json \
+            --previous https://lyl0316.github.io/klang/data/concerts.json \
+            --report data/feed-report.json
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Fails the run (after the site is deployed) when the calendar check failed, so the failure is
+  # visible on the Actions page and in GitHub's notifications.
+  report:
+    needs: [build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Calendar check result
+        run: |
+          echo "Calendar check: ${{ needs.build.outputs.check }}"
+          test "${{ needs.build.outputs.check }}" = "success"
+

@@ -1,0 +1,140 @@
+/* Pages area (entity.js, discover.js, editorial.js): listening buttons, real-listing notes and the
+   Chinese interface. Loaded after the parity sheets, so these rules win where they overlap.
+
+   Listening (ui/preview.js): a cover's round ▶ disc plays Apple's 30-second preview inside Klang
+   (it widens to show the time left while playing); "Apple Music Classical ↗" under it plays the
+   recording in full there. `.pv-lbl` buttons show a label of their own ("40 min", "2 recordings")
+   while idle, set in data-label, and the time left while playing. */
+
+/* ---------- shared: labelled preview buttons ---------- */
+.pv-btn.pv-lbl { flex-direction: row-reverse; }
+.pv-btn.pv-lbl:not(.on) .pv-t { display: none; }
+.pv-btn.pv-lbl:not(.on)::after { content: attr(data-label); }
+/* Under a narrow cover the Classical link shows a short name ("Classical", set in data-label), then ↗ */
+.pv-btn.pv-open[data-label] .pv-t { display: none; }
+.pv-btn.pv-open[data-label]::before { content: attr(data-label); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-btn.pv-open[data-label] { flex-direction: row; } /* label (::before), then ↗ */
+
+/* =====================================================================
+   Entity pages (entity.js)
+   ===================================================================== */
+/* cover = preview (tap anywhere on it); ▶ disc in the corner, "+" save in the other */
+.ep-cover, .ep-vcover { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ep-cover:active img, .ep-vcover:active img { opacity: 0.8; }
+.ep-vcover { position: relative; display: block; }
+.pv-btn.ep-pv {
+  position: absolute; right: 6px; bottom: 6px; z-index: 1; height: 28px; min-width: 28px; padding: 0; gap: 4px;
+  justify-content: center; border-radius: 14px; font-size: 11.5px; color: #fff;
+  background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+.pv-btn.ep-pv::before { content: ''; position: absolute; inset: -8px; } /* a thumb-sized target */
+.ep-pv .pv-t { display: none; }
+.pv-btn.ep-pv.on { padding: 0 9px 0 8px; background: var(--ep-accent, var(--accent)); box-shadow: none; }
+.ep-pv.on .pv-t { display: inline; }
+.ep-pv.loading .icon { animation: ep-pulse 1s ease-in-out infinite; }
+.ep-vcover .pv-btn.ep-pv { right: 5px; bottom: 5px; height: 24px; min-width: 24px; }
+.ep-vcover .ep-save.sm { top: 5px; right: 5px; }
+
+/* "Apple Music Classical ↗" under a cover */
+.pv-btn.ep-open {
+  align-self: flex-start; max-width: 100%; height: auto; margin-top: 6px; padding: 2px 0; gap: 4px;
+  border-radius: 0; background: none; font-size: 11.5px; font-weight: 600; color: var(--ep-accent, var(--accent-strong));
+}
+.ep-rail:not(.left) .pv-btn.ep-open { align-self: center; }
+.ep-open .pv-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ep-open .icon svg { width: 11px; height: 11px; }
+.ep-open:active { opacity: 0.6; }
+.ep-versions .version-card .pv-btn.ep-open { align-self: center; margin: 5px auto 0; display: flex; width: fit-content; }
+
+/* names: the original spelling under a Chinese name; where the listings come from */
+.ep-orig { margin-top: 3px; font-size: 12.5px; color: var(--text-3); }
+.ep-sources { margin: 12px 2px 0; font-size: 11.5px; line-height: 1.5; color: var(--text-3); }
+.ep-sources a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--line-strong); }
+.ep-en-note { margin: 0 0 12px; font-size: 12.5px; color: var(--text-3); }
+.ep-sheet-text .ep-en-note { font-style: normal; }
+
+/* =====================================================================
+   Discover (discover.js)
+   ===================================================================== */
+/* Today's Pick: "40 min ▶" plays the preview in place (time left while playing), "Classical ↗"
+   opens the piece in full in Apple Music Classical */
+.dc-acts { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.dc-card.prog .dc-acts { margin-top: 14px; }
+.dc-card .dc-acts .dc-chip, .dc-wl-card .dc-acts .dc-chip { margin-top: 0; }
+.pv-btn.dc-chip { height: 24px; padding: 0 9px; gap: 5px; border-radius: 6px; font-size: 12.5px; font-weight: 500; background: transparent; }
+.pv-btn.dc-chip.red { color: var(--dc-red, var(--accent-strong)); border: 1px solid color-mix(in srgb, var(--dc-red, var(--accent)) 46%, transparent); }
+.pv-btn.dc-chip.white { color: color-mix(in srgb, var(--bg) 78%, var(--text)); background: color-mix(in srgb, var(--text) 94%, var(--bg)); border: 1px solid transparent; }
+.pv-btn.dc-chip.on { color: #fff; background: var(--dc-red, var(--accent)); border-color: var(--dc-red, var(--accent)); }
+.pv-btn.dc-chip.loading { opacity: 0.6; }
+.pv-btn.dc-chip .icon svg { width: 10px; height: 10px; }
+.pv-btn.dc-open { height: 24px; padding: 0 2px; gap: 3px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: var(--dc-dim, var(--text-3));
+  background: transparent; }
+.pv-btn.dc-open .icon svg { width: 11px; height: 11px; }
+.pv-btn.dc-open[data-state='current'] { color: var(--dc-red, var(--accent-strong)); }
+.dc-open:active { opacity: 0.6; }
+
+/* Widely Loved: the card is a block whose link covers it, so its two buttons can sit on top */
+.dc-wl-card { position: relative; }
+.dc-wl-link { display: block; color: inherit; -webkit-tap-highlight-color: transparent; }
+.dc-wl-link::after { content: ''; position: absolute; inset: 0; }
+.dc-wl-card .dc-acts { margin-top: 12px; }
+
+/* New on Record: cover = preview, ▶ disc bottom-left (Sheng's red state disc), ↗ under the title */
+.dc-album .art-wrap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.dc-album .art-wrap:active .art { opacity: 0.75; }
+.pv-btn.dc-pv {
+  position: absolute; left: 7px; bottom: 7px; z-index: 1; height: 26px; min-width: 26px; padding: 0; gap: 4px;
+  justify-content: center; border-radius: 13px; font-size: 11.5px; color: #fff;
+  background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+.pv-btn.dc-pv::before { content: ''; position: absolute; inset: -8px; }
+.dc-pv .pv-t { display: none; }
+.pv-btn.dc-pv.on { padding: 0 9px 0 8px; background: var(--dc-red, var(--accent)); box-shadow: none; }
+.dc-pv.on .pv-t { display: inline; }
+.dc-pv.loading .icon { animation: ep-pulse 1s ease-in-out infinite; }
+.pv-btn.dc-alb-open { max-width: 100%; height: auto; margin-top: 5px; padding: 2px 0; gap: 4px; border-radius: 0; background: none;
+  font-size: 11.5px; font-weight: 600; color: var(--dc-red, var(--accent-strong)); }
+.dc-alb-open .pv-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dc-alb-open .icon svg { width: 11px; height: 11px; }
+.dc-album[data-state='current'] .dc-alb-open { color: var(--dc-red, var(--accent-strong)); }
+
+/* =====================================================================
+   Editorials (editorial.js)
+   ===================================================================== */
+/* header: "2 recordings ▶" previews them all in order; "Open in Apple Music Classical ↗" opens the first */
+.ed-actions .pv-btn.ed-recpill { height: 30px; padding: 0 14px; gap: 7px; border-radius: 15px; font-size: 13px; font-weight: 600;
+  color: var(--accent-strong); background: transparent; border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); }
+.ed-actions .pv-btn.ed-recpill.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+.ed-actions .pv-btn.ed-recpill .icon svg { width: 10px; height: 10px; }
+.ed-open-all { display: flex; justify-content: center; margin: -6px 0 14px; }
+.pv-btn.ed-open { height: auto; padding: 2px 0; gap: 4px; border-radius: 0; background: none; font-size: 12px; font-weight: 600;
+  color: var(--accent-strong); flex-direction: row-reverse; }
+.ed-open .icon svg { width: 11px; height: 11px; }
+.ed-open:active { opacity: 0.6; }
+
+/* recording embed: cover = preview with the round disc; Save and Apple Music Classical ↗ side by side */
+.ed-rec-cover { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pv-btn.ed-pv {
+  position: absolute; right: 6px; bottom: 6px; z-index: 1; height: 26px; min-width: 26px; padding: 0; gap: 4px;
+  justify-content: center; border-radius: 13px; font-size: 11.5px; color: #111; background: rgba(255, 255, 255, 0.92);
+}
+.pv-btn.ed-pv::before { content: ''; position: absolute; inset: -8px; }
+.ed-pv .pv-t { display: none; }
+.pv-btn.ed-pv.on { padding: 0 9px 0 8px; background: var(--accent); color: #fff; }
+.ed-pv.on .pv-t { display: inline; }
+.ed-pv.loading .icon { animation: ed-pulse 0.9s ease-in-out infinite alternate; }
+.ed-rec-cap { display: block; }
+.ed-rec-btns { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 2px; }
+.ed-rec-btns .ed-rec-save { margin-top: 0; }
+.ed-en-note { margin: 0 0 18px; text-align: center; font-size: 12.5px; color: var(--text-3); }
+.ed-list-page .ed-en-note { margin: 2px 0 12px; text-align: left; }
+.ed-live-alt { margin: 0 0 8px; font-size: 12px; color: var(--text-3); }
+
+/* Chinese: the END rule reads "全文完", which needs less tracking than the Latin caps */
+:root[lang|="zh"] .ed-end { letter-spacing: 0.12em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ep-pv.loading .icon, .dc-pv.loading .icon, .ed-pv.loading .icon { animation: none; }
+}

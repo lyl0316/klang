@@ -15,12 +15,22 @@
   <p id="summary">Running…</p>
   <ol id="out"></ol>
   <script type="module">
-    import { generateDemo, DEMO_ANCHOR, DEMO_END } from '../js/data/generate.js';
-    import { CITIES } from '../js/data/cities.js';
-    import { VENUES } from '../js/data/venues.js';
-    import { WORKS, COMPOSERS } from '../js/data/repertoire.js';
-    import { parseICS, buildICS, parseFeed, matchCity } from '../js/ics.js';
-    import { zurichOffset, dayKeyOf, timeOf, addDays, relDayLabel } from '../js/time.js';
+    // Everything below runs against sandboxed copies of Klang's localStorage keys (restored at the end).
+    const KEYS = ['klang.v1', 'klang.activity.posts.v1', 'klang.listening.v1', 'klang.feed.v1'];
+    const savedKeys = Object.fromEntries(KEYS.map((k) => [k, localStorage.getItem(k)]));
+
+    const { generateDemo, DEMO_ANCHOR, DEMO_END } = await import('../js/data/generate.js');
+    const { CITIES, EXTRA_CITIES } = await import('../js/data/cities.js');
+    const { VENUES } = await import('../js/data/venues.js');
+    const { WORKS, COMPOSERS } = await import('../js/data/repertoire.js');
+    const { COUNTRIES, country, countryCities, otherCountries } = await import('../js/data/countries.js');
+    const { parseICS, buildICS, parseFeed, matchCity, matchVenue, matchComposer, matchProgramItem, workFromTitle } = await import('../js/ics.js');
+    const { zurichOffset, dayKeyOf, timeOf, addDays, relDayLabel, fullDateTime } = await import('../js/time.js');
+    const store = await import('../js/store.js');
+    const i18n = await import('../js/i18n.js');
+    const feed = await import('../js/feed.js');
+    const repo = await import('../js/repo.js');
+    store.setPref('lang', 'en'); // the tests below expect English unless they switch to Chinese
 
     const out = document.getElementById('out');
     let pass = 0, fail = 0;
@@ -97,6 +107,74 @@
       eq(matchCity('Stadtcasino Basel'), 'basel');
       eq(matchCity('Salle de musique, La Chaux-de-Fonds'), 'la-chaux-de-fonds');
       eq(matchCity('Nowhere special'), null);
+      eq(matchCity('Genf'), 'geneva');
+      eq(matchCity('Bâle'), 'basel');
+      eq(matchCity('Lucerna'), 'lucerne');
+      eq(matchCity('St.Gallen'), 'st-gallen');
+      eq(matchCity('Biel/Bienne'), 'biel');
+      eq(matchCity('Mézières (FR)'), 'mezieres-fr', 'Mézières FR is not Mézières VD');
+      eq(matchCity('Mézières'), 'mezieres');
+    });
+    test('venue matching stays within the listing\'s city', () => {
+      eq(matchVenue('Stadtkirche', 'liestal')?.id, 'stadtkirche-liestal');
+      eq(matchVenue('Cathédrale', 'lausanne')?.id, 'cathedrale-lausanne');
+      eq(matchVenue('Stadtcasino Basel, Hans Huber-Saal', 'basel')?.id, 'stadtcasino-basel');
+      eq(matchVenue('Theater St.Gallen, Grosses Haus', 'st-gallen')?.id, 'theater-st-gallen');
+      eq(matchVenue('Martinskirche Chur', 'chur'), null, 'not Basel\'s Martinskirche');
+      eq(matchVenue('Opernhaus im Quartier', 'zurich'), null, 'an outreach series, not the opera house');
+    });
+    test('composers: German / French / Italian spellings, and their namesakes', () => {
+      eq(matchComposer('Pjotr Iljitsch Tschaikowsky'), 'tchaikovsky');
+      eq(matchComposer('Piotr Il\'ič Čajkovskij'), 'tchaikovsky');
+      eq(matchComposer('Dmitri Chostakovitch'), 'shostakovich');
+      eq(matchComposer('Dmitrij Schostakowitsch'), 'shostakovich');
+      eq(matchComposer('Sergej Rachmaninow'), 'rachmaninoff');
+      eq(matchComposer('Igor Strawinsky'), 'stravinsky');
+      eq(matchComposer('Antonín Dvořák'), 'dvorak');
+      eq(matchComposer('Felix Mendelssohn Bartholdy'), 'mendelssohn');
+      eq(matchComposer('Georg Friedrich Haendel'), 'handel');
+      eq(matchComposer('Béla Bartók'), 'bartok');
+      eq(matchComposer('L. v. Beethoven'), 'beethoven');
+      eq(matchComposer('Wolfgang Amadeus Mozart / Franz Xaver Süssmayr'), 'mozart');
+      eq(matchComposer('Richard Strauss'), 'richard-strauss');
+      eq(matchComposer('Johann Strauss (Sohn)'), 'johann-strauss');
+      eq(matchComposer('Strauss', 'Also sprach Zarathustra'), 'richard-strauss', 'Strauss by work');
+      eq(matchComposer('Strauss', 'Kaiserwalzer op. 437'), 'johann-strauss', 'Strauss by work');
+      for (const other of ['Carl Philipp Emanuel Bach', 'Alma Mahler', 'Clara Schumann', 'Fanny Hensel-Mendelssohn', 'Josef Strauss', 'Mozart Camargo Guarnieri', 'Modest Mussorgsky']) {
+        eq(matchComposer(other), null, other);
+      }
+    });
+    test('works: real German / French / Italian programme lines', () => {
+      const w = (composer, title) => matchProgramItem({ composer, title }).workId || null;
+      eq(w('Ludwig van Beethoven', 'Sinfonie Nr. 5 c-Moll op. 67'), 'beethoven-symphony-5');
+      eq(w('Ludwig van Beethoven', 'Symphonie n°5 en do mineur, op. 67'), 'beethoven-symphony-5');
+      eq(w('Pjotr Iljitsch Tschaikowsky', 'Sinfonie Nr. 6 Pathétique in h-Moll, op. 74'), 'tchaikovsky-pathetique');
+      eq(w('Antonín Dvořák', 'Concerto pour violoncelle en si mineur, op. 104'), 'dvorak-cello-concerto');
+      eq(w('Antonín Dvořák', '9. Sinfonie e-Moll op. 95 «Aus der Neuen Welt»'), 'dvorak-new-world');
+      eq(w('Franz Schubert', 'Symphonie n°7 en si mineur, D. 759, « Inachevée »'), 'schubert-unfinished', 'catalogue wins over numbering');
+      eq(w('Igor Strawinsky', 'Der Feuervogel, Ballett-Suite (1909/1919)'), 'stravinsky-firebird');
+      eq(w('Sergej Rachmaninow', 'Symphonische Tänze op. 45 (1940)'), 'rachmaninoff-symphonic-dances');
+      eq(w('L. van Beethoven', 'Trio pour piano n°7 en si bémol majeur, op.97, « Archiduc »'), 'beethoven-archduke');
+      eq(w('Piotr Il\'ič Čajkovskij', 'Concerto per pianoforte e orchestra n. 1 in si bemolle minore op. 23'), 'tchaikovsky-piano-concerto-1');
+      eq(w('Wolfgang Amadeus Mozart', 'Die Zauberflöte'), 'mozart-magic-flute');
+      // not the work we know
+      eq(w('Ludwig van Beethoven', 'Trio für Flöte, Fagott und Klavier, WoO 37'), null, 'WoO is not Op. 97');
+      eq(w('Felix Mendelssohn', 'Konzert für Violine und Streichorchester d-Moll, MWV O3'), null, 'the D minor concerto');
+      eq(w('Wolfgang Amadeus Mozart', 'Sinfonie Nr. 40 in g-Moll, KV 550'), null, 'K. 550 is not K. 551');
+      eq(w('Maurice Ravel', 'Introduction et Allegro für Harfe, Streichquartett, Flöte und Klarinette'), null, 'quartet only in the scoring');
+      eq(w('Johann Sebastian Bach', 'Chaconne aus der Partita für Violine Nr. 2 d-Moll BWV 1004'), null, 'a movement');
+      eq(w('Antonio Vivaldi', 'La primavera (Der Frühling) RV 269'), null, 'one season');
+      const ex = matchProgramItem({ composer: 'Wolfgang Amadeus Mozart', title: 'Ouvertüre zur Oper «Die Zauberflöte» KV 620' });
+      eq([ex.composerId, ex.workId, ex.title], ['mozart', undefined, 'Ouvertüre zur Oper «Die Zauberflöte» KV 620'], 'overture: composer only, raw title kept');
+    });
+    test('a listing titled with an opera or song cycle gets that work', () => {
+      eq(workFromTitle('Die Zauberflöte')?.id, 'mozart-magic-flute');
+      eq(workFromTitle('Zauberflöte')?.id, 'mozart-magic-flute');
+      eq(workFromTitle('La traviata')?.id, 'verdi-traviata');
+      eq(workFromTitle('«Die Winterreise»')?.id, 'schubert-winterreise');
+      eq(workFromTitle('Marathon Bohême'), null, 'not just a word of the title');
+      eq(workFromTitle('Carmen-Suite'), null);
+      eq(workFromTitle('Orgelkonzert'), null);
     });
     test('ICS import parses events, venues, cities, composers', () => {
       const ics = ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'UID:abc-1', 'DTSTART;TZID=Europe/Zurich:20261120T193000', 'DTEND;TZID=Europe/Zurich:20261120T213000',
@@ -127,6 +205,118 @@
       eq(list[0].venueId, 'berner-munster');
     });
 
+    // ---------- real listings (feed.js → repo.js) ----------
+    // Real listings copied from data/concerts.json (26 October 2026) as a fixed fixture, plus one marked test record.
+    const FIXTURE = {
+      generatedAt: '2026-10-26T05:23:00+01:00',
+      sources: [
+        { key: 'tonhalle', name: 'Tonhalle Zürich', site: 'https://www.tonhalle-orchester.ch/', attribution: 'Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhallezuerich.ch)', count: 1, ok: true, error: null },
+        { key: 'osr', name: 'Orchestre de la Suisse Romande', site: 'https://www.osr.ch/', attribution: 'Source: Orchestre de la Suisse Romande (osr.ch)', count: 1, ok: true, error: null },
+        { key: 'kts_st_gallen', name: 'Konzert und Theater St.Gallen', site: 'https://www.konzertundtheater.ch/', attribution: 'Source: Konzert und Theater St.Gallen (konzertundtheater.ch)', count: 1, ok: true, error: null },
+        { key: 'opernhaus_zurich', name: 'Opernhaus Zürich', site: 'https://www.opernhaus.ch/', attribution: 'Source: Opernhaus Zürich (opernhaus.ch). Facts only; details and tickets on opernhaus.ch.', count: 1, ok: true, error: null },
+        { key: 'reformiert_zuerich', name: 'Reformierte Kirche Zürich', site: 'https://reformiert-zuerich.ch/', attribution: 'Source: Reformierte Kirche Zürich (reformiert-zuerich.ch). Facts only; details there.', count: 1, ok: true, error: null },
+        { key: 'kammerorchester_basel', name: 'Kammerorchester Basel', site: 'https://www.kammerorchesterbasel.ch/', attribution: 'Source: Kammerorchester Basel (kammerorchesterbasel.ch). Facts only; details and tickets there.', count: 1, ok: true, error: null },
+      ],
+      concerts: [
+        { id: 'tonhalle-2055210', source: 'tonhalle', title: 'Paavo Järvi mit Mahler', start: '2026-11-11T19:30:00+01:00', city: 'Zürich', venueName: 'Tonhalle Zürich – Grosser Saal', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Tonhalle-Orchester Zürich' }, { role: 'Conductor', name: 'Paavo Järvi' }], program: [{ composer: 'Gustav Mahler', title: 'Sinfonie Nr. 6 a-Moll «Tragische»' }], ticketUrl: 'https://tickets.tonhallezuerich.ch/webshop/webticket/shop?event=5634&language=de', url: 'https://www.tonhalle-orchester.ch/konzerte/kalender/paavo-jaervi-mit-mahler-2055210/', status: 'scheduled' },
+        { id: 'osr-beethoven-1-4-5-20261105', source: 'osr', title: 'Cycle Beethoven 1', start: '2026-11-05T20:15:00+01:00', durationMin: 120, city: 'Lausanne', venueName: 'Théâtre de Beaulieu', type: 'orchestral', series: 'Cycle Beethoven', credits: [{ role: 'Conductor', name: 'Daniele Gatti' }, { role: 'Orchestra', name: 'Orchestre de la Suisse Romande' }], program: [{ composer: 'Ludwig van Beethoven', title: 'Symphonie N° 1 en ut majeur op. 21' }, { composer: 'Ludwig van Beethoven', title: 'Symphonie N° 4 en si bémol majeur op. 60' }, { composer: 'Ludwig van Beethoven', title: 'Symphonie N° 5 en ut mineur op. 67' }], ticketUrl: 'https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-1-4-5', url: 'https://www.osr.ch/fr/concerts-billets/concerts/evenement/concert/beethoven-1-4-5', status: 'scheduled' },
+        { id: 'kts_st_gallen-3997', source: 'kts_st_gallen', title: 'Neujahrskonzert 2027', start: '2027-01-03T17:00:00+01:00', city: 'St. Gallen', venueName: 'Verrucano Mels', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Pietro Rizzo' }, { role: 'Soprano', name: 'Olivia Smith' }, { role: 'Orchestra', name: 'Sinfonieorchester St.Gallen' }], program: [{ composer: 'Werke von', title: 'P. Tschaikowski, G. Puccini, M. Glinka, E. Korngold, F. Lehár, A. Dvořák, J. Strauss u.a.' }], url: 'https://www.konzertundtheater.ch/programm/kalender/2027-01/neujahrskonzert-27/3997/', status: 'scheduled' },
+        { id: 'opernhaus_zurich-200322', source: 'opernhaus_zurich', title: 'Die Zauberflöte', start: '2026-10-30T19:00:00+01:00', durationMin: 190, city: 'Zürich', venueName: 'Opernhaus Zürich, Hauptbühne', type: 'vocal-opera', credits: [{ role: 'Conductor', name: 'Tarmo Peltokoski' }, { role: 'Pamina', name: 'Regula Mühlemann' }, { role: 'Orchestra', name: 'Orchester der Oper Zürich' }, { role: 'Choir', name: 'Chor der Oper Zürich' }], program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Die Zauberflöte' }], ticketUrl: 'https://tickets.opernhaus.ch/webshop/webticket/shop?event=15163&language=de', url: 'https://www.opernhaus.ch/spielplan/kalendarium/die-zauberfloete/', status: 'scheduled' },
+        { id: 'reformiert_zuerich-16109', source: 'reformiert_zuerich', title: '«Die Winterreise»', start: '2026-11-13T19:30:00+01:00', durationMin: 90, city: 'Zürich', venueName: 'Johanneskirche', url: 'https://reformiert-zuerich.ch/event/die-winterreise-16109/', status: 'scheduled' },
+        { id: 'kammerorchester_basel-liestal-202611171930', source: 'kammerorchester_basel', title: 'Kammerorchester Basel – Konzertreise mit Pianistin Angela Hewitt', start: '2026-11-17T19:30:00+01:00', city: 'Liestal', venueName: 'Stadtkirche', type: 'orchestral', credits: [{ role: 'Orchestra', name: 'Kammerorchester Basel' }], url: 'https://www.blkonzerte.ch/31-angela-hewitt-klavier', status: 'scheduled' },
+        // NOT a real listing: a test-only record for a town that is neither one of the 47 nor an extra town
+        // (every town in today's feed is known, so the "town of its own" path needs a synthetic case)
+        { id: 'test-unknown-town', source: 'test', title: 'Test listing in an unknown town', start: '2027-01-02T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', url: 'https://example.org/', status: 'scheduled' },
+      ],
+    };
+    feed.setFeed(feed.mergeFeed(FIXTURE, null, '2026-10-26'), { persist: false });
+
+    test('feed listings become Klang concerts (city, venue, room, programme, source)', () => {
+      const c = repo.concert('feed-tonhalle-2055210');
+      ok(c, 'concert');
+      eq([c.cityId, c.venueId, c.room, c.type, c.featured], ['zurich', 'tonhalle-zurich', 'Grosser Saal', 'orchestral', true]);
+      eq(c.program[0].composerId, 'mahler');
+      eq(c.credits.map((cr) => [cr.artistId, repo.artist(cr.artistId).kind]), [['artist-tonhalle-orchester-zurich', 'ensemble'], ['artist-paavo-jarvi', 'person']]);
+      eq([c.sourceName, c.sourceUrl], ['Tonhalle Zürich', 'https://www.tonhalle-orchester.ch/konzerte/kalender/paavo-jaervi-mit-mahler-2055210/']);
+      ok(/tonhalle/.test(c.attribution), 'attribution');
+      eq(repo.concert('feed-osr-beethoven-1-4-5-20261105').program.map((p) => p.workId || null), [null, null, 'beethoven-symphony-5']);
+      eq(repo.concert('feed-opernhaus_zurich-200322').program[0].workId, 'mozart-magic-flute');
+      eq(repo.concert('feed-reformiert_zuerich-16109').program[0].workId, 'schubert-winterreise', 'title → work when there is no programme');
+      ok(!repo.concert('feed-kammerorchester_basel-liestal-202611171930').program.length, 'no invented programme');
+    });
+    test('towns: venue town wins, known venues, and a town of its own when unknown', () => {
+      eq(repo.concert('feed-kts_st_gallen-3997').cityId, 'mels', 'Verrucano Mels (listed under St. Gallen)');
+      eq(repo.concert('feed-kammerorchester_basel-liestal-202611171930').venueId, 'stadtkirche-liestal');
+      const c = repo.concert('feed-test-unknown-town');
+      eq(c.cityId, 'town-tiefencastel');
+      const town = repo.city(c.cityId);
+      eq([town.name, town.dynamic, town.lat], ['Tiefencastel', true, null]);
+      ok(repo.allCities().some((x) => x.id === 'town-tiefencastel'), 'listed in allCities');
+      ok(repo.venue(c.venueId).dynamic && repo.venue(c.venueId).kind === 'church', 'dynamic venue');
+      eq(repo.allCities().slice(0, 47).map((x) => x.id), CITIES.map((x) => x.id), 'the 47 Sheng cities first');
+      ok(!repo.allCities().some((x) => x.id === 'thun'), 'extra towns only when they have concerts');
+      eq(repo.cityCounts({ from: '2026-10-26' }).get('mels'), 1);
+    });
+    test('featured = names a performer or a piece', () => {
+      ok(repo.concert('feed-opernhaus_zurich-200322').featured);
+      ok(!repo.concert('feed-test-unknown-town').featured, 'bare listing');
+    });
+    test('no demo concerts at run time', () => {
+      ok(repo.allConcerts().length >= FIXTURE.concerts.length, 'fixture loaded');
+      ok(repo.allConcerts().every((c) => !c.demo && !c.id.startsWith('demo-') && (c.id.startsWith('feed-') || c.imported)), 'only real listings and imports');
+      ok(repo.allArtists().every((a) => !a.demo), 'no invented performers');
+      eq(store.pref('showDemo'), undefined, 'old demo switch gone');
+    });
+    test('feed keeps past concerts for 120 days (Look back) and drops vanished upcoming ones', () => {
+      const prev = { sources: [], concerts: [
+        { id: 'a', title: 'Past, kept', start: '2026-09-01T19:30:00+02:00' },
+        { id: 'b', title: 'Too old', start: '2026-05-01T19:30:00+02:00' },
+        { id: 'c', title: 'Upcoming, no longer listed', start: '2026-11-01T19:30:00+01:00' },
+      ] };
+      const next = feed.mergeFeed({ generatedAt: 'x', sources: [], concerts: [{ id: 'd', title: 'New', start: '2026-11-02T19:30:00+01:00' }, { title: 'broken' }] }, prev, '2026-10-26');
+      eq(next.concerts.map((c) => c.id), ['a', 'd']);
+      eq(repo.pastStart('2026-10-26'), '2026-06-28');
+      ok(feed.feedInfo().sources.length === FIXTURE.sources.length && feed.feedInfo().generatedAt === FIXTURE.generatedAt, 'feedInfo');
+      eq(repo.concert('feed-test-unknown-town').sourceName, null, 'unknown source: no attribution invented');
+    });
+
+    // ---------- Sheng's countries ----------
+    test('countries: Sheng\'s 47, in its order, with regions and cities', () => {
+      eq(COUNTRIES.length, 47);
+      eq(new Set(COUNTRIES.map((c) => c.id)).size, 47);
+      eq(COUNTRIES[0].name, 'Germany');
+      ok(country('Switzerland').swiss && otherCountries().length === 46, 'Switzerland');
+      ok(countryCities('Germany').includes('Berlin') && countryCities('germany').includes('Munich'), 'Germany');
+      ok(country('Japan').regions.some((r) => r.name === 'Tokyo' && r.cities.includes('Hachioji')), 'Japan regions');
+      ok(country('United States').partial?.length > 0, 'partial lists noted');
+      ok(otherCountries().every((c) => countryCities(c).length > 0), 'every other country has cities');
+    });
+
+    // ---------- interface language ----------
+    test('i18n: English by default, Simplified Chinese on request', () => {
+      try {
+        store.setPref('lang', 'en');
+        eq([i18n.t('Concerts'), i18n.tn(1, '{n} concert', '{n} concerts'), i18n.tn(3, '{n} concert', '{n} concerts')], ['Concerts', '1 concert', '3 concerts']);
+        eq([i18n.dayMonth('2026-10-27'), i18n.relDay('2026-10-27', '2026-10-26'), relDayLabel('2026-10-30', '2026-10-26')], ['Oct 27', 'Tomorrow', 'Fri, Oct 30']);
+        eq([i18n.monthYear('2026-10'), fullDateTime('2026-10-27T19:30:00+01:00'), i18n.joinList(['A', 'B', 'C'])], ['October 2026', 'Tue, Oct 27, 2026 · 19:30', 'A, B and C']);
+        store.setPref('lang', 'zh');
+        eq(i18n.lang(), 'zh');
+        eq([i18n.t('Concerts'), i18n.tn(3, '{n} concert', '{n} concerts'), i18n.t('Featured only')], ['音乐会', '3 场音乐会', '仅看精选']);
+        eq([i18n.dayMonth('2026-10-27'), i18n.relDay('2026-10-27', '2026-10-26'), relDayLabel('2026-10-27', '2026-10-26')], ['10月27日', '明天', '明天']);
+        eq([relDayLabel('2026-10-30', '2026-10-26'), relDayLabel('2027-01-05', '2026-10-26')], ['10月30日 周五', '2027年1月5日 周二']);
+        eq([fullDateTime('2026-10-27T19:30:00+01:00'), i18n.monthYear('2026-10'), i18n.joinList(['马勒', '布鲁克纳', '贝多芬']), i18n.joinList(['A', 'B', 'C'])], ['2026年10月27日 周二 · 19:30', '2026年10月', '马勒、布鲁克纳和贝多芬', 'A、B 和 C']);
+        // t() closes the spaces between Chinese characters, but keeps the one between a date and its weekday
+        eq([i18n.t('Updated {date}', { date: '10月30日 周五' }), i18n.tidyZh('在 Apple Music 古典乐 中打开')], ['更新于 10月30日 周五', '在 Apple Music 古典乐中打开']);
+        eq(i18n.t('Opened in {app}', { app: i18n.t('Apple Music Classical') }), '已在 Apple Music 古典乐中打开', 'no space between Chinese characters');
+        eq(i18n.t('Opened in {app}', { app: 'Apple Music' }), '已在 Apple Music 中打开');
+        eq(i18n.cityName(repo.city('zurich')), '苏黎世');
+        eq(i18n.t('An English sentence nobody translated'), 'An English sentence nobody translated', 'falls back to English');
+      } finally {
+        store.setPref('lang', 'en');
+      }
+      eq(i18n.t('Concerts'), 'Concerts', 'restored');
+    });
+
     // ---------- local assistant ----------
     const eng = await import('../js/assistant-engine.js');
     const ask = (q) => eng.answer(q, { today: '2026-10-26' });
@@ -152,15 +342,11 @@
       ok(ask('opera in Bâle next week').reply.length > 0);
     });
 
-    // ---------- personal store (runs against a sandboxed copy of localStorage) ----------
-    const saved = localStorage.getItem('klang.v1');
-    const savedPosts = localStorage.getItem('klang.activity.posts.v1');
-    const savedListening = localStorage.getItem('klang.listening.v1');
-    const store = await import('../js/store.js');
-    const repo = await import('../js/repo.js');
+    // ---------- personal store (runs against the sandboxed localStorage) ----------
     const am = await import('../js/applemusic.js');
     try {
       store.resetAll();
+      store.setPref('lang', 'en');
       test('favourites toggle and are logged in the personal timeline', () => {
         eq(store.toggleFollow('composer', 'bach'), true);
         ok(store.isFollowing('composer', 'bach'));
@@ -176,9 +362,9 @@
         eq(store.libraryAlbums().length + store.libraryPlaylists().length, 0);
       });
       test('hidden concerts are excluded from queries', () => {
-        const first = repo.upcoming()[0];
+        const first = repo.query()[0];
         store.toggleHidden(first.id);
-        ok(!repo.upcoming().some((c) => c.id === first.id), 'hidden concert still listed');
+        ok(!repo.query().some((c) => c.id === first.id), 'hidden concert still listed');
         ok(repo.query({ includeHidden: true }).some((c) => c.id === first.id));
         store.toggleHidden(first.id);
       });
@@ -188,21 +374,21 @@
         eq(store.reminderPref('dailyContent'), false);
       });
       test('backup round-trips marks and posted listens', () => {
-        store.toggleMark('demo-bern-001', 'saved');
+        store.toggleMark('feed-tonhalle-2055210', 'saved');
         localStorage.setItem('klang.activity.posts.v1', JSON.stringify([{ trackId: 1, title: 'T', at: '2026-10-26T10:00:00Z' }]));
         const backup = store.exportUserData();
         store.resetAll();
-        ok(!store.isMarked('demo-bern-001', 'saved'), 'reset clears marks');
+        ok(!store.isMarked('feed-tonhalle-2055210', 'saved'), 'reset clears marks');
         eq(JSON.parse(localStorage.getItem('klang.activity.posts.v1')), [], 'reset clears posts');
         store.importUserData(backup);
-        ok(store.isMarked('demo-bern-001', 'saved'), 'mark restored');
+        ok(store.isMarked('feed-tonhalle-2055210', 'saved'), 'mark restored');
         eq(JSON.parse(localStorage.getItem('klang.activity.posts.v1')).length, 1, 'posts restored');
       });
       test('marks: going + attended, review keeps record', () => {
-        store.toggleMark('demo-zurich-000', 'going');
-        ok(store.isMarked('demo-zurich-000', 'going'));
-        store.setReview('demo-zurich-000', { rating: 5 });
-        eq(store.markOf('demo-zurich-000').rating, 5);
+        store.toggleMark('feed-osr-beethoven-1-4-5-20261105', 'going');
+        ok(store.isMarked('feed-osr-beethoven-1-4-5-20261105', 'going'));
+        store.setReview('feed-osr-beethoven-1-4-5-20261105', { rating: 5 });
+        eq(store.markOf('feed-osr-beethoven-1-4-5-20261105').rating, 5);
       });
 
       // ---------- listening: Apple Music Classical / Apple Music links (no audio in Klang) ----------
@@ -285,9 +471,9 @@
         eq([back.name, back.items.map((x) => x.id)], ['Road trip', [p.id]]);
       });
     } finally {
-      try { saved == null ? localStorage.removeItem('klang.v1') : localStorage.setItem('klang.v1', saved); } catch {}
-      try { savedPosts == null ? localStorage.removeItem('klang.activity.posts.v1') : localStorage.setItem('klang.activity.posts.v1', savedPosts); } catch {}
-      try { savedListening == null ? localStorage.removeItem('klang.listening.v1') : localStorage.setItem('klang.listening.v1', savedListening); } catch {}
+      for (const [k, v] of Object.entries(savedKeys)) {
+        try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {}
+      }
     }
 
     document.getElementById('summary').innerHTML = fail ? `<span class="fail">${fail} failed</span>, ${pass} passed` : `<span class="pass">All ${pass} tests passed</span>`;

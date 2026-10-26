@@ -367,7 +367,7 @@
 .lib-ic { width: 32px; height: 32px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); }
 .lib-h { margin: 28px 2px 12px; font-family: var(--serif); font-size: 21px; font-weight: 650; letter-spacing: var(--tracking-tight, -0.012em); }
 .lib-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; }
-.lib-tile { min-width: 0; text-align: left; color: inherit; }
+.lib-tile { min-width: 0; align-self: start; text-align: left; color: inherit; } /* a button: keep the cover at the top when the neighbour's title wraps */
 .lib-tile:active { opacity: 0.8; }
 .lib-tile .t { margin-top: 7px; font-size: 13.5px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .lib-tile .s { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -640,6 +640,7 @@ a.ed-person:active { background: var(--surface-3); }
 /* listen carousel: one big card per work, the active card centred */
 .cp-listen { margin-top: 26px; scroll-margin-top: calc(var(--safe-t) + 64px); }
 .cp-carousel {
+  position: relative; /* clips the cards' screen-reader-only labels, which would otherwise widen the page */
   display: flex; gap: 14px; overflow-x: auto; margin: 0 -16px;
   padding: 4px calc(50% - 104px) 6px; /* centres a 240px card: (section + 32px) / 2 - 120px */
   scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;

@@ -1,6 +1,6 @@
-// Real Swiss venues, one or more per city, used as places for demo concerts.
-// kind: hall | opera | church | theatre — steers which concert types the demo
-// generator schedules there. Venue names are public facts; the demo concerts are not.
+// Known Swiss venues, one or more per city: real listings are matched to them (ics.matchVenue);
+// a venue not listed here gets one made from the listing (repo.js, dynamic: true).
+// kind: hall | opera | church | theatre. `weight` / `small` only steer the test generator (js/data/generate.js).
 
 export const VENUES = [
   // Zurich

@@ -1,43 +1,56 @@
 // Entity pages (#/composer, #/work, #/artist, #/venue, #/city), modelled on Sheng's
 // knowledge pages — Switzerland only, personal only (no other users, no public reviews).
+// Every concert listed here is a REAL listing (repo.js: the venues' and orchestras' own websites,
+// plus the user's own imports); performers, venues and towns come from those listings.
 //
 //   Work:     floating back · ♡ · share; composer portrait + name, serif title, caps
-//             "1892 · ~23 MIN", Listening guide sheet, Recordings carousel (tap = play the
-//             work in full in Apple Music Classical, "+" = Save to Library), More recordings
-//             (every version, same taps), Report a problem, Concerts N (date blocks,
-//             city only). Section bars take the work's genre colour, as on Sheng.
+//             "1892 · ~23 MIN", Listening guide sheet, Recordings carousel, More recordings
+//             (every version), Report a problem, Concerts N (date blocks, city only). Section bars
+//             take the work's genre colour, as on Sheng.
 //   Composer: back · share; portrait, serif name, Read Bio / Explore Works / Editorials N,
 //             centred ♡, caps life line; Latest releases, Popular among listeners,
 //             "Explore <name>" (By period · By genre · Related), then Swiss Concerts N.
-//   Artist:   portrait + serif name + gold ON TOUR, caps role line, Artist bio + ♡;
-//             Upcoming Events (route of cities, Swiss local time, first dates,
-//             "Full Itinerary ›" = #/artist/<id>/itinerary page with every date + past ones),
-//             Related artists (shared concerts), demo note for invented performers.
-//   Album covers (Latest releases, Popular, Featured albums) open the album in Apple Music
-//   Classical / Apple Music, which plays it in full; Klang itself plays no audio.
-//   The iTunes credit sits at the foot of each page (Sheng has no fine print under rails).
-//   Venue / City: same visual language (serif names, caps facts, date blocks).
+//   Artist:   a performer or ensemble from the listings: portrait + serif name + gold ON TOUR, caps
+//             line of their roles in the listings, Artist bio (only when Klang has one) + ♡;
+//             Upcoming Events (route of cities, Swiss local time, first dates, "Full Itinerary ›" =
+//             #/artist/<id>/itinerary with every date + past ones), Related artists (shared concerts),
+//             their albums on Apple Music.
+//   Venue / City: same visual language (serif names, caps facts, date blocks); venues and towns that
+//             only the listings name get the same page, with Directions and their sources.
+//
+// Listening: a cover plays Apple's 30-second preview inside Klang (ui/preview.js — the work's own
+// tracks on that recording, queued in order); "Apple Music Classical ↗" under it is a real link that
+// plays the recording in full there; "+" saves it (ui/save.js). The iTunes credit sits at the foot of
+// each page (Sheng has no fine print under its rails).
+//
+// Language: interface text goes through i18n.t(); composer and city names follow the interface
+// language. Long-form text (bios, listening guides) stays English for now, with a short note in Chinese.
 //
 // The app header stays (main.js back button) but turns into Sheng's floating buttons on
 // these pages (see the "entity pages (entity.js)" block in css/shell.css).
 // Editorial content (BIOS, GUIDES, ARTICLES) is loaded defensively: pages work when the
 // content files are empty or fail to load.
 
-import { h, icon, toast, plural, normalize, TYPE_LABELS } from '../util.js';
+import { h, icon, toast, normalize, TYPE_LABELS } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { openSheet } from '../ui/sheet.js';
-import { href, emptyState, rowItem, venueLabel, cityLabel, withFace } from '../ui/components.js';
-import { todayKey, addDays, monthKeyOf, monthLong, monthShort, dayNum, yearOf, timeOf, relDayLabel } from '../time.js';
+import { href, emptyState, rowItem, withFace, roleText as sharedRoleText } from '../ui/components.js';
+import { todayKey, addDays, daysBetween, monthKeyOf, monthShort, dayNum, yearOf, timeOf, relDayLabel } from '../time.js';
 import {
-  searchAlbums, albumTracks, composerAlbums,
+  t, tn, fmtN, isZh, cityName, countryName, cantonName, composerName, composerShort, typeLabel,
+  monthYear,
+} from '../i18n.js';
+import {
+  searchAlbums, albumTracks, composerAlbums, ITUNES_CREDIT,
   classicalAlbumURL, classicalSearchURL, appleMusicSearchURL,
 } from '../music.js';
-import { listenLink, workPiece, albumPiece, pieceURL, albumURL, listening, onListening, playAppName, APPLE_CREDIT } from '../applemusic.js';
+import { workPiece, albumPiece, pieceURL, albumURL, listening, onListening, playApp, playAppName } from '../applemusic.js';
+import { previewButton, classicalButton } from '../ui/preview.js';
 import { openSaveSheet } from '../ui/save.js';
 import { searchTerm, matchWorkTracks } from '../ui/listen.js';
 
-// ---------- reference tables ----------
+// ---------- reference tables (English keys; shown through t()) ----------
 const GENRES = [
   { id: 'symphony', label: 'Symphonies', intro: 'Large-scale works for full orchestra, usually in four movements.' },
   { id: 'concerto', label: 'Concertos', intro: 'A soloist, or a small group of soloists, set against the orchestra.' },
@@ -88,11 +101,6 @@ const PERIODS = {
 };
 
 const VENUE_KINDS = { hall: 'Concert hall', opera: 'Opera house', church: 'Church', theatre: 'Theatre' };
-const PLAYERS = {
-  piano: 'Pianist', violin: 'Violinist', cello: 'Cellist', viola: 'Violist', clarinet: 'Clarinettist',
-  flute: 'Flautist', oboe: 'Oboist', horn: 'Horn player', harpsichord: 'Harpsichordist',
-};
-const ENSEMBLE_TYPES = { orchestra: 'Orchestra', quartet: 'String quartet', trio: 'Trio', choir: 'Choir', baroque: 'Baroque ensemble' };
 const MARK_LABELS = { saved: 'Saved', going: 'Going', attended: 'Attended' };
 const MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const REPORT_REASONS = ['Wrong date or venue', 'Wrong programme or performers', 'Recording doesn’t match', 'Wrong facts or text', 'Something else'];
@@ -137,6 +145,42 @@ const cityCount = (list) => new Set(list.map((c) => c.cityId).filter(Boolean)).s
 const same = (a, b) => a != null && b != null && String(a) === String(b);
 const byYear = (a, b) => (a.year || 9999) - (b.year || 9999) || a.title.localeCompare(b.title);
 
+// Names in the interface language (cities, composers); venue names stay as published.
+const cityText = (c) => cityName(repo.city(c.cityId));
+const venueText = (c) => repo.venue(c.venueId)?.name || c.venueName || t('Venue to be announced');
+const cantonText = (code) => (code ? cantonName(code, repo.cantonName(code)) : '');
+const countryText = (s) => String(s || '').split(/\s*\/\s*/).filter(Boolean)
+  .map((x) => (countryName(x) !== x ? countryName(x) : t(x))).join(isZh() ? '／' : ' / ');
+
+// t() for a template whose {placeholders} are nodes (a link, <b>): an array of parts.
+function tNodes(text, vars) {
+  return t(text).split(/\{(\w+)\}/).map((p, i) => (i % 2 ? vars[p] ?? '' : p)).filter((p) => p !== '');
+}
+
+// t() with values that must keep their own spacing ("11月1日 周六"): t() tidies the spaces between
+// Chinese characters of the whole sentence, so these go in after it.
+function tRaw(text, vars, raw) {
+  const marks = Object.fromEntries(Object.keys(raw).map((k) => [k, `\u2063${k}\u2063`]));
+  let out = t(text, { ...vars, ...marks });
+  for (const k of Object.keys(raw)) out = out.replace(marks[k], raw[k]);
+  return out;
+}
+
+// A performer's role in the interface language (shared translator, ui/components.js); "Performer" when unknown.
+const roleText = (role) => (role ? sharedRoleText(role) : t('Performer'));
+
+// "A, B and C" / "A、B 和 C" (i18n's joinList writes "B和C", which runs Latin titles into the 和;
+// t() closes the spaces again when the names are Chinese)
+function joinNames(items) {
+  const list = (items || []).filter(Boolean).map(String);
+  if (list.length < 2) return list[0] || '';
+  const head = list.slice(0, -1).join(isZh() ? '、' : ', ');
+  return isZh() ? `${head} 和 ${list[list.length - 1]}` : `${head} and ${list[list.length - 1]}`;
+}
+
+// In Chinese, long-form English text (bios, guides) gets one short note.
+const englishOnly = () => (isZh() ? h('p', { class: 'ep-en-note' }, t('This text is available in English only for now.')) : null);
+
 function countBy(list, keyFn) {
   const m = new Map();
   for (const x of list) {
@@ -155,10 +199,11 @@ function workCounts(list) {
   return m;
 }
 
+// "on 7 May 1833" / "in 1833"; Chinese "1833年5月7日" / "1833年"
 function longDate(year, mmdd) {
-  if (!mmdd) return `in ${year}`;
+  if (!mmdd) return isZh() ? `${year}年` : `in ${year}`;
   const [m, d] = mmdd.split('-').map(Number);
-  return `on ${d} ${MONTHS_LONG[m - 1]} ${year}`;
+  return isZh() ? `${year}年${m}月${d}日` : `on ${d} ${MONTHS_LONG[m - 1]} ${year}`;
 }
 
 function ageAt(born, bornDate, year, mmdd) {
@@ -168,29 +213,32 @@ function ageAt(born, bornDate, year, mmdd) {
 }
 
 function fmtMinutes(m) {
-  if (m < 60) return `${m} minutes`;
+  if (m < 60) return t('{n} minutes', { n: m });
   const hh = Math.floor(m / 60);
   const mm = m % 60;
-  return mm ? `${hh} h ${mm} min` : `${hh} hours`;
+  return mm ? t('{h} h {m} min', { h: hh, m: mm }) : t('{h} hours', { h: hh });
 }
 
-// "today" / "tomorrow" / "on Sat, Nov 1"
+// "today" / "tomorrow" / "on Sat, Nov 1"; Chinese "今天" / "明天" / "11月1日 周六"
 function whenPhrase(dayKey) {
   const rel = relDayLabel(dayKey);
-  if (rel === 'Today' || rel === 'Tomorrow') return rel.toLowerCase();
-  return `on ${rel}`;
+  if (isZh()) return rel;
+  const diff = daysBetween(todayKey(), dayKey);
+  return diff === 0 || diff === 1 ? rel.toLowerCase() : `on ${rel}`;
 }
 
 function venueKind(v) {
-  if (v.imported) return 'Imported venue';
-  if (v.kind === 'hall' && v.small) return 'Small hall';
-  return VENUE_KINDS[v.kind] || 'Venue';
+  if (v.imported) return t('Imported venue');
+  // a venue made from a listing is a "hall" only by default (its name said church, opera or theatre otherwise)
+  if (v.dynamic && v.kind === 'hall') return t('Venue');
+  if (v.kind === 'hall' && v.small) return t('Small hall');
+  return t(VENUE_KINDS[v.kind] || 'Venue');
 }
 
-function artistRole(a) {
-  if (a.kind === 'ensemble') return ENSEMBLE_TYPES[a.ensembleType] || a.role || 'Ensemble';
-  if (a.instrument) return PLAYERS[a.instrument] || a.role || 'Performer';
-  return a.role || 'Performer';
+// The roles an artist has in the listings, most frequent first ("Conductor", "Piano").
+function rolesOf(id, list) {
+  const m = countBy(list.flatMap((c) => (c.credits || []).filter((cr) => cr.artistId === id)), (cr) => cr.role || null);
+  return [...m].sort((a, b) => b[1] - a[1]).map(([r]) => r);
 }
 
 // _italic_ → <em>; plain text otherwise (never innerHTML).
@@ -215,10 +263,10 @@ async function shareText(title, text, url = null) {
   }
   try {
     await navigator.clipboard.writeText(url ? `${text}\n${url}` : text);
-    toast(url ? 'Link copied' : 'Copied to the clipboard');
+    toast(url ? t('Link copied') : t('Copied to the clipboard'));
     return true;
   } catch {
-    toast('Couldn’t share — copy the address from the address bar');
+    toast(t('Couldn’t share — copy the address from the address bar'));
     return false;
   }
 }
@@ -239,7 +287,7 @@ function topActions(...buttons) {
 }
 
 function shareButton(title, text, path) {
-  return h('button', { class: 'ep-tb', type: 'button', 'aria-label': 'Share', onclick: () => shareText(title, text, pageURL(path)) }, icon('share', 18));
+  return h('button', { class: 'ep-tb', type: 'button', 'aria-label': t('Share'), onclick: () => shareText(title, text, pageURL(path)) }, icon('share', 18));
 }
 
 // ♡ favourite (= follow) toggle that stays in sync with other hearts on the page.
@@ -249,12 +297,12 @@ function favButton(kind, id, label, bag, cls = 'ep-tb') {
     const on = store.isFollowing(kind, id);
     btn.classList.toggle('on', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-    btn.setAttribute('aria-label', on ? `Remove ${label} from favourites` : `Add ${label} to favourites`);
+    btn.setAttribute('aria-label', on ? t('Remove {name} from favourites', { name: label }) : t('Add {name} to favourites', { name: label }));
   };
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     const on = store.toggleFollow(kind, id);
-    toast(on ? `${label} added to your favourites` : `${label} removed from your favourites`);
+    toast(on ? t('{name} added to your favourites', { name: label }) : t('{name} removed from your favourites', { name: label }));
   });
   bag.push(store.subscribe((topic) => topic === 'follows' && paint()));
   paint();
@@ -264,8 +312,8 @@ function favButton(kind, id, label, bag, cls = 'ep-tb') {
 function epHead(title, { count = null, bar = false, serif = false, more = null, info = null } = {}) {
   return h('div', { class: ['ep-h', bar && 'bar', serif && 'serif'] },
     h('h2', {}, title,
-      count != null ? h('span', { class: 'n' }, count.toLocaleString('en-US')) : null,
-      info ? h('button', { class: 'ep-info', type: 'button', 'aria-label': `About ${title}`, onclick: info }, icon('info', 15)) : null),
+      count != null ? h('span', { class: 'n' }, fmtN(count)) : null,
+      info ? h('button', { class: 'ep-info', type: 'button', 'aria-label': t('About {title}', { title }), onclick: info }, icon('info', 15)) : null),
     more);
 }
 
@@ -275,20 +323,29 @@ function softEmpty(iconName, title, text, action = null) {
   return el;
 }
 
-function notFound(kind, text, action = h('a', { class: 'btn small', href: '#/search' }, icon('search', 15), 'Search')) {
-  return { title: kind, back: true, body: emptyState('search', `${kind} not found`, text, action) };
+function notFound(kind, text, action = h('a', { class: 'btn small', href: '#/search' }, icon('search', 15), t('Search'))) {
+  return { title: t(kind), back: true, body: emptyState('search', t('{kind} not found', { kind: t(kind) }), text, action) };
 }
 
 // Bottom sheet with a centred title and a red "Close" text button (Sheng's Bio / guide sheets).
 function textSheet(title, nodes, footer = null) {
-  const sheet = openSheet({ title, body: h('div', { class: 'ep-sheet-text' }, nodes), footer, closeLabel: 'Close' });
+  const sheet = openSheet({ title, body: h('div', { class: 'ep-sheet-text' }, nodes), footer, closeLabel: t('Close') });
   sheet.el.classList.add('ep-sheet');
   return sheet;
 }
 
-function demoNote(text) {
-  return h('p', { class: 'ep-demo' }, icon('sparkle', 14),
-    h('span', {}, text, ' ', h('a', { href: '#/me/data' }, 'Import real listings'), '.'));
+// "Listings from Tonhalle Zürich and Opernhaus Zürich" — where a page's concerts come from.
+function sourcesLine(list) {
+  const seen = new Map();
+  for (const c of list) if (c.sourceName && !seen.has(c.sourceName)) seen.set(c.sourceName, c.sourceSite || null);
+  if (!seen.size) return null;
+  const names = [...seen].slice(0, 6);
+  const parts = [];
+  names.forEach(([name, site], i) => {
+    if (i) parts.push(i === names.length - 1 ? (isZh() ? ' 和 ' : ' and ') : (isZh() ? '、' : ', '));
+    parts.push(site ? h('a', { href: site, target: '_blank', rel: 'noopener' }, name) : name);
+  });
+  return h('p', { class: 'ep-sources' }, tNodes('Listings from {name}', { name: parts }));
 }
 
 // Sheng's chip glyphs (SF Symbols book.closed.fill / books.vertical), drawn inline.
@@ -307,13 +364,13 @@ const flagCH = () => h('span', { class: 'ep-flag', 'aria-hidden': 'true', html: 
 
 // ---------- concerts: date-block rows with live personal marks ----------
 const SUB = {
-  city: (c) => [cityLabel(c), venueLabel(c)].filter(Boolean).join(' · '),
-  cityOnly: (c) => cityLabel(c) || venueLabel(c),
+  city: (c) => [cityText(c), venueText(c)].filter(Boolean).join(' · '),
+  cityOnly: (c) => cityText(c) || venueText(c),
   // Sheng's artist cards: flag · city (brighter) · venue
-  flagCity: (c) => [flagCH(), cityLabel(c) ? h('span', { class: 'cty' }, cityLabel(c)) : null,
-    cityLabel(c) ? h('span', { class: 'sep' }, '·') : null, venueLabel(c)],
-  venue: (c) => venueLabel(c),
-  program: (c) => [TYPE_LABELS[c.type], c.series].filter(Boolean).join(' · '),
+  flagCity: (c) => [flagCH(), cityText(c) ? h('span', { class: 'cty' }, cityText(c)) : null,
+    cityText(c) ? h('span', { class: 'sep' }, '·') : null, venueText(c)],
+  venue: (c) => [venueText(c), c.room].filter(Boolean).join(' · '),
+  program: (c) => [typeLabel(c.type, TYPE_LABELS[c.type]), c.series, c.room].filter(Boolean).join(' · '),
 };
 
 function liveMarks(bag) {
@@ -321,7 +378,7 @@ function liveMarks(bag) {
   const paint = (slot, id) => {
     const m = store.markOf(id);
     slot.replaceChildren(...store.MARK_KINDS.filter((k) => m[k]).map((k) =>
-      h('i', { class: `mark-dot ${k}`, title: MARK_LABELS[k] }, h('span', { class: 'sr-only' }, MARK_LABELS[k]))));
+      h('i', { class: `mark-dot ${k}`, title: t(MARK_LABELS[k]) }, h('span', { class: 'sr-only' }, t(MARK_LABELS[k])))));
   };
   bag.push(store.subscribe((topic) => {
     if (topic !== 'marks') return;
@@ -352,7 +409,7 @@ function eventItem(c, mark, { time = false, sub = SUB.city, idx = null, chev = t
     time ? h('span', { class: 'tm' }, timeOf(c.start)) : null),
   h('span', { class: 'ep-ev-main' },
     h('span', { class: 't' }, c.title),
-    h('span', { class: 's' }, cancelled ? h('span', { class: 'ep-cx' }, 'Cancelled · ') : null, sub(c))),
+    h('span', { class: 's' }, cancelled ? h('span', { class: 'ep-cx' }, `${t('Cancelled')} · `) : null, sub(c))),
   mark(c.id),
   chev ? icon('chevron', 15, 'ep-chev') : null);
 }
@@ -368,7 +425,7 @@ function eventList(list, renderItem, { initial = 10, cards = false } = {}) {
     for (; shown < end; shown++) box.append(renderItem(list[shown], shown));
     if (shown >= list.length) btn.remove();
     else {
-      btn.replaceChildren(`Show all ${list.length.toLocaleString('en-US')}`, icon('down', 14));
+      btn.replaceChildren(t('Show all {n}', { n: fmtN(list.length) }), icon('down', 14));
       if (btn.parentNode !== wrap) wrap.append(btn);
     }
   }
@@ -392,13 +449,13 @@ function monthGrouped(list, renderItem, initial = 20) {
         cur = m;
         box = h('div', { class: 'ep-events' });
         nodes.push(h('div', { class: 'ep-month' },
-          h('span', {}, `${monthLong(m)} ${yearOf(m)}`),
-          h('span', { class: 'n' }, plural(perMonth.get(m) || 0, 'concert'))), box);
+          h('span', {}, monthYear(m)),
+          h('span', { class: 'n' }, tn(perMonth.get(m) || 0, '{n} concert', '{n} concerts'))), box);
       }
       box.append(renderItem(c, i));
     });
     if (n < list.length) {
-      btn.replaceChildren(`Show all ${list.length.toLocaleString('en-US')}`, icon('down', 14));
+      btn.replaceChildren(t('Show all {n}', { n: fmtN(list.length) }), icon('down', 14));
       nodes.push(btn);
     }
     wrap.replaceChildren(...nodes);
@@ -419,23 +476,24 @@ function flash(el) {
 function reportPill(subject) {
   return h('div', { class: 'ep-report-wrap' },
     h('button', { class: 'ep-report', type: 'button', onclick: () => openReport(subject) },
-      h('span', { class: 'dot', 'aria-hidden': 'true' }, '!'), 'Report a problem'));
+      h('span', { class: 'dot', 'aria-hidden': 'true' }, '!'), t('Report a problem')));
 }
 
-// Also used by the article end matter (editorial.js).
-export function openReport({ kind, name, path }) {
+// Also used by the article end matter (editorial.js). The shared report itself stays in English:
+// it goes to the venue or whoever publishes the listing. `label`: the name as the interface shows it.
+export function openReport({ kind, name, path, label = name }) {
   let reason = REPORT_REASONS[0];
-  const chips = h('div', { class: 'chip-wrap ep-report-reasons', role: 'radiogroup', 'aria-label': 'What’s wrong?' });
+  const chips = h('div', { class: 'chip-wrap ep-report-reasons', role: 'radiogroup', 'aria-label': t('What’s wrong?') });
   const paintChips = () => chips.replaceChildren(...REPORT_REASONS.map((r) => h('button', {
     class: ['chip', r === reason && 'active'], type: 'button', role: 'radio', 'aria-checked': r === reason ? 'true' : 'false',
     onclick: () => { reason = r; paintChips(); },
-  }, r)));
+  }, t(r))));
   paintChips();
-  const note = h('textarea', { class: 'ep-report-note', rows: '4', placeholder: 'What should it say? (optional)', 'aria-label': 'Details' });
+  const note = h('textarea', { class: 'ep-report-note', rows: '4', placeholder: t('What should it say? (optional)'), 'aria-label': t('Details') });
   const body = h('div', { class: 'ep-report-body' },
-    h('p', { class: 'lead' }, `What’s wrong on the page for ${name}?`),
+    h('p', { class: 'lead' }, t('What’s wrong on the page for {name}?', { name: label })),
     chips, note,
-    h('p', { class: 'hint' }, 'Klang has no server, so nothing is sent automatically. Share the report with the venue or whoever publishes the listing.'));
+    h('p', { class: 'hint' }, t('Klang has no server, so nothing is sent automatically. Share the report with the venue or whoever publishes the listing.')));
   const report = () => [
     'Klang — problem report',
     `${kind[0].toUpperCase()}${kind.slice(1)}: ${name}`,
@@ -443,15 +501,16 @@ export function openReport({ kind, name, path }) {
     note.value.trim() ? `Details: ${note.value.trim()}` : null,
     pageURL(path),
   ].filter(Boolean).join('\n');
-  const sheet = textSheet('Report a problem', [body],
+  const sheet = textSheet(t('Report a problem'), [body],
     h('button', { class: 'btn primary block', type: 'button', onclick: async () => { if (await shareText('Problem report', report())) sheet.close(); } },
-      icon('share', 16), 'Share report'));
+      icon('share', 16), t('Share report')));
 }
 
-// ---------- listening (Apple Music) ----------
-// Klang plays no audio. A cover is a real link (applemusic.listenLink), so on an iPhone the tap
-// itself hands the recording to Apple Music Classical (or Apple Music, chosen in Me), which plays
-// it in full; "+" on the cover opens Save to Library (ui/save.js).
+// ---------- listening ----------
+// A cover plays Apple's 30-second preview inside Klang (previewButton); "Apple Music Classical ↗"
+// under it (classicalButton) is a real link, so on an iPhone the tap itself hands the recording to
+// Apple Music Classical (or Apple Music, chosen in Me), which plays it in full; "+" on the cover
+// opens Save to Library (ui/save.js).
 
 // First track of a work on an album, so that a link starts at the work instead of the top of the
 // album. Looked up once the cover is on screen, one lookup at a time (iTunes allows ~20 requests a
@@ -469,9 +528,9 @@ function firstTrackOf(work, album, live = () => true) {
       .then(() => (live() ? albumTracks(album.id) : null))
       .then((res) => {
         if (!res) return null;
-        const t = matchWorkTracks(work, res.tracks)?.tracks[0] || null;
-        firstTracks.set(key, t);
-        return t;
+        const tr = workTracks(work, res.tracks)?.[0] || null;
+        firstTracks.set(key, tr);
+        return tr;
       })
       .catch(() => null) // offline: keep the album link, try again next time
       .finally(() => firstTrackLoads.delete(key));
@@ -481,9 +540,50 @@ function firstTrackOf(work, album, live = () => true) {
   return firstTrackLoads.get(key);
 }
 
-// What a cover plays: the work on that recording (work page), or the whole album.
+// A work's tracks on an album (null when none): ui/listen.js matchWorkTracks first; then, as Apple's
+// titles vary ("The Firebird – Suite (1919)" / "Firebird Suite (1919 Version): I. …", "Op. 8 Nos. 1–4" /
+// "Op. 8, No. 1"), the catalogue number's first part, or every distinctive word and number of the
+// title. Never the album's first track on a guess. Also used by Discover and the editorials.
+const tokens = (s) => ` ${normalize(s || '').replace(/[^a-z0-9]+/g, ' ').trim()} `;
+const STOP = new Set(['the', 'and', 'for', 'with', 'from', 'major', 'minor', 'flat', 'sharp', 'des', 'les', 'der', 'die', 'das', 'und', 'del', 'version']);
+export function workTracks(work, tracks) {
+  const m = matchWorkTracks(work, tracks);
+  if (m) return m.tracks;
+  // "Op. 8" of "Op. 8 Nos. 1–4" — but not "Op. 18" of "Op. 18 No. 4", which names one of six
+  const catalog = String(work.catalog || '').trim();
+  const cat = /\bno\.?\s*\d/i.test(catalog) ? null : /^([a-z]+\.?\s*[ivx]*[:.]?\s*\d+[a-z]?)/i.exec(catalog);
+  if (cat) {
+    const key = tokens(cat[1]);
+    const hit = tracks.filter((x) => tokens(x.title).includes(key));
+    if (hit.length) return hit;
+  }
+  const words = tokens(String(work.title || '').replace(/[“”"«»]/g, ' ')).trim().split(' ')
+    .filter((w) => (/^\d+$/.test(w) || w.length > 2) && !STOP.has(w));
+  if (words.length < 2) return null;
+  const hit = tracks.filter((x) => { const tt = tokens(x.title); return words.every((w) => tt.includes(` ${w} `)); });
+  return hit.length ? hit : null;
+}
+
+// What a recording is as a piece: the work on that recording (work page), or the whole album.
 function recordingPiece(work, a, track = work ? firstTracks.get(`${work.id}|${a.id}`) : null) {
   return work ? workPiece(work, repo.composer(work.composerId)?.name, a, track || null) : albumPiece(a);
+}
+
+// The preview of a recording: the work's own tracks on that album (all of them for an album), first
+// one playing and the rest queued. Tracks carry the piece fields so the player can name the work.
+function previewOf(album, work = null) {
+  return albumTracks(album.id).then(({ tracks }) => {
+    const m = work ? workTracks(work, tracks) : null;
+    if (work && !m) return null; // this recording's tracks don't name the work: no guessing
+    const list = (m || tracks).filter((x) => x.preview);
+    if (!list.length) return null;
+    const composer = work ? repo.composer(work.composerId)?.name || null : null;
+    for (const x of list) {
+      Object.assign(x, { trackId: x.id, collectionId: album.id, workId: work?.id || null, workTitle: work?.title || null, composer });
+    }
+    if (work && m && !firstTracks.get(`${work.id}|${album.id}`)) firstTracks.set(`${work.id}|${album.id}`, m[0]);
+    return { track: list[0], queue: list };
+  });
 }
 
 // Calls fn once each watched element is on screen (cards in sideways rails included).
@@ -514,24 +614,36 @@ function onScreen(bag) {
   }, { live: () => open });
 }
 
-// A link that plays album `a` (the work on it when `work` is given) in Apple Music Classical.
-// Once the work's first track is known, the link and the piece its tap records point at it.
-function coverLink(a, work, children, { cls, watch, onOpen }) {
+// A recording: cover (tap = 30-second preview, round ▶ disc in its corner, "+" to save) and the
+// "Apple Music Classical ↗" link. onPick(a): the recording was previewed or opened.
+function recordingParts(a, work, { watch, onPick, saveCls = '', coverCls = 'ep-cover' }) {
   const piece = recordingPiece(work, a);
-  const what = work ? work.title : a.title;
-  const link = listenLink(piece, children, {
-    cls,
-    onOpen,
-    label: `Play ${what}${a.artist ? ` by ${a.artist}` : ''}${a.year ? ` (${a.year})` : ''} in ${playAppName()}`,
+  const what = [work ? work.title : a.title, a.artist].filter(Boolean).join(' — ');
+  const open = classicalButton(piece, { cls: 'ep-open' });
+  open.dataset.label = shortAppName(); // a 124px card has no room for "Apple Music Classical"
+
+  const key = work ? `${work.id}|${a.id}` : null;
+  // once the work's first track is known, the link (and the piece its tap records) starts there
+  const upgrade = () => {
+    const tr = key ? firstTracks.get(key) : null;
+    if (!tr || piece.trackId) return;
+    Object.assign(piece, recordingPiece(work, a, tr));
+    open.href = pieceURL(piece);
+  };
+  const pv = previewButton({
+    cls: 'ep-pv',
+    label: t('Play a 30-second preview of {title}', { title: what }),
+    resolve: () => {
+      onPick?.(a);
+      return previewOf(a, work).then((r) => { upgrade(); return r; });
+    },
   });
-  if (work && !piece.trackId && !firstTracks.has(`${work.id}|${a.id}`)) {
-    watch(link, () => firstTrackOf(work, a, watch.live).then((t) => {
-      if (!t) return;
-      Object.assign(piece, recordingPiece(work, a, t));
-      link.href = pieceURL(piece);
-    }));
-  }
-  return { link, piece };
+  open.addEventListener('click', () => onPick?.(a));
+  const cover = h('span', { class: coverCls, onclick: () => pv.click() },
+    a.artwork ? h('img', { src: a.artwork, alt: '', loading: 'lazy' }) : h('span', { class: 'ph' }, icon('music', 26)),
+    pv, saveDisc(piece, saveCls));
+  if (work && !piece.trackId && !firstTracks.has(key)) watch(cover, () => firstTrackOf(work, a, watch.live).then(upgrade));
+  return { cover, open, piece };
 }
 
 // "+" on a cover: Save to Library (the album, and/or the piece into one of your playlists).
@@ -550,7 +662,7 @@ function paintSave(btn) {
   const name = [p.artist, p.album || p.title].filter(Boolean).join(' — ');
   btn.classList.toggle('on', on);
   btn.replaceChildren(icon(on ? 'check' : 'plus', 15));
-  btn.setAttribute('aria-label', on ? `In your Library: ${name}. Change where it’s saved` : `Save ${name} to your Library`);
+  btn.setAttribute('aria-label', on ? t('In your Library: {name}. Change where it’s saved', { name }) : t('Save {name} to your Library', { name }));
 }
 
 function saveDisc(piece, cls = '') {
@@ -573,9 +685,20 @@ const watchSaves = (root) => store.subscribe((topic) => {
   if (topic === 'library') root.querySelectorAll('.ep-save').forEach(paintSave);
 });
 
+// "Classical ↗" under a cover (the full name is in the link's accessible label).
+const shortAppName = () => (playApp() === 'music' ? 'Apple Music' : t('Classical'));
+
+// The iTunes credit with links to Apple Music (Apple's terms), for the foot of a page or sheet.
+function creditNodes(classicalHref, musicHref) {
+  return [t(ITUNES_CREDIT), isZh() ? '' : ' ',
+    h('a', { href: classicalHref, target: '_blank', rel: 'noopener' }, t('Apple Music Classical')),
+    ' · ',
+    h('a', { href: musicHref, target: '_blank', rel: 'noopener' }, 'Apple Music'), isZh() ? '' : '.'];
+}
+
 // ---------- recordings carousel ----------
-// load(): Promise<albums>. With `work` (work page) a cover plays that work on the recording and
-// becomes your version; otherwise it plays the whole album.
+// load(): Promise<albums>. With `work` (work page) a cover previews that work on the recording and
+// makes it your version; otherwise it previews the album.
 function recordingsRail({
   load, title, sub, work = null, term, bag, ariaLabel,
   chosenId = null, autoSelect = false, onSelect = null, align = 'center', extra = null, credit = true, max = 10,
@@ -592,10 +715,8 @@ function recordingsRail({
   function paintCredit() {
     if (!creditEl) return;
     const sel = albums.find((a) => same(a.id, selectedId));
-    creditEl.replaceChildren(APPLE_CREDIT, ' ',
-      h('a', { href: sel ? classicalAlbumURL(sel.id) : classicalSearchURL(term), target: '_blank', rel: 'noopener' }, 'Apple Music Classical'),
-      ' · ',
-      h('a', { href: sel ? albumURL(sel.id, null, 'music') : appleMusicSearchURL(term), target: '_blank', rel: 'noopener' }, 'Apple Music'), '.');
+    creditEl.replaceChildren(...creditNodes(sel ? classicalAlbumURL(sel.id) : classicalSearchURL(term),
+      sel ? albumURL(sel.id, null, 'music') : appleMusicSearchURL(term)));
   }
 
   // chosen = your version (work page); current = the recording you last opened in Apple Music
@@ -619,14 +740,12 @@ function recordingsRail({
 
   function card(a) {
     const s = sub(a);
-    const { link, piece } = coverLink(a, work, [
-      h('span', { class: 'ep-cover' },
-        a.artwork ? h('img', { src: a.artwork, alt: '', loading: 'lazy' }) : h('span', { class: 'ph' }, icon('music', 26)),
-        h('span', { class: 'ep-play' }, icon('play', 13))),
+    const { cover, open } = recordingParts(a, work, { watch, onPick: choose });
+    return h('div', { class: 'ep-album', dataset: { id: String(a.id) } },
+      cover,
       h('span', { class: 't' }, title(a)),
       s ? h('span', { class: 's' }, s) : null,
-    ], { cls: 'ep-album-link', watch, onOpen: () => choose(a) });
-    return h('div', { class: 'ep-album', dataset: { id: String(a.id) } }, link, saveDisc(piece));
+      open);
   }
 
   function visible() {
@@ -653,8 +772,8 @@ function recordingsRail({
     rail.replaceChildren(h('div', { class: 'ep-rail-msg' },
       h('p', {}, text),
       h('div', { class: 'ep-rail-actions' },
-        retry ? h('button', { class: 'btn small', type: 'button', onclick: start }, 'Try again') : null,
-        h('a', { class: 'btn small', href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), 'Search Apple Music Classical'))));
+        retry ? h('button', { class: 'btn small', type: 'button', onclick: start }, t('Try again')) : null,
+        h('a', { class: 'btn small', href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), t('Search Apple Music Classical')))));
     paintCredit();
   }
 
@@ -662,12 +781,12 @@ function recordingsRail({
     skeleton();
     try {
       albums = (await load()) || [];
-    } catch (err) {
-      message(`Couldn’t load recordings${err?.message ? ` — ${err.message}` : ''}.`, true);
+    } catch {
+      message(t('Couldn’t load recordings. Check your connection and try again.'), true);
       return;
     }
     if (!albums.length) {
-      message('No recordings found on Apple Music.');
+      message(t('No recordings found on Apple Music.'));
       return;
     }
     if (autoSelect && !albums.some((a) => same(a.id, selectedId))) selectedId = albums[0].id;
@@ -688,18 +807,17 @@ function recordingsRail({
 }
 
 // ---------- More recordings (every version of a work) ----------
-// Sheng's Versions sheet, where every cover plays: a tap opens the work on that recording in
-// Apple Music Classical and makes it your version; "+" saves it.
+// Sheng's Versions sheet: tap a cover to hear its preview (it becomes your version); "Open" plays it
+// in full in Apple Music Classical; "+" saves it.
 function openRecordingsSheet(w, title, term, onChoose) {
   const bag = [];
   const body = h('div', { class: 'versions' },
     h('div', { class: 'versions-grid', 'aria-busy': 'true' }, Array.from({ length: 9 }, () => h('div', { class: 'skeleton version-skel' }))));
   const sheet = openSheet({
     title,
-    subtitle: 'Versions · All recordings',
+    subtitle: t('Versions · All recordings'),
     body,
-    footer: h('p', { class: 'listen-credit' }, APPLE_CREDIT, ' ',
-      h('a', { href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, 'Search Apple Music Classical'), '.'),
+    footer: h('p', { class: 'listen-credit' }, creditNodes(classicalSearchURL(term), appleMusicSearchURL(term))),
     onClose: () => bag.forEach((fn) => fn()),
   });
   sheet.el.classList.add('versions-sheet', 'ep-versions');
@@ -707,38 +825,43 @@ function openRecordingsSheet(w, title, term, onChoose) {
   bag.push(watchSaves(body));
 
   function paint(albums) {
-    const chosenId = albums.find((a) => same(a.id, store.listenChoice(w.id)))?.id ?? albums[0].id;
+    let chosenId = albums.find((a) => same(a.id, store.listenChoice(w.id)))?.id ?? albums[0].id;
+    const cards = [];
+    const mark = () => cards.forEach(([el, a]) => el.classList.toggle('chosen', same(a.id, chosenId)));
+    const pick = (a) => {
+      if (same(a.id, chosenId)) return;
+      chosenId = a.id;
+      store.setListenChoice(w.id, a.id);
+      onChoose?.(a);
+      mark();
+    };
     body.replaceChildren(
-      h('p', { class: 'versions-count' }, `${plural(albums.length, 'recording')} · tap one to play it in ${playAppName()}`),
+      h('p', { class: 'versions-count' }, tn(albums.length, '{n} recording · tap the cover for a 30-second preview', '{n} recordings · tap a cover for a 30-second preview')),
       h('div', { class: 'versions-grid' }, albums.map((a) => {
-        const { link, piece } = coverLink(a, w, [
-          a.artwork ? h('img', { src: a.artwork, alt: '', loading: 'lazy' }) : h('div', { class: 'ph' }, icon('music', 22)),
+        const { cover, open } = recordingParts(a, w, { watch, onPick: pick, saveCls: 'sm', coverCls: 'ep-vcover' });
+        open.addEventListener('click', () => setTimeout(() => sheet.close(), 0));
+        const el = h('div', { class: 'version-card' },
+          cover,
           h('div', { class: 't' }, a.artist),
           h('div', { class: 's' }, [a.year, a.title].filter(Boolean).join(' · ')),
-        ], {
-          cls: 'version-link',
-          watch,
-          onOpen: () => {
-            store.setListenChoice(w.id, a.id);
-            onChoose?.(a);
-            sheet.close();
-          },
-        });
-        return h('div', { class: ['version-card', same(a.id, chosenId) && 'chosen'] }, link, saveDisc(piece, 'sm'));
+          open);
+        cards.push([el, a]);
+        return el;
       })));
+    mark();
   }
 
   function message(text) {
     body.replaceChildren(h('div', { class: 'listen-msg' },
       h('p', {}, text),
       h('div', { class: 'ep-rail-actions' },
-        h('a', { class: 'btn small', href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), 'Search Apple Music Classical'),
+        h('a', { class: 'btn small', href: classicalSearchURL(term), target: '_blank', rel: 'noopener' }, icon('external', 14), t('Search Apple Music Classical')),
         h('a', { class: 'btn small', href: appleMusicSearchURL(term), target: '_blank', rel: 'noopener' }, icon('music', 14), 'Apple Music'))));
   }
 
   searchAlbums(term, SEARCH_LIMIT)
-    .then((albums) => (albums.length ? paint(albums) : message('No recordings of this work found on Apple Music.')))
-    .catch((err) => message(`Couldn’t load recordings${err?.message ? ` — ${err.message}` : ''}.`));
+    .then((albums) => (albums.length ? paint(albums) : message(t('No recordings of this work found on Apple Music.'))))
+    .catch(() => message(t('Couldn’t load recordings. Check your connection and try again.')));
   return sheet;
 }
 
@@ -747,10 +870,10 @@ function openRecordingsSheet(w, title, term, onChoose) {
 // upcoming Swiss performances goes into the accessible name instead of a visible line.
 function workCard(w, n = 0) {
   const g = genreOf(w);
-  const meta = [w.catalog, w.year, w.minutes ? `${w.minutes} min` : null].filter(Boolean).join(' · ');
+  const meta = [w.catalog, w.year, w.minutes ? t('{n} min', { n: w.minutes }) : null].filter(Boolean).join(' · ');
   return h('a', {
     class: ['ep-work', `g-${g.id}`], href: href.work(w.id),
-    'aria-label': [w.title, meta, n > 0 ? `${n} upcoming` : null].filter(Boolean).join(', '),
+    'aria-label': [w.title, meta, n > 0 ? t('{n} upcoming', { n: fmtN(n) }) : null].filter(Boolean).join(', '),
   },
   h('span', { class: 'bar', 'aria-hidden': 'true' }),
   h('span', { class: 't' }, w.title),
@@ -766,8 +889,9 @@ function workGrid(list, perWork) {
 function periodsOf(c, works) {
   const sorted = [...works].sort(byYear);
   let defs = PERIODS[c.id];
-  if (!defs) {
-    if (!c.born) return [{ label: 'Works', range: '', intro: null, works: sorted }];
+  if (defs) defs = defs.map((d) => ({ ...d, label: t(d.label), intro: t(d.intro) }));
+  else {
+    if (!c.born) return [{ label: t('Works'), range: '', intro: null, works: sorted }];
     const years = sorted.map((w) => w.year).filter(Boolean);
     const start = Math.min(c.born + 18, ...years);
     const end = Math.max(c.died || yearOf(todayKey()), start + 2);
@@ -775,10 +899,10 @@ function periodsOf(c, works) {
     const b1 = start + Math.round(span / 3);
     const b2 = start + Math.round((2 * span) / 3);
     defs = [
-      { label: 'Early years', from: start, to: b1 - 1 },
-      { label: 'Middle years', from: b1, to: b2 - 1 },
-      { label: c.died ? 'Late years' : 'Recent years', from: b2, to: end },
-    ].map((d) => ({ ...d, intro: `From ${d.from} to ${d.to}, when ${c.short} was ${d.from - c.born} to ${d.to - c.born}.` }));
+      { label: t('Early years'), from: start, to: b1 - 1 },
+      { label: t('Middle years'), from: b1, to: b2 - 1 },
+      { label: t(c.died ? 'Late years' : 'Recent years'), from: b2, to: end },
+    ].map((d) => ({ ...d, intro: t('From {from} to {to}, when {name} was {a} to {b}.', { from: d.from, to: d.to, name: composerShort(c), a: d.from - c.born, b: d.to - c.born }) }));
   }
   const groups = defs.map((d) => ({
     ...d,
@@ -821,59 +945,65 @@ function relatedComposers(id) {
 }
 
 function lifeLine(c) {
-  const life = c.died ? `${c.born} — ${c.died}` : `Born ${c.born}`;
-  return [c.born ? life : null, c.country].filter(Boolean).join(' · ');
+  const life = c.died ? `${c.born} — ${c.died}` : t('Born {year}', { year: c.born });
+  return [c.born ? life : null, c.country ? countryText(c.country) : null].filter(Boolean).join(' · ');
 }
 
+// Facts from Klang's own data, for a composer without a written biography.
 function composerFacts(c, works, up) {
   const today = todayKey();
+  const name = composerShort(c);
   const ps = [];
   if (c.born) {
-    const who = c.country ? `${c.name} (${c.country})` : c.name;
+    const who = c.country ? (isZh() ? `${composerName(c)}（${countryText(c.country)}）` : `${c.name} (${c.country})`) : composerName(c);
     if (c.died) {
-      ps.push(`${who} was born ${longDate(c.born, c.bornDate)} and died ${longDate(c.died, c.diedDate)}, aged ${ageAt(c.born, c.bornDate, c.died, c.diedDate)}.`);
+      ps.push(tRaw('{who} was born {born} and died {died}, aged {age}.', { who, age: ageAt(c.born, c.bornDate, c.died, c.diedDate) },
+        { born: longDate(c.born, c.bornDate), died: longDate(c.died, c.diedDate) }));
     } else {
-      ps.push(`${who} was born ${longDate(c.born, c.bornDate)} and is ${ageAt(c.born, c.bornDate, yearOf(today), today.slice(5))}.`);
+      ps.push(tRaw('{who} was born {born} and is {age}.', { who, age: ageAt(c.born, c.bornDate, yearOf(today), today.slice(5)) },
+        { born: longDate(c.born, c.bornDate) }));
     }
   }
   const sorted = [...works].sort(byYear);
   if (sorted.length === 1) {
     const w = sorted[0];
-    ps.push(`Klang’s repertoire includes one work by ${c.short}: ${w.title}${w.year ? ` (${w.year})` : ''}.`);
+    ps.push(t('Klang’s repertoire includes one work by {name}: {title}{year}.', { name, title: w.title, year: w.year ? (isZh() ? `（${w.year}）` : ` (${w.year})`) : '' }));
   } else if (sorted.length > 1) {
     const years = sorted.map((w) => w.year).filter(Boolean);
-    const span = years.length ? (years[0] === years[years.length - 1] ? `, all from ${years[0]}` : `, written between ${years[0]} and ${years[years.length - 1]}`) : '';
-    const titles = sorted.map((w) => w.title);
-    ps.push(`Klang’s repertoire includes ${sorted.length} works by ${c.short}${span}: ${titles.slice(0, -1).join(', ')} and ${titles[titles.length - 1]}.`);
+    const span = !years.length ? ''
+      : years[0] === years[years.length - 1] ? t(', all from {year}', { year: years[0] })
+        : t(', written between {a} and {b}', { a: years[0], b: years[years.length - 1] });
+    ps.push(t('Klang’s repertoire includes {n} works by {name}{span}: {titles}.', { n: sorted.length, name, span, titles: joinNames(sorted.map((w) => w.title)) }));
   }
   const act = live(up);
   if (act.length) {
     const next = act[0];
     const top = [...workCounts(act)].sort((a, b) => b[1] - a[1])[0];
     const topWork = top ? repo.work(top[0]) : null;
-    ps.push(`On stage in Switzerland: ${plural(act.length, 'upcoming performance')} of music by ${c.short} in ${plural(cityCount(act), 'city', 'cities')}; the next is ${whenPhrase(next.day)} in ${cityLabel(next) || venueLabel(next)}.` +
-      (topWork && top[1] > 1 ? ` Most programmed: ${topWork.title} (${plural(top[1], 'concert')}).` : ''));
+    ps.push(tRaw('On stage in Switzerland: {n} upcoming performances of music by {name} in {cities}; the next is {when} in {city}.', {
+      n: fmtN(act.length), name, cities: tn(cityCount(act), '{n} city', '{n} cities'), city: cityText(next) || venueText(next),
+    }, { when: whenPhrase(next.day) }) + (topWork && top[1] > 1 ? ` ${t('Most programmed: {title} ({n} concerts).', { title: topWork.title, n: fmtN(top[1]) })}` : ''));
   } else {
-    ps.push(`No performances of music by ${c.short} are announced in Switzerland right now.`);
+    ps.push(t('No performances of music by {name} are announced in Switzerland right now.', { name }));
   }
   return ps;
 }
 
 function openBio(c, bios, works, up) {
   const text = textOf(bios[c.id]);
-  const nodes = [h('p', { class: 'who' }, c.name)];
-  if (text) nodes.push(...paragraphs(text));
+  const nodes = [h('p', { class: 'who' }, composerName(c))];
+  if (text) nodes.push(englishOnly(), ...paragraphs(text));
   else {
-    nodes.push(...composerFacts(c, works, up).map((t) => h('p', {}, t)),
-      h('p', { class: 'fine' }, `A full biography of ${c.short} hasn’t been written for Klang yet.`));
+    nodes.push(...composerFacts(c, works, up).map((x) => h('p', {}, x)),
+      h('p', { class: 'fine' }, t('A full biography of {name} hasn’t been written for Klang yet.', { name: composerShort(c) })));
   }
-  textSheet('Bio', nodes);
+  textSheet(t('Bio'), nodes);
 }
 
 // ---------- Composer ----------
 export async function renderComposer({ id }) {
   const c = repo.composer(id);
-  if (!c) return notFound('Composer', 'This composer isn’t in Klang’s repertoire.');
+  if (!c) return notFound('Composer', t('This composer isn’t in Klang’s repertoire.'));
   const content = await loadContent();
   const bag = [];
   const mark = liveMarks(bag);
@@ -881,61 +1011,65 @@ export async function renderComposer({ id }) {
   const works = repo.worksOf(id);
   const perWork = workCounts(live(up));
   const nEditorials = content.articles.filter((a) => mentionsComposer(a, id)).length;
+  const name = composerName(c);
+  const short = composerShort(c);
 
   const explore = exploreSection(c, works, perWork);
   const scrollToExplore = () => explore.scrollIntoView({ behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
 
   const head = h('header', { class: 'ep-head' },
     portrait(c.name, 'lg', c.id),
-    h('h1', { class: 'ep-name' }, c.name),
+    h('h1', { class: 'ep-name' }, name),
+    name !== c.name ? h('div', { class: 'ep-orig' }, c.name) : null,
     h('div', { class: 'ep-chips' },
-      h('button', { class: 'ep-chip light', type: 'button', onclick: () => openBio(c, content.bios, works, up) }, glyph('book'), 'Read Bio'),
-      h('button', { class: 'ep-chip', type: 'button', onclick: scrollToExplore }, glyph('books'), 'Explore Works'),
+      h('button', { class: 'ep-chip light', type: 'button', onclick: () => openBio(c, content.bios, works, up) }, glyph('book'), t('Read Bio')),
+      h('button', { class: 'ep-chip', type: 'button', onclick: scrollToExplore }, glyph('books'), t('Explore Works')),
       nEditorials > 0
-        ? h('a', { class: 'ep-chip ed', href: `#/editorials/${encodeURIComponent(id)}` }, icon('notes', 15), 'Editorials', h('span', { class: 'n' }, nEditorials))
+        ? h('a', { class: 'ep-chip ed', href: `#/editorials/${encodeURIComponent(id)}` }, icon('notes', 15), t('Editorials'), h('span', { class: 'n' }, fmtN(nEditorials)))
         : null),
-    favButton('composer', id, c.short, bag, 'ep-heart'),
+    favButton('composer', id, short, bag, 'ep-heart'),
     h('div', { class: 'ep-caps' }, lifeLine(c)));
 
   const latest = recordingsRail({
     load: () => composerAlbums(c.name, { newest: true }).then((l) => l.slice(0, 10)),
     title: (a) => a.title, sub: (a) => a.artist, term: c.name, bag,
-    ariaLabel: `Latest releases of music by ${c.name}`, align: 'left', credit: false,
+    ariaLabel: t('Latest releases of music by {name}', { name }), align: 'left', credit: false,
   });
   const popular = recordingsRail({
     load: () => composerAlbums(c.name).then((l) => l.slice(0, 10)),
     title: (a) => a.title, sub: (a) => a.artist, term: c.name, bag,
-    ariaLabel: `Popular recordings of music by ${c.name}`, align: 'left', credit: 'detached',
+    ariaLabel: t('Popular recordings of music by {name}', { name }), align: 'left', credit: 'detached',
   });
 
   // Sheng: head · Latest releases · Popular among listeners · Explore <name>. Klang adds the
   // Swiss concerts after Explore (styled like the work page's "Concerts N" list).
   const body = h('div', { class: 'ep-page ep-composer' },
     head,
-    h('section', { class: 'ep-sec' }, epHead('Latest releases', { serif: true }), latest.el),
-    h('section', { class: 'ep-sec' }, epHead('Popular among listeners', { serif: true }), popular.el),
+    h('section', { class: 'ep-sec' }, epHead(t('Latest releases'), { serif: true }), latest.el),
+    h('section', { class: 'ep-sec' }, epHead(t('Popular among listeners'), { serif: true }), popular.el),
     explore,
     h('section', { class: 'ep-sec ep-comp-concerts' },
-      epHead('Concerts', { bar: true, count: up.length }),
+      epHead(t('Concerts'), { bar: true, count: up.length }),
       up.length
         ? eventList(up, (x) => eventItem(x, mark, { sub: SUB.cityOnly }), { initial: 10 }).el
-        : softEmpty('calendar', `No ${c.short} on Swiss stages right now`,
-          `Nothing by ${c.short} is announced in Switzerland at the moment. Add ${c.short} to your favourites and new dates show up under Following in Concerts.`),
-      up.some((x) => x.demo) ? demoNote('Demo listings: real venues and works, invented performers.') : null),
-    reportPill({ kind: 'composer', name: c.name, path: href.composer(id) }),
+        : softEmpty('calendar', t('No {name} on Swiss stages right now', { name: short }),
+          t('Nothing by {name} is announced in Switzerland at the moment. Add {name} to your favourites and new dates show up under Following in Concerts.', { name: short })),
+      up.length ? sourcesLine(up) : null),
+    reportPill({ kind: 'composer', name: c.name, label: name, path: href.composer(id) }),
     popular.credit);
 
   return {
-    title: c.name,
+    title: name,
     back: true,
-    actions: topActions(shareButton(c.name, `${c.name} — on stage in Switzerland`, href.composer(id))),
+    actions: topActions(shareButton(name, t('{name} — on stage in Switzerland', { name }), href.composer(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
 }
 
 function exploreSection(c, works, perWork) {
-  const tabs = h('div', { class: 'ep-tabs', role: 'tablist', 'aria-label': `Explore ${c.short}` });
+  const short = composerShort(c);
+  const tabs = h('div', { class: 'ep-tabs', role: 'tablist', 'aria-label': t('Explore {name}', { name: short }) });
   const panel = h('div', { class: 'ep-explore-panel', role: 'tabpanel' });
   const TABS = [['period', 'By period'], ['genre', 'By genre'], ['related', 'Related']];
 
@@ -949,18 +1083,19 @@ function exploreSection(c, works, perWork) {
     if (tab === 'related') {
       const rel = relatedComposers(c.id);
       if (!rel.length) {
-        return [softEmpty('person', 'No shared programmes yet',
-          `No other composer shares an announced Swiss programme with ${c.short} this season.`)];
+        return [softEmpty('person', t('No shared programmes yet'),
+          t('No other composer shares an announced Swiss programme with {name} this season.', { name: short }))];
       }
       return [h('div', { class: 'ep-rel-grid' }, rel.map(({ comp, n }) => h('a', { class: 'ep-rel', href: href.composer(comp.id) },
         h('span', { class: 'ep-rel-av', 'aria-hidden': 'true' }, icon('person', 18)),
-        h('p', {}, 'Shares ', plural(n, 'programme'), ' with ', h('b', {}, comp.name), ' in Switzerland this season'))))];
+        h('p', {}, tNodes(n === 1 ? 'Shares {n} programme with {name} in Switzerland this season' : 'Shares {n} programmes with {name} in Switzerland this season',
+          { n: fmtN(n), name: h('b', {}, composerName(comp)) })))))];
     }
     if (!works.length) {
-      return [softEmpty('music', 'No works in Klang yet', `Klang’s repertoire doesn’t list works by ${c.short} yet.`)];
+      return [softEmpty('music', t('No works in Klang yet'), t('Klang’s repertoire doesn’t list works by {name} yet.', { name: short }))];
     }
     const groups = tab === 'genre'
-      ? genresOf(works).map((g) => ({ label: g.label, range: plural(g.works.length, 'work'), intro: g.intro, works: g.works }))
+      ? genresOf(works).map((g) => ({ label: t(g.label), range: tn(g.works.length, '{n} work', '{n} works'), intro: t(g.intro), works: g.works }))
       : periodsOf(c, works);
     return groups.map(groupBlock);
   }
@@ -970,33 +1105,40 @@ function exploreSection(c, works, perWork) {
     tabs.replaceChildren(...TABS.map(([k, label]) => h('button', {
       class: k === tab ? 'active' : '', type: 'button', role: 'tab', 'aria-selected': k === tab ? 'true' : 'false',
       onclick: () => { if (k !== exploreTab) show(k); },
-    }, label)));
+    }, t(label))));
     panel.replaceChildren(...build(tab));
   }
   show(TABS.some(([k]) => k === exploreTab) ? exploreTab : 'period');
 
   return h('section', { class: 'ep-explore', id: `explore-${c.id}` },
-    h('h2', { class: 'ep-explore-title' }, `Explore ${c.short}`),
+    h('h2', { class: 'ep-explore-title' }, t('Explore {name}', { name: short })),
     h('div', { class: 'ep-ornament', 'aria-hidden': 'true' }, h('i'), h('b'), h('i')),
     tabs,
     panel);
 }
 
 // ---------- Work ----------
+// Facts from Klang's own data, for a work without a written listening guide.
 function workFacts(w, comp, up) {
   const ps = [];
-  if (w.blurb) ps.push(w.blurb);
+  if (w.blurb && !isZh()) ps.push(w.blurb);
   const bits = [];
-  const what = `${w.title}${w.catalog ? ` (${w.catalog})` : ''}`;
-  if (w.year) bits.push(`${what} dates from ${w.year}${comp?.born ? `, when ${comp.short} was about ${w.year - comp.born}` : ''}.`);
-  if (w.minutes) bits.push(`A performance lasts about ${fmtMinutes(w.minutes)}.`);
-  if (bits.length) ps.push(bits.join(' '));
+  const what = `${w.title}${w.catalog ? (isZh() ? `（${w.catalog}）` : ` (${w.catalog})`) : ''}`;
+  if (w.year) {
+    bits.push(comp?.born
+      ? t('{what} dates from {year}, when {name} was about {age}.', { what, year: w.year, name: composerShort(comp), age: w.year - comp.born })
+      : t('{what} dates from {year}.', { what, year: w.year }));
+  }
+  if (w.minutes) bits.push(t('A performance lasts about {time}.', { time: fmtMinutes(w.minutes) }));
+  if (bits.length) ps.push(bits.join(isZh() ? '' : ' '));
   const act = live(up);
   if (act.length) {
     const next = act[0];
-    ps.push(`On stage in Switzerland: ${plural(act.length, 'upcoming performance')} in ${plural(cityCount(act), 'city', 'cities')}; the next is ${whenPhrase(next.day)} in ${cityLabel(next) || venueLabel(next)}.`);
+    ps.push(tRaw('On stage in Switzerland: {n} upcoming performances in {cities}; the next is {when} in {city}.', {
+      n: fmtN(act.length), cities: tn(cityCount(act), '{n} city', '{n} cities'), city: cityText(next) || venueText(next),
+    }, { when: whenPhrase(next.day) }));
   } else {
-    ps.push('No Swiss performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.');
+    ps.push(t('No Swiss performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.'));
   }
   return ps;
 }
@@ -1005,25 +1147,25 @@ function openGuide(w, comp, guides, up) {
   const text = textOf(guides[w.id]);
   // Sheng's guide starts straight with the prose (only the Bio sheet opens with the italic name).
   const nodes = [];
-  if (text) nodes.push(...paragraphs(text));
+  if (text) nodes.push(englishOnly(), ...paragraphs(text));
   else {
-    nodes.push(h('p', { class: 'who' }, [comp?.name, w.title].filter(Boolean).join(' · ')));
-    nodes.push(...workFacts(w, comp, up).map((t) => h('p', {}, t)),
-      h('p', { class: 'fine' }, 'A full listening guide for this work hasn’t been written yet.'));
+    nodes.push(h('p', { class: 'who' }, [comp ? composerName(comp) : null, w.title].filter(Boolean).join(' · ')));
+    nodes.push(...workFacts(w, comp, up).map((x) => h('p', {}, x)),
+      h('p', { class: 'fine' }, t('A full listening guide for this work hasn’t been written yet.')));
   }
-  textSheet('Listening guide', nodes);
+  textSheet(t('Listening guide'), nodes);
 }
 
 export async function renderWork({ id }) {
   const w = repo.work(id);
-  if (!w) return notFound('Work', 'This work isn’t in Klang’s repertoire.');
+  if (!w) return notFound('Work', t('This work isn’t in Klang’s repertoire.'));
   const content = await loadContent();
   const bag = [];
   const mark = liveMarks(bag);
   const comp = repo.composer(w.composerId);
   const up = repo.upcoming({ workId: id });
-  const label = [comp?.short, w.title].filter(Boolean).join(': ');
-  const caps = [w.catalog, w.year, w.minutes ? `~${w.minutes} min` : null].filter(Boolean).join(' · ');
+  const label = [comp ? composerShort(comp) : null, w.title].filter(Boolean).join(isZh() ? '：' : ': ');
+  const caps = [w.catalog, w.year, w.minutes ? t('~{n} min', { n: w.minutes }) : null].filter(Boolean).join(' · ');
   const term = searchTerm(w);
 
   const rail = recordingsRail({
@@ -1031,11 +1173,11 @@ export async function renderWork({ id }) {
     title: (a) => a.artist,
     sub: (a) => a.title,
     work: w,
-    term, bag, ariaLabel: `Recordings of ${label}`,
+    term, bag, ariaLabel: t('Recordings of {title}', { title: label }),
     chosenId: store.listenChoice(id), autoSelect: true,
     onSelect: (a) => store.setListenChoice(id, a.id),
-    extra: h('button', { class: 'ep-link', type: 'button', onclick: () => openRecordingsSheet(w, [comp?.short, w.title].filter(Boolean).join(' · '), term, (a) => rail.select(a)) },
-      'More recordings', icon('chevron', 14)),
+    extra: h('button', { class: 'ep-link', type: 'button', onclick: () => openRecordingsSheet(w, [comp ? composerShort(comp) : null, w.title].filter(Boolean).join(' · '), term, (a) => rail.select(a)) },
+      t('More recordings'), icon('chevron', 14)),
     credit: 'detached',
   });
 
@@ -1044,22 +1186,22 @@ export async function renderWork({ id }) {
   const body = h('div', { class: ['ep-page', 'ep-workpage', `ga-${genreOf(w).id}`] },
     h('header', { class: 'ep-head' },
       comp
-        ? h('a', { class: 'ep-comp-link', href: href.composer(comp.id) }, portrait(comp.name, 'md', comp.id), h('span', {}, comp.name))
+        ? h('a', { class: 'ep-comp-link', href: href.composer(comp.id) }, portrait(comp.name, 'md', comp.id), h('span', {}, composerName(comp)))
         : null,
       h('h1', { class: 'ep-name work' }, w.title),
       caps ? h('div', { class: 'ep-caps' }, caps) : null,
-      h('button', { class: 'ep-guide-btn', type: 'button', onclick: () => openGuide(w, comp, content.guides, up) }, glyph('book'), 'Listening guide')),
-    h('section', { class: 'ep-sec' }, epHead('Recordings', { bar: true }),
-      h('p', { class: 'ep-listen-note' }, `Tap a recording to play it in full in ${playAppName()}.`),
+      h('button', { class: 'ep-guide-btn', type: 'button', onclick: () => openGuide(w, comp, content.guides, up) }, glyph('book'), t('Listening guide'))),
+    h('section', { class: 'ep-sec' }, epHead(t('Recordings'), { bar: true }),
+      h('p', { class: 'ep-listen-note' }, t('Tap a cover for a 30-second preview; ↗ plays the recording in full in {app}.', { app: t(playAppName()) })),
       rail.el),
-    reportPill({ kind: 'work', name: label, path: href.work(id) }),
+    reportPill({ kind: 'work', name: [comp?.short, w.title].filter(Boolean).join(': '), label, path: href.work(id) }),
     h('section', { class: 'ep-sec' },
-      epHead('Concerts', { bar: true, count: up.length }),
+      epHead(t('Concerts'), { bar: true, count: up.length }),
       up.length
         ? eventList(up, (x) => eventItem(x, mark, { sub: SUB.cityOnly }), { initial: 40 }).el
-        : softEmpty('calendar', 'No upcoming performances',
-          'This work isn’t on any announced Swiss programme right now. Add it to your favourites to catch new dates.'),
-      up.some((x) => x.demo) ? demoNote('Demo listings: real venues and works, invented performers.') : null),
+        : softEmpty('calendar', t('No upcoming performances'),
+          t('This work isn’t on any announced Swiss programme right now. Add it to your favourites to catch new dates.')),
+      up.length ? sourcesLine(up) : null),
     rail.credit);
 
   return {
@@ -1067,31 +1209,13 @@ export async function renderWork({ id }) {
     back: true,
     actions: topActions(
       favButton('work', id, w.title, bag),
-      shareButton(label, `${label} — recordings and concerts in Switzerland`, href.work(id))),
+      shareButton(label, t('{title} — recordings and concerts in Switzerland', { title: label }), href.work(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
 }
 
-// ---------- Artist (performer or ensemble) ----------
-function artistFacts(a, all, up) {
-  const ps = [];
-  const act = live(up);
-  if (a.demo) ps.push('An invented performer, used in Klang’s demo listings: the venues and works are real, the people are not.');
-  const role = artistRole(a);
-  if (all.length) {
-    const first = all[0].day;
-    const last = all[all.length - 1].day;
-    ps.push(`${a.name} appears in Klang’s listings as ${/^[AEIOU]/.test(role) ? 'an' : 'a'} ${role.toLowerCase()}, in ${plural(all.length, 'concert')} between ${monthShort(first)} ${dayNum(first)}, ${yearOf(first)} and ${monthShort(last)} ${dayNum(last)}, ${yearOf(last)}.`);
-  }
-  if (act.length) ps.push(`Coming up: ${plural(act.length, 'date')} in ${plural(cityCount(act), 'city', 'cities')}, the next ${whenPhrase(act[0].day)} in ${cityLabel(act[0]) || venueLabel(act[0])}.`);
-  const venues = [...countBy(live(all), (c) => c.venueId)].sort((x, y) => y[1] - x[1]);
-  if (venues.length && venues[0][1] > 1) ps.push(`Most frequent venue: ${repo.venue(venues[0][0])?.name || 'a venue to be announced'} (${plural(venues[0][1], 'concert')}).`);
-  const rep = [...workCounts(live(all))].sort((x, y) => y[1] - x[1]).map(([wid]) => repo.work(wid)).filter(Boolean).slice(0, 5);
-  if (rep.length) ps.push(`Repertoire: ${rep.map((w) => `${repo.composer(w.composerId)?.short || ''} ${w.title}`.trim()).join('; ')}.`);
-  return ps;
-}
-
+// ---------- Artist (performer or ensemble from the listings) ----------
 function relatedArtists(id, all) {
   const today = todayKey();
   const m = new Map();
@@ -1123,7 +1247,7 @@ function routeLegs(up) {
     const leg = byKey.get(key);
     if (leg) leg.n += 1;
     else {
-      const l = { key, name: repo.city(c.cityId)?.name || 'Venue TBA', n: 1, idx: i };
+      const l = { key, name: cityText(c) || t('Venue TBA'), n: 1, idx: i };
       byKey.set(key, l);
       legs.push(l);
     }
@@ -1138,16 +1262,18 @@ function routeEl(legs, onStop) {
     if (k) route.append(h('span', { class: 'arr', 'aria-hidden': 'true' }, '→'));
     route.append(h('button', {
       class: 'ep-stop', type: 'button',
-      'aria-label': `${leg.name}, ${plural(leg.n, 'date')} — show the first one`,
+      'aria-label': t('{city}, {dates} — show the first one', { city: leg.name, dates: tn(leg.n, '{n} date', '{n} dates') }),
       onclick: () => onStop(leg),
-    }, leg.name, h('b', {}, leg.n)));
+    }, leg.name, h('b', {}, fmtN(leg.n))));
   });
   return route;
 }
 
-const ITIN_NOTE = 'All times shown in Swiss local time.';
+const itinNote = () => t('All times shown in Swiss local time.');
 const artistCard = (mark) => (c, i) => eventItem(c, mark, { time: true, idx: i, sub: SUB.flagCity, chev: false });
 const itineraryHref = (id, idx = null) => `${href.artist(id)}/itinerary${idx != null ? `/${idx}` : ''}`;
+const countsLine = (active, up) => [tn(cityCount(active), '{n} city', '{n} cities'), tn(active.length, '{n} date', '{n} dates'),
+  up.length > active.length ? t('{n} cancelled', { n: fmtN(up.length - active.length) }) : null].filter(Boolean).join(' · ');
 
 export async function renderArtist({ id }) {
   // Sub-route: #/artist/<id>/itinerary[/<index to highlight>] — Sheng's "Full Itinerary" page.
@@ -1155,11 +1281,7 @@ export async function renderArtist({ id }) {
   if (sub) return renderItinerary(sub[1], sub[2] != null ? Number(sub[2]) : null);
 
   const a = repo.artist(id);
-  if (!a) {
-    return store.pref('showDemo')
-      ? notFound('Performer', 'This performer isn’t in the current listings.')
-      : notFound('Performer', 'Demo performers are hidden while demo data is off.', h('a', { class: 'btn small', href: '#/me/data' }, icon('gear', 15), 'Settings'));
-  }
+  if (!a) return notFound('Performer', t('This performer isn’t in the current listings.'));
   const content = await loadContent();
   const bag = [];
   const mark = liveMarks(bag);
@@ -1167,28 +1289,26 @@ export async function renderArtist({ id }) {
   const all = repo.query({ artistId: id });
   const up = all.filter((c) => c.day >= today);
   const active = live(up);
-  const nCities = cityCount(active);
-  const role = artistRole(a);
-
-  const openArtistBio = () => {
-    const text = textOf(content.bios[id]);
-    const nodes = [h('p', { class: 'who' }, a.name)];
-    if (text) nodes.push(...paragraphs(text));
-    else nodes.push(...artistFacts(a, all, up).map((t) => h('p', {}, t)));
-    textSheet('Artist bio', nodes);
-  };
+  const roles = rolesOf(id, all);
+  // two roles at most, each once ("Violin & Conductor" and "Violin & direction" are both 小提琴兼指挥)
+  const roleLine = [...new Set((roles.length ? roles : [a.role]).map(roleText))].slice(0, 2).join(' · ');
+  // Klang writes no biographies of living performers: the button shows only when one exists.
+  const bio = textOf(content.bios[id]);
 
   const head = h('header', { class: 'ep-head left' },
     h('div', { class: 'ep-artist-top' },
       portrait(a.name, 'lg'),
       h('div', { class: 'ep-artist-id' },
         h('h1', { class: 'ep-name' }, a.name),
-        active.length >= 2 ? h('span', { class: 'ep-tour' }, h('i'), 'On tour') : null)),
-    h('div', { class: 'ep-caps' }, [role, all.length ? `${plural(all.length, 'concert')} this season` : null].filter(Boolean).join(' · ')),
+        // Sheng's gold ON TOUR: dates in more than one city (a resident orchestra at home is not touring)
+        cityCount(active) >= 2 ? h('span', { class: 'ep-tour' }, h('i'), t('On tour')) : null)),
+    h('div', { class: 'ep-caps' }, [roleLine, all.length ? tn(all.length, '{n} concert', '{n} concerts') : null].filter(Boolean).join(' · ')),
     h('div', { class: 'ep-row' },
-      h('button', { class: 'ep-chip light', type: 'button', onclick: openArtistBio }, glyph('book'), 'Artist bio'),
-      favButton('artist', id, a.name, bag, 'ep-heart ring'),
-      a.imported ? h('span', { class: 'tag import' }, 'Imported') : null));
+      bio ? h('button', {
+        class: 'ep-chip light', type: 'button',
+        onclick: () => textSheet(t('Artist bio'), [h('p', { class: 'who' }, a.name), englishOnly(), ...paragraphs(bio)]),
+      }, glyph('book'), t('Artist bio')) : null,
+      favButton('artist', id, a.name, bag, 'ep-heart ring')));
 
   // Upcoming events: caps counts, route of cities, Swiss-time note, first dates, Full Itinerary ›
   let events;
@@ -1197,69 +1317,64 @@ export async function renderArtist({ id }) {
     const box = h('div', { class: 'ep-events cards' }, up.slice(0, INITIAL).map(artistCard(mark)));
     const legs = routeLegs(up);
     events = [
-      active.length ? h('div', { class: 'ep-caps left' }, [plural(nCities, 'city', 'cities'), plural(active.length, 'date'),
-        up.length > active.length ? `${up.length - active.length} cancelled` : null].filter(Boolean).join(' · ')) : null,
+      active.length ? h('div', { class: 'ep-caps left' }, countsLine(active, up)) : null,
       legs.length ? routeEl(legs, (leg) => {
         if (leg.idx < INITIAL) flash(box.querySelector(`[data-idx="${leg.idx}"]`));
         else location.hash = itineraryHref(id, leg.idx);
       }) : null,
-      h('p', { class: 'ep-note' }, ITIN_NOTE),
+      h('p', { class: 'ep-note' }, itinNote()),
       box,
       h('a', { class: 'ep-itin', href: itineraryHref(id) },
-        h('span', { class: 'l' }, 'Full Itinerary'),
-        h('span', { class: 'r' }, `All ${up.length.toLocaleString('en-US')} ${up.length === 1 ? 'date' : 'dates'}`, icon('chevron', 14))),
+        h('span', { class: 'l' }, t('Full Itinerary')),
+        h('span', { class: 'r' }, tn(up.length, 'All {n} date', 'All {n} dates'), icon('chevron', 14))),
     ];
   } else {
-    events = softEmpty('calendar', 'No upcoming dates',
-      `${a.name} has no announced concerts in Switzerland right now. Add ${a.kind === 'ensemble' ? 'the ensemble' : 'this performer'} to your favourites to catch new dates under Following in Concerts.`);
+    events = softEmpty('calendar', t('No upcoming dates'),
+      t(a.kind === 'ensemble'
+        ? '{name} has no announced concerts in Switzerland right now. Add the ensemble to your favourites to catch new dates under Following in Concerts.'
+        : '{name} has no announced concerts in Switzerland right now. Add this performer to your favourites to catch new dates under Following in Concerts.', { name: a.name }));
   }
 
   const related = relatedArtists(id, all);
   const relatedSection = related.length
     ? h('section', { class: 'ep-sec' },
-      epHead('Related artists', { serif: true }),
+      epHead(t('Related artists'), { serif: true }),
       h('div', { class: ['ep-people', related.length <= 2 && 'one'] }, related.map((r) => h('a', { class: 'ep-person', href: href.artist(r.id) },
         portrait(r.name, 'sm'),
-        h('p', {}, h('b', {}, r.name), ` — ${plural(r.n, 'concert')} together`,
-          r.example ? [', e.g. ', h('i', {}, r.example.title)] : null)))))
+        h('p', {}, h('b', {}, r.name), ' ', tn(r.n, '— {n} concert together', '— {n} concerts together'),
+          r.example ? tNodes(', e.g. {title}', { title: h('i', {}, r.example.title) }) : null)))))
     : null;
 
-  // Real (imported) performers: their albums on Apple Music.
-  let albums = null;
-  let credit = null;
-  if (!a.demo) {
-    const last = normalize(a.name.split(/\s+/).pop() || a.name);
-    const rail = recordingsRail({
-      load: () => searchAlbums(a.name, SEARCH_LIMIT).then((l) => l.filter((x) => normalize(x.artist).includes(last)).slice(0, 10)),
-      title: (x) => x.title, sub: (x) => x.artist, term: a.name, bag,
-      ariaLabel: `Albums by ${a.name}`, align: 'left', credit: 'detached',
-    });
-    albums = h('section', { class: 'ep-sec' }, epHead('Featured albums', { serif: true }), rail.el);
-    credit = rail.credit;
-  }
+  // Their albums on Apple Music (names match on the last word, so namesakes rarely slip in).
+  const last = normalize(a.name.split(/\s+/).pop() || a.name);
+  const rail = recordingsRail({
+    load: () => searchAlbums(a.name, SEARCH_LIMIT).then((l) => l.filter((x) => normalize(x.artist).includes(last)).slice(0, 10)),
+    title: (x) => x.title, sub: (x) => x.artist, term: a.name, bag,
+    ariaLabel: t('Albums by {name}', { name: a.name }), align: 'left', credit: 'detached',
+  });
 
   const body = h('div', { class: 'ep-page ep-artist' },
     head,
     h('section', { class: 'ep-sec' },
-      epHead('Upcoming Events', {
+      epHead(t('Upcoming Events'), {
         serif: true,
-        info: () => textSheet('Upcoming events', [
-          h('p', {}, 'Dates in Switzerland from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.'),
-          h('p', {}, 'All times are Swiss local time (Europe/Zurich). Cancelled dates stay in the list but are left out of the route and the counts.'),
-          a.demo ? h('p', { class: 'fine' }, 'This performer and these dates are demo data: the venues and works are real, the people are invented.') : null,
+        info: () => textSheet(t('Upcoming events'), [
+          h('p', {}, t('Dates in Switzerland from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.')),
+          h('p', {}, t('All times are Swiss local time (Europe/Zurich). Cancelled dates stay in the list but are left out of the route and the counts.')),
+          h('p', { class: 'fine' }, t('Real listings from the venues’ and orchestras’ own websites, updated daily.')),
         ]),
       }),
-      events),
+      events,
+      up.length ? sourcesLine(up) : null),
     relatedSection,
-    albums,
-    a.demo ? demoNote(`${a.name} is an invented performer: the name exists only in Klang’s demo listings (real venues and works).`) : null,
+    h('section', { class: 'ep-sec' }, epHead(t('Featured albums'), { serif: true }), rail.el),
     reportPill({ kind: 'performer', name: a.name, path: href.artist(id) }),
-    credit);
+    rail.credit);
 
   return {
     title: a.name,
     back: true,
-    actions: topActions(shareButton(a.name, `${a.name} — upcoming dates in Switzerland`, href.artist(id))),
+    actions: topActions(shareButton(a.name, t('{name} — upcoming dates in Switzerland', { name: a.name }), href.artist(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1268,7 +1383,7 @@ export async function renderArtist({ id }) {
 // "Full Itinerary": the same route header, every upcoming date, then the past ones.
 function renderItinerary(id, focusIdx) {
   const a = repo.artist(id);
-  if (!a) return notFound('Performer', 'This performer isn’t in the current listings.');
+  if (!a) return notFound('Performer', t('This performer isn’t in the current listings.'));
   const bag = [];
   const mark = liveMarks(bag);
   const today = todayKey();
@@ -1280,23 +1395,24 @@ function renderItinerary(id, focusIdx) {
   const legs = routeLegs(up);
 
   const body = h('div', { class: 'ep-itin-page' },
-    active.length ? h('div', { class: 'ep-caps left' }, `${plural(cityCount(active), 'city', 'cities')} · ${plural(active.length, 'date')}`) : null,
+    active.length ? h('div', { class: 'ep-caps left' }, countsLine(active, up)) : null,
     legs.length ? routeEl(legs, (leg) => flash(box.querySelector(`[data-idx="${leg.idx}"]`))) : null,
-    h('p', { class: 'ep-note' }, ITIN_NOTE),
-    up.length ? box : softEmpty('calendar', 'No upcoming dates', `${a.name} has no announced concerts in Switzerland right now.`),
+    h('p', { class: 'ep-note' }, itinNote()),
+    up.length ? box : softEmpty('calendar', t('No upcoming dates'), t('{name} has no announced concerts in Switzerland right now.', { name: a.name })),
     past.length
-      ? h('section', { class: 'ep-sec' }, epHead('Past performances', { serif: true, count: past.length }),
+      ? h('section', { class: 'ep-sec' }, epHead(t('Past performances'), { serif: true, count: past.length }),
         eventList(past, (c, i) => eventItem(c, mark, { time: true, idx: i, sub: SUB.flagCity, chev: false }), { initial: 5, cards: true }).el)
-      : null);
+      : null,
+    sourcesLine(all));
 
   if (focusIdx != null) {
     // after main.js has mounted the page and reset the scroll
-    const t = setTimeout(() => flash(box.querySelector(`[data-idx="${focusIdx}"]`)), 80);
-    bag.push(() => clearTimeout(t));
+    const tm = setTimeout(() => flash(box.querySelector(`[data-idx="${focusIdx}"]`)), 80);
+    bag.push(() => clearTimeout(tm));
   }
 
   return {
-    title: 'Full Itinerary',
+    title: t('Full Itinerary'),
     back: true,
     body,
     cleanup: () => bag.forEach((fn) => fn()),
@@ -1306,7 +1422,7 @@ function renderItinerary(id, focusIdx) {
 // ---------- Venue ----------
 export function renderVenue({ id }) {
   const v = repo.venue(id);
-  if (!v) return notFound('Venue', 'This venue isn’t in the current listings.');
+  if (!v) return notFound('Venue', t('This venue isn’t in the current listings.'));
   const city = v.cityId ? repo.city(v.cityId) : null;
   const bag = [];
   const mark = liveMarks(bag);
@@ -1315,7 +1431,9 @@ export function renderVenue({ id }) {
   const active = live(up);
   const soon = active.filter((c) => c.day <= addDays(today, 30)).length;
   const featured = active.filter((c) => c.featured).length;
+  // Apple Maps finds the place by its published name and town
   const mapsQ = [v.name, city?.name].filter(Boolean).join(', ');
+  const canton = city?.canton ? cantonText(city.canton) : '';
 
   let neighbours = [];
   if (city) {
@@ -1323,6 +1441,7 @@ export function renderVenue({ id }) {
     neighbours = repo.venuesOfCity(city.id)
       .filter((x) => x.id !== id)
       .map((x) => ({ v: x, n: perVenue.get(x.id) || 0 }))
+      .filter((x) => x.n > 0 || !x.v.dynamic) // a venue only a past listing named has nothing to show
       .sort((p, q) => q.n - p.n || p.v.name.localeCompare(q.v.name));
   }
 
@@ -1331,36 +1450,36 @@ export function renderVenue({ id }) {
       iconPortrait('pin'),
       h('h1', { class: 'ep-name' }, v.name),
       h('div', { class: 'ep-caps' }, venueKind(v),
-        city ? [' · ', h('a', { href: href.city(city.id) }, city.name),
-          repo.cantonName(city.canton) !== city.name ? ` · ${repo.cantonName(city.canton)}` : null] : null),
+        city ? [' · ', h('a', { href: href.city(city.id) }, cityName(city)),
+          canton && canton !== city.name && canton !== cityName(city) ? ` · ${canton}` : null] : null),
       h('div', { class: 'ep-caps sub' }, [
-        `${active.length.toLocaleString('en-US')} upcoming`,
-        up.length > active.length ? `${up.length - active.length} cancelled` : null,
-        `${soon} in the next 30 days`,
-        featured ? `${featured} featured` : null,
+        t('{n} upcoming', { n: fmtN(active.length) }),
+        up.length > active.length ? t('{n} cancelled', { n: fmtN(up.length - active.length) }) : null,
+        t('{n} in the next 30 days', { n: fmtN(soon) }),
+        featured ? t('{n} featured', { n: fmtN(featured) }) : null,
       ].filter(Boolean).join(' · ')),
       h('div', { class: 'ep-row center' },
-        h('a', { class: 'ep-chip light', href: `https://maps.apple.com/?q=${encodeURIComponent(mapsQ)}`, target: '_blank', rel: 'noopener' }, icon('pin', 15), 'Directions'),
-        v.imported ? h('span', { class: 'tag import' }, 'Imported') : null)),
+        h('a', { class: 'ep-chip light', href: `https://maps.apple.com/?q=${encodeURIComponent(mapsQ)}`, target: '_blank', rel: 'noopener' }, icon('pin', 15), t('Directions')),
+        v.imported ? h('span', { class: 'tag import' }, t('Imported')) : null)),
     h('section', { class: 'ep-sec' },
-      epHead('Upcoming at this venue', { bar: true, count: up.length }),
+      epHead(t('Upcoming at this venue'), { bar: true, count: up.length }),
       up.length
         ? monthGrouped(up, (c) => eventItem(c, mark, { time: true, sub: SUB.program }), 20)
-        : softEmpty('calendar', 'Nothing announced here yet',
-          'Add this venue to your favourites and its new concerts show up under Following in Concerts.'),
-      up.some((x) => x.demo) ? demoNote('Demo listings: real venues and works, invented performers.') : null),
+        : softEmpty('calendar', t('Nothing announced here yet'),
+          t('Add this venue to your favourites and its new concerts show up under Following in Concerts.')),
+      sourcesLine(up.length ? up : repo.query({ venueId: id }))),
     neighbours.length
       ? h('section', { class: 'ep-sec' },
-        epHead(`More venues in ${city.name}`, { bar: true }),
+        epHead(t('More venues in {city}', { city: cityName(city) }), { bar: true }),
         h('div', { class: 'chip-wrap ep-venue-chips' }, neighbours.map(({ v: x, n }) => h('a', { class: ['chip', n === 0 && 'zero'], href: href.venue(x.id) },
-          h('span', { class: 'lbl' }, x.name), n > 0 ? h('span', { class: 'count' }, n.toLocaleString('en-US')) : null))))
+          h('span', { class: 'lbl' }, x.name), n > 0 ? h('span', { class: 'count' }, fmtN(n)) : null))))
       : null,
     reportPill({ kind: 'venue', name: v.name, path: href.venue(id) }));
 
   return {
     title: v.name,
     back: true,
-    actions: topActions(favButton('venue', id, v.name, bag), shareButton(v.name, `${v.name} — upcoming concerts`, href.venue(id))),
+    actions: topActions(favButton('venue', id, v.name, bag), shareButton(v.name, t('{name} — upcoming concerts', { name: v.name }), href.venue(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1369,7 +1488,7 @@ export function renderVenue({ id }) {
 // ---------- City ----------
 export function renderCity({ id }) {
   const city = repo.city(id);
-  if (!city) return notFound('City', 'This city isn’t in Klang’s list of Swiss cities.');
+  if (!city) return notFound('City', t('This city isn’t in Klang’s list of Swiss cities.'));
   const bag = [];
   const mark = liveMarks(bag);
   const today = todayKey();
@@ -1379,7 +1498,9 @@ export function renderCity({ id }) {
   const perVenue = countBy(active, (c) => c.venueId);
   const venues = repo.venuesOfCity(id)
     .map((v) => ({ v, n: perVenue.get(v.id) || 0 }))
+    .filter((x) => x.n > 0 || !x.v.dynamic) // a venue only a past listing named has nothing to show
     .sort((p, q) => q.n - p.n || (q.v.weight || 0) - (p.v.weight || 0) || p.v.name.localeCompare(q.v.name));
+  const name = cityName(city);
 
   const browse = () => {
     store.setFilters({ cityIds: [id], day: null, lookBack: false });
@@ -1390,44 +1511,47 @@ export function renderCity({ id }) {
   const body = h('div', { class: 'ep-page ep-city' },
     h('header', { class: 'ep-head' },
       iconPortrait('map'),
-      h('h1', { class: 'ep-name' }, city.name),
-      h('div', { class: 'ep-caps' }, `Canton of ${repo.cantonName(city.canton)} · Switzerland`),
+      h('h1', { class: 'ep-name' }, name),
+      name !== city.name ? h('div', { class: 'ep-orig' }, city.name) : null,
+      h('div', { class: 'ep-caps' }, city.canton
+        ? t('Canton of {canton} · Switzerland', { canton: cantonText(city.canton) })
+        : t('Switzerland')),
       h('div', { class: 'ep-caps sub' }, [
-        `${active.length.toLocaleString('en-US')} upcoming`,
-        up.length > active.length ? `${up.length - active.length} cancelled` : null,
-        `${week} this week`,
-        plural(venues.length, 'venue'),
+        t('{n} upcoming', { n: fmtN(active.length) }),
+        up.length > active.length ? t('{n} cancelled', { n: fmtN(up.length - active.length) }) : null,
+        t('{n} this week', { n: fmtN(week) }),
+        tn(venues.length, '{n} venue', '{n} venues'),
       ].filter(Boolean).join(' · ')),
       h('div', { class: 'ep-row center' },
-        h('button', { class: 'ep-chip light', type: 'button', onclick: browse }, icon('calendar', 15), 'Browse in Concerts'))),
+        h('button', { class: 'ep-chip light', type: 'button', onclick: browse }, icon('calendar', 15), t('Browse in Concerts')))),
     venues.length
       ? h('section', { class: 'ep-sec' },
-        epHead('Venues', { bar: true, count: venues.length }),
+        epHead(t('Venues'), { bar: true, count: venues.length }),
         h('div', { class: 'group ep-venues' }, venues.map(({ v, n }) => rowItem({
           title: v.name,
           subtitle: venueKind(v),
           to: href.venue(v.id),
-          right: h('span', {}, n ? plural(n, 'concert') : 'No dates'),
+          right: h('span', {}, n ? tn(n, '{n} concert', '{n} concerts') : t('No dates')),
         }))))
       : null,
     h('section', { class: 'ep-sec' },
-      epHead('Next concerts', { bar: true, count: up.length }),
+      epHead(t('Next concerts'), { bar: true, count: up.length }),
       up.length
         ? [
           h('div', { class: 'ep-events' }, up.slice(0, NEXT).map((c) => eventItem(c, mark, { time: true, sub: SUB.venue }))),
           up.length > NEXT
-            ? h('button', { class: 'ep-more', type: 'button', onclick: browse }, `See all ${up.length.toLocaleString('en-US')} in Concerts`, icon('chevron', 14))
+            ? h('button', { class: 'ep-more', type: 'button', onclick: browse }, t('See all {n} in Concerts', { n: fmtN(up.length) }), icon('chevron', 14))
             : null,
         ]
-        : softEmpty('calendar', `Nothing announced in ${city.name}`,
-          'Add the city to your favourites and new listings show up under Following in Concerts.'),
-      up.some((x) => x.demo) ? demoNote('Demo listings: real venues and works, invented performers.') : null),
-    reportPill({ kind: 'city', name: city.name, path: href.city(id) }));
+        : softEmpty('calendar', t('Nothing announced in {city}', { city: name }),
+          t('Add the city to your favourites and new listings show up under Following in Concerts.')),
+      up.length ? sourcesLine(up) : null),
+    reportPill({ kind: 'city', name: city.name, label: name, path: href.city(id) }));
 
   return {
-    title: city.name,
+    title: name,
     back: true,
-    actions: topActions(favButton('city', id, city.name, bag), shareButton(city.name, `Classical concerts in ${city.name}`, href.city(id))),
+    actions: topActions(favButton('city', id, name, bag), shareButton(name, t('Classical concerts in {city}', { city: name }), href.city(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };

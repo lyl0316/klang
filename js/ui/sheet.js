@@ -2,6 +2,7 @@
 // openSheet({ title, subtitle, body: Node, footer: Node|null, onClose }) -> { close, setBody, setFooter, el }
 
 import { h, icon, clear } from '../util.js';
+import { t } from '../i18n.js';
 
 let openCount = 0;
 
@@ -12,7 +13,7 @@ export function openSheet({ title, subtitle = null, body, footer = null, onClose
   if (!footer) footerEl.hidden = true;
   const closeBtn = closeLabel
     ? h('button', { class: 'btn small', onclick: () => close() }, closeLabel)
-    : h('button', { class: 'icon-btn', 'aria-label': 'Close', onclick: () => close() }, icon('close', 18));
+    : h('button', { class: 'icon-btn', 'aria-label': t('Close'), onclick: () => close() }, icon('close', 18));
   const sheet = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     h('div', { class: 'sheet-handle' }),
     h('div', { class: 'sheet-header' },
@@ -28,6 +29,7 @@ export function openSheet({ title, subtitle = null, body, footer = null, onClose
     sheet.classList.remove('open');
     backdrop.classList.remove('open');
     document.removeEventListener('keydown', onKey);
+    window.removeEventListener('hashchange', close);
     openCount -= 1;
     if (!openCount) document.body.style.overflow = '';
     setTimeout(() => {
@@ -41,6 +43,8 @@ export function openSheet({ title, subtitle = null, body, footer = null, onClose
   };
   backdrop.addEventListener('click', close);
   document.addEventListener('keydown', onKey);
+  // Going to another page (a link, Back, the iPhone's edge swipe) never leaves a sheet over it.
+  window.addEventListener('hashchange', close);
   document.body.append(backdrop, sheet);
   openCount += 1;
   document.body.style.overflow = 'hidden';

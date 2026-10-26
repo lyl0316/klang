@@ -2,8 +2,9 @@
 // concert marks (saved / going / attended + private review), favourites ("follows"),
 // library (albums, concert / article playlists and your own playlists of pieces), hidden concerts,
 // personal activity timeline (incl. pieces opened in Apple Music), preferences (region, reminders,
-// appearance, Play in, New Year mode …), assistant history, article ratings and read notifications.
-// Browse filters are session-only.
+// appearance, interface language, Play in, New Year mode …), assistant history, article ratings and read
+// notifications. Browse filters are session-only. The concert listings themselves are not user state:
+// they come from the real feed (feed.js) and the user's own imports (below).
 
 import { storage } from './util.js';
 
@@ -26,10 +27,11 @@ export const REMINDER_DEFAULTS = {
 };
 
 const DEFAULTS = () => ({
+  schema: 2,
   marks: {}, // concertId -> { saved, going, attended, rating, note, favoriteWorkId, encores, updatedAt }
   follows: { venue: [], city: [], composer: [], artist: [], work: [] },
   prefs: {
-    showDemo: true,
+    lang: 'auto', // interface language: 'auto' (follows the phone) | 'en' | 'zh' (i18n.js)
     playIn: 'classical', // 'classical' (Apple Music Classical) or 'music' (Apple Music)
     reminderDays: [7, 1],
     homeCityId: null,
@@ -60,21 +62,45 @@ function load() {
   if (!saved || typeof saved !== 'object') return base;
   const prefs = { ...base.prefs, ...(saved.prefs || {}) };
   prefs.reminders = { ...REMINDER_DEFAULTS, ...((saved.prefs && saved.prefs.reminders) || {}) };
-  return {
+  return migrate({
     ...base,
     ...saved,
     follows: { ...base.follows, ...(saved.follows || {}) },
     prefs,
     library: { ...base.library, ...(saved.library || {}) },
-  };
+  });
+}
+
+// Klang no longer has demo concerts (only real listings): drop the old "Show demo concerts" switch
+// and the marks / hidden entries that pointed at invented concerts ('demo-…' ids).
+function migrate(s) {
+  delete s.prefs.showDemo;
+  if (!['auto', 'en', 'zh'].includes(s.prefs.lang)) s.prefs.lang = 'auto';
+  if ((s.schema || 1) < 2) {
+    const isDemo = (id) => typeof id === 'string' && id.startsWith('demo-');
+    s.marks = Object.fromEntries(Object.entries(s.marks || {}).filter(([id]) => !isDemo(id)));
+    s.hidden = (s.hidden || []).filter((id) => !isDemo(id));
+    s.timeline = (s.timeline || []).filter((e) => !(e.kind === 'concert' && isDemo(e.id)));
+    s.schema = 2;
+  }
+  return s;
 }
 
 function persist() {
-  storage.set(KEY, state);
+  // The listings copy (feed.js) shares the quota; the user's own data always wins.
+  if (!storage.set(KEY, state)) {
+    storage.remove('klang.feed.v1');
+    storage.set(KEY, state);
+  }
 }
 
 function emit(topic) {
   for (const fn of listeners) fn(topic);
+}
+
+// For modules that own other data (feed.js emits 'feed' when the real listings change).
+export function notify(topic) {
+  emit(topic);
 }
 
 export function subscribe(fn) {
@@ -422,6 +448,7 @@ export function importUserData(json) {
     marks: data.marks || {},
     follows: { ...base.follows, ...(data.follows || {}) },
     prefs: { ...base.prefs, ...(data.prefs || {}), reminders: { ...REMINDER_DEFAULTS, ...((data.prefs && data.prefs.reminders) || {}) } },
+    schema: 2,
     imports: data.imports || [],
     listenChoice: data.listenChoice || {},
     library: { ...base.library, ...(data.library || {}) },
@@ -429,6 +456,7 @@ export function importUserData(json) {
     timeline: data.timeline || [],
     articleRatings: data.articleRatings || {},
   };
+  delete state.prefs.showDemo;
   persist();
   if (Array.isArray(data.posts)) { storage.set(POSTS_KEY, data.posts); postsChanged(); }
   emit('data');

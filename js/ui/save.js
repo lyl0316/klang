@@ -9,6 +9,7 @@ import { h, icon, clear, toast } from '../util.js';
 import * as store from '../store.js';
 import { openSheet } from './sheet.js';
 import { toPlain } from '../applemusic.js';
+import { t, tn } from '../i18n.js';
 
 function albumRecord(p) {
   return { id: p.collectionId, title: p.album || p.title, artist: p.artist || '', artwork: p.artwork || null, year: p.year || '', workId: p.workId || null };
@@ -18,7 +19,7 @@ export function openSaveSheet(piece) {
   const p = toPlain(piece);
   const body = h('div', { class: 'save-sheet' });
   const sheet = openSheet({
-    title: 'Save to Library',
+    title: t('Save to Library'),
     subtitle: [p.composer, p.title].filter(Boolean).join(' · '),
     body,
   });
@@ -30,12 +31,12 @@ export function openSaveSheet(piece) {
     // Album
     if (p.collectionId) {
       const inLib = store.hasAlbum(p.collectionId);
-      rows.push(h('div', { class: 'caps-label' }, 'Album'));
+      rows.push(h('div', { class: 'caps-label' }, t('Album')));
       rows.push(h('button', {
         type: 'button', class: ['save-row', inLib && 'on'], 'aria-pressed': inLib ? 'true' : 'false',
         onclick: () => {
           const on = store.toggleAlbum(albumRecord(p));
-          toast(on ? 'Album added to your Library' : 'Album removed from your Library');
+          toast(t(on ? 'Album added to your Library' : 'Album removed from your Library'));
           paint();
         },
       },
@@ -45,7 +46,7 @@ export function openSaveSheet(piece) {
     }
 
     // Playlists (only for a piece, or a whole album as one entry)
-    rows.push(h('div', { class: 'caps-label' }, 'Add to a playlist'));
+    rows.push(h('div', { class: 'caps-label' }, t('Add to a playlist')));
     const lists = store.userPlaylists();
     for (const pl of lists) {
       const on = store.isInPlaylist(pl.id, p.id);
@@ -53,32 +54,32 @@ export function openSaveSheet(piece) {
         type: 'button', class: ['save-row', on && 'on'], 'aria-pressed': on ? 'true' : 'false',
         onclick: () => {
           const now = store.togglePlaylistItem(pl.id, p);
-          toast(now ? `Added to “${pl.name}”` : `Removed from “${pl.name}”`);
+          toast(t(now ? 'Added to “{name}”' : 'Removed from “{name}”', { name: pl.name }));
           paint();
         },
       },
       h('span', { class: 'save-art ph' }, icon('playlist', 18)),
-      h('span', { class: 'save-main' }, h('span', { class: 't' }, pl.name), h('span', { class: 's' }, `${pl.items.length} ${pl.items.length === 1 ? 'piece' : 'pieces'}`)),
+      h('span', { class: 'save-main' }, h('span', { class: 't' }, pl.name), h('span', { class: 's' }, tn(pl.items.length, '{n} piece', '{n} pieces'))),
       h('span', { class: 'save-state' }, on ? icon('check', 18) : icon('plus', 18))));
     }
 
     if (creating) {
-      const input = h('input', { class: 'input', type: 'text', placeholder: 'Playlist name', 'aria-label': 'New playlist name', maxlength: '80', enterkeyhint: 'done' });
+      const input = h('input', { class: 'input', type: 'text', placeholder: t('Playlist name'), 'aria-label': t('New playlist name'), maxlength: '80', enterkeyhint: 'done' });
       const create = () => {
         const pl = store.createPlaylist(input.value, p);
         creating = false;
-        toast(`Added to new playlist “${pl.name}”`);
+        toast(t('Added to new playlist “{name}”', { name: pl.name }));
         paint();
       };
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); create(); } });
       rows.push(h('form', { class: 'save-new', onsubmit: (e) => { e.preventDefault(); create(); } },
         input,
-        h('button', { type: 'submit', class: 'btn small primary' }, 'Create')));
+        h('button', { type: 'submit', class: 'btn small primary' }, t('Create'))));
       setTimeout(() => input.focus(), 50);
     } else {
       rows.push(h('button', { type: 'button', class: 'save-row new', onclick: () => { creating = true; paint(); } },
         h('span', { class: 'save-art ph' }, icon('plus', 18)),
-        h('span', { class: 'save-main' }, h('span', { class: 't' }, 'New playlist…'))));
+        h('span', { class: 'save-main' }, h('span', { class: 't' }, t('New playlist…')))));
     }
     clear(body).append(...rows);
   }
@@ -88,7 +89,7 @@ export function openSaveSheet(piece) {
 
 export function saveButton(piece, { cls = 'btn small', label = 'Save', iconOnly = false } = {}) {
   return h('button', {
-    type: 'button', class: [cls, 'save-btn'], 'aria-label': `Save ${piece.title} to your Library`,
+    type: 'button', class: [cls, 'save-btn'], 'aria-label': t('Save {title} to your Library', { title: piece.title }),
     onclick: (e) => { e.stopPropagation(); e.preventDefault(); openSaveSheet(piece); },
-  }, icon('plus', 15), iconOnly ? null : label);
+  }, icon('plus', 15), iconOnly ? null : t(label));
 }

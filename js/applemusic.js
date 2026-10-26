@@ -8,9 +8,14 @@
 //
 // A "piece" is one work in one recording, or a whole album (kind 'album'):
 // { id, kind: 'piece' | 'album', title, composer, workId, artist, album, collectionId, trackId, artwork, year }
+//
+// Apple's 30-second previews, played inside Klang, are music.js `preview` (buttons: ui/preview.js).
+// Interface text follows the interface language (i18n.js): playAppName() is "Apple Music 古典乐" in
+// Chinese, appleCredit() the credit line; APPLE_CREDIT stays the English key for t().
 
 import { h, storage } from './util.js';
 import * as store from './store.js';
+import { t } from './i18n.js';
 
 const KEY = 'klang.listening.v1';
 const QUEUE_MAX = 60;
@@ -18,9 +23,13 @@ const HOST = { classical: 'https://classical.music.apple.com', music: 'https://m
 
 export const PLAY_APPS = [['classical', 'Apple Music Classical'], ['music', 'Apple Music']];
 export const playApp = () => (store.pref('playIn') === 'music' ? 'music' : 'classical');
-export const playAppName = (app = playApp()) => (app === 'music' ? 'Apple Music' : 'Apple Music Classical');
+const APP_EN = (app) => (app === 'music' ? 'Apple Music' : 'Apple Music Classical');
+// The app's name as shown: "Apple Music Classical" / "Apple Music 古典乐"
+export const playAppName = (app = playApp()) => t(APP_EN(app));
 
+// English text; show it with appleCredit() (or t(APPLE_CREDIT)) so it follows the interface language.
 export const APPLE_CREDIT = 'Recording details come from Apple’s iTunes Search API. Pieces play in full in Apple Music Classical or Apple Music, with your own subscription.';
+export const appleCredit = () => t(APPLE_CREDIT);
 
 // ---------- links ----------
 export function albumURL(collectionId, trackId = null, app = playApp()) {
@@ -129,7 +138,7 @@ export function noteOpened(queue, index = 0) {
   const q = all.slice(from, from + QUEUE_MAX);
   state = { queue: q, index: i - from, at: new Date().toISOString() };
   save();
-  store.logListen(state.queue[state.index], playAppName());
+  store.logListen(state.queue[state.index], APP_EN(playApp())); // stored data: the app's own name
 }
 
 // A lookup finished after the tap (e.g. the 2nd work of a programme resolved its recording): upgrade
@@ -155,7 +164,7 @@ export function listenLink(piece, children, { cls = '', queue = null, index = 0,
     href: pieceURL(piece),
     target: '_blank',
     rel: 'noopener',
-    'aria-label': label || `Play ${piece.title} in ${playAppName()}`,
+    'aria-label': label || t('Play {title} in {app}', { title: piece.title, app: playAppName() }),
     onclick: (e) => {
       e.stopPropagation();
       noteOpened(queue || [piece], queue ? index : 0);
