@@ -6,7 +6,8 @@
 
 Fails (exit 1) when:
   - the feed is missing or unreadable, or older than --max-age-hours;
-  - a source's website could not be read today (its previous events were reused, or lost);
+  - a source's website could not be read two updates in a row, or could not be read and its
+    events were lost (a one-day outage whose events were kept, or that had none, is a warning);
   - a source that had events before now returns none (the site has probably changed);
   - a source's count collapsed to under 30% of the previous feed (likely a parsing break).
 Also lists Klang cities with no upcoming concerts (information only, not a failure).
@@ -91,12 +92,22 @@ def check(feed, previous, max_age_hours):
     prev = {s.get('key'): s for s in ((previous or {}).get('sources') or []) if isinstance(s, dict)}
     for s in feed.get('sources') or []:
         key, name, n = s.get('key'), s.get('name') or s.get('key'), s.get('count') or 0
-        if not s.get('ok'):
-            how = f'kept {n} events from the previous day' if s.get('reused') and n else 'no events kept'
-            problems.append(f'{name}: website could not be read ({s.get("error") or "error"}); {how}.')
-            continue
         p = prev.get(key)
         pn = (p or {}).get('count') or 0
+        if not s.get('ok'):
+            how = f'kept {n} events from the previous day' if s.get('reused') and n else 'no events kept'
+            msg = f'{name}: website could not be read ({s.get("error") or "error"}); {how}'
+            # A site that is down for one day is not an alarm when nothing was lost: its events were
+            # kept from the previous feed, or it had none. Two days in a row, or events lost, is.
+            if p is None:
+                problems.append(msg + '.')
+            elif not p.get('ok'):
+                problems.append(msg + '; it could not be read the day before either.')
+            elif pn and not (s.get('reused') and n):
+                problems.append(msg + f' (had {pn}).')
+            else:
+                warnings.append(msg + '; will try again on the next update.')
+            continue
         if n == 0 and pn >= 5:
             problems.append(f'{name}: returned 0 events (had {pn}); the website has probably changed.')
         elif pn >= 10 and n < 0.3 * pn:

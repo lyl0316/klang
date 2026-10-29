@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '23 4 * * *'   # 04:23 UTC = 05:23 CET / 06:23 CEST
+    - cron: '17 1 * * *'   # 01:17 UTC; GitHub often starts scheduled runs hours late, so ask early
   workflow_dispatch:
 
 permissions:
@@ -28,9 +28,9 @@ jobs:
     outputs:
       check: ${{ steps.check.outcome }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -59,9 +59,9 @@ jobs:
             --previous https://lyl0316.github.io/klang/data/concerts.json \
             --report data/feed-report.json
 
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: '.'
 
@@ -74,7 +74,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # Fails the run (after the site is deployed) when the calendar check failed, so the failure is
   # visible on the Actions page and in GitHub's notifications.

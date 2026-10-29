@@ -1222,6 +1222,26 @@ class OpernhausRecovery(unittest.TestCase):
         self.assertEqual(oz.missed_performances([], set(), date(2026, 10, 26)), {})
 
 
+class Check(unittest.TestCase):
+    def test_one_day_outage_is_a_warning(self):
+        import check as chk
+        now = datetime.now(timezone.utc).isoformat()
+        def feed(**src):
+            return {'generatedAt': now, 'concerts': [], 'sources': [dict({'key': 'gstaad', 'name': 'Gstaad'}, **src)]}
+        down = dict(ok=False, count=0, error='robots.txt unreachable (timed out)')
+        p, w, _, _ = chk.check(feed(**down), feed(ok=True, count=0), 30)
+        self.assertEqual(p, [])                                     # had no events, nothing lost
+        self.assertTrue(any('try again' in x for x in w))
+        p, w, _, _ = chk.check(feed(ok=False, count=12, reused=True, error='timeout'), feed(ok=True, count=12), 30)
+        self.assertEqual(p, [])                                     # yesterday's events kept
+        p, _, _, _ = chk.check(feed(**down), feed(ok=False, count=0), 30)
+        self.assertEqual(len(p), 1)                                 # two days in a row
+        p, _, _, _ = chk.check(feed(ok=False, count=0, error='timeout'), feed(ok=True, count=12), 30)
+        self.assertEqual(len(p), 1)                                 # events lost
+        p, _, _, _ = chk.check(feed(**down), None, 30)
+        self.assertEqual(len(p), 1)                                 # nothing to compare with
+
+
 class CodeHash(unittest.TestCase):
     def test_helpers_count(self):
         names = lambda key: [os.path.basename(p) for p in build.code_files(registry.discover([key])[0])]
