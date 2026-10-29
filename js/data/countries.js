@@ -2,8 +2,9 @@
 // 2026-10-26, spec/sheng-locations.json): 47 countries with their regions and cities, in Sheng's order.
 //
 // Only the NAMES are used. `count` is the number of listings Sheng showed for the country at that
-// time; Klang uses it only to keep Sheng's order and never displays it as a concert count — Klang
-// has real feeds for Switzerland only, so every other country (and its cities) has 0 events.
+// time; Klang uses it only to keep Sheng's order and never displays it as a concert count. Klang's
+// own feed reads venues in Switzerland and in the main cities of Austria, Germany, France and Italy
+// (tools/feeds, COUNTRY in each reader); every other country (and its cities) has 0 events.
 //
 // Shape: { id, name, count, regions: [{ name, cities: [...] }], cities: [...], partial?: [...], swiss? }
 //   regions — Sheng's region groups (Japanese prefectures, German states, US states …);

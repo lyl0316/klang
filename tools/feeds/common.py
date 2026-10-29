@@ -281,6 +281,10 @@ def _load_robots(origin):
                 raw = _decompress(resp.read(512 * 1024), resp.headers.get('Content-Encoding', ''))
                 text = _decode(raw, resp.headers.get('Content-Type', ''))
                 log.debug('robots.txt %s: %d bytes', origin, len(raw))
+                if re.match(r'\s*(?:<!doctype\s+html|<html|<head)', text, re.I):
+                    # a challenge or error page instead of robots.txt (captcha, bot protection): the
+                    # site is not letting us read its rules, so treat it as unreachable, not "no rules"
+                    return _Robots(disallow_all=True, note='robots.txt is an HTML page (bot protection?)')
                 robots = _Robots(text)
                 with _host_lock:   # honour Crawl-delay from the very first page request
                     _next_slot[host] = max(_next_slot.get(host, 0.0), time.monotonic() + robots.delay)

@@ -19,7 +19,7 @@
 
 import * as store from './store.js';
 import ZH_SHELL from './i18n/zh-shell.js';
-import ZH_CONCERTS from './i18n/zh-concerts.js';
+import ZH_CONCERTS, { ZH_PLACES } from './i18n/zh-concerts.js';
 import ZH_CONCERT from './i18n/zh-concert.js';
 import ZH_PAGES from './i18n/zh-pages.js';
 import ZH_PERSONAL from './i18n/zh-personal.js';
@@ -129,7 +129,8 @@ export function relDay(dayKey, today) {
 }
 
 // ---------- names ----------
-export const cityName = (city) => (city ? (isZh() && ZH_CITIES[city.id || city]) || city.name || city : '');
+// a city abroad ({ abroad: true }, repo.js) takes its Chinese name from Sheng's place names
+export const cityName = (city) => (city ? (isZh() && (ZH_CITIES[city.id || city] || (city.abroad && ZH_PLACES[city.name]))) || city.name || city : '');
 export const countryName = (name) => (isZh() && ZH_COUNTRIES[name]) || name;
 export const cantonName = (code, fallback) => (isZh() && ZH_CANTONS[code]) || fallback || code;
 export const composerName = (c) => (c ? (isZh() && ZH_COMPOSERS[c.id]) || c.name : '');

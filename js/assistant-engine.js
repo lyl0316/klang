@@ -40,6 +40,7 @@ import {
 } from './i18n.js';
 import { ZH_CITIES, ZH_CANTONS, ZH_COMPOSERS, ZH_COMPOSERS_SHORT, ZH_COUNTRIES } from './i18n/zh-names.js';
 import { ZH_PLACES } from './i18n/zh-concerts.js';
+import { country as countryOf } from './data/countries.js';
 
 const MAX_ITEMS = 8;
 const NOTES_KEY = 'klang.assistant.notes';
@@ -150,6 +151,12 @@ const ZH_PHRASES = {
 };
 
 let ZH_TABLE = null;
+// A Chinese place name (维也纳, 奥地利) that names a city or country abroad Klang has listings for.
+function coveredZh(zh) {
+  const name = zhTable().map.get(zh)?.en?.replace(/^in /, '');
+  return !!name && dynamicIndex().abroad.has(prep(name));
+}
+
 function zhTable() {
   if (ZH_TABLE) return ZH_TABLE;
   const map = new Map();
@@ -163,7 +170,7 @@ function zhTable() {
   for (const [id, zh] of Object.entries(ZH_COMPOSERS)) { const c = repo.composer(id); if (c) put(zh, c.name); }
   for (const [id, zh] of Object.entries(ZH_COMPOSERS_SHORT)) { const c = repo.composer(id); if (c) put(zh, c.name); }
   for (const [en, zh] of Object.entries(ZH_COUNTRIES)) if (en !== 'Switzerland') put(zh, `in ${en}`, 'country');
-  // cities abroad (柏林, 维也纳 …): named like a country, so the reply says Klang covers Switzerland only
+  // cities abroad (柏林, 维也纳 …): named like a country; the reply says which ones Klang has no listings for
   for (const [en, zh] of Object.entries(ZH_PLACES)) put(zh, `in ${en}`, 'country');
   for (const [adj, zh] of Object.entries(NATIONS_ZH)) {
     put(`${zh}作曲家`, `${adj} composer`);
@@ -462,6 +469,19 @@ const VENUE_ALIASES = {
   'auditorium-stravinski': ['auditorium stravinski', 'stravinski auditorium'],
   'salle-des-combins': ['combins', 'salle des combins'],
   'festival-zelt-gstaad': ['festival zelt'],
+};
+
+// Klang's English names of cities abroad -> local names people may type
+const ABROAD_ALIASES = {
+  Vienna: ['wien', 'vienne', 'vienna austria'], Munich: ['munchen', 'muenchen', 'munchen'], Cologne: ['koln', 'koeln'],
+  Nuremberg: ['nurnberg', 'nuernberg'], Frankfurt: ['frankfurt am main'], Düsseldorf: ['dusseldorf', 'duesseldorf'],
+  Milan: ['milano', 'milan italy'], Rome: ['roma'], Naples: ['napoli'], Turin: ['torino'], Genoa: ['genova'],
+  Venice: ['venezia'], Florence: ['firenze'], Strasbourg: ['strassburg'],
+};
+// countries abroad Klang may have listings for -> the words that name them
+const ABROAD_COUNTRIES = {
+  austria: ['austria', 'osterreich', 'oesterreich', 'autriche'], germany: ['germany', 'deutschland', 'allemagne', 'germania'],
+  france: ['france', 'frankreich', 'francia'], italy: ['italy', 'italien', 'italie', 'italia'],
 };
 
 const CITY_ALIASES = {
@@ -766,8 +786,18 @@ function dynamicIndex() {
       if (last.length >= 4 && !STOP.has(last)) addKey(artistParts, last, a.id);
     }
   }
+  // places abroad that have listings: their cities (English and local names) and whole countries
+  const abroad = new Map();
+  for (const c of repo.abroadCities()) {
+    addKey(abroad, c.name, c.id);
+    for (const a of ABROAD_ALIASES[c.name] || []) addKey(abroad, a, c.id);
+  }
+  for (const [id, names] of Object.entries(ABROAD_COUNTRIES)) {
+    if (repo.hasListingsIn(id)) for (const n of names) addKey(abroad, n, `country:${id}`);
+  }
   return {
     venues, venueKeys: sortedKeys(venues),
+    abroad, abroadKeys: sortedKeys(abroad),
     artistFull, artistFullKeys: sortedKeys(artistFull),
     artistParts, artistPartKeys: sortedKeys(artistParts),
   };
@@ -1138,6 +1168,15 @@ export function parse(text, { today = todayKey() } = {}) {
     placeLabels.push(...[...ids].map((id) => repo.city(id)?.name).filter(Boolean));
     placeZh.push(...[...ids].map((id) => repo.city(id)).filter(Boolean).map((c) => zhCity(c)));
   });
+  takeFromList(ctx, dyn.abroadKeys, dyn.abroad, (ids) => {
+    addAll(p.cityIds, ids);
+    for (const id of ids) {
+      const c = repo.city(id);
+      const x = c ? null : countryOf(id.slice('country:'.length));
+      placeLabels.push(c ? c.name : x ? x.name : id);
+      placeZh.push(c ? zhCity(c) : x ? countryName(x.name) : id);
+    }
+  });
   takeFromList(ctx, st.cantonKeys, st.cantons, (codes) => {
     for (const code of codes) {
       addAll(p.cityIds, repo.allCities().filter((c) => c.canton === code).map((c) => c.id));
@@ -1490,8 +1529,8 @@ function placePromptZh(p) {
 function introNoteZh(p) {
   const bits = [];
   if (p.corrections.length) bits.push(`（把“${p.corrections[0][0]}”理解为${p.corrections[0][2] || p.corrections[0][1]}。）`);
-  if (p.zhPlaces?.length) bits.push(`Klang 暂时只有瑞士的演出信息，所以忽略了“${uniq(p.zhPlaces).join('、')}”。`);
-  else if (p.unknownPlace) bits.push(`Klang 暂时只有瑞士的演出信息，所以忽略了“${p.unknownPlace}”。`);
+  if (p.zhPlaces?.length) bits.push(`Klang 暂时只有瑞士以及奥地利、德国、法国和意大利主要城市的演出信息，所以忽略了“${uniq(p.zhPlaces).join('、')}”。`);
+  else if (p.unknownPlace) bits.push(`Klang 暂时只有瑞士以及奥地利、德国、法国和意大利主要城市的演出信息，所以忽略了“${p.unknownPlace}”。`);
   else if (p.zhUnknown?.length) bits.push(`我不认识“${p.zhUnknown.join('、')}”，所以忽略了它。`);
   else if (p.unknownRaw && /[A-ZÀ-Ý]/.test(p.unknownRaw)) bits.push(`我不认识“${p.unknownRaw}”，所以忽略了它。`);
   if (p.missing.length && !p.works.length) {
@@ -1652,7 +1691,7 @@ function answerConcerts(p, { entityRows = [] } = {}) {
 function introNote(p) {
   const bits = [];
   if (p.corrections.length) bits.push(`(Reading “${p.corrections[0][0]}” as ${p.corrections[0][1]}.)`);
-  if (p.unknownPlace) bits.push(`Klang only covers Switzerland, so I left out “${p.unknownPlace}”.`);
+  if (p.unknownPlace) bits.push(`Klang covers Switzerland and the main cities of Austria, Germany, France and Italy, so I left out “${p.unknownPlace}”.`);
   else if (p.unknownRaw && /[A-ZÀ-Ý]/.test(p.unknownRaw)) bits.push(`I don't know “${p.unknownRaw}”, so I left it out.`);
   if (p.missing.length && !p.works.length) {
     const m = p.missing[0];
@@ -2142,7 +2181,8 @@ export function answer(text, { today = todayKey(), expect = null } = {}) {
   if (RE_MINE.test(q)) return answerMine(today);
 
   const p = parse(raw, { today });
-  p.zhPlaces = zhIn.places;
+  // places abroad Klang has listings for were understood (parse 6); only the others were left out
+  p.zhPlaces = zhIn.places.filter((zh) => !coveredZh(zh));
   p.zhUnknown = zhIn.unknown;
   const hasPlace = p.cityIds.length > 0 || p.venueIds.length > 0;
   const hasWhen = !!(p.date || p.part || p.weekday != null);

@@ -38,11 +38,12 @@ function followingFilter() {
     c.credits.some((cr) => artists.has(cr.artistId));
 }
 
-// ---------- other countries (Sheng's list; Klang has no listings outside Switzerland yet) ----------
+// ---------- other countries (Sheng's list) ----------
 // A country other than Switzerland is kept in the location filter itself, so any other screen that
 // sets cityIds (map, city page, Your region) brings the list back to Switzerland:
 //   ['country:germany'] = all of Germany · ['country:germany|Berlin', …] = some of its cities.
-// No concert has such a city id, so the list is (honestly) empty there.
+// Concerts abroad carry these ids (repo.js), so Austria, Germany, France and Italy list their real
+// concerts; a country whose venues Klang does not read yet shows an honest empty list.
 const CC = 'country:';
 const isCountryId = (id) => typeof id === 'string' && id.startsWith(CC);
 function browseCountry(ids = f.cityIds) {
@@ -206,6 +207,13 @@ export function render() {
     const toSwitzerland = (label = t('Show all of Switzerland')) =>
       h('button', { class: 'btn small', onclick: () => { store.setFilters({ cityIds: [], day: null, lookBack: false }); window.scrollTo(0, 0); } }, label);
     const x = browseCountry();
+    if (x && repo.hasListingsIn(x.id)) {
+      const names = browseCountryCities();
+      const place = names && names.length === 1 ? placeName(names[0]) : countryName(x.name);
+      return emptyState('calendar', t('No concerts in {city} right now', { city: place }),
+        t('Klang reads the venues’ own calendars every day; nothing is listed here at the moment.'),
+        toSwitzerland(t('Back to Switzerland')));
+    }
     if (x) {
       return emptyState('globe', t('No concerts here yet'),
         t('No listings for {country} yet — Klang reads Swiss venues’ own calendars.', { country: countryName(x.name) }),
@@ -245,7 +253,7 @@ export function render() {
       paintRail([]);
       return;
     }
-    const hideCity = f.cityIds.length === 1;
+    const hideCity = f.cityIds.length === 1 && !/^country:[^|]*$/.test(f.cityIds[0]); // one city, not a whole country
     let i = 0;
     const sentinel = h('div', { class: 'load-more' });
     let chunks = 0;
@@ -600,8 +608,9 @@ export function render() {
 
   // ---------- Location sheet ----------
   // Like Sheng: every city starts selected ("Select all"); tapping a city excludes it. "Other countries ›"
-  // opens Sheng's 47 country chips. Klang reads Swiss venues only, so another country shows its regions
-  // and cities with 0 events and a calm note; confirming it shows an empty list (never invented concerts).
+  // opens Sheng's 47 country chips with Klang's own counts. Another country shows its regions and cities
+  // (plus any other town its listings name); one whose venues Klang does not read yet has 0 events and a
+  // calm note, and confirming it shows an empty list (never invented concerts).
   function openLocationSheet() {
     const swissCities = repo.allCities();
     const allIds = swissCities.map((c) => c.id);
@@ -620,9 +629,19 @@ export function render() {
     for (const c of repo.query({ from, to })) if (c.cityId) counts.set(c.cityId, (counts.get(c.cityId) || 0) + 1);
     const swissTotal = [...counts.values()].reduce((a, b) => a + b, 0);
     const cities = [...swissCities].sort((a, b) => (counts.get(b.id) - counts.get(a.id)) || a.name.localeCompare(b.name));
-    // Sheng orders countries by their number of listings: Switzerland (the only one with listings here)
-    // first, the others in Sheng's order.
-    const countries = [...COUNTRIES].sort((a, b) => (b.swiss ? 1 : 0) - (a.swiss ? 1 : 0));
+    const abroad = repo.abroadCounts({ from, to });
+    const xTotal = (x) => (x.swiss ? swissTotal : abroad.get(x.id)?.total || 0);
+    const xCount = (x, n) => abroad.get(x.id)?.cities.get(n) || 0;
+    // a country's cities: Sheng's, then other towns its listings name
+    const xCities = (x) => {
+      const known = countryCities(x);
+      const extra = [...(abroad.get(x.id)?.cities.keys() || [])].filter((n) => !known.includes(n)).sort();
+      return [...known, ...extra];
+    };
+    // Like Sheng, countries by their number of listings: Switzerland first, then the countries Klang has
+    // listings for, the others in Sheng's order.
+    const countries = [...COUNTRIES].sort((a, b) => (b.swiss ? 1 : 0) - (a.swiss ? 1 : 0) || xTotal(b) - xTotal(a));
+    if (startCountry && !browseCountryCities()) xPicked = new Set(xCities(startCountry)); // the whole country
     const otherCountry = () => (current ? countryOf(current) : null);
     function setCountry(id) {
       current = id;
@@ -633,7 +652,7 @@ export function render() {
       const x = otherCountry();
       if (x) {
         const names = startCountry && startCountry.id === x.id ? browseCountryCities() : null;
-        xPicked = new Set(names || countryCities(x));
+        xPicked = new Set(names || xCities(x));
       } else picked = new Set(!startCountry && f.cityIds.length ? f.cityIds : allIds);
       paintChoices();
     }
@@ -672,11 +691,11 @@ export function render() {
       search.setPlaceholder(countriesOpen ? t('Search countries') : t('Search cities'));
     }
 
-    // Sheng's "Other countries": chips with each country's events (only Switzerland has any here).
+    // Sheng's "Other countries": chips with each country's events.
     function paintCountries() {
       const list = countries.filter((x) => !q || normalize(x.name).includes(q) || normalize(countryName(x.name)).includes(q));
       fill(choices, h('div', { class: 'chip-wrap cr-country-chips' }, list.map((x) => chip(x.swiss ? t('Switzerland') : countryName(x.name), {
-        count: x.swiss ? swissTotal : 0,
+        count: xTotal(x),
         active: x.swiss ? !current : current === x.id,
         onClick: () => setCountry(x.swiss ? null : x.id),
       }))), list.length ? null : h('p', { class: 'cr-none' }, t('No country matches')));
@@ -696,13 +715,16 @@ export function render() {
         visible.length ? null : h('p', { class: 'cr-none' }, t('No city matches')));
     }
 
-    // Another country: Sheng's regions (with › to open their cities) and its other cities, all 0 events.
+    // Another country: Sheng's regions (with › to open their cities) and its other cities, with counts
+    // (cities with concerts first in the flat list, as Sheng does).
     function paintOther(x) {
       const toggle = (list, on) => { for (const n of list) on ? xPicked.add(n) : xPicked.delete(n); };
-      const cityChip = (n) => chip(placeName(n), { count: 0, active: xPicked.has(n), onClick: () => { xPicked.has(n) ? xPicked.delete(n) : xPicked.add(n); paintChoices(); } });
-      const note = h('div', { class: 'cr-note' }, icon('info', 15),
+      const cityChip = (n) => chip(placeName(n), { count: xCount(x, n), active: xPicked.has(n), onClick: () => { xPicked.has(n) ? xPicked.delete(n) : xPicked.add(n); paintChoices(); } });
+      const note = repo.hasListingsIn(x.id) ? null : h('div', { class: 'cr-note' }, icon('info', 15),
         h('p', {}, t('No listings for {country} yet — Klang reads Swiss venues’ own calendars.', { country: countryName(x.name) })));
-      const all = countryCities(x);
+      const all = xCities(x);
+      const grouped = new Set(x.regions.flatMap((r) => r.cities));
+      const flat = all.filter((n) => !grouped.has(n)).sort((a, b) => xCount(x, b) - xCount(x, a));
       if (q) {
         // a city matches by its name, or by its region's name ("Bavaria" / "巴伐利亚")
         const inRegion = (n) => x.regions.some((r) => r.cities.includes(n) && (normalize(r.name).includes(q) || normalize(regionName(r.name)).includes(q)));
@@ -712,6 +734,7 @@ export function render() {
           hits.length ? null : h('p', { class: 'cr-none' }, t('No city matches')));
         return;
       }
+      const regionCount = (r) => r.cities.reduce((n, c) => n + xCount(x, c), 0);
       const regions = x.regions.map((r) => {
         const open = openRegions.has(r.name);
         const allOn = r.cities.every((n) => xPicked.has(n));
@@ -722,14 +745,15 @@ export function render() {
           h('div', { class: 'cr-region-row' },
             input,
             h('button', { type: 'button', class: 'cr-region-name', 'aria-expanded': open ? 'true' : 'false', onclick: () => { open ? openRegions.delete(r.name) : openRegions.add(r.name); paintChoices(); } },
-              h('span', { class: 'nm' }, regionName(r.name)), h('span', { class: 'n' }, tn(r.cities.length, '{n} city', '{n} cities')), icon(open ? 'down' : 'chevron', 12))),
+              h('span', { class: 'nm' }, regionName(r.name)), h('span', { class: 'n' }, tn(r.cities.length, '{n} city', '{n} cities')),
+              regionCount(r) ? h('span', { class: 'n' }, '· ', tn(regionCount(r), '{n} event', '{n} events')) : null, icon(open ? 'down' : 'chevron', 12))),
           open ? h('div', { class: 'chip-wrap cr-city-chips' }, r.cities.map(cityChip)) : null);
       });
       fill(choices, note,
         checkRow(all, (n) => xPicked.has(n), toggle, t('Select all')),
         regions.length ? h('div', { class: 'cr-regions' }, regions) : null,
-        x.cities.length ? [regions.length ? h('div', { class: 'cr-sub' }, t('Other cities')) : null,
-          h('div', { class: 'chip-wrap cr-city-chips' }, x.cities.map(cityChip))] : null);
+        flat.length ? [regions.length ? h('div', { class: 'cr-sub' }, t('Other cities')) : null,
+          h('div', { class: 'chip-wrap cr-city-chips' }, flat.map(cityChip))] : null);
     }
 
     function paintChoices() {
@@ -740,10 +764,11 @@ export function render() {
       else paintSwiss();
       // CTA: "Confirm" while nothing changed, else Sheng's live "Show N events"
       if (x) {
-        const all = countryCities(x);
+        const all = xCities(x);
         const names = xPicked.size === all.length ? null : all.filter((n) => xPicked.has(n));
         const unchanged = countryCityIds(x, names).sort().join(',') === initialKey();
-        cta.textContent = unchanged ? t('Confirm') : tn(0, 'Show {n} event', 'Show {n} events');
+        const n = xPicked.size ? applyFollowing(repo.query({ ...baseOpts({ cityIds: countryCityIds(x, names) }), from, to })).length : 0;
+        cta.textContent = unchanged ? t('Confirm') : tn(n, 'Show {n} event', 'Show {n} events');
         cta.disabled = xPicked.size === 0;
       } else {
         const n = total();
@@ -755,7 +780,7 @@ export function render() {
     cta.onclick = () => {
       const x = otherCountry();
       if (x) {
-        const all = countryCities(x);
+        const all = xCities(x);
         const names = xPicked.size === all.length ? null : all.filter((n) => xPicked.has(n));
         store.setFilters({ cityIds: countryCityIds(x, names), day: null, lookBack: false });
       } else {

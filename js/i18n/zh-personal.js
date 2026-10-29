@@ -166,8 +166,8 @@ export default {
     '介绍文字、节目说明和图片一律不复制。每场音乐会都会链接回信息来源，详情和购票请前往来源网站。',
   'Listings can change at short notice. Always check with the venue or organiser before you buy tickets or travel.':
     '演出信息可能临时变动。购票或出行前，请务必向场馆或主办方确认。',
-  'Klang has no listings outside Switzerland yet, so other countries show no concerts. Concerts you import yourself stay on this device.':
-    'Klang 暂时只有瑞士的演出信息，因此其他国家不显示音乐会。你自己导入的音乐会只保存在本设备上。',
+  'Outside Switzerland, Klang reads the main venues of Austria, Germany, France and Italy; other countries show no concerts yet. Concerts you import yourself stay on this device.':
+    '在瑞士以外，Klang 读取奥地利、德国、法国和意大利主要场馆的日程；其他国家暂时没有音乐会。你自己导入的音乐会只保存在本设备上。',
   'Preview plays Apple’s 30-second preview of a recording inside Klang. Previews are streamed from Apple and never stored. 30-second previews provided courtesy of iTunes.':
     '“试听”会在 Klang 内播放 Apple 提供的 30 秒录音片段。试听片段从 Apple 流式播放，从不保存。30 秒试听片段由 iTunes 提供。',
   'Apple Music Classical ↗, Listen and Play open the piece — or the whole album — in Apple Music Classical or Apple Music (choose which in Me → Play in), where it plays in full. Both need your own Apple Music subscription.':

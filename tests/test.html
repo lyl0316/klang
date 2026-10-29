@@ -352,6 +352,7 @@
     const FIXTURE = {
       generatedAt: '2026-10-26T05:23:00+01:00',
       sources: [
+        { key: 'test_abroad', name: 'Test source abroad', site: 'https://example.org/', attribution: 'Test only', count: 2, ok: true, error: null, country: 'austria' },
         { key: 'tonhalle', name: 'Tonhalle Zürich', site: 'https://www.tonhalle-orchester.ch/', attribution: 'Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhallezuerich.ch)', count: 1, ok: true, error: null },
         { key: 'osr', name: 'Orchestre de la Suisse Romande', site: 'https://www.osr.ch/', attribution: 'Source: Orchestre de la Suisse Romande (osr.ch)', count: 1, ok: true, error: null },
         { key: 'kts_st_gallen', name: 'Konzert und Theater St.Gallen', site: 'https://www.konzertundtheater.ch/', attribution: 'Source: Konzert und Theater St.Gallen (konzertundtheater.ch)', count: 1, ok: true, error: null },
@@ -399,6 +400,9 @@
         // NOT a real listing: test-only lines for the limits of the key-only rule (Mozart wrote many Masses in C;
         // a concerto for one soloist in a key is no one work)
         { id: 'test-same-key', source: 'test', title: 'Test listing: works named by form and key', start: '2027-01-03T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', program: [{ composer: 'Wolfgang Amadeus Mozart', title: 'Messe C-Dur' }, { composer: 'Wolfgang Amadeus Mozart', title: 'Messe C-Dur KV 317 «Krönungsmesse»' }, { composer: 'Carl Stamitz', title: 'Klarinettenkonzert B-Dur' }, { composer: 'Carl Stamitz', title: 'Klarinettenkonzert Nr. 3 B-Dur op. 7' }], url: 'https://example.org/', status: 'scheduled' },
+        // NOT real listings: test-only records abroad (a reader's English city name, and a local one)
+        { id: 'test_abroad-vienna', source: 'test_abroad', title: 'Test listing in Vienna', start: '2026-11-20T19:30:00+01:00', city: 'Vienna', country: 'austria', venueName: 'Wiener Konzerthaus, Großer Saal', type: 'orchestral', credits: [{ role: 'Conductor', name: 'Test Conductor' }], program: [{ composer: 'Gustav Mahler', title: 'Symphonie Nr. 5 cis-Moll' }], url: 'https://example.org/', status: 'scheduled' },
+        { id: 'test_abroad-wien', source: 'test_abroad', title: 'Test listing in Wien', start: '2026-11-21T19:30:00+01:00', city: 'Wien', country: 'austria', venueName: 'Musikverein Wien, Brahms-Saal', type: 'chamber', url: 'https://example.org/', status: 'scheduled' },
         // NOT a real listing: a test-only record for a town that is neither one of the 47 nor an extra town
         // (every town in today's feed is known, so the "town of its own" path needs a synthetic case)
         { id: 'test-unknown-town', source: 'test', title: 'Test listing in an unknown town', start: '2027-01-02T17:00:00+01:00', city: 'Tiefencastel', venueName: 'Kirche St. Stefan', url: 'https://example.org/', status: 'scheduled' },
@@ -431,6 +435,27 @@
       eq(repo.allCities().slice(0, 47).map((x) => x.id), CITIES.map((x) => x.id), 'the 47 Sheng cities first');
       ok(!repo.allCities().some((x) => x.id === 'thun'), 'extra towns only when they have concerts');
       eq(repo.cityCounts({ from: '2026-10-26' }).get('mels'), 1);
+    });
+    test('concerts abroad: the location filter ids, kept out of “Switzerland”', () => {
+      const v = repo.concert('feed-test_abroad-vienna');
+      eq([v.cityId, v.country], ['country:austria|Vienna', 'austria']);
+      eq(repo.concert('feed-test_abroad-wien').cityId, 'country:austria|Vienna', 'local name → Klang’s name');
+      const city = repo.city(v.cityId);
+      eq([city.name, city.abroad, city.country], ['Vienna', true, 'austria']);
+      ok(!repo.allCities().some((x) => x.abroad), 'not among the Swiss cities');
+      const from = '2026-10-26';
+      const ids = (opts) => repo.query({ from, ...opts }).map((c) => c.id).filter((id) => id.startsWith('feed-test_abroad'));
+      eq(ids({}), [], 'no place = Switzerland');
+      eq(ids({ cityIds: ['country:austria'] }).length, 2, 'all of Austria');
+      eq(ids({ cityIds: ['country:austria|Vienna'] }).length, 2, 'Vienna');
+      eq(ids({ cityIds: ['country:germany'] }), []);
+      ok(repo.query({ from, composerId: 'mahler' }).some((c) => c.id === 'feed-test_abroad-vienna'), 'a composer’s page lists every country');
+      const counts = repo.abroadCounts({ from });
+      eq([counts.get('austria').total, counts.get('austria').cities.get('Vienna')], [2, 2]);
+      eq([repo.hasListingsIn('austria'), repo.hasListingsIn('spain')], [true, false]);
+      eq(i18n.cityName(city), 'Vienna');
+      store.setPref('lang', 'zh');
+      try { eq(i18n.cityName(city), '维也纳'); } finally { store.setPref('lang', 'en'); }
     });
     test('featured = names a performer or a piece', () => {
       ok(repo.concert('feed-opernhaus_zurich-200322').featured);
@@ -597,6 +622,18 @@
       const ids = ask('that Swiss composer').items.map((i) => i.id);
       ok(['honegger', 'martin', 'bloch'].every((id) => ids.includes(id)), ids.join());
       ok(ask('Tonhalle').items.some((i) => i.kind === 'venue'));
+    });
+    test('assistant: places abroad with listings, and those without', () => {
+      const a = ask('concerts in Wien in November');
+      ok(a.items.some((i) => i.id === 'feed-test_abroad-vienna'), a.reply);
+      ok(ask('Mahler in Austria').items.some((i) => i.id === 'feed-test_abroad-vienna'), 'the whole country');
+      ok(!/left out/.test(ask('concerts in Vienna').reply), 'Vienna is covered');
+      store.setPref('lang', 'zh');
+      try {
+        const z = eng.answer('维也纳的音乐会', { today: '2026-10-26' });
+        ok(z.items.some((i) => i.id === 'feed-test_abroad-vienna') && !/忽略/.test(z.reply), z.reply);
+        ok(/忽略了“马德里”/.test(eng.answer('马德里的音乐会', { today: '2026-10-26' }).reply), 'Madrid has no listings');
+      } finally { store.setPref('lang', 'en'); }
     });
     test('assistant: French/German city names', () => {
       ok(/Geneva/.test(ask('chamber music in Genève this weekend').reply) || ask('chamber music in Genève this weekend').items.length >= 0);

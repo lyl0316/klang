@@ -13,6 +13,11 @@
 //
 // Cities: the 47 Sheng cities (js/data/cities.js), the extra Swiss towns that have concerts, and a
 // city of its own (no coordinates, `dynamic: true`) for any other town a listing names.
+// Concerts abroad (the feed's `country`: Austria, Germany, France, Italy) carry `country` and the
+// location filter's own city id 'country:<country id>|<City>' (views/concerts.js), e.g.
+// 'country:austria|Vienna'; their cities are `{ abroad: true, country }`. A query without a place,
+// venue, work, composer, performer or ids (the Concerts list for "Switzerland", the day views) keeps to
+// Switzerland; ['country:austria'] means all of Austria.
 // Venues: the known venues (js/data/venues.js), else one made from the listing ({ dynamic: true }).
 // Works: the repertoire (js/data/repertoire.js), plus a work index over every programme line of every
 // listing (ics.js workIdentity): each line that names a work carries `wkey` — the repertoire id when
@@ -21,6 +26,7 @@
 
 import { CITIES, CANTONS, EXTRA_CITIES } from './data/cities.js';
 import { VENUES } from './data/venues.js';
+import { country as countryOf, countryCities } from './data/countries.js';
 import { COMPOSERS, WORKS } from './data/repertoire.js';
 import * as store from './store.js';
 import * as feed from './feed.js';
@@ -47,6 +53,30 @@ function dynamicCity(name) {
   if (!clean) return null;
   const id = `town-${slug(clean)}`;
   if (!cityMap.has(id)) cityMap.set(id, { id, name: clean, canton: null, lat: null, lon: null, dynamic: true });
+  return id;
+}
+
+// Local names of cities abroad, for listings that do not use Klang's English name.
+const ABROAD_ALIASES = {
+  wien: 'Vienna', munchen: 'Munich', koln: 'Cologne', nurnberg: 'Nuremberg', 'frankfurt am main': 'Frankfurt',
+  milano: 'Milan', roma: 'Rome', napoli: 'Naples', torino: 'Turin', genova: 'Genoa', venezia: 'Venice',
+  firenze: 'Florence', padova: 'Padua', mantova: 'Mantua', hanover: 'Hannover', weiden: 'Weiden in der Oberpfalz',
+};
+const abroadNames = new Map();   // country id -> Map(normalized name -> Klang's name)
+function abroadCityName(x, text) {
+  const t = normalize(text);
+  if (!t) return null;
+  if (!abroadNames.has(x.id)) abroadNames.set(x.id, new Map(countryCities(x).map((n) => [normalize(n), n])));
+  const names = abroadNames.get(x.id);
+  return names.get(t) || ABROAD_ALIASES[t] || null;
+}
+function abroadCity(countryId, cityText, venueText) {
+  const x = countryOf(countryId);
+  if (!x || x.swiss) return null;
+  const clean = String(cityText || '').trim();
+  const name = abroadCityName(x, clean) || (!clean && abroadCityName(x, venueText)) || clean || x.name;
+  const id = `country:${x.id}|${name}`;
+  if (!cityMap.has(id)) cityMap.set(id, { id, name, country: x.id, canton: null, lat: null, lon: null, abroad: true });
   return id;
 }
 
@@ -187,7 +217,8 @@ function normalizeFeedConcert(feedRaw) {
     title: nfc(feedRaw.title), series: nfc(feedRaw.series), venueName: nfc(feedRaw.venueName), city: nfc(feedRaw.city),
     credits: (feedRaw.credits || []).filter(Boolean).map((cr) => ({ ...cr, role: nfc(cr.role), name: nfc(cr.name) })),
   };
-  const cityId = cityFor(raw.city, raw.venueName);
+  const abroad = raw.country && raw.country !== 'switzerland' ? raw.country : null;
+  const cityId = (abroad && abroadCity(abroad, raw.city, raw.venueName)) || cityFor(raw.city, raw.venueName);
   const { venueId, room } = venueFor(raw.venueName, cityId);
   const credits = creditsFor(raw.credits);
   const program = programFor(raw.program, raw.title, raw.credits);
@@ -201,6 +232,7 @@ function normalizeFeedConcert(feedRaw) {
     start: raw.start,
     durationMin: Number(raw.durationMin) > 0 ? Number(raw.durationMin) : null,
     cityId,
+    country: abroad,
     venueId,
     room,
     type: raw.type || guessType(text),
@@ -464,6 +496,26 @@ export function rebuild() {
 export const allConcerts = () => concerts;
 export const concert = (id) => concertMap.get(id);
 export const city = (id) => cityMap.get(id);
+// Concerts abroad per country and city: Map(country id -> { total, cities: Map(city name -> count) }),
+// for the given date range (upcoming by default), ignoring the other filters.
+export function abroadCounts({ from = todayKey(), to = null } = {}) {
+  const out = new Map();
+  const hidden = new Set(store.hiddenIds());
+  for (const c of concerts) {
+    if (!c.country || c.day < from || (to && c.day > to) || hidden.has(c.id)) continue;
+    const name = cityMap.get(c.cityId)?.name;
+    if (!out.has(c.country)) out.set(c.country, { total: 0, cities: new Map() });
+    const x = out.get(c.country);
+    x.total += 1;
+    if (name) x.cities.set(name, (x.cities.get(name) || 0) + 1);
+  }
+  return out;
+}
+// Cities abroad that the listings name ({ abroad: true, country }).
+export const abroadCities = () => [...cityMap.values()].filter((c) => c.abroad);
+// Whether the feed reads any website in this country (else Klang has no listings there at all).
+export const hasListingsIn = (countryId) => feed.feedInfo().sources.some((s) => s.country === countryId);
+
 // The 47 Sheng cities, then extra Swiss towns that have concerts, then other towns the listings name.
 export const allCities = () => shownCities;
 export const cantonName = (code) => CANTONS[code] || code || '';
@@ -518,11 +570,13 @@ export function query({
   const typeSet = types.length ? new Set(types) : null;
   const idSet = ids ? new Set(ids) : null;
   const hidden = includeHidden ? null : new Set(store.hiddenIds());
+  // no place and nothing else that names what to find: Switzerland (see the header)
+  const swissOnly = !citySet && !venueId && !composerId && !workId && !artistId && !idSet;
   return concerts.filter((c) =>
     (!hidden || !hidden.has(c.id)) &&
     (!from || c.day >= from) &&
     (!to || c.day <= to) &&
-    (!citySet || citySet.has(c.cityId)) &&
+    (citySet ? citySet.has(c.cityId) || (c.country && citySet.has(`country:${c.country}`)) : !(swissOnly && c.country)) &&
     (!typeSet || typeSet.has(c.type)) &&
     (!featuredOnly || c.featured) &&
     (!venueId || c.venueId === venueId) &&

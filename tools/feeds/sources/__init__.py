@@ -14,9 +14,12 @@ and optionally:
 
     KIND = 'orchestra' | 'ensemble' | 'venue' | 'festival' | 'aggregator'   # default 'venue'
     PRIORITY = int           # overrides KIND when de-duplicating (higher wins)
-    MAX_REQUESTS = int       # lower the per-run request cap (never above common.MAX_REQUESTS)
+    MAX_REQUESTS = int       # the per-run request cap (default common.MAX_REQUESTS, at most MAX_REQUESTS_CAP)
     TIME_LIMIT = int         # seconds for this source (build.py default 600, max 1200)
     ENABLED = False          # keep a reader in the tree without running it
+    COUNTRY = 'austria'      # outside Switzerland: one of COUNTRIES (default 'switzerland');
+                             # its events then name the city in English as Klang lists it
+                             # ('Vienna', 'Munich', 'Cologne', 'Milan', 'Paris' …)
 """
 from __future__ import annotations
 
@@ -37,6 +40,7 @@ if _FEEDS not in sys.path:          # readers do `from common import ...`
 import common  # noqa: E402
 
 KIND_PRIORITY = {'orchestra': 30, 'ensemble': 30, 'venue': 20, 'festival': 20, 'aggregator': 10}
+COUNTRIES = ('switzerland', 'austria', 'germany', 'france', 'italy')   # ids of js/data/countries.js
 DEFAULT_TIME_LIMIT = 600
 MAX_TIME_LIMIT = 1200
 
@@ -53,6 +57,7 @@ class Source:
     max_requests: int = common.MAX_REQUESTS
     time_limit: int = DEFAULT_TIME_LIMIT
     enabled: bool = True
+    country: str = 'switzerland'
     error: Optional[str] = None     # set when the module could not be loaded or is invalid
 
     def fetch(self):
@@ -87,9 +92,13 @@ def _load(name: str) -> Source:
     if kind not in KIND_PRIORITY:
         problems.append(f'unknown KIND {kind!r}')
         kind = 'venue'
+    country = getattr(mod, 'COUNTRY', 'switzerland')
+    if country not in COUNTRIES:
+        problems.append(f'unknown COUNTRY {country!r}')
+        country = 'switzerland'
     try:
         priority = int(getattr(mod, 'PRIORITY', KIND_PRIORITY[kind]))
-        max_requests = max(1, min(int(getattr(mod, 'MAX_REQUESTS', common.MAX_REQUESTS)), common.MAX_REQUESTS))
+        max_requests = max(1, min(int(getattr(mod, 'MAX_REQUESTS', common.MAX_REQUESTS)), common.MAX_REQUESTS_CAP))
         time_limit = max(30, min(int(getattr(mod, 'TIME_LIMIT', DEFAULT_TIME_LIMIT)), MAX_TIME_LIMIT))
     except (TypeError, ValueError) as e:
         problems.append(f'bad PRIORITY/MAX_REQUESTS/TIME_LIMIT: {e}')
@@ -97,7 +106,7 @@ def _load(name: str) -> Source:
     return Source(key=name, name=str(getattr(mod, 'NAME', name)), site=str(getattr(mod, 'SITE', '')),
                   attribution=str(getattr(mod, 'ATTRIBUTION', '')), module=mod, kind=kind,
                   priority=priority, max_requests=max_requests, time_limit=time_limit,
-                  enabled=bool(getattr(mod, 'ENABLED', True)),
+                  enabled=bool(getattr(mod, 'ENABLED', True)), country=country,
                   error='; '.join(problems) or None)
 
 

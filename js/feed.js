@@ -23,8 +23,8 @@ const KEY = 'klang.feed.v1';
 export const KEEP_PAST_DAYS = 120; // past concerts kept for Look back
 const STALE_MS = 6 * 3600 * 1000;
 // The copy shares localStorage's quota with the user's own data (klang.v1), so it is stored compactly
-// and capped; if the feed outgrows the cap only the coming months are kept (the service worker still
-// has the whole file for offline use).
+// and capped; if the feed outgrows the cap only the coming months (down to two weeks, with five
+// countries' listings) are kept (the service worker still has the whole file for offline use).
 const MAX_CACHE_CHARS = 1_500_000;
 
 let feed = readCache();
@@ -74,7 +74,7 @@ function readCache() {
 
 function writeCache(f) {
   const today = todayKey();
-  for (const days of [null, 240, 120, 60]) {
+  for (const days of [null, 240, 120, 60, 30, 14]) {
     const list = days == null ? f.concerts : f.concerts.filter((c) => dayKeyOf(c.start) <= addDays(today, days));
     const text = JSON.stringify({ v: 2, generatedAt: f.generatedAt, fetchedAt: f.fetchedAt, window: f.window, sources: f.sources, c: list.map(pack), trimmedTo: days });
     if (text.length > MAX_CACHE_CHARS) continue;

@@ -7,7 +7,8 @@
 Fails (exit 1) when:
   - the feed is missing or unreadable, or older than --max-age-hours;
   - a source's website could not be read two updates in a row, or could not be read and its
-    events were lost (a one-day outage whose events were kept, or that had none, is a warning);
+    events were lost (a one-day outage whose events were kept, or that had none, is a warning,
+    and so is a new source's first failed run);
   - a source that had events before now returns none (the site has probably changed);
   - a source's count collapsed to under 30% of the previous feed (likely a parsing break).
 Also lists Klang cities with no upcoming concerts (information only, not a failure).
@@ -99,7 +100,9 @@ def check(feed, previous, max_age_hours):
             msg = f'{name}: website could not be read ({s.get("error") or "error"}); {how}'
             # A site that is down for one day is not an alarm when nothing was lost: its events were
             # kept from the previous feed, or it had none. Two days in a row, or events lost, is.
-            if p is None:
+            if p is None and prev:
+                warnings.append(msg + '; a new source, it will try again on the next update.')
+            elif p is None:
                 problems.append(msg + '.')
             elif not p.get('ok'):
                 problems.append(msg + '; it could not be read the day before either.')
@@ -120,15 +123,23 @@ def check(feed, previous, max_age_hours):
     upcoming = [c for c in concerts if str(c.get('start', ''))[:10] >= today]
     by_city = {}
     for c in upcoming:
-        by_city[norm(c.get('city'))] = by_city.get(norm(c.get('city')), 0) + 1
+        if not c.get('country'):          # Klang's Swiss cities only
+            by_city[norm(c.get('city'))] = by_city.get(norm(c.get('city')), 0) + 1
     empty = []
     for cid, name in klang_cities():
         keys = CITY_ALIASES.get(cid, [norm(name)])
         if not any(k in city for city in by_city for k in keys):
             empty.append(name)
+    abroad = {}
+    for c in upcoming:
+        if c.get('country'):
+            abroad[c['country']] = abroad.get(c['country'], 0) + 1
     stats = {'concerts': len(concerts), 'upcoming': len(upcoming), 'sources': len(feed.get('sources') or []),
-             'sourcesOk': sum(1 for s in feed.get('sources') or [] if s.get('ok')), 'citiesWithoutConcerts': empty}
+             'sourcesOk': sum(1 for s in feed.get('sources') or [] if s.get('ok')), 'citiesWithoutConcerts': empty,
+             'abroad': abroad}
     info.append(f"{stats['upcoming']} upcoming concerts from {stats['sourcesOk']}/{stats['sources']} sources.")
+    if abroad:
+        info.append('Outside Switzerland: ' + ', '.join(f'{k.title()} {n}' for k, n in sorted(abroad.items())) + '.')
     if empty:
         info.append(f'{len(empty)} Klang cities have no upcoming concerts in the feed: {", ".join(empty)}.')
     return problems, warnings, info, stats

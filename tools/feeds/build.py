@@ -33,6 +33,7 @@ import time
 import traceback
 import unicodedata
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Optional
@@ -51,7 +52,7 @@ WINDOW_DAYS = 450
 DEDUPE_MINUTES = 20
 GRACE_SECONDS = 60          # extra wait after a source's time limit before abandoning it
 SUSPICIOUS_PREVIOUS = 5     # 0 events now but at least this many last time -> treat as failure
-KEY_ORDER = ('id', 'source', 'title', 'start', 'durationMin', 'city', 'venueName', 'type', 'series',
+KEY_ORDER = ('id', 'source', 'title', 'start', 'durationMin', 'city', 'country', 'venueName', 'type', 'series',
              'credits', 'program', 'ticketUrl', 'url', 'status')
 
 log = logging.getLogger('feeds.build')
@@ -66,7 +67,9 @@ class Previous:
 
     def __init__(self, spec, out_path):
         self.candidates = []
-        if spec and spec.strip().lower() not in ('none', 'off', 'no', ''):
+        if spec and spec.strip().lower() in ('none', 'off', 'no'):
+            out_path = None                      # "none" means none, not even the local --out copy
+        elif spec and spec.strip():
             self.candidates.append(spec.strip())
         if out_path and os.path.exists(out_path) and os.path.abspath(out_path) not in map(os.path.abspath, self.candidates):
             self.candidates.append(out_path)     # local copy as a second chance
@@ -162,6 +165,53 @@ def run_source(src, time_limit):
     if 'error' in box:
         return None, box['error'], note, used, seconds, box.get('trace')
     return box.get('events', []), None, note, used, seconds, None
+
+
+_COUNTRY_CITIES = None
+
+
+def country_cities():
+    """Folded city names per country id, from the app's own lists: js/data/countries.js (Sheng's cities
+    of each country) and js/data/cities.js (Switzerland). Used to catch a tour date a reader abroad
+    missed ("Düsseldorf" in a Paris orchestra's calendar)."""
+    global _COUNTRY_CITIES
+    if _COUNTRY_CITIES is None:
+        out = {}
+        try:
+            with open(os.path.join(APP_ROOT, 'js', 'data', 'countries.js'), encoding='utf-8') as f:
+                src = f.read()
+            for block in re.split(r"\n  \{ id: '", src)[1:]:
+                cid = block.split("'", 1)[0]
+                names = set()
+                for arr in re.findall(r'cities: \[(.*?)\]', block, re.S):
+                    names |= {a or b for a, b in re.findall(r"'([^']*)'|\"([^\"]*)\"", arr)}
+                out[cid] = {common._fold(n) for n in names if n}
+            with open(os.path.join(APP_ROOT, 'js', 'data', 'cities.js'), encoding='utf-8') as f:
+                swiss = re.findall(r"name: '([^']+)'", f.read())
+            out['switzerland'] = {common._fold(n) for n in swiss} | set(_CITY_OF)
+        except OSError:
+            pass
+        _COUNTRY_CITIES = out
+    return _COUNTRY_CITIES
+
+
+# town names found in more than one of these countries (Baden near Vienna and in Aargau): never a reason
+# to drop an event; names in two of the app's lists are added in in_other_country()
+_SHARED_TOWNS = {'baden', 'rheinfelden', 'laufenburg', 'freiburg', 'neustadt', 'sankt gallen', 'st. gallen'}
+
+
+def in_other_country(ev, country):
+    """The other country whose city list names this event's city (and the reader's country's does not)."""
+    city = common._fold(ev.get('city') or '').strip()
+    lists = country_cities()
+    if not city or city in _SHARED_TOWNS or city in lists.get(country, ()):
+        return None
+    if sum(city in names for names in lists.values()) > 1:
+        return None
+    for cid in ('switzerland', 'austria', 'germany', 'france', 'italy'):
+        if cid != country and city in lists.get(cid, ()):
+            return cid
+    return None
 
 
 def check_events(events, key, today, last_day):
@@ -389,6 +439,8 @@ def match_strength(a, b):
     A similar venue is not enough when the listings name different halls of one building, or
     only one of them names a hall and nothing else (cast, title) ties them together: the
     "Tonhalle Zürich" listing of one ensemble is not the "Kleiner Saal" recital of another."""
+    if (a.get('country') or 'switzerland') != (b.get('country') or 'switzerland'):
+        return 0                          # Freiburg im Breisgau is not Fribourg
     s = _base_strength(a, b)
     if not s:
         return 0
@@ -749,6 +801,7 @@ def parse_args(argv):
                         'less than H hours ago with the same reader code (used on push builds)')
     p.add_argument('--timeout', type=int, default=None,
                    help='per-source time limit in seconds (default: the reader\'s TIME_LIMIT or 600)')
+    p.add_argument('--jobs', type=int, default=8, help='sources read at the same time (default 8)')
     p.add_argument('--show', type=int, default=0, metavar='N', help='print N sample events per source')
     p.add_argument('--strict', action='store_true', help='exit 1 if a source failed without a fallback')
     p.add_argument('--list', action='store_true', help='list the readers and their attribution, fetch nothing')
@@ -799,11 +852,8 @@ def main(argv=None):
         log.info('previous feed handed to the readers: %d events (reader code changed since: %s)', known,
                  ', '.join(changed) or 'none')
 
-    results, entries, all_events, priority, kinds, sites = [], [], [], {}, {}, {}
-    for src in sources:
-        priority[src.key] = src.priority
-        kinds[src.key] = src.kind
-        sites[src.key] = src.site
+    def run_one(src):
+        """Fetch one source (or reuse it from the previous feed). Returns (Result, entry)."""
         res = Result(key=src.key)
         code = codes.get(src.key)
         info = None
@@ -848,20 +898,40 @@ def main(argv=None):
                     res.fetched_at = (previous.info(src.key) or {}).get('fetchedAt')
                 _annotate('warning', f'source {src.key} failed: {error}'
                           + (f' (reused {len(old)} previous events)' if old else ' (no previous events)'))
-        results.append(res)
-        all_events.extend(res.events)
-        entries.append({
+        if src.country != 'switzerland':
+            elsewhere = [ev for ev in res.events if in_other_country(ev, src.country)]
+            if elsewhere:
+                log.info('%s: %d event(s) in another country left out (e.g. %s, %s)', src.key, len(elsewhere),
+                         elsewhere[0].get('city'), elsewhere[0]['title'][:60])
+            res.events = [dict(ev, country=src.country) for ev in res.events if ev not in elsewhere]
+        entry = {
             'key': src.key, 'name': src.name, 'site': src.site, 'attribution': src.attribution,
             'count': len(res.events), 'ok': res.ok, 'error': res.error, 'reused': res.reused,
             'fetchedAt': res.fetched_at, 'codeHash': code,
-        })
+        }
+        if src.country != 'switzerland':
+            entry['country'] = src.country
         status = 'ok' if res.ok and not res.reused else ('fresh' if res.ok else ('REUSED' if res.reused else 'FAILED'))
-        print(f'  {src.key:<24} {status:<7} {len(res.events):>5} events  {res.requests:>3} req  {res.seconds:6.1f}s'
-              + (f'  {res.error}' if res.error else '') + (f'  [{res.note}]' if res.note else ''), flush=True)
-        if res.trace:
-            print('    ' + '\n    '.join(res.trace.strip().splitlines()[-6:]), file=sys.stderr)
-        for ev in res.events[:max(0, args.show)]:
-            print('    ' + json.dumps(ev, ensure_ascii=False))
+        lines = [f'  {src.key:<24} {status:<7} {len(res.events):>5} events  {res.requests:>3} req  {res.seconds:6.1f}s'
+                 + (f'  {res.error}' if res.error else '') + (f'  [{res.note}]' if res.note else '')]
+        lines += ['    ' + json.dumps(ev, ensure_ascii=False) for ev in res.events[:max(0, args.show)]]
+        with print_lock:
+            print('\n'.join(lines), flush=True)
+            if res.trace:
+                print('    ' + '\n    '.join(res.trace.strip().splitlines()[-6:]), file=sys.stderr)
+        return res, entry
+
+    # Several sources are read at once; each still waits its turn per host (common.MIN_DELAY),
+    # so a website never sees more than one request at a time from us.
+    print_lock = threading.Lock()
+    priority = {src.key: src.priority for src in sources}
+    kinds = {src.key: src.kind for src in sources}
+    sites = {src.key: src.site for src in sources}
+    with ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
+        done = list(pool.map(run_one, sources))
+    results = [r for r, _ in done]
+    entries = [e for _, e in done]
+    all_events = [ev for r in results for ev in r.events]
 
     merges = []
     concerts, merged = dedupe([tidy_event(ev) for ev in all_events], priority, sites, merges)

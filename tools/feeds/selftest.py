@@ -270,6 +270,20 @@ class Robots(unittest.TestCase):
         self.assertFalse(common._Robots(disallow_all=True).allowed('https://x.ch/'))
         self.assertTrue(common._Robots(allow_all=True).allowed('https://x.ch/'))
 
+    def test_html_instead_of_robots_txt_is_unreachable(self):
+        class Resp:
+            headers = {'Content-Type': 'text/html'}
+            def read(self, n): return b'<!DOCTYPE html><html><title>Security check required</title>'
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+        saved = common._plain_opener
+        common._plain_opener = type('O', (), {'open': lambda self, req, timeout=20: Resp()})()
+        try:
+            r = common._load_robots('https://captcha.example')
+        finally:
+            common._plain_opener = saved
+        self.assertFalse(r.allowed('https://captcha.example/programme'))
+
 
 class _Handler(http.server.BaseHTTPRequestHandler):
     log = []
@@ -391,7 +405,7 @@ class Registry(unittest.TestCase):
         self.assertEqual([s.key for s in found], registry.module_names())
         for s in found:
             self.assertTrue(s.key)
-            self.assertLessEqual(s.max_requests, common.MAX_REQUESTS)
+            self.assertLessEqual(s.max_requests, common.MAX_REQUESTS_CAP)
 
 
 def ev(source, sid, start, title='Konzert', **kw):
@@ -600,6 +614,20 @@ class Merge(unittest.TestCase):
                 credits=cast)
         out, merged = build.dedupe([a, b1, b2], self.PRIO)
         self.assertEqual((merged, len(out)), (1, 2))        # a source's second listing is not absorbed too
+
+    def test_tour_dates_in_another_country(self):
+        self.assertEqual(build.in_other_country({'city': 'Düsseldorf'}, 'france'), 'germany')
+        self.assertEqual(build.in_other_country({'city': 'Zürich'}, 'austria'), 'switzerland')
+        for city, country in (('Paris', 'france'), ('Bondy', 'france'), ('Baden', 'austria'), ('Freiburg', 'germany')):
+            self.assertIsNone(build.in_other_country({'city': city}, country), city)
+
+    def test_never_across_countries(self):
+        a = ev('x', 1, '2026-11-07T19:30:00+01:00', 'Sinfoniekonzert', city='Freiburg', venueName='Konzerthaus',
+               credits=[('Conductor', 'A B'), ('Orchestra', 'Philharmonisches Orchester')])
+        b = dict(ev('y', 1, '2026-11-07T19:30:00+01:00', 'Sinfoniekonzert', city='Freiburg', venueName='Konzerthaus',
+                    credits=[('Conductor', 'A B'), ('Orchestra', 'Philharmonisches Orchester')]), country='germany')
+        self.assertFalse(build.same_concert(a, b))           # Fribourg (Switzerland) is not Freiburg im Breisgau
+        self.assertTrue(build.same_concert(dict(a, country='germany'), b))
 
     def test_one_shared_performer_in_the_same_building(self):
         ocg = ev('ocg', 'semi', '2026-11-07T14:30:00+01:00', '80e Concours de Genève – Demi-Finale 1', city='Vernier',
@@ -1240,6 +1268,10 @@ class Check(unittest.TestCase):
         self.assertEqual(len(p), 1)                                 # events lost
         p, _, _, _ = chk.check(feed(**down), None, 30)
         self.assertEqual(len(p), 1)                                 # nothing to compare with
+        other = {'generatedAt': now, 'concerts': [], 'sources': [{'key': 'tonhalle', 'ok': True, 'count': 90}]}
+        p, w, _, _ = chk.check(feed(**down), other, 30)
+        self.assertEqual(p, [])                                     # a new source's first run
+        self.assertTrue(any('new source' in x for x in w))
 
 
 class CodeHash(unittest.TestCase):

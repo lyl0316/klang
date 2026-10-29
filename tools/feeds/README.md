@@ -7,8 +7,8 @@ Sheng's data is never used. The research behind the source list is in `spec/CONC
 ## How it works
 
 1. **Schedule.** `.github/workflows/pages.yml` runs at 04:23 UTC (early morning in Switzerland), on every push to `main`, and on demand.
-2. **Fetch.** `build.py` finds every reader in `sources/` and runs them one after another. Each reader fetches its site through `common.get()`, which is polite by construction (see [Politeness](#politeness)). The previously published feed is handed to the readers, so a reader that reads one detail page per concert can reuse what it learnt on earlier runs (see [Incremental details](#incremental-details)).
-3. **Normalise.** Each reader returns a list of events made by `common.make_event()`. Every event has Swiss local time with the correct offset.
+2. **Fetch.** `build.py` finds every reader in `sources/` and runs up to 8 of them at once (`--jobs`). Each reader fetches its site through `common.get()`, which is polite by construction (see [Politeness](#politeness)). The previously published feed is handed to the readers, so a reader that reads one detail page per concert can reuse what it learnt on earlier runs (see [Incremental details](#incremental-details)).
+3. **Normalise.** Each reader returns a list of events made by `common.make_event()`. Every event has Swiss local time with the correct offset (the same as Austria, Germany, France and Italy). A reader outside Switzerland sets `COUNTRY` (`'austria'`, `'germany'`, `'france'` or `'italy'`), names the city in English as Klang lists it (`'Vienna'`, `'Munich'`, `'Milan'` …), and `build.py` adds `"country"` to its events. Events in different countries are never merged.
 4. **Combine.** `build.py` then:
    - keeps events from today to today + 450 days (Swiss time);
    - merges the same performance listed by two sources (see [De-duplication](#de-duplication));
@@ -120,7 +120,7 @@ Reader checklist:
   - When a site labels UTC as `+02:00` (ZKO), strip the label and use `to_zurich_iso(naive, assume='UTC')`.
   - When JSON-LD looks like UTC without a `Z` (Lucerne Festival), use `assume='UTC'`.
   - Naive local times use the default `assume='Europe/Zurich'`.
-- **Keep only concerts.** Keep classical concerts, opera and recitals in Switzerland. Skip:
+- **Keep only concerts.** Keep classical concerts, opera and recitals in the reader's country. Skip:
   - tours abroad;
   - guided tours, workshops, school projects and talks;
   - galas and balls;
@@ -146,7 +146,7 @@ Reader checklist:
   - when robots.txt is unreachable (5xx, network), the host is skipped;
   - when it answers 401 or 403, the host is skipped.
 - **It waits between requests** to the same host, at least 1.5 s, or longer when `Crawl-delay` or `Request-rate` asks for it.
-- **Sources run one at a time,** with no parallel requests.
+- **One request at a time per website.** Up to 8 sources run at once, but every request to a host waits for that host's turn, so a site never gets parallel requests from us, even when two readers share it.
 - **It retries twice** on 429, 5xx and network errors, honouring `Retry-After` up to 120 s.
 - **It caps each source** at 60 requests per run by default (at most 150 for a reader that sets `MAX_REQUESTS` to read detail pages), with a time limit. The daily schedule means each site is read about once a day, and detail pages already read are reused rather than fetched again every day.
 - **It never logs in, sends forms, or sets cookies or credentials.**
@@ -289,3 +289,82 @@ After merging, `build.py` checks each concert's `type` against its facts (`commo
 | | Collegium Novum Zürich (HTML) | 2 | Source: Collegium Novum Zürich (cnz.ch) |
 | | Tonhalle Zürich (HTML; robots.txt forbids the filter query) | 2 | Source: Tonhalle-Gesellschaft Zürich (tonhalle-orchester.ch / tonhalle.ch) |
 | | Stadtcasino Basel, Bühnen Bern, OCG Geneva, Opéra de Lausanne, Verbier Festival, OSI Lugano (HTML) | 2 | Source: each venue's or orchestra's own site |
+
+### Outside Switzerland
+
+Added on 30 October 2026: the main venues of Austria, Germany, France and Italy (`COUNTRY` in each reader). Each reader's docstring says how its site is read, what is skipped and when it was checked. Sites left out on purpose:
+
+- **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`).
+- **Terms forbid storing or republishing the programme:** Theater an der Wien, Innsbrucker Festwochen der Alten Musik.
+- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille.
+- **Calendar only behind robots-forbidden addresses or a login:** Kölner Philharmonie, Salzburger Festspiele.
+
+| Reader key | Country | Source | Site | Note |
+|---|---|---|---|---|
+| `bregenzer_festspiele` | Austria | Bregenzer Festspiele | https://bregenzerfestspiele.com/de |  |
+| `brucknerhaus_linz` | Austria | Brucknerhaus Linz | https://www.brucknerhaus.at/ |  |
+| `esterhazy_eisenstadt` | Austria | Esterházy – Haydn in Eisenstadt | https://esterhazy.at/veranstaltungen |  |
+| `grafenegg` | Austria | Grafenegg | https://www.grafenegg.com/ |  |
+| `landestheater_linz` | Austria | Landestheater Linz | https://www.landestheater-linz.at/ |  |
+| `mozarteum_salzburg` | Austria | Stiftung Mozarteum Salzburg | https://mozarteum.at/konzerte |  |
+| `mozarteumorchester` | Austria | Mozarteumorchester Salzburg | https://www.mozarteumorchester.at/de/konzerte |  |
+| `musikverein_graz` | Austria | Musikverein für Steiermark | https://musikverein-graz.at/ |  |
+| `musikverein_wien` | Austria | Musikverein Wien | https://musikverein.at/ |  |
+| `muth_wien` | Austria | MuTh – Konzertsaal der Wiener Sängerknaben | https://muth.at/ |  |
+| `oper_graz` | Austria | Oper Graz | https://oper-graz.buehnen-graz.com/ |  |
+| `styriarte` | Austria | styriarte | https://styriarte.com/ |  |
+| `tiroler_landestheater` | Austria | Tiroler Landestheater & Tiroler Symphonieorchester Innsbruck | https://www.landestheater.at/spielplan |  |
+| `volksoper_wien` | Austria | Volksoper Wien | https://www.volksoper.at/ |  |
+| `wiener_konzerthaus` | Austria | Wiener Konzerthaus | https://konzerthaus.at/ |  |
+| `wiener_staatsoper` | Austria | Wiener Staatsoper | https://www.wiener-staatsoper.at/ | off: robots.txt blocks ClaudeBot |
+| `auditorium_lyon` | France | Auditorium – Orchestre national de Lyon | https://www.auditorium-lyon.com/ |  |
+| `capitole_toulouse` | France | Orchestre national & Opéra national du Capitole, Toulouse | https://onct.toulouse.fr/ |  |
+| `opera_bordeaux` | France | Opéra national de Bordeaux | https://www.opera-bordeaux.com/ |  |
+| `opera_comique` | France | Opéra Comique | https://www.opera-comique.com/ |  |
+| `opera_de_paris` | France | Opéra national de Paris | https://www.operadeparis.fr/ |  |
+| `opera_du_rhin` | France | Opéra national du Rhin | https://www.operanationaldurhin.eu/ |  |
+| `opera_lyon` | France | Opéra de Lyon | https://www.opera-lyon.com/ |  |
+| `opera_marseille` | France | Opéra de Marseille – Théâtre de l’Odéon | https://opera-odeon.marseille.fr/ |  |
+| `ops_strasbourg` | France | Orchestre philharmonique de Strasbourg | https://philharmonique.strasbourg.eu/ |  |
+| `philharmonie_paris` | France | Philharmonie de Paris | https://philharmoniedeparis.fr/ |  |
+| `radio_france` | France | Radio France | https://www.maisondelaradioetdelamusique.fr/ |  |
+| `salle_gaveau` | France | Salle Gaveau | https://www.sallegaveau.com/ |  |
+| `seine_musicale` | France | La Seine Musicale | https://www.laseinemusicale.com/ |  |
+| `theatre_champs_elysees` | France | Théâtre des Champs-Élysées | https://www.theatrechampselysees.fr/ |  |
+| `alte_oper_frankfurt` | Germany | Alte Oper Frankfurt | https://www.alteoper.de/ |  |
+| `berliner_philharmoniker` | Germany | Berliner Philharmoniker / Philharmonie Berlin | https://www.berliner-philharmoniker.de/ |  |
+| `boulez_saal` | Germany | Pierre Boulez Saal | https://www.boulezsaal.de/ |  |
+| `deutsche_oper_berlin` | Germany | Deutsche Oper Berlin | https://deutscheoperberlin.de/ |  |
+| `dresdner_philharmonie` | Germany | Dresdner Philharmonie | https://www.dresdnerphilharmonie.de/ |  |
+| `frauenkirche_dresden` | Germany | Frauenkirche Dresden | https://www.frauenkirche-dresden.de/ |  |
+| `gaertnerplatztheater` | Germany | Staatstheater am Gärtnerplatz | https://www.gaertnerplatztheater.de/ |  |
+| `gewandhaus_leipzig` | Germany | Gewandhaus zu Leipzig | https://www.gewandhausorchester.de/ |  |
+| `komische_oper_berlin` | Germany | Komische Oper Berlin | https://www.komische-oper-berlin.de/ |  |
+| `konzerthaus_berlin` | Germany | Konzerthaus Berlin | https://www.konzerthaus.de/ |  |
+| `muenchener_kammerorchester` | Germany | Münchener Kammerorchester | https://www.m-k-o.eu/ |  |
+| `muenchner_philharmoniker` | Germany | Münchner Philharmoniker | https://www.mphil.de/ |  |
+| `oper_frankfurt` | Germany | Oper Frankfurt | https://oper-frankfurt.de/ |  |
+| `oper_koeln` | Germany | Oper Köln | https://www.oper.koeln/ |  |
+| `oper_leipzig` | Germany | Oper Leipzig | https://www.oper-leipzig.de/ |  |
+| `roc_berlin` | Germany | Rundfunk Orchester und Chöre Berlin (RSB, DSO, Rundfunkchor, RIAS Kammerchor) | https://www.roc-berlin.de/ |  |
+| `semperoper` | Germany | Semperoper Dresden | https://www.semperoper.de/ |  |
+| `staatskapelle_dresden` | Germany | Sächsische Staatskapelle Dresden | https://www.staatskapelle-dresden.de/ |  |
+| `staatsoper_berlin` | Germany | Staatsoper Unter den Linden | https://www.staatsoper-berlin.de/ |  |
+| `staatsoper_hamburg` | Germany | Staatsoper Hamburg | https://www.die-hamburgische-staatsoper.de/ |  |
+| `staatsoper_stuttgart` | Germany | Staatsoper Stuttgart | https://www.staatsoper-stuttgart.de/ |  |
+| `stuttgarter_philharmoniker` | Germany | Stuttgarter Philharmoniker | https://www.stuttgarter-philharmoniker.de/ |  |
+| `thomaskirche_leipzig` | Germany | Thomaskirche Leipzig | https://www.thomaskirche.org/ |  |
+| `tonhalle_duesseldorf` | Germany | Tonhalle Düsseldorf | https://www.tonhalle.de/ |  |
+| `arena_di_verona` | Italy | Fondazione Arena di Verona | https://www.arena.it/ |  |
+| `carlo_felice_genova` | Italy | Teatro Carlo Felice | https://carlofelice.it/ |  |
+| `maggio_fiorentino` | Italy | Maggio Musicale Fiorentino | https://www.maggiofiorentino.com/ |  |
+| `opera_di_roma` | Italy | Teatro dell'Opera di Roma | https://www.operaroma.it/ |  |
+| `osn_rai` | Italy | Orchestra Sinfonica Nazionale della Rai | https://www.raicultura.it/orchestrarai |  |
+| `quartetto_milano` | Italy | Società del Quartetto di Milano | https://www.quartettomilano.it/ |  |
+| `santa_cecilia` | Italy | Accademia Nazionale di Santa Cecilia | https://santacecilia.it/ |  |
+| `sinfonica_milano` | Italy | Orchestra Sinfonica di Milano | https://sinfonicadimilano.org/ |  |
+| `teatro_alla_scala` | Italy | Teatro alla Scala | https://www.teatroallascala.org/ |  |
+| `teatro_comunale_bologna` | Italy | Teatro Comunale di Bologna | https://www.tcbo.it/ | off: robots.txt blocks ClaudeBot |
+| `teatro_la_fenice` | Italy | Teatro La Fenice | https://www.teatrolafenice.it/ |  |
+| `teatro_regio_parma` | Italy | Teatro Regio di Parma | https://teatroregioparma.it/ |  |
+| `teatro_regio_torino` | Italy | Teatro Regio Torino | https://www.teatroregio.torino.it/ |  |

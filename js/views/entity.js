@@ -38,6 +38,7 @@
 
 import { h, icon, toast, normalize, TYPE_LABELS } from '../util.js';
 import * as repo from '../repo.js';
+import { country as countryOf } from '../data/countries.js';
 import * as store from '../store.js';
 import { openSheet } from '../ui/sheet.js';
 import { href, emptyState, rowItem, withFace, roleText as sharedRoleText } from '../ui/components.js';
@@ -1655,7 +1656,7 @@ export function renderCity({ id }) {
       name !== city.name ? h('div', { class: 'ep-orig' }, city.name) : null,
       h('div', { class: 'ep-caps' }, city.canton
         ? t('Canton of {canton} · Switzerland', { canton: cantonText(city.canton) })
-        : t('Switzerland')),
+        : city.abroad ? countryName(countryOf(city.country)?.name || '') : t('Switzerland')),
       h('div', { class: 'ep-caps sub' }, [
         t('{n} upcoming', { n: fmtN(active.length) }),
         up.length > active.length ? t('{n} cancelled', { n: fmtN(up.length - active.length) }) : null,

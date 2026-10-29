@@ -41,4 +41,6 @@ export default {
   'Real listings from the venues’ and orchestras’ own websites, updated daily.': '演出信息来自各场馆和乐团的官方网站，每日更新。',
   'No concerts here yet': '这里暂时没有音乐会',
   'Klang has no listings outside Switzerland yet.': 'Klang 暂时只有瑞士的演出信息。',
+  'Klang also lists the main cities of Austria, Germany, France and Italy. Tap one to browse it; your region stays the same.':
+    'Klang 也收录奥地利、德国、法国和意大利主要城市的演出。点按即可浏览，你的地区设置不变。',
 };

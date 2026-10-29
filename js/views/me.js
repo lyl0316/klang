@@ -529,7 +529,8 @@ export function renderHidden() {
 // ========== #/me/region ==========
 // Sheng: a radio list of countries + Next. Klang's listings are Swiss, so "your region" is the
 // default Location filter: all of Switzerland, or chosen cities / whole cantons. Saved on tap.
-// Sheng's other countries are listed below with 0 events — Klang has no listings there yet.
+// Sheng's other countries are listed below with their upcoming concerts; one Klang has listings for
+// opens the Concerts tab on that country (the region itself stays Swiss), the others show 0.
 export function renderRegion() {
   const cities = [...repo.allCities()];
   const allIds = cities.map((c) => c.id);
@@ -608,13 +609,19 @@ export function renderRegion() {
     }));
   }
 
-  // Sheng's other countries: names only, 0 events each (no feeds outside Switzerland yet).
+  // Sheng's other countries, those with listings first.
+  const abroadN = repo.abroadCounts();
+  const others = [...otherCountries()].sort((a, b) => (abroadN.get(b.id)?.total || 0) - (abroadN.get(a.id)?.total || 0));
   const abroad = h('details', { class: 'me-abroad' },
     h('summary', {}, h('span', {}, t('Other countries')), h('span', { class: 'me-abroad-n' }, fmtN(otherCountries().length))),
-    h('p', { class: 'me-gfoot' }, t('Klang has no listings outside Switzerland yet.')),
-    h('div', { class: 'me-group me-region-list' }, otherCountries().map((c) => radio({
-      title: countryName(c.name), sub: tn(countryCities(c).length, '{n} city', '{n} cities'), count: 0, disabled: true, onClick: () => {},
-    }))));
+    h('p', { class: 'me-gfoot' }, t('Klang also lists the main cities of Austria, Germany, France and Italy. Tap one to browse it; your region stays the same.')),
+    h('div', { class: 'me-group me-region-list' }, others.map((c) => {
+      const n = abroadN.get(c.id)?.total || 0;
+      return radio({
+        title: countryName(c.name), sub: tn(countryCities(c).length, '{n} city', '{n} cities'), count: n, disabled: !n,
+        onClick: () => { store.setFilters({ cityIds: [`country:${c.id}`], day: null, lookBack: false }); location.hash = '#/concerts'; },
+      });
+    })));
 
   paint();
   const body = h('div', { class: 'me me-region' },
@@ -636,7 +643,7 @@ const LEGAL = [
     'Klang shows real concerts only. Every day it reads the public calendars of the venues, orchestras and festivals below, from their own websites or open data, and keeps only the facts: date and time, title, venue and city, performers and their roles, the works, a cancellation and the link to the event page.',
     'Descriptions, programme notes and images are never copied. Every concert links back to its source for details and tickets.',
     'Listings can change at short notice. Always check with the venue or organiser before you buy tickets or travel.',
-    'Klang has no listings outside Switzerland yet, so other countries show no concerts. Concerts you import yourself stay on this device.',
+    'Outside Switzerland, Klang reads the main venues of Austria, Germany, France and Italy; other countries show no concerts yet. Concerts you import yourself stay on this device.',
   ], 'listings'],
   ['Listening', [
     'Preview plays Apple’s 30-second preview of a recording inside Klang. Previews are streamed from Apple and never stored. 30-second previews provided courtesy of iTunes.',
