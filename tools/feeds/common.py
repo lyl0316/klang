@@ -268,6 +268,10 @@ def _robots_for(url):
     return r
 
 
+_CHALLENGE_RE = re.compile(r'captcha|security check|just a moment|checking your browser|cf-challenge|challenge-platform|'
+                           r'verify (?:you are|that you are) (?:a )?human|tiger ?protect|botguard|ddos-guard|access denied', re.I)
+
+
 def _load_robots(origin):
     url = origin + '/robots.txt'
     host = urllib.parse.urlsplit(origin).netloc.lower()
@@ -282,9 +286,12 @@ def _load_robots(origin):
                 text = _decode(raw, resp.headers.get('Content-Type', ''))
                 log.debug('robots.txt %s: %d bytes', origin, len(raw))
                 if re.match(r'\s*(?:<!doctype\s+html|<html|<head)', text, re.I):
-                    # a challenge or error page instead of robots.txt (captcha, bot protection): the
-                    # site is not letting us read its rules, so treat it as unreachable, not "no rules"
-                    return _Robots(disallow_all=True, note='robots.txt is an HTML page (bot protection?)')
+                    # A web page instead of robots.txt. A challenge page (captcha, bot protection) means
+                    # the site is not letting us read its rules: unreachable. Any other page (robots.txt
+                    # redirected to the home page or a "not found" page) means there is no robots.txt.
+                    if _CHALLENGE_RE.search(text[:20000]):
+                        return _Robots(disallow_all=True, note='robots.txt answered with a bot challenge')
+                    return _Robots(allow_all=True, note='no robots.txt (a web page instead)')
                 robots = _Robots(text)
                 with _host_lock:   # honour Crawl-delay from the very first page request
                     _next_slot[host] = max(_next_slot.get(host, 0.0), time.monotonic() + robots.delay)

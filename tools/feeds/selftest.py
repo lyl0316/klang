@@ -284,6 +284,20 @@ class Robots(unittest.TestCase):
             common._plain_opener = saved
         self.assertFalse(r.allowed('https://captcha.example/programme'))
 
+    def test_home_page_instead_of_robots_txt_means_no_rules(self):
+        class Resp:
+            headers = {'Content-Type': 'text/html'}
+            def read(self, n): return b'<!DOCTYPE html><html lang="de"><head><title>Tonhalle</title></head></html>'
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+        saved = common._plain_opener
+        common._plain_opener = type('O', (), {'open': lambda self, req, timeout=20: Resp()})()
+        try:
+            r = common._load_robots('https://soft404.example')
+        finally:
+            common._plain_opener = saved
+        self.assertTrue(r.allowed('https://soft404.example/konzerte/'))
+
 
 class _Handler(http.server.BaseHTTPRequestHandler):
     log = []
