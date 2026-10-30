@@ -52,6 +52,10 @@ SITE = 'https://www.gaertnerplatztheater.de/'
 ATTRIBUTION = 'Source: Staatstheater am Gärtnerplatz (gaertnerplatztheater.de)'
 KIND = 'venue'
 COUNTRY = 'germany'
+# Off: from GitHub's servers every request, robots.txt included, times out (the daily runs of 29/30 Oct
+# 2026), while it answers at once from a home connection; the site apparently does not serve data-centre
+# addresses, and that is not worked around. Turn on again if the daily build can reach it.
+ENABLED = False
 MAX_REQUESTS = 150             # ~10 months of programme, the rest for performance pages
 TIME_LIMIT = 900
 REFRESH_NEAR_DAYS = 14

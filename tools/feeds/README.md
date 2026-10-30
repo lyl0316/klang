@@ -296,7 +296,7 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 
 - **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`).
 - **Terms forbid storing or republishing the programme:** Theater an der Wien, Innsbrucker Festwochen der Alten Musik.
-- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille.
+- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz does not answer GitHub's servers at all (reader kept, `ENABLED = False`).
 - **Calendar only behind robots-forbidden addresses or a login:** Kölner Philharmonie, Salzburger Festspiele.
 
 | Reader key | Country | Source | Site | Note |
@@ -337,7 +337,7 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 | `deutsche_oper_berlin` | Germany | Deutsche Oper Berlin | https://deutscheoperberlin.de/ |  |
 | `dresdner_philharmonie` | Germany | Dresdner Philharmonie | https://www.dresdnerphilharmonie.de/ |  |
 | `frauenkirche_dresden` | Germany | Frauenkirche Dresden | https://www.frauenkirche-dresden.de/ |  |
-| `gaertnerplatztheater` | Germany | Staatstheater am Gärtnerplatz | https://www.gaertnerplatztheater.de/ |  |
+| `gaertnerplatztheater` | Germany | Staatstheater am Gärtnerplatz | https://www.gaertnerplatztheater.de/ | off: no answer to GitHub's servers |
 | `gewandhaus_leipzig` | Germany | Gewandhaus zu Leipzig | https://www.gewandhausorchester.de/ |  |
 | `komische_oper_berlin` | Germany | Komische Oper Berlin | https://www.komische-oper-berlin.de/ |  |
 | `konzerthaus_berlin` | Germany | Konzerthaus Berlin | https://www.konzerthaus.de/ |  |
