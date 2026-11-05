@@ -6,7 +6,8 @@
     https://www.volksoper.at/produktion/<slug>.<id>.de.html             one performance's page
 
 The month pages (found in the sitemap; "jänner-2027" is spelt with the umlaut) list each
-performance with schema.org microdata (startDate/endDate with offset), title, a genre line
+performance with its date and start/end time (Vienna time; schema.org microdata until
+November 2026), title, a genre line
 ("Operette von Franz Lehár", "Musikdrama von Richard Strauss", "Ein Musical-Vaudeville …",
 "Ballett von …"), the stage (Volksoper, Balkon-Foyer, Probebühne …), the ticket link, badges
 ("Ausverkauft") and the link to the performance's page, whose number is the performance id.
@@ -42,9 +43,10 @@ import re
 from datetime import timedelta
 
 from common import (BudgetExceeded, FetchError, clean, event_id, get, get_json, infer_type, log, looks_cancelled,
-                    make_event, previous_event, refresh_due, requests_left, to_zurich_datetime, today_zurich)
+                    make_event, previous_event, refresh_due, requests_left, to_zurich_datetime, to_zurich_iso,
+                    today_zurich)
 
-from ._vienna import CITY, credit, fold, month_number, order_credits, role
+from ._vienna import CITY, TZ, credit, fold, month_number, order_credits, role
 
 KEY = 'volksoper_wien'
 NAME = 'Volksoper Wien'
@@ -93,21 +95,41 @@ def month_urls(sitemap, today, last):
     return [u for _, u in sorted(set(out))]
 
 
+def _times(article):
+    """(start, end) ISO strings of one month-page entry, or (None, None). Since November 2026 the
+    page gives '<time datetime="2026-11-05">' and '<span>19:00</span> - <span>21:45</span>'
+    (Vienna time); before, schema.org startDate/endDate with an offset."""
+    start = re.search(r'itemprop="startDate"\s+content="([^"]+)"', article)
+    if start:
+        end = re.search(r'itemprop="endDate"\s+content="([^"]+)"', article)
+        return start.group(1), end.group(1) if end else None
+    day = re.search(r'<time[^>]*datetime="(\d{4}-\d\d-\d\d)"', article)
+    span = re.search(r'class="event-date-time">(.*?)</span>\s*</li>', article, re.S)
+    hours = re.findall(r'(\d{1,2}):(\d\d)', span.group(1) if span else '')
+    if not day or not hours:
+        return None, None
+    try:
+        times = [to_zurich_iso(f'{day.group(1)}T{int(h):02d}:{m}', assume=TZ) for h, m in hours[:2]]
+    except ValueError:
+        return None, None
+    end = times[1] if len(times) > 1 and times[1] > times[0] else None   # past midnight: no end
+    return times[0], end
+
+
 def parse_month(page_html):
     """-> list of performance dicts (raw facts) from one month page."""
     out = []
     for a in re.findall(r'<article(.*?)</article>', page_html or '', re.S):
-        start = re.search(r'itemprop="startDate"\s+content="([^"]+)"', a)
+        start, end = _times(a)
         prod = re.search(r'href="(https://www\.volksoper\.at/produktion/[^"]+?\.(\d+)\.de\.html)"', a)
         prodid = re.search(r'filter\[production\]=(\d+)', a)
-        title = re.search(r'itemprop="name">(.*?)</h2>', a, re.S)
+        title = re.search(r'<h2[^>]*>(.*?)</h2>', a, re.S)
         if not start or not prod or not title:
             continue
-        end = re.search(r'itemprop="endDate"\s+content="([^"]+)"', a)
         loc = re.search(r'<span class="event-location">(.*?)</span>', a, re.S)
         ticket = re.search(r'href="(https://tickets\.volksoper\.at/[^"]+)"', a)
         out.append({
-            'start': start.group(1), 'end': end.group(1) if end else None,
+            'start': start, 'end': end,
             'prod_url': prod.group(1), 'eid': prod.group(2), 'prodid': prodid.group(1) if prodid else prod.group(2),
             'title': clean(title.group(1)),
             'lines': [clean(x) for x in re.findall(r'<p class="event-description[^"]*">(.*?)</p>', a, re.S) if clean(x)],

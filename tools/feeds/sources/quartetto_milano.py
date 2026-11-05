@@ -72,16 +72,29 @@ def _flat(prefix, value, out):
         out.append((prefix, str(value)))
 
 
+def _list_options(page):
+    """{tax_slug: (position, options)} for each events-list block; the theme has written the
+    data-options attribute both double-quoted (&quot;-escaped) and single-quoted (raw JSON)."""
+    found = {}
+    for m in re.finditer(r'''data-options=(?:"(\{[^"]*\})"|'(\{[^']*\})')''', page):
+        try:
+            opts = json.loads(_html.unescape(m.group(1) or m.group(2)))
+        except ValueError:
+            continue
+        if isinstance(opts, dict) and opts.get('tax_slug'):
+            found.setdefault(opts['tax_slug'], (m.start(), opts))
+    return found
+
+
 def upcoming():
     page = get(CALENDAR)
-    start = page.find('eventi-prossimi&quot;')
-    end = page.find('eventi-passati&quot;', start)
-    block = page[start:end if end > 0 else len(page)]
+    lists = _list_options(page)
+    if 'eventi-prossimi' not in lists:
+        raise FetchError('the calendar page has no "eventi-prossimi" list (layout changed?)')
+    start, m = lists['eventi-prossimi']
+    end = lists['eventi-passati'][0] if 'eventi-passati' in lists else len(page)
+    block = page[start:end if end > start else len(page)]
     urls = _links(block)
-    m = None
-    for opts in re.findall(r'data-options="(\{[^"]*\})"', page):
-        if 'eventi-prossimi' in opts:
-            m = json.loads(_html.unescape(opts))
     if m:
         try:
             last = int(m.get('max_pages_num') or 1)
