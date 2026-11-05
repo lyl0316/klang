@@ -130,6 +130,18 @@ export default {
   'Added to “{name}”': '已添加到“{name}”', 'Removed from “{name}”': '已从“{name}”中移除',
   '{n} piece': '{n} 首', '{n} pieces': '{n} 首', 'Playlist name': '播放列表名称', 'New playlist name': '新播放列表名称',
   'Added to new playlist “{name}”': '已添加到新播放列表“{name}”', Create: '创建', 'New playlist…': '新建播放列表…',
+  // Share to RedNote (ui/rednote.js)
+  'Share to RedNote': '分享到小红书', 'Share picture': '分享图片', 'Save picture': '保存图片', 'Copy text': '复制文案',
+  'Open RedNote': '打开小红书', 'Post title': '笔记标题', 'Post text': '笔记正文', Title: '标题', Text: '正文',
+  'Picture for your post: {title}': '笔记配图：{title}',
+  'A ready-made post: tap Share picture, pick RedNote (小红书), then paste the text. You can edit the text first.':
+    '已为你准备好笔记：点“分享图片”，选择小红书，再粘贴文案即可。文案可先修改。',
+  'Text copied — paste it into your RedNote post': '文案已复制，在小红书笔记中粘贴即可',
+  'Picture saved and text copied — add both to a new RedNote post': '图片已保存、文案已复制，发小红书笔记时添加即可',
+  'Picture saved': '图片已保存', 'Title and text copied': '标题和文案已复制',
+  'Couldn’t copy — select the text and copy it': '无法复制，请选中文字后手动复制',
+  'Long-press the picture to save it to Photos.': '长按图片可保存到相册。',
+  'Nothing is sent until you share it. The picture uses only the listing’s facts.': '分享之前不会发送任何内容。图片只使用演出信息本身。',
 };
 
 // Credit roles the listings use beyond i18n's shared ZH_ROLES (zh-names.js); pairs like

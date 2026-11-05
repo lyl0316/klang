@@ -1,5 +1,6 @@
 // Concert detail (#/concert/:id), mirroring Sheng's concert page in order and look:
-//  1. floating back · share (share sheet: Share…, Copy link, Add to calendar, Hide) over a header
+//  1. floating back · share (share sheet: Share…, Share to RedNote (ui/rednote.js: picture card + post
+//     text), Copy link, Add to calendar, Hide) over a header
 //     band: bold centred sans title, grey series, gold Swiss date ("Wed, Dec 2, 7:30 PM" /
 //     "12月2日 周三 19:30") plus the viewer's own clock when their time zone differs, "Duration: ≈ N min",
 //     gold "City | Venue · room ☆"
@@ -31,6 +32,8 @@ import { openSheet } from '../ui/sheet.js';
 import { openVersionsSheet, matchWorkTracks, searchTerm, previewQueue, catalogKeys, oneWorkAlbum } from '../ui/listen.js';
 import { previewButton, classicalButton } from '../ui/preview.js';
 import { openSaveSheet } from '../ui/save.js';
+import { openRedNoteSheet } from '../ui/rednote.js';
+import { country as countryOf } from '../data/countries.js';
 import { href, emptyState, followButton, avatar, roleText, sourceCredit } from '../ui/components.js';
 import { GUIDES, WIDELY_LOVED, HOOKS } from '../content/guides.js';
 import { goBack } from '../main.js';
@@ -1395,6 +1398,10 @@ function openMenu(c, items, keepSheet) {
   // Sheng's top bar has only Back and Share; Klang's extra actions sit in the share sheet.
   const body = h('div', { class: 'group' },
     navigator.share ? row('share', t('Share…'), () => shareConcert(c)) : null,
+    row('camera', t('Share to RedNote'), () => openRedNoteSheet({
+      concert: c, items, when: fmtWhen(c.start, TZ), venue: venueText(c), city: cityText(c),
+      country: countryOf(c.country || 'switzerland')?.name || null, keepSheet,
+    })),
     row('notes', t('Copy link'), () => copyText(shareURL(c))),
     row('calendar', t('Add to calendar'), () => addToCalendar(c, items)),
     row('eyeoff', t(store.isHidden(c.id) ? 'Show this concert again' : 'Hide this concert'), () => toggleHide(c)));
