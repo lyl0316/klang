@@ -258,4 +258,9 @@ export default {
   // Legal › portrait credits
   'Public domain': '公有领域', 'No restrictions': '无限制', 'Unknown painter': '佚名画家', 'Unknown artist': '佚名画家',
   'Unknown photographer': '佚名摄影师', 'Library of Congress': '美国国会图书馆', 'attributed to {name}': '传为 {name} 所作',
+  // Library ↔ Apple Music links
+  'My Apple Music library': '我的 Apple Music 资料库', 'Add to Apple Music': '添加到 Apple Music',
+  'Klang keeps its own library on this phone. To add an album to Apple Music too, open it and tap Add to Apple Music.':
+    'Klang 的资料库保存在这部手机上。想把专辑也加进 Apple Music，打开专辑后点“添加到 Apple Music”。',
+  'To keep these in Apple Music too: open a piece with ↗ and tap ＋ there.': '想同时存进 Apple Music：用 ↗ 打开曲目，再在那里点＋。',
 };

@@ -37,6 +37,10 @@ export function albumURL(collectionId, trackId = null, app = playApp()) {
   return `${HOST[app]}/ch/album/${encodeURIComponent(collectionId)}${q}`;
 }
 
+// The listener's own Apple Music library (shared by Apple Music and Apple Music Classical). Showing it
+// inside Klang would need paid MusicKit, so Klang links to it instead; an album page's ＋ adds the album.
+export const LIBRARY_URL = 'https://music.apple.com/library/recently-added';
+
 export function searchURL(term, app = playApp()) {
   return `${HOST[app]}/ch/search?term=${encodeURIComponent(term)}`;
 }

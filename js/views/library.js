@@ -9,8 +9,11 @@
 // opens the full piece in Apple Music Classical (or Apple Music, chosen in Me). "Play all" previews the
 // whole album or playlist in order (music.js preview queue); "Apple Music Classical ↗" next to it
 // opens the first piece — or the album — to play in full with your own subscription.
+// Apple Music itself: "My Apple Music library ↗" opens the listener's own library, and each album sheet
+// has "Add to Apple Music ↗" (the album's page, where ＋ adds it); showing that library inside Klang
+// would need paid MusicKit.
 //
-//   #/library            Albums › · Playlists › · Recently added
+//   #/library            Albums › · Playlists › · My Apple Music library ↗ · Recently added
 //   #/library/albums     "My albums"    — sort (Recently added / Title / Artist) + search
 //   #/library/playlists  "My playlists" — New playlist… · sort (Recently added / Title) + search
 //
@@ -24,7 +27,7 @@ import { href, emptyState } from '../ui/components.js';
 import { searchTerm, matchWorkTracks } from '../ui/listen.js';
 import { searchAlbums, albumTracks, artwork, fmtDuration, ITUNES_CREDIT } from '../music.js';
 import {
-  makePiece, albumPiece, workPieceId, albumURL, searchURL, listenLink, onListening, playAppName,
+  makePiece, albumPiece, workPieceId, albumURL, searchURL, listenLink, onListening, playAppName, LIBRARY_URL,
 } from '../applemusic.js';
 import { saveButton } from '../ui/save.js';
 import { previewButton, classicalButton } from '../ui/preview.js';
@@ -144,6 +147,12 @@ function quietLink(a) {
   return a;
 }
 
+// "Add to Apple Music ↗": the album's page in Apple Music, where ＋ adds it to the listener's library.
+function amAddLink(url) {
+  return h('a', { class: 'btn small lib-am-add', href: url, target: '_blank', rel: 'noopener' },
+    icon('plus', 14), t('Add to Apple Music'), icon('external', 12));
+}
+
 // Rename a playlist / name a new one: a small sheet with one field.
 function nameSheet({ title, value = '', action, onSave }) {
   const input = h('input', {
@@ -204,7 +213,7 @@ export function openAlbumSheet(album) {
       saveButton(whole, { cls: 'btn small lib-save', label: t('Save') })),
     playCaption(),
     tracksEl,
-    h('div', { class: 'lib-sheet-foot' }, libBtn));
+    h('div', { class: 'lib-sheet-foot' }, libBtn, amAddLink(albumURL(id, null, 'music'))));
   paintLibBtn();
 
   const unsubLib = store.subscribe((topic) => {
@@ -385,12 +394,13 @@ export function openPlaylistSheet(playlist) {
   const caption = h('div', { class: 'lib-caption-slot' });
   const list = h('div', { class: 'pl-items' });
   const foot = h('div', { class: 'lib-sheet-foot' });
+  const amHint = h('p', { class: 'lib-am-hint' }, t('To keep these in Apple Music too: open a piece with ↗ and tap ＋ there.'));
   const firstTerm = itemsOf(p).length ? itemTerm(itemsOf(p)[0]) : p.name || 'classical';
 
   const sheet = openSheet({
     title: p.name || t('Playlist'),
     subtitle: playlistSub(p),
-    body: h('div', { class: 'lib-sheet' }, head, from, actions, caption, list, foot),
+    body: h('div', { class: 'lib-sheet' }, head, from, actions, caption, list, foot, amHint),
     footer: creditLine(searchURL(firstTerm, 'classical'), searchURL(firstTerm, 'music')),
     onClose: () => {
       closed = true;
@@ -690,7 +700,12 @@ function renderRoot() {
     clear(body).append(
       h('nav', { class: 'lib-nav', 'aria-label': t('Library') },
         navRow('#/library/albums', 'albums', t('Albums'), albums.length),
-        navRow('#/library/playlists', 'playlists', t('Playlists'), playlists.length)),
+        navRow('#/library/playlists', 'playlists', t('Playlists'), playlists.length),
+        h('a', { class: 'lib-row lib-am-row', href: LIBRARY_URL, target: '_blank', rel: 'noopener' },
+          h('span', { class: 'lib-ic' }, icon('music', 17)),
+          h('span', { class: 'grow' }, t('My Apple Music library')),
+          icon('external', 15))),
+      h('p', { class: 'lib-am-hint' }, t('Klang keeps its own library on this phone. To add an album to Apple Music too, open it and tap Add to Apple Music.')),
       h('h2', { class: 'lib-h' }, t('Recently added')),
       recent.length
         ? h('div', { class: 'lib-grid' }, recent.map(recentTile))
