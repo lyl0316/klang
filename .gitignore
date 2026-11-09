@@ -3,3 +3,4 @@ __pycache__/
 # built daily by the workflow (tools/feeds); a local build is for testing only
 data/concerts.json
 data/feed-report.json
+data/widget.json

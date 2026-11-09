@@ -161,6 +161,15 @@ Apple's terms are followed:
 
 **Before a public launch,** add Apple's official "Listen on Apple Music" badge from Apple's marketing tools, and the trademark credit.
 
+## iPhone widget
+
+A Home Screen and Lock Screen widget with tomorrow's concerts, made with the free [Scriptable](https://scriptable.app) app (a web app can't add widgets by itself). Setup steps and a Copy button are at <https://lyl0316.github.io/klang/tools/widget/>.
+
+- It shows Switzerland by default; the widget's Parameter can be Austria, Germany, France, Italy or All. Small, medium and large sizes on the Home Screen, and the three Lock Screen sizes; English or Chinese, following the iPhone's language.
+- Tapping a concert opens it in Klang.
+- It reads `data/widget.json` (about 20 KB: today and the next three days), which the daily build writes with `tools/feeds/widget.py`. When offline it keeps the last copy.
+- People paste a small loader (`tools/widget/klang-loader.js`) once. It downloads the widget itself (`tools/widget/klang-widget.js`) on every run and keeps the last working copy, so changes to the widget reach every phone without pasting again, and a broken update falls back to the previous version.
+
 ## Files
 
 ```
@@ -188,7 +197,9 @@ js/ui/                shared components, bottom sheet, Preview / Apple Music Cla
 js/views/             discover, concerts, concert, entity (work/composer/artist/venue/city),
                       editorial, activity, library, assistant, me, settings (Data & imports), map
 data/concerts.json    the listings, built daily by the workflow (not committed)
+data/widget.json      the next few days for the iPhone widget, built daily (not committed)
 tools/feeds/          the collectors (Python, standard library only) and their tests
+tools/widget/         the iPhone widget: loader, widget module (Scriptable) and setup page
 tools/serve.py        no-cache local server
 tests/test.html       unit tests (run in a browser)
 .github/workflows/pages.yml   daily build of the listings and deploy to GitHub Pages

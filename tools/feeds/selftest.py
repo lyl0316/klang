@@ -5,8 +5,8 @@ Covers common.py (ICS incl. DST, to_zurich_iso, make_event, jsonld_events, clean
 guess_type, robots.txt rules, the polite GET against a throwaway server on 127.0.0.1,
 the previous feed for incremental details, and the type rules), the source registry,
 build.py (checks, de-duplication and the merge rule, the type pass, codeHash, request
-caps, fallback to the previous feed) and the incremental details of the Tonhalle and
-Opernhaus readers. Nothing leaves this machine.
+caps, fallback to the previous feed), the incremental details of the Tonhalle and
+Opernhaus readers, and the small widget feed (widget.py). Nothing leaves this machine.
 """
 from __future__ import annotations
 
@@ -28,6 +28,7 @@ sys.path.insert(0, HERE)
 import common  # noqa: E402
 import sources as registry  # noqa: E402
 import build  # noqa: E402
+import widget  # noqa: E402
 
 Z = common.ZURICH
 
@@ -1312,6 +1313,28 @@ class CodeHash(unittest.TestCase):
                 self.assertNotEqual(build._code_hash(src), before)              # a helper edit invalidates reuse
             finally:
                 build.HERE = saved
+
+
+class Widget(unittest.TestCase):
+    def test_slim(self):
+        def c(i, start, **kw):
+            return dict({'id': i, 'start': start, 'title': 'T' + i, 'venueName': 'Hall', 'city': 'Zürich',
+                         'status': 'scheduled', 'credits': [{'role': 'Piano', 'name': 'X'}]}, **kw)
+        feed = {'generatedAt': 'g', 'concerts': [
+            c('a', '2026-11-10T19:30:00+01:00'),
+            c('b', '2026-11-10T12:00:00+01:00', country='austria', city='Vienna'),
+            c('x', '2026-11-10T20:00:00+01:00', status='cancelled'),
+            c('old', '2026-11-08T19:30:00+01:00'),
+            c('far', '2026-11-13T19:30:00+01:00'),
+            c('last', '2026-11-12T19:30:00+01:00'),
+        ]}
+        out = widget.slim(feed, '2026-11-09', 4)
+        self.assertEqual(out['days'], ['2026-11-09', '2026-11-10', '2026-11-11', '2026-11-12'])
+        self.assertEqual([r['i'] for r in out['concerts']], ['b', 'a', 'last'])   # by day and time; no cancelled
+        self.assertEqual(out['concerts'][0], {'i': 'b', 'd': '2026-11-10', 't': '12:00', 'n': 'Tb', 'v': 'Hall',
+                                              'c': 'Vienna', 'k': 'austria'})
+        self.assertEqual(out['concerts'][1]['k'], 'switzerland')                  # Swiss events carry no country
+        self.assertEqual(out['feedGeneratedAt'], 'g')
 
 
 if __name__ == '__main__':

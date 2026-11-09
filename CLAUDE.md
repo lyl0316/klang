@@ -58,7 +58,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 60 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (69 tests, offline).
+- **Feed tests:** `python3 tools/feeds/selftest.py` (70 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -89,7 +89,9 @@ python3 tools/serve.py            # http://localhost:8765, caching off
      - On a push it runs with `--fresh-hours 20`, so sources read in the last 20 h with unchanged
        code are reused. A code-only push deploys in under a minute.
   2. `tools/feeds/check.py` writes `data/feed-report.json`.
-  3. The site deploys, then the run is marked **failed** if the check failed. GitHub then emails
+  3. `tools/feeds/widget.py` writes `data/widget.json` for the iPhone widget (`continue-on-error`,
+     so it can never block a deploy).
+  4. The site deploys, then the run is marked **failed** if the check failed. GitHub then emails
      the owner; that is what "I receive some emails" means.
 - **check.py:**
   - **Fails** when:
@@ -212,6 +214,20 @@ Rules and gotchas:
 
 ## 7. Recent features (Nov 2026)
 
+- **iPhone widget** (`tools/widget/`, added 9 Nov 2026): tomorrow's concerts on the Home Screen and
+  Lock Screen.
+  - A PWA can't provide iOS widgets (still true in iOS 26), so it runs in the free **Scriptable** app.
+    The owner compared six options on 9 Nov 2026 and chose this one.
+  - `klang-loader.js` is what people paste, once. On every run it downloads `klang-widget.js` (a
+    module: `module.exports = { main }`, must contain the `KLANG-WIDGET` marker), saves it as
+    `klang-widget-latest.js` in Scriptable's local folder, runs it, and keeps `klang-widget-good.js`
+    as the last working copy. **So a push to `klang-widget.js` updates every phone**; test it first.
+  - `index.html` is the setup page (Copy button and steps), live at `/klang/tools/widget/`.
+  - It reads `data/widget.json` (today plus 3 days, ~20 KB; the full feed is too big for a widget).
+    Rows open `#/concert/<id>` in Klang. The widget Parameter picks a country; empty is Switzerland.
+  - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
+  - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
+    Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.
 - **Share to RedNote** (`js/ui/rednote.js`, opened from the concert page: Share › 分享到小红书).
   - It draws a 1080×1440 picture card on a canvas from the listing's facts, with the organiser credited.
   - It writes an editable post title (at most 20 characters, RedNote's limit) and text with emoji

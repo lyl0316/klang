@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Klang widget</title>
+<!-- Setup page for the iPhone widget. People paste klang-loader.js into the free Scriptable app once;
+     it downloads klang-widget.js (the widget itself) on every run, so changes there need no new paste. -->
+<style>
+  :root { --bg: #0c0c0e; --surface: #161619; --text: #f3f1ee; --text-2: #b9b5af; --accent: #d24d57; --line: rgba(255,255,255,.1); color-scheme: dark light; }
+  @media (prefers-color-scheme: light) { :root { --bg: #f6f4f1; --surface: #fff; --text: #1b1a19; --text-2: #55514c; --accent: #b8343f; --line: rgba(0,0,0,.1); } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, system-ui, sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 28px 16px 48px; }
+  h1 { font: 650 28px/1.2 ui-serif, 'New York', Georgia, serif; margin: 0 0 6px; }
+  p.lead { color: var(--text-2); margin: 0 0 24px; }
+  ol { padding-left: 22px; margin: 0 0 24px; }
+  li { margin: 0 0 14px; }
+  li small { display: block; color: var(--text-2); font-size: 14px; }
+  a { color: var(--accent); }
+  button { font: 600 16px -apple-system, system-ui, sans-serif; color: #fff; background: var(--accent); border: 0; border-radius: 12px; padding: 12px 20px; margin: 6px 0 2px; }
+  #status { color: var(--text-2); font-size: 14px; margin-left: 8px; }
+  details { border-top: 0.5px solid var(--line); padding-top: 12px; color: var(--text-2); font-size: 14px; }
+  pre { background: var(--surface); border-radius: 12px; padding: 12px; overflow: auto; font-size: 11px; color: var(--text-2); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Klang on your Home Screen</h1>
+  <p class="lead">Tomorrow's concerts on your Home Screen and Lock Screen. The listings and the widget itself update automatically.</p>
+  <ol>
+    <li>Install <b>Scriptable</b> from the App Store. It's free.
+      <small><a href="https://scriptable.app">scriptable.app</a></small></li>
+    <li>Copy the widget script. You only do this once.<br>
+      <button id="copy" disabled>Copy script</button><span id="status"></span></li>
+    <li>Open Scriptable, tap <b>+</b>, and paste. Tap the name at the top, call it <b>Klang</b>, then tap <b>Done</b>.
+      <small>To check it, tap <b>Klang</b> in the list: a preview of the widget appears.</small></li>
+    <li>On your Home Screen, touch and hold an empty spot, tap <b>Edit</b>, then <b>Add Widget</b>. Choose <b>Scriptable</b>, pick a size and tap <b>Add Widget</b>.</li>
+    <li>Touch and hold the new widget, tap <b>Edit Widget</b>, and set <b>Script</b> to <b>Klang</b>.
+      <small>Switzerland is shown by default. To see another country, type Austria, Germany, France, Italy or All in <b>Parameter</b>.</small></li>
+    <li>For the Lock Screen (optional): touch and hold the Lock Screen, tap <b>Customize</b>, then <b>Lock Screen</b>. Tap the widget area, choose <b>Scriptable</b> and add a widget. Tap it and set <b>Script</b> to <b>Klang</b>.</li>
+  </ol>
+  <details><summary>Show the script</summary><pre id="code">Loading…</pre></details>
+</main>
+<script>
+  const btn = document.getElementById('copy'), status = document.getElementById('status'), code = document.getElementById('code');
+  let text = '';
+  fetch('klang-loader.js', { cache: 'no-cache' }).then((r) => r.text()).then((t) => { text = t; code.textContent = t; btn.disabled = false; })
+    .catch(() => { status.textContent = "Couldn't load the script. Try again."; });
+  btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(text); status.textContent = 'Copied'; }
+    catch (e) { status.textContent = 'Open "Show the script" below and copy it from there.'; }
+  });
+</script>
+</body>
+</html>
