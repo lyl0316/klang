@@ -49,7 +49,7 @@ The **Concerts** tab has:
 - **A flat list** like Sheng's, of real concerts. Each card shows "Tomorrow Oct 27 · Venue · City", then a bold centred title, series, performers and the programme, as the organiser published them. The list ends with "That's all the venues have published so far", the number of sources and when they were updated.
 - **Pull to refresh:** reloads the day's listings (and your own feed URL, if you saved one), then says "Up to date" or "N new concerts".
 - **Date sheet:** shows relative event density as 1–3 dots. "Jump to Oct 30 · Fri" scrolls the list to that day. Picking a past day asks you to **pick one city to look back**.
-- **Location sheet:** "Current country: Switzerland", with every city selected to start and its real count. Tap a city to exclude it, and the button changes from "Confirm" to "Show N events". You can search cities, cantons and countries, and a Map link opens the city map.
+- **Location sheet:** "Current country: Switzerland", with every city selected to start and its real count. Klang remembers the place you confirm and opens there next time. Tap a city to exclude it, and the button changes from "Confirm" to "Show N events". You can search cities, cantons and countries, and a Map link opens the city map.
   - **Other countries ›** lists Sheng's 47 countries, with each country's regions and cities. Austria, Germany, France and Italy show their real counts (their main cities have listings); the others show 0 events and a short note. **Back to Switzerland** returns.
 - **Type sheet:** works the same way.
 - **Month rail:** tap a month, press and slide to pick a week, or slide left to pick a day.
@@ -165,9 +165,9 @@ Apple's terms are followed:
 
 A Home Screen and Lock Screen widget with tomorrow's concerts, made with the free [Scriptable](https://scriptable.app) app (a web app can't add widgets by itself). Setup steps and a Copy button are at <https://lyl0316.github.io/klang/tools/widget/>.
 
-- It shows Switzerland by default; the widget's Parameter can be Austria, Germany, France, Italy or All. Small, medium and large sizes on the Home Screen, and the three Lock Screen sizes; English or Chinese, following the iPhone's language.
+- It shows the same place as the Concerts tab: **Me › Show my cities in the widget** sends it (Scriptable opens for a moment). Without that it shows all of Switzerland, and a widget's own Parameter can be Austria, Germany, France, Italy or All. Small, medium and large sizes on the Home Screen, and the three Lock Screen sizes; English or Chinese, following the iPhone's language.
 - Tapping a concert opens it in Klang.
-- It reads `data/widget.json` (about 20 KB: today and the next three days), which the daily build writes with `tools/feeds/widget.py`. When offline it keeps the last copy.
+- It reads `data/widget.json` (about 20 KB: today and the next three days). The daily build writes it with `tools/widget/widget-feed.mjs`, which loads the listings through Klang's own modules, so each concert has the app's own concert and city ids. When offline the widget keeps the last copy.
 - People paste a small loader (`tools/widget/klang-loader.js`) once. It downloads the widget itself (`tools/widget/klang-widget.js`) on every run and keeps the last working copy, so changes to the widget reach every phone without pasting again, and a broken update falls back to the previous version.
 
 ## Files
@@ -199,7 +199,7 @@ js/views/             discover, concerts, concert, entity (work/composer/artist/
 data/concerts.json    the listings, built daily by the workflow (not committed)
 data/widget.json      the next few days for the iPhone widget, built daily (not committed)
 tools/feeds/          the collectors (Python, standard library only) and their tests
-tools/widget/         the iPhone widget: loader, widget module (Scriptable) and setup page
+tools/widget/         the iPhone widget: loader and widget module (Scriptable), setup page, widget-feed.mjs (daily data)
 tools/serve.py        no-cache local server
 tests/test.html       unit tests (run in a browser)
 .github/workflows/pages.yml   daily build of the listings and deploy to GitHub Pages

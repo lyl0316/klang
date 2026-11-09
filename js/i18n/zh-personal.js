@@ -263,4 +263,8 @@ export default {
   'Klang keeps its own library on this phone. To add an album to Apple Music too, open it and tap Add to Apple Music.':
     'Klang 的资料库保存在这部手机上。想把专辑也加进 Apple Music，打开专辑后点“添加到 Apple Music”。',
   'To keep these in Apple Music too: open a piece with ↗ and tap ＋ there.': '想同时存进 Apple Music：用 ↗ 打开曲目，再在那里点＋。',
+  // iPhone widget (Scriptable)
+  'iPhone widget': 'iPhone 小组件', 'Show my cities in the widget': '在小组件中显示我的城市', 'Set up the iPhone widget': '设置 iPhone 小组件',
+  'The widget runs in the free Scriptable app. After you change your cities, tap the first row: Scriptable opens for a moment, then come back to Klang.':
+    '小组件在免费的 Scriptable App 中运行。更改城市后，点第一行：Scriptable 会短暂打开，然后回到 Klang 即可。',
 };

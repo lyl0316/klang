@@ -1,35 +1,77 @@
-// KLANG-WIDGET 2: tomorrow's concerts on the iPhone Home Screen and Lock Screen.
+// KLANG-WIDGET 3: tomorrow's concerts on the iPhone Home Screen and Lock Screen.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
 // on the phone, and calls main(). Edits here reach every phone at its next widget refresh.
 // Setup page: https://lyl0316.github.io/klang/tools/widget/
-// Data: data/widget.json (the next few days, written by tools/feeds/widget.py in the daily build).
-// Widget parameter (long-press the widget > Edit Widget > Parameter): a country, for example
-// Austria, or All. Empty means Switzerland. Tapping a concert opens it in Klang.
+// Data: data/widget.json (the next few days with Klang's own concert and city ids, written by
+// tools/widget/widget-feed.mjs in the daily build).
+//
+// Which concerts: the same place as Klang's Concerts tab. Me › iPhone widget in Klang opens
+// scriptable:///run/Klang?place={"ids":[…],"label":"…"}; this script saves it on the phone and the
+// widget filters with Klang's own rule (repo.query): no ids = Switzerland, a city id, or
+// 'country:<id>' for a whole country. A widget's own Parameter (long-press › Edit Widget) wins over it:
+// Switzerland, Austria, Germany, France, Italy or All. Tapping a concert opens it in Klang.
 // Sizes: small, medium, large (Home Screen); accessoryRectangular, accessoryInline and
 // accessoryCircular (Lock Screen, iOS 16+).
 
 const SITE = "https://lyl0316.github.io/klang/";
 const FEED = SITE + "data/widget.json";
+const PLACE_KEY = "klang.widget.place";
+const PLACE_FILE = "klang-widget-place.json";
 const COUNTRIES = { switzerland: "Switzerland", austria: "Austria", germany: "Germany", france: "France", italy: "Italy", all: "" };
 const SHORT = { ch: "switzerland", at: "austria", de: "germany", fr: "france", it: "italy", "瑞士": "switzerland", "奥地利": "austria", "德国": "germany", "法国": "france", "意大利": "italy", "全部": "all" };
 
 function labels() {
   return Device.language().startsWith("zh")
     ? { tomorrow: "明天", short: "明天", more: (n) => `还有 ${n} 场`, count: (n) => `${n} 场音乐会`, inline: (n) => `明天 ${n} 场音乐会`, none: "明天没有音乐会", old: "节目单还没更新",
-        fail: "无法加载音乐会", locale: "zh-CN", names: { switzerland: "瑞士", austria: "奥地利", germany: "德国", france: "法国", italy: "意大利", all: "全部" } }
+        fail: "无法加载音乐会", locale: "zh-CN", saved: (p) => `小组件现在显示${p}明天的音乐会。回到 Klang 即可。`, ok: "好",
+        names: { switzerland: "瑞士", austria: "奥地利", germany: "德国", france: "法国", italy: "意大利", all: "全部" } }
     : { tomorrow: "Tomorrow", short: "tomorrow", more: (n) => `${n} more`, count: (n) => (n === 1 ? "1 concert" : `${n} concerts`),
         inline: (n) => `Tomorrow: ${n === 1 ? "1 concert" : `${n} concerts`}`, none: "No concerts tomorrow",
-        old: "Listings not updated yet", fail: "Couldn't load concerts", locale: "en-GB", names: COUNTRIES };
+        old: "Listings not updated yet", fail: "Couldn't load concerts", locale: "en-GB",
+        saved: (p) => `The widget now shows tomorrow's concerts in ${p}. You can go back to Klang.`, ok: "OK", names: COUNTRIES };
 }
 
-function pickCountry() {
+// ----- the place (sent from Klang, kept on the phone) -----
+// Saved twice, in Scriptable's keychain and in a file, so the widget finds it either way.
+function savePlace(place) {
+  const json = JSON.stringify(place);
+  try { Keychain.set(PLACE_KEY, json); } catch (e) { /* the file below */ }
+  try {
+    const fm = FileManager.local();
+    fm.writeString(fm.joinPath(fm.documentsDirectory(), PLACE_FILE), json);
+  } catch (e) { /* the keychain above */ }
+}
+
+function savedPlace() {
+  const ok = (p) => p && Array.isArray(p.ids) ? p : null;
+  try { if (Keychain.contains(PLACE_KEY)) { const p = ok(JSON.parse(Keychain.get(PLACE_KEY))); if (p) return p; } } catch (e) { /* try the file */ }
+  try {
+    const fm = FileManager.local();
+    const file = fm.joinPath(fm.documentsDirectory(), PLACE_FILE);
+    if (fm.fileExists(file)) return ok(JSON.parse(fm.readString(file)));
+  } catch (e) { /* none */ }
+  return null;
+}
+
+// { ids, label } or { all: true, label: "" }
+function pickPlace(L) {
   const raw = (args.widgetParameter || "").trim().toLowerCase();
-  if (!raw) return "switzerland";
-  if (COUNTRIES[raw] !== undefined) return raw;
-  return SHORT[raw] || "switzerland";
+  const k = COUNTRIES[raw] !== undefined ? raw : SHORT[raw];
+  if (k === "all") return { all: true, ids: [], label: "" };
+  if (k === "switzerland") return { ids: [], label: L.names.switzerland };
+  if (k) return { ids: ["country:" + k], label: L.names[k] };
+  return savedPlace() || { ids: [], label: L.names.switzerland };
 }
 
+// Klang's rule (js/repo.js query): no ids = Switzerland; else the concert's city, or its whole country.
+function inPlace(c, place) {
+  if (place.all) return true;
+  if (!place.ids.length) return c.k === "switzerland";
+  return place.ids.includes(c.y) || (c.k !== "switzerland" && place.ids.includes("country:" + c.k));
+}
+
+// ----- data -----
 async function loadData() {
   const fm = FileManager.local();
   const file = fm.joinPath(fm.cacheDirectory(), "klang-widget.json");
@@ -58,10 +100,13 @@ function addText(stack, text, size, color, bold) {
   return t;
 }
 
-// Tomorrow's concerts for the chosen country, or a message explaining why there are none.
+// Klang's concert ids start with "feed-" (older widget data had the bare feed id).
+const concertURL = (c) => SITE + "#/concert/" + encodeURIComponent(String(c.i).startsWith("feed-") ? c.i : "feed-" + c.i);
+
+// Tomorrow's concerts for the place, or a message explaining why there are none.
 async function state() {
   const L = labels();
-  const country = pickCountry();
+  const place = pickPlace(L);
   const data = await loadData();
   const now = new Date();
   const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -71,10 +116,10 @@ async function state() {
   if (!data) message = L.fail;
   else if (!(data.days || []).includes(key)) message = L.old;
   else {
-    list = data.concerts.filter((c) => c.d === key && (country === "all" || c.k === country));
+    list = data.concerts.filter((c) => c.d === key && inPlace(c, place));
     if (!list.length) message = L.none;
   }
-  return { L, country, tomorrow, list, message };
+  return { L, place, tomorrow, list, message };
 }
 
 // Lock Screen: the system tints these, so they use plain white text and no colours.
@@ -111,7 +156,7 @@ function lockWidget(family, s) {
 function concertRow(w, c, family, colors) {
   const { RED, TEXT, TEXT2 } = colors;
   const row = w.addStack();
-  row.url = SITE + "#/concert/" + encodeURIComponent(c.i);
+  row.url = concertURL(c);
   if (family === "small") {
     row.layoutVertically();
     addText(row, `${c.t}  ${c.c}`, 11, TEXT2);
@@ -137,12 +182,14 @@ function concertRow(w, c, family, colors) {
   const col = row.addStack();
   col.layoutVertically();
   addText(col, c.n, 14, TEXT, true);
-  addText(col, c.v.includes(c.c) ? c.v : `${c.c} · ${c.v}`, 12, TEXT2);
+  const plain = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const venue = c.v && plain(c.v).includes(plain(c.c)) ? c.v : [c.c, c.v].filter(Boolean).join(" · ");
+  addText(col, venue, 12, TEXT2);
   row.addSpacer();
 }
 
 function homeWidget(family, s) {
-  const { L, country, tomorrow, list, message } = s;
+  const { L, place, tomorrow, list, message } = s;
   const colors = {
     RED: Color.dynamic(new Color("#b8343f"), new Color("#e4606a")),
     TEXT: Color.dynamic(new Color("#1b1a19"), new Color("#f3f1ee")),
@@ -162,7 +209,7 @@ function homeWidget(family, s) {
     addText(head, tomorrow.toLocaleDateString(L.locale, { weekday: "short", day: "numeric", month: "short" }), 12, TEXT2);
   }
   head.addSpacer();
-  if (family !== "small" && L.names[country]) addText(head, L.names[country], 11, RED, true);
+  if (family !== "small" && place.label) addText(head, place.label, 11, RED, true);
   w.addSpacer(family === "large" ? 10 : 8);
 
   if (message) {
@@ -182,6 +229,23 @@ function homeWidget(family, s) {
 }
 
 async function main() {
+  // Sent from Klang (Me › iPhone widget): keep the place, say so, then show the preview.
+  const sent = (args.queryParameters || {}).place;
+  if (sent && !config.runsInWidget) {
+    try {
+      const p = JSON.parse(sent);
+      if (Array.isArray(p.ids)) {
+        const place = { ids: p.ids.map(String), label: String(p.label || "") };
+        savePlace(place);
+        const L = labels();
+        const a = new Alert();
+        a.title = "Klang";
+        a.message = L.saved(place.label || L.names.switzerland);
+        a.addAction(L.ok);
+        await a.present();
+      }
+    } catch (e) { /* not a place from Klang: just show the widget */ }
+  }
   const family = config.widgetFamily || "medium";
   const s = await state();
   const widget = family.startsWith("accessory") ? lockWidget(family, s) : homeWidget(family, s);
@@ -190,4 +254,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 2 };
+module.exports = { main, version: 3 };

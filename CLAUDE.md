@@ -58,7 +58,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 60 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (70 tests, offline).
+- **Feed tests:** `python3 tools/feeds/selftest.py` (69 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -89,8 +89,9 @@ python3 tools/serve.py            # http://localhost:8765, caching off
      - On a push it runs with `--fresh-hours 20`, so sources read in the last 20 h with unchanged
        code are reused. A code-only push deploys in under a minute.
   2. `tools/feeds/check.py` writes `data/feed-report.json`.
-  3. `tools/feeds/widget.py` writes `data/widget.json` for the iPhone widget (`continue-on-error`,
-     so it can never block a deploy).
+  3. `node tools/widget/widget-feed.mjs` writes `data/widget.json` for the iPhone widget
+     (`continue-on-error`, so it can never block a deploy). It is the only Node step: it imports the
+     app's own `js/feed.js` and `js/repo.js` (`js/package.json` marks them as ES modules for Node).
   4. The site deploys, then the run is marked **failed** if the check failed. GitHub then emails
      the owner; that is what "I receive some emails" means.
 - **check.py:**
@@ -189,6 +190,10 @@ Recent example (5 Nov 2026, commit `bdb75b6`):
 
 Rules and gotchas:
 
+- **Place (Location).** `prefs.placeCityIds` keeps the place last confirmed in the Location sheet or in
+  Me › Your region, and Klang opens there (`store.homePlace()`, else `regionCityIds`). The owner asked
+  for this on 9 Nov 2026. Other ways of setting `filters.cityIds` (map, city page, Assistant, Your
+  region › Other countries) are only for the current visit.
 - **Concerts abroad.**
   - Their `cityId` is `country:<id>|<City>`, and they carry `country`.
   - `repo.query()` with no place filter shows **Switzerland only**. `cityIds: ['country:austria']`
@@ -197,7 +202,7 @@ Rules and gotchas:
   - English and Chinese aliases for those cities are in `repo.js` (`ABROAD_ALIASES`) and in
     `assistant-engine.js`.
 - **Service worker.** When you add a JS or CSS file, add it to the list in `sw.js`. When you change
-  shell files, bump `CACHE` (currently `klang-shell-v11`). Otherwise installed Home Screen apps
+  shell files, bump `CACHE` (currently `klang-shell-v12`). Otherwise installed Home Screen apps
   keep the old version.
 - **Translations.**
   - Put new Chinese strings inside the file's **`export default { … }`** object.
@@ -223,8 +228,13 @@ Rules and gotchas:
     `klang-widget-latest.js` in Scriptable's local folder, runs it, and keeps `klang-widget-good.js`
     as the last working copy. **So a push to `klang-widget.js` updates every phone**; test it first.
   - `index.html` is the setup page (Copy button and steps), live at `/klang/tools/widget/`.
-  - It reads `data/widget.json` (today plus 3 days, ~20 KB; the full feed is too big for a widget).
-    Rows open `#/concert/<id>` in Klang. The widget Parameter picks a country; empty is Switzerland.
+  - It reads `data/widget.json` (today plus 3 days, ~20 KB; the full feed is too big for a widget),
+    written by `widget-feed.mjs` with Klang's own concert ids (`feed-…`) and city ids, so rows open
+    `#/concert/<id>` and filter exactly like `repo.query`.
+  - **Same place as Klang:** Me › "Show my cities in the widget" opens
+    `scriptable:///run/Klang?place={"ids":[…],"label":"…"}` (the script must be named Klang). The
+    widget saves it in Scriptable's Keychain and in a file, and uses it until sent again. A widget's
+    own Parameter (a country, or All) wins over it.
   - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
   - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
     Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.

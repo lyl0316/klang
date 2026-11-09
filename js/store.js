@@ -36,6 +36,7 @@ const DEFAULTS = () => ({
     reminderDays: [7, 1],
     homeCityId: null,
     regionCityIds: [], // "Your region": default Location filter (empty = all Switzerland)
+    placeCityIds: null, // the Concerts tab's place as last confirmed (Location sheet or Your region); null = Your region
     theme: 'system',
     podcastApp: 'apple',
     newYearMode: false,
@@ -471,10 +472,15 @@ export function resetAll() {
 }
 
 // ----- session browse filters (Concerts tab) -----
-// Like Sheng: "Featured only" is on by default; Location starts from "Your region".
+// Like Sheng: "Featured only" is on by default. Location starts from the place last confirmed in the
+// Location sheet or in Your region (kept across launches), else Your region. Other ways of setting
+// cityIds (map, city page, Assistant, Other countries in Your region) are only for this visit.
+// The iPhone widget is sent the same place (Me › iPhone widget).
+export const homePlace = () => [...(state.prefs.placeCityIds || state.prefs.regionCityIds || [])];
+
 export const filters = {
   day: null, // 'YYYY-MM-DD' jump target, or null for today
-  cityIds: [...(state.prefs.regionCityIds || [])], // empty = all of Switzerland
+  cityIds: homePlace(), // empty = all of Switzerland
   types: [], // empty = all types
   featuredOnly: true,
   following: false, // only concerts linked to favourite venues / cities / composers / performers / works

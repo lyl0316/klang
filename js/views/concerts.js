@@ -91,7 +91,7 @@ function countFor(overrides) {
 }
 
 function defaultFilters() {
-  return { day: null, lookBack: false, cityIds: [...(store.pref('regionCityIds') || [])], types: [], featuredOnly: true, following: false };
+  return { day: null, lookBack: false, cityIds: store.homePlace(), types: [], featuredOnly: true, following: false };
 }
 
 // ---------- chips ----------
@@ -660,7 +660,7 @@ export function render() {
     const body = h('div');
     const cta = h('button', { class: 'btn primary block' });
     const footer = h('div', {}, cta, h('div', { class: 'hint' }, t('This filter won’t change your region settings')));
-    const sheet = crSheet(openSheet({ title: t('Location'), subtitle: t('Only affects this browse · won’t change your followed regions'), body, footer }), 'cr-location');
+    const sheet = crSheet(openSheet({ title: t('Location'), subtitle: t('Klang opens here next time · won’t change your followed regions'), body, footer }), 'cr-location');
     // search matches city and canton names ("Vaud", "Ticino") — then "Select all matches"; with the
     // country list open it matches countries
     const search = searchField((v) => { q = v; paintChoices(); });
@@ -779,13 +779,18 @@ export function render() {
     }
     cta.onclick = () => {
       const x = otherCountry();
+      let ids;
       if (x) {
         const all = xCities(x);
         const names = xPicked.size === all.length ? null : all.filter((n) => xPicked.has(n));
-        store.setFilters({ cityIds: countryCityIds(x, names), day: null, lookBack: false });
+        ids = countryCityIds(x, names);
+        store.setFilters({ cityIds: ids, day: null, lookBack: false });
       } else {
-        store.setFilters({ cityIds: isAll() ? [] : [...picked] });
+        ids = isAll() ? [] : [...picked];
+        store.setFilters({ cityIds: ids });
       }
+      store.setPref('placeCityIds', [...ids]); // Klang opens here next time
+
       sheet.close();
       window.scrollTo(0, 0);
     };

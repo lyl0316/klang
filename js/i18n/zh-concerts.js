@@ -53,6 +53,7 @@ export default {
   // ----- Look back -----
   'Pick one city to look back': '选择一个城市进行回顾',
   'Only affects this browse · won’t change your followed regions': '仅影响本次浏览 · 不会更改你关注的地区',
+  'Klang opens here next time · won’t change your followed regions': '下次打开 Klang 时显示这里 · 不会更改你关注的地区',
   'Klang keeps past concerts for {n} days, back to {date}.': 'Klang 只保留最近 {n} 天的往期音乐会（最早到 {date}）。',
   'No past concerts from {date} yet. Klang keeps the concerts it has listed for {n} days after they take place, so Look back fills up as the days go by.':
     '{date}以来还没有往期音乐会。Klang 会把收录过的音乐会在演出后保留 {n} 天，回顾的内容会随时间逐渐增多。',

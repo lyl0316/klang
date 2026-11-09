@@ -23,7 +23,7 @@ import {
   t, tn, fmtN, isZh, lang, setLang, LANGS, cityName, cantonName as cantonLabel, countryName, composerName, composerShort,
   dayMonth, joinList, tidyZh,
 } from '../i18n.js';
-import { otherCountries, countryCities } from '../data/countries.js';
+import { otherCountries, countryCities, country as countryById } from '../data/countries.js';
 import { updatedLabel, listingStats } from './settings.js';
 import { ARTICLES } from '../content/editorials.js';
 import { GUIDES } from '../content/guides.js';
@@ -132,6 +132,22 @@ function regionSummary() {
   if (!ids.length) return t('Nationwide');
   if (ids.length <= 2) return ids.map((id) => cityName(repo.city(id))).join(isZh() ? '、' : ', ');
   return tn(ids.length, '{n} city', '{n} cities');
+}
+
+// The place Klang opens with (Concerts tab): "Switzerland" / "Zurich, Basel" / "Austria" / "5 cities"
+function placeSummary(ids = store.homePlace()) {
+  if (!ids.length) return t('Switzerland');
+  const [cid, name] = ids[0].startsWith('country:') ? ids[0].slice(8).split('|') : [];
+  if (cid && !name) return countryName(countryById(cid)?.name || cid);
+  if (ids.length <= 2) return ids.map((id) => cityName(repo.city(id)) || id.split('|')[1] || id).join(isZh() ? '、' : ', ');
+  return tn(ids.length, '{n} city', '{n} cities');
+}
+
+// iPhone widget (tools/widget/, runs in the free Scriptable app): opening this link runs the widget's
+// script once, which saves the place so the widget lists tomorrow's concerts there too.
+function widgetLink() {
+  const place = { ids: store.homePlace(), label: placeSummary() };
+  return `scriptable:///run/Klang?place=${encodeURIComponent(JSON.stringify(place))}`;
 }
 
 // ---------- calendar export (saved + going upcoming, with alarms) ----------
@@ -373,6 +389,10 @@ export function render() {
         }, t('New Year mode')),
       }),
     ], t('Show concerts featuring Johann Strauss on your calendar.')),
+    ...group(t('iPhone widget'), [
+      row({ ic: 'send', title: t('Show my cities in the widget'), value: placeSummary(), to: widgetLink() }),
+      row({ ic: 'info', title: t('Set up the iPhone widget'), to: './tools/widget/', external: true }),
+    ], t('The widget runs in the free Scriptable app. After you change your cities, tap the first row: Scriptable opens for a moment, then come back to Klang.')),
     ...group(t('Connections'), [
       // Listen / Play open the piece in this app (applemusic.js); Preview plays 30 s inside Klang.
       pickerRow({
@@ -558,6 +578,7 @@ export function renderRegion() {
     if (picked.size === allIds.length) picked = new Set();
     const ids = [...picked];
     store.setPref('regionCityIds', ids);
+    store.setPref('placeCityIds', [...ids]); // the newest choice is where Klang opens
     store.setFilters({ cityIds: [...ids] });
     paint();
   }

@@ -1,0 +1,5 @@
+{
+  "description": "Tells Node that Klang's browser modules are ES modules, so tools/widget/widget-feed.mjs can load them in the daily build. Browsers ignore this file.",
+  "type": "module",
+  "private": true
+}
