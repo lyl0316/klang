@@ -18,7 +18,7 @@ python3 tools/serve.py
 
 Then open <http://localhost:8765>. The server turns caching off, so edits show up on reload.
 
-To run the tests, open `tests/test.html` (locally <http://localhost:8765/tests/test.html>). There are 41, covering:
+To run the tests, open `tests/test.html` (locally <http://localhost:8765/tests/test.html>). There are 60, covering:
 - cities, venues and repertoire, and a fixed-seed test generator (synthetic concerts for these tests only: a test checks that the app never shows them);
 - Swiss time handling, and matching listings to towns, venues, composers and works (German, French and Italian spellings);
 - the real listings: feed entries becoming concerts, Featured, the 120-day Look back window, and Sheng's countries;
@@ -50,12 +50,12 @@ The **Concerts** tab has:
 - **Pull to refresh:** reloads the day's listings (and your own feed URL, if you saved one), then says "Up to date" or "N new concerts".
 - **Date sheet:** shows relative event density as 1–3 dots. "Jump to Oct 30 · Fri" scrolls the list to that day. Picking a past day asks you to **pick one city to look back**.
 - **Location sheet:** "Current country: Switzerland", with every city selected to start and its real count. Tap a city to exclude it, and the button changes from "Confirm" to "Show N events". You can search cities, cantons and countries, and a Map link opens the city map.
-  - **Other countries ›** lists Sheng's 47 countries, with each country's regions and cities. Klang has no listings outside Switzerland yet, so they show 0 events and a short note; **Back to Switzerland** returns.
+  - **Other countries ›** lists Sheng's 47 countries, with each country's regions and cities. Austria, Germany, France and Italy show their real counts (their main cities have listings); the others show 0 events and a short note. **Back to Switzerland** returns.
 - **Type sheet:** works the same way.
 - **Month rail:** tap a month, press and slide to pick a week, or slide left to pick a day.
 
 **Concert page**, in Sheng's order:
-1. Back and Share. The share sheet also has Copy link, Add to calendar (an .ics file with reminders) and Hide.
+1. Back and Share. The share sheet also has **Share to RedNote** (a ready-made 小红书 post: a picture card of the concert plus editable text and hashtags), Copy link, Add to calendar (an .ics file with reminders) and Hide.
 2. Header, then the action tiles: Listen, Program, Notes, Podcasts, Ticket.
 3. Save + Going, or Save + Attended (with a private review) once the concert has started.
 4. A **Listen** carousel with one recording per work, also for works Klang's repertoire doesn't know (found by composer and title as listed). **▶ Preview** plays Apple's 30-second previews of the work's movements inside Klang (tap again to pause), and **Apple Music Classical ↗** opens the same recording at that piece, where it plays in full. **Versions** picks another recording, and **Save** adds the album to your Library or the piece to one of your playlists. **▶ Play all** previews the whole programme in order; **Open in Apple Music Classical** opens the first work with the rest queued (⏭ in the mini player opens the next one). "Add playlist to my Library" keeps the whole programme.
@@ -76,7 +76,7 @@ Community features are intentionally left out: other users, following people, co
 ## Data
 
 **Real concerts only.** Klang shows no invented concerts and never uses Sheng's data. Its listings come from the venues', orchestras' and festivals' own websites (and the City of Geneva's open data), read by the collectors in `tools/feeds/` (see [its README](tools/feeds/README.md)).
-- **Daily refresh.** The GitHub workflow (`.github/workflows/pages.yml`) runs every morning at 04:23 UTC (early morning in Switzerland), writes `data/concerts.json` and publishes it with the app. A source that fails keeps its events from the day before, so one broken site doesn't empty a city.
+- **Daily refresh.** The GitHub workflow (`.github/workflows/pages.yml`) runs once a day (requested for 01:17 UTC; GitHub often starts it a few hours later), writes `data/concerts.json` and publishes it with the app. A source that fails keeps its events from the day before, so one broken site doesn't empty a city.
 - **In the app** (`js/feed.js`), the listings load at start, again when the app comes back after more than 6 hours, and on pull to refresh. A copy on the device makes the next start instant and works offline.
 - **Facts only.** Date and time, title, venue and city, performers and their roles, works, cancellations, and the link to the organiser's page. Details and tickets stay on the organiser's site: every concert page links back to it.
 - **Credits.** Each source's credit line (for example "Source: Zürcher Kammerorchester (zko.ch)") is shown on its concerts' pages, and every source is listed with its credit under **Me → Legal & Privacy → Concert listings**. **Me → Data & imports** shows when the listings were last updated and how many concerts came from how many sources.
@@ -100,7 +100,7 @@ The sources (`python3 tools/feeds/build.py --list`), by region. ★ = the organi
 
 Some festivals publish nothing between seasons, so a source can show 0 concerts for months.
 
-**Other countries.** The Location sheet and Me → Your region list Sheng's 47 countries, with their regions and cities (names only, from `spec/sheng-locations.json`; Sheng's counts are not shown). There are no feeds for them yet, so each shows 0 events and a short note.
+**Other countries.** The main cities of **Austria, Germany, France and Italy** have real listings too, read the same way from their venues' own sites (see the "Outside Switzerland" section of [the feeds README](tools/feeds/README.md)). With no place chosen, Klang shows Switzerland; pick a country under Location › Other countries or Me → Your region. The rest of Sheng's 47 countries are listed by name only (from `spec/sheng-locations.json`; Sheng's counts are not shown) and show 0 events with a short note.
 
 **Your own concerts.** In **Me → Data & imports** you can also add:
 - an **.ics calendar** (many venues publish season calendars);
@@ -153,7 +153,7 @@ These are the access options that were checked (October 2026):
 How listening works, the free way:
 - **▶ Preview** plays Apple's 30-second preview clips inside Klang: tap again to pause; the mini player shows the time left and ⏭. Play all previews a whole programme, album or playlist in order. The clips stream from Apple and are never downloaded or cached.
 - **Apple Music Classical ↗** opens the same recording at that piece in Apple Music Classical (or Apple Music), which plays it in full with your own subscription. **Open in Apple Music Classical** opens the first piece and keeps the rest as "Now listening" on this device: the mini player's ⏭ opens the next piece. (Apple's links can't hand a whole queue to the app.)
-- **Save** keeps albums and pieces in Klang's own Library on this device. Adding to your Apple Music library would need MusicKit (paid), so it isn't done.
+- **Save** keeps albums and pieces in Klang's own Library on this device. Showing or changing your Apple Music library inside Klang would need MusicKit (paid), so the Library links to it instead: **My Apple Music library ↗** opens your own library, and each album's **Add to Apple Music ↗** opens its page in Apple Music, where ＋ adds it.
 
 Apple's terms are followed:
 - Recording details and previews appear with links to Apple Music Classical and Apple Music, with the credit "30-second previews provided courtesy of iTunes".
