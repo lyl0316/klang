@@ -13,8 +13,11 @@ upcoming concerts from 121/121 active sources.
 - A mobile web app (PWA) for classical concerts, modelled screen by screen on the iOS app
   **Sheng (响声)**. It covers Switzerland, plus the main cities of Austria, Germany, France and Italy.
 - **Live:** <https://lyl0316.github.io/klang/>. **Repo:** `lyl0316/klang` (public), branch `main`.
-  - Locally the repo is `/Users/yinistliu/xiang/app`. `/Users/yinistliu/xiang/spec` holds Sheng
-    screenshots and the spec, and `/Users/yinistliu/xiang/klang-logo` holds logo drafts. Neither is in git.
+  - Locally the repo is `/Users/yinistliu/Klang/app`. `/Users/yinistliu/Klang/spec` holds Sheng
+    screenshots and the spec, and `/Users/yinistliu/Klang/klang-logo` holds logo drafts. Neither is in git.
+  - The parent folder was `/Users/yinistliu/xiang` until 9 Nov 2026. If it is moved again, update
+    `.claude/launch.json` and rerun `tools/feeds/mac/install.sh` (it writes the script path into the
+    launchd job).
 - **No build step, no dependencies.** The app is plain HTML, CSS and ES modules. The feed tools
   are Python 3.9+ with the standard library only.
 - **Interface:** English and Simplified Chinese. Personal only: marks, follows, library and reviews
@@ -53,7 +56,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 ```
 
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
-  (config: `/Users/yinistliu/xiang/.claude/launch.json`).
+  (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 60 tests passed".
 - **Feed tests:** `python3 tools/feeds/selftest.py` (69 tests, offline).
 - **One reader against the live site:**
