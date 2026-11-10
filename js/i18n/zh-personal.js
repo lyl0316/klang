@@ -265,6 +265,8 @@ export default {
   'To keep these in Apple Music too: open a piece with ↗ and tap ＋ there.': '想同时存进 Apple Music：用 ↗ 打开曲目，再在那里点＋。',
   // iPhone widget (Scriptable)
   'iPhone widget': 'iPhone 小组件', 'Show my cities in the widget': '在小组件中显示我的城市', 'Set up the iPhone widget': '设置 iPhone 小组件',
-  'The widget runs in the free Scriptable app. After you change your cities, tap the first row: Scriptable opens for a moment, then come back to Klang.':
-    '小组件在免费的 Scriptable App 中运行。更改城市后，点第一行：Scriptable 会短暂打开，然后回到 Klang 即可。',
+  'Update the widget automatically': '自动更新小组件',
+  'The widget will follow your cities': '小组件会跟随你选择的城市', 'Automatic widget updates off': '已关闭小组件自动更新',
+  'The widget runs in the free Scriptable app. With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.':
+    '小组件在免费的 Scriptable App 中运行。开启自动更新后，每次选择其他城市时 Scriptable 会短暂打开；点左上角的 ◀ Klang 即可返回。',
 };

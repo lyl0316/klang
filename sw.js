@@ -4,7 +4,7 @@
 // here (previews stream from Apple; full pieces open in Apple Music Classical / Apple Music). The real
 // listings (data/concerts.json) are not precached: they are fetched network-first like any own file,
 // and feed.js also keeps a copy for an instant, offline start.
-const CACHE = 'klang-shell-v12';
+const CACHE = 'klang-shell-v13';
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -46,6 +46,7 @@ const SHELL = [
   './js/ui/save.js',
   './js/ui/rednote.js',
   './js/ui/sheet.js',
+  './js/ui/widget.js',
   './js/i18n/zh-concert.js',
   './js/i18n/zh-concerts.js',
   './js/i18n/zh-names.js',

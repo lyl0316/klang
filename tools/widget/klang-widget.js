@@ -1,4 +1,4 @@
-// KLANG-WIDGET 3: tomorrow's concerts on the iPhone Home Screen and Lock Screen.
+// KLANG-WIDGET 4: tomorrow's concerts on the iPhone Home Screen and Lock Screen.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
 // on the phone, and calls main(). Edits here reach every phone at its next widget refresh.
@@ -9,7 +9,8 @@
 // Which concerts: the same place as Klang's Concerts tab. Me › iPhone widget in Klang opens
 // scriptable:///run/Klang?place={"ids":[…],"label":"…"}; this script saves it on the phone and the
 // widget filters with Klang's own rule (repo.query): no ids = Switzerland, a city id, or
-// 'country:<id>' for a whole country. A widget's own Parameter (long-press › Edit Widget) wins over it:
+// 'country:<id>' for a whole country. With &auto=1 (Klang's "Update the widget automatically", sent
+// whenever the place changes) it saves quietly: no message, no preview, so ◀ Klang goes straight back. A widget's own Parameter (long-press › Edit Widget) wins over it:
 // Switzerland, Austria, Germany, France, Italy or All. Tapping a concert opens it in Klang.
 // Sizes: small, medium, large (Home Screen); accessoryRectangular, accessoryInline and
 // accessoryCircular (Lock Screen, iOS 16+).
@@ -230,13 +231,15 @@ function homeWidget(family, s) {
 
 async function main() {
   // Sent from Klang (Me › iPhone widget): keep the place, say so, then show the preview.
-  const sent = (args.queryParameters || {}).place;
+  const q = args.queryParameters || {};
+  const sent = q.place;
   if (sent && !config.runsInWidget) {
     try {
       const p = JSON.parse(sent);
       if (Array.isArray(p.ids)) {
         const place = { ids: p.ids.map(String), label: String(p.label || "") };
         savePlace(place);
+        if (q.auto) { Script.complete(); return; } // sent automatically: nothing to show
         const L = labels();
         const a = new Alert();
         a.title = "Klang";
@@ -254,4 +257,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 3 };
+module.exports = { main, version: 4 };

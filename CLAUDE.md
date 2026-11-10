@@ -202,7 +202,7 @@ Rules and gotchas:
   - English and Chinese aliases for those cities are in `repo.js` (`ABROAD_ALIASES`) and in
     `assistant-engine.js`.
 - **Service worker.** When you add a JS or CSS file, add it to the list in `sw.js`. When you change
-  shell files, bump `CACHE` (currently `klang-shell-v12`). Otherwise installed Home Screen apps
+  shell files, bump `CACHE` (currently `klang-shell-v13`). Otherwise installed Home Screen apps
   keep the old version.
 - **Translations.**
   - Put new Chinese strings inside the file's **`export default { … }`** object.
@@ -235,6 +235,13 @@ Rules and gotchas:
     `scriptable:///run/Klang?place={"ids":[…],"label":"…"}` (the script must be named Klang). The
     widget saves it in Scriptable's Keychain and in a file, and uses it until sent again. A widget's
     own Parameter (a country, or All) wins over it.
+  - **Automatic** (owner's request, 10 Nov 2026): Me › "Update the widget automatically"
+    (`prefs.widgetAutoSync`, off by default) makes Klang open that link with `&auto=1` whenever the
+    place changes, in the confirming tap (Location sheet's Show button; in Your region, the tap that
+    leaves the page), since iOS only opens another app from a tap. The widget then saves quietly
+    (no message, no preview) and the owner taps ◀ Klang to come back. `prefs.widgetSentKey` stops
+    re-sends of an unchanged place. Code: `js/ui/widget.js`. A silent sync with no app switch would
+    need a server, and Klang has none.
   - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
   - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
     Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.

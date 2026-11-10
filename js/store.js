@@ -37,6 +37,8 @@ const DEFAULTS = () => ({
     homeCityId: null,
     regionCityIds: [], // "Your region": default Location filter (empty = all Switzerland)
     placeCityIds: null, // the Concerts tab's place as last confirmed (Location sheet or Your region); null = Your region
+    widgetAutoSync: false, // Me › Update the widget automatically (ui/widget.js): send the place to the iPhone widget on change
+    widgetSentKey: null, // the place last sent to the widget (sorted ids joined by ','), so an unchanged place isn't re-sent
     theme: 'system',
     podcastApp: 'apple',
     newYearMode: false,

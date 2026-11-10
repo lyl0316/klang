@@ -9,6 +9,7 @@ import { h, icon, clear, toast, TYPE_LABELS, normalize } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { openSheet } from '../ui/sheet.js';
+import { syncWidget } from '../ui/widget.js';
 import { concertCard, chip, emptyState, skeletonList } from '../ui/components.js';
 import {
   todayKey, addDays, monthKeyOf, monthShort, dayNum, weekdayShort, weekdayOf, daysBetween, dayKeyOf, timeOf,
@@ -790,6 +791,7 @@ export function render() {
         store.setFilters({ cityIds: ids });
       }
       store.setPref('placeCityIds', [...ids]); // Klang opens here next time
+      syncWidget(); // the iPhone widget follows, if Me › Update the widget automatically is on
 
       sheet.close();
       window.scrollTo(0, 0);
