@@ -58,7 +58,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 60 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (69 tests, offline).
+- **Feed tests:** `python3 tools/feeds/selftest.py` (75 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -202,7 +202,7 @@ Rules and gotchas:
   - English and Chinese aliases for those cities are in `repo.js` (`ABROAD_ALIASES`) and in
     `assistant-engine.js`.
 - **Service worker.** When you add a JS or CSS file, add it to the list in `sw.js`. When you change
-  shell files, bump `CACHE` (currently `klang-shell-v13`). Otherwise installed Home Screen apps
+  shell files, bump `CACHE` (currently `klang-shell-v14`). Otherwise installed Home Screen apps
   keep the old version.
 - **Translations.**
   - Put new Chinese strings inside the file's **`export default { … }`** object.
@@ -219,6 +219,19 @@ Rules and gotchas:
 
 ## 7. Recent features (Nov 2026)
 
+- **Programme booklets** (owner's request, 13 Nov 2026): the concert page shows a "Programme booklet"
+  row under the programme when the organiser's own concert page links one (Programmheft, programme
+  de salle). Link only, never the text (rule 4).
+  - `tools/feeds/booklets.py` runs after each source in `build.py`: for concerts in the next 14 days it
+    reads the concert's page (at most 15 per source and run) and keeps the link as `bookletUrl`.
+    Only the 23 sources in `booklets.RULES` are looked at, chosen from a survey of one or two pages
+    per source. Details and how to add a source: `tools/feeds/README.md`, "Programme booklets".
+  - The app carries it through `js/feed.js` (compact copy), `js/repo.js` and `bookletLink()` in
+    `js/views/concert.js`. It is separate from the "Program book" section, which is Klang's own notes.
+  - Not covered: organisers with one page for all booklets (Gewandhaus, Dresdner Philharmonie,
+    Mozarteum), booklets that are only sold (Opernhaus Zürich), and sites Klang doesn't read.
+  - Most other organisers publish no booklet online. Booklets appear only close to the date, so a
+    concert months away never has one yet.
 - **iPhone widget** (`tools/widget/`, added 9 Nov 2026): tomorrow's concerts on the Home Screen and
   Lock Screen.
   - A PWA can't provide iOS widgets (still true in iOS 26), so it runs in the free **Scriptable** app.

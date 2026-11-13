@@ -48,16 +48,18 @@ const unpairs = (flat, a, b) => {
 function pack(c) {
   return [c.id, c.source || '', c.title, c.start, c.durationMin || 0, c.city || '', c.venueName || '', c.type || '', c.series || '',
     pairs(c.credits, 'role', 'name'), pairs(c.program, 'composer', 'title'), c.ticketUrl || '',
-    c.url && c.url === c.ticketUrl ? '=' : (c.url || ''), c.status && c.status !== 'scheduled' ? c.status : ''];
+    c.url && c.url === c.ticketUrl ? '=' : (c.url || ''), c.status && c.status !== 'scheduled' ? c.status : '',
+    c.bookletUrl || ''];
 }
 function unpack(a) {
-  const [id, source, title, start, durationMin, city, venueName, type, series, credits, program, ticketUrl, url, status] = a;
+  const [id, source, title, start, durationMin, city, venueName, type, series, credits, program, ticketUrl, url, status, bookletUrl] = a;
   const c = { id, source, title, start, city, venueName, credits: unpairs(credits, 'role', 'name'), program: unpairs(program, 'composer', 'title'), status: status || 'scheduled' };
   if (durationMin) c.durationMin = durationMin;
   if (type) c.type = type;
   if (series) c.series = series;
   if (ticketUrl) c.ticketUrl = ticketUrl;
   if (url) c.url = url === '=' ? ticketUrl : url;
+  if (bookletUrl) c.bookletUrl = bookletUrl; // the organiser's programme booklet (tools/feeds/booklets.py)
   return c;
 }
 

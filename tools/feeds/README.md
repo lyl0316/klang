@@ -77,6 +77,7 @@ The output follows the JSON feed format that Klang already imports (`js/ics.js`,
 ```
 
 - **Empty fields are left out.**
+- **`bookletUrl`** (not in the example) is the link to the organiser's own programme booklet, on concerts in the next two weeks whose page offers one (see [Programme booklets](#programme-booklets)). A source that is looked at for booklets has `"booklets": N` in its `sources` entry.
 - **`merges`** lists the listings that were merged into another source's record of the same performance (see [De-duplication](#de-duplication)); Klang ignores it, it is there for audits.
 - **`type`** is one of `orchestral`, `chamber`, `recital`, `vocal-opera` or `mixed`. Leave it out when unsure: Klang guesses it on import.
 - **`ok: false` with `reused: true`** means the source failed this time, and its `count` events are from `fetchedAt`.
@@ -169,10 +170,23 @@ Only these facts are republished:
 - venue and city;
 - performers with their roles;
 - works (composer and title);
-- the event or ticket link;
+- the event or ticket link, and the link to the organiser's own programme booklet;
 - cancelled status.
 
 Descriptions, programme notes, essays and images are never copied. `make_event` has no field for them. Each source's credit is in `sources[].attribution` of the feed.
+
+## Programme booklets
+
+Many organisers put the evening's programme booklet (Programmheft, programme de salle) on the concert's page a week or two before the date. `booklets.py` keeps the **link** to it as `bookletUrl`, and the app shows a "Programme booklet" row under the programme. The booklet itself is never fetched or copied.
+
+- After a source was read, `build.py` calls `booklets.add_booklets()`. For that source's concerts from today to today + 14 days it reads the concert's own page and looks for the booklet link: at most 15 pages per source and run, nearest concerts first, through `common.get` like every other request.
+- A link found on an earlier run is kept from the previous feed. Pages without a link are read first; with requests to spare, pages with a known link are read again, so a replaced file is noticed.
+- Only the sources in `booklets.RULES` are looked at (23 on 13 Nov 2026): those whose concert pages were seen to carry a booklet link. Most need no rule: the usual wording of the link is enough ("Programmheft", "Abendprogramm", "Programmbuch", "Programme de salle" …). A few have a rule of their own, for a link without words (Tonhalle, Opéra de Lyon) or one that just says "programme" (OSR, Société de Musique La Chaux-de-Fonds).
+- Left out on purpose: one page for all booklets (Gewandhaus, Dresdner Philharmonie, Mozarteum), season brochures, librettos, cast sheets and posters. Booklets that are only sold (Opernhaus Zürich) have no link.
+- On a push, a reused source keeps its links and no page is read. The only exception is a source that was never looked at (new in `RULES`): it is looked at once.
+- A failure here never fails the source; its concerts simply have no booklet link.
+
+To add a source: open one of its concert pages a few days ahead, check what the link looks like, add the key to `RULES` (`{}` if the usual wording fits), and add a case to `Booklets` in `selftest.py` if it needed a rule.
 
 ## Incremental details
 

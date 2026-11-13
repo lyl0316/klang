@@ -59,7 +59,7 @@ The **Concerts** tab has:
 2. Header, then the action tiles: Listen, Program, Notes, Podcasts, Ticket.
 3. Save + Going, or Save + Attended (with a private review) once the concert has started.
 4. A **Listen** carousel with one recording per work, also for works Klang's repertoire doesn't know (found by composer and title as listed). **▶ Preview** plays Apple's 30-second previews of the work's movements inside Klang (tap again to pause), and **Apple Music Classical ↗** opens the same recording at that piece, where it plays in full. **Versions** picks another recording, and **Save** adds the album to your Library or the piece to one of your playlists. **▶ Play all** previews the whole programme in order; **Open in Apple Music Classical** opens the first work with the rest queued (⏭ in the mini player opens the next one). "Add playlist to my Library" keeps the whole programme.
-5. **Program** (performers and works exactly as listed), then a **Program book**: an original note for each work Klang knows (104 in the repertoire), with a "Listen for" line and a full-screen reader.
+5. **Program** (performers and works exactly as listed). Where the organiser publishes its own **programme booklet** for the evening (Programmheft, programme de salle), a row under the programme opens it on the organiser's site; Klang links it and never copies it. Then a **Program book**: an original note for each work Klang knows (104 in the repertoire), with a "Listen for" line and a full-screen reader.
 6. **Podcasts** (Apple Podcasts episodes), **Featured artists**, "**Listing from** <organiser> · **Details & tickets ›**" with the source's credit, and Report a problem.
 
 **Other pages:**

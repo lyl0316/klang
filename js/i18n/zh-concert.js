@@ -65,6 +65,7 @@ export default {
   'Work to be announced': '作品待公布', '{name} — work page': '{name}——作品页面', '{name} — composer page': '{name}——作曲家页面',
   'Performers and programme to be announced.': '演出者和曲目待公布。', 'Programme to be announced.': '曲目待公布。',
   'From the organiser': '来自主办方', 'Programme notes': '节目说明', 'Listen for ': '聆听要点：',
+  'Programme booklet': '主办方节目册', 'Programme booklet (opens the organiser’s site)': '主办方节目册（打开主办方网站）',
   'Program book · double-tap for full screen': '节目册 · 轻点两下全屏阅读', 'Chapter {n}: {title}': '第 {n} 章：{title}',
   Chapters: '章节', 'Double-tap for full screen': '轻点两下即可全屏阅读', 'Read the program book full screen': '全屏阅读节目册',
 

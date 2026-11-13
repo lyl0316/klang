@@ -764,6 +764,9 @@ a.cp-work:active { background: var(--surface); }
 .cp-pod .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .cp-pod .t { font-size: 13.5px; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .cp-pod .s { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* the organiser's programme booklet, under the programme (a link out) */
+.cp-booklet { margin-top: 12px; }
+.cp-booklet > .ico:last-child, .cp-booklet > svg:last-child, .cp-booklet > span:last-child { flex: none; color: var(--text-3); }
 .cp-pod > .icon { color: var(--text-3); }
 
 /* featured artists */

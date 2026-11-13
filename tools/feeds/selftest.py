@@ -28,6 +28,7 @@ sys.path.insert(0, HERE)
 import common  # noqa: E402
 import sources as registry  # noqa: E402
 import build  # noqa: E402
+import booklets  # noqa: E402
 
 Z = common.ZURICH
 
@@ -1312,6 +1313,123 @@ class CodeHash(unittest.TestCase):
                 self.assertNotEqual(build._code_hash(src), before)              # a helper edit invalidates reuse
             finally:
                 build.HERE = saved
+
+
+class Booklets(unittest.TestCase):
+    """booklets.py: the organiser's programme booklet link on a concert page."""
+    PAGE = 'https://www.example.org/konzerte/abend-1/'
+
+    def find(self, html, rule=None, page=None):
+        return booklets.find_booklet(html, page or self.PAGE, rule)
+
+    def test_usual_wording(self):
+        self.assertEqual(self.find('<a href="/files/ph_1.pdf" target="_blank"> <span>Programm Heft</span> </a>'),
+                         'https://www.example.org/files/ph_1.pdf')
+        self.assertEqual(self.find('<a href="https://cdn.example.net/n.pdf">Programme de salle (PDF – 1038 ko)</a>'),
+                         'https://cdn.example.net/n.pdf')                      # "salle" is not German "alle"
+        self.assertEqual(self.find('<a class="btn" href="/dl/27274/programmbuch/x.pdf">Programmbuch Download</a>'),
+                         'https://www.example.org/dl/27274/programmbuch/x.pdf')
+        self.assertEqual(self.find('<a href="https://www.calameo.com/toulouse/read/0059">Lire le programme de salle</a>'
+                                   '<a href="/le-kiosque/type/programme/">Programme de salle</a>'),
+                         'https://www.calameo.com/toulouse/read/0059')         # the booklet, not the page of all booklets
+        # a picture button: the picture's description or the PDF's file name says what it is
+        self.assertEqual(self.find('<a href="/f/DEF%2014.pdf" download><img src="a.jpg" alt="Programme de salle OP 14 novembre"></a>'),
+                         'https://www.example.org/f/DEF%2014.pdf')
+        self.assertEqual(self.find('<a href="/up/LaDamnation-Programmheft-zum-downloaden.pdf"><img src="b.png"></a>'),
+                         'https://www.example.org/up/LaDamnation-Programmheft-zum-downloaden.pdf')
+        # a download link whose PDF is in the query
+        self.assertEqual(self.find('<a href="/mediathek?_hash=ab&amp;p=media%2FAbendprogramme%2F26_web.pdf">Programmheft</a>'),
+                         'https://www.example.org/mediathek?_hash=ab&p=media%2FAbendprogramme%2F26_web.pdf')
+        # a PDF is preferred to a page
+        self.assertEqual(self.find('<a href="/konzerte/abend-2/">Programmheft</a><a href="/x/programmheft_abend.pdf">Programmheft »Abend« – Jetzt lesen!</a>'),
+                         'https://www.example.org/x/programmheft_abend.pdf')
+
+    def test_not_a_booklet(self):
+        for html in (
+            '<a href="/media/programmhefte/">Programmhefte</a>',                       # all booklets
+            '<a href="/programmhefte/">Programmheft</a>',
+            '<a href="/abo/programmheft-abo-auf-bestellung/">Programmheft bestellen</a>',
+            '<a href="/ihre-werbung-im-konzertprogramm/">Ihre Werbung im Programmheft</a>',
+            '<a href="#programmheft">Programmheft</a>',                                # a tab of the same page
+            '<a href="https://www.example.org/konzerte/abend-1/#heft">Programmheft</a>',
+            '<a href="https://www.facebook.com/sharer.php?u=x&t=Programmheft">Programmheft</a>',
+            '<a href="javascript:void(0)">Programmheft</a>',
+            '<a href="/files/saalplan.pdf">Saalplan PDF</a>',
+            '<a href="/files/agb.pdf">AGB</a>',
+            '<a href="/files/le-tour-livret.pdf">Livret</a>',                          # a libretto
+            '',
+        ):
+            self.assertIsNone(self.find(html), html)
+
+    def test_rules(self):
+        plain = {'text': r'^programme$', 'pdf': True}
+        self.assertEqual(self.find('<a href="https://x.usrfiles.com/ugd/5f.pdf" class="btn">programme</a>', plain),
+                         'https://x.usrfiles.com/ugd/5f.pdf')
+        self.assertIsNone(self.find('<a href="/fr/programme/">Programme</a>', plain))
+        self.assertIsNone(self.find('<a href="/f/saison.pdf">Programme de la saison</a>', plain))
+        self.assertEqual(self.find('<a target="_blank" class="programm" href="/mediadateien/dokumente/ph/26-27/mahler-6/" ></a>',
+                                   booklets.RULES['tonhalle']),
+                         'https://www.example.org/mediadateien/dokumente/ph/26-27/mahler-6/')
+        self.assertEqual(self.find(r'x:"[lire](https://api.opera-lyon.com/files/4030629d/prog_beethoven.pdf)"',
+                                   booklets.RULES['opera_lyon']),
+                         'https://api.opera-lyon.com/files/4030629d/prog_beethoven.pdf')
+        self.assertIsNone(self.find(r'(https://api.opera-lyon.com/files/89270949/opera_visite.pdf)',
+                                    booklets.RULES['opera_lyon']))
+        # a mail gateway's wrapper around the real link
+        self.assertEqual(self.find('<a href="https://urldefense.com/v3/__https://canva.link/4sbip__;!!P5F!Q2$">Consultez le programme de salle</a>'),
+                         'https://canva.link/4sbip')
+
+    def test_every_rule_is_a_reader(self):
+        keys = {s.key for s in registry.discover()}
+        self.assertEqual(sorted(set(booklets.RULES) - keys), [])
+
+    def test_add_booklets(self):
+        today = common.today_zurich()
+        day = lambda n: (today + timedelta(days=n)).isoformat() + 'T19:30:00+01:00'
+        mk = lambda sid, n, **kw: dict(common.make_event('tonhalle', sid, f'Abend {sid}', day(n),
+                                                         url=f'https://t.example.org/k/{sid}/'), **kw)
+        near, twice, far, none, off, old = mk(1, 1), mk(2, 2), mk(3, 60), mk(4, 3), mk(5, 2, status='cancelled'), mk(6, 4)
+        twice2 = dict(mk(7, 3), url=twice['url'])                         # a second date of the same page
+        pages = {near['url']: '<a class="programm" href="/ph/1/"></a>', twice['url']: '<a class="programm" href="/ph/2/"></a>',
+                 none['url']: '<p>noch kein Heft</p>'}
+        asked = []
+
+        def fake_get(url, **kw):
+            asked.append(url)
+            if url not in pages:
+                raise common.FetchError(url, 'HTTP 500', 500)
+            return pages[url]
+
+        saved = common.get
+        common.get = fake_get
+        try:
+            common.set_previous([dict(old, bookletUrl='https://t.example.org/ph/6/')])
+            events = [far, twice2, near, twice, none, off, old]
+            links, read = booklets.add_booklets('tonhalle', events, today)
+            self.assertEqual((links, read), (4, 3))
+            self.assertEqual(near['bookletUrl'], 'https://t.example.org/ph/1/')
+            self.assertEqual(twice['bookletUrl'], twice2['bookletUrl'])
+            self.assertEqual(asked.count(twice['url']), 1)                 # one page, read once
+            self.assertEqual(old['bookletUrl'], 'https://t.example.org/ph/6/')   # kept when its page can't be read
+            self.assertEqual(asked[-1], old['url'])                        # ... and known pages are read last
+            for e in (far, none, off):
+                self.assertNotIn('bookletUrl', e)
+            self.assertNotIn(far['url'], asked)                            # only near concerts
+            self.assertNotIn(off['url'], asked)
+            # a source without a rule is left alone; a broken page never fails the source
+            self.assertEqual(booklets.add_booklets('zko', [dict(near, source='zko')], today), (0, 0))
+            common.get = lambda url, **kw: (_ for _ in ()).throw(RuntimeError('boom'))
+            self.assertEqual(booklets.add_booklets('tonhalle', [mk(8, 1)], today), (0, 0))
+        finally:
+            common.get = saved
+            common.set_previous(None)
+
+    def test_merge_keeps_the_booklet(self):
+        a = ev('tonhalle', 1, '2026-11-20T19:30:00+01:00', url='https://a.example.org/1')
+        b = dict(ev('zko', 2, '2026-11-20T19:30:00+01:00', url='https://b.example.org/2'), bookletUrl='https://b.example.org/heft.pdf')
+        out = build.merge(a, b, {'tonhalle': 2, 'zko': 1})
+        self.assertEqual((out['id'], out['bookletUrl']), (a['id'], 'https://b.example.org/heft.pdf'))
+        self.assertLess(list(out).index('bookletUrl'), list(out).index('status') if 'status' in out else 99)
 
 
 if __name__ == '__main__':

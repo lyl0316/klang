@@ -982,6 +982,22 @@ function programSection(c, items) {
   return sec;
 }
 
+// The organiser's own programme booklet (Programmheft, programme de salle), when the concert's page
+// links one: the daily feed keeps that link as bookletUrl (tools/feeds/booklets.py), usually from a
+// week or two before the evening. A link only; Klang never copies the booklet.
+function bookletLink(c) {
+  if (!/^https?:\/\//i.test(c.bookletUrl || '')) return null;
+  let host = '';
+  try { host = new URL(c.bookletUrl).hostname.replace(/^www\./, ''); } catch (e) { return null; }
+  const pdf = /\.pdf(?:$|[?#&])|%2F[^&#]*\.pdf/i.test(c.bookletUrl);
+  return h('a', { class: 'cp-pod cp-booklet', href: c.bookletUrl, ...extAttrs, 'aria-label': t('Programme booklet (opens the organiser’s site)') },
+    h('span', { class: 'ph' }, icon('book', 20)),
+    h('span', { class: 'main' },
+      h('span', { class: 't' }, t('Programme booklet')),
+      h('span', { class: 's' }, [t('From the organiser'), host, pdf ? 'PDF' : null].filter(Boolean).join(' · '))),
+    icon('external', 14));
+}
+
 // ---------- 6. program book ----------
 function guideFor(workId) {
   const g = GUIDES ? GUIDES[workId] : null;
@@ -1469,6 +1485,8 @@ export function render({ id } = {}) {
 
   const listen = listenBlock(c, entries, ctx);
   const programEl = programSection(c, items);
+  const booklet = bookletLink(c);
+  if (booklet) programEl.append(booklet);
   const book = programBook(c, items, ctx);
   const podcastsEl = podcastsSection(entries, ctx);
 

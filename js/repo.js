@@ -248,6 +248,7 @@ function normalizeFeedConcert(feedRaw) {
     sourceUrl: raw.url || null,
     url: raw.url || null,
     ticketUrl: raw.ticketUrl || raw.url || null,
+    bookletUrl: raw.bookletUrl || null, // the organiser's own programme booklet, when its concert page links one
   };
 }
 

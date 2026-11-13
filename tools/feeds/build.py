@@ -44,6 +44,7 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 import common  # noqa: E402
+import booklets  # noqa: E402
 import sources as registry  # noqa: E402
 
 DEFAULT_OUT = os.path.join(APP_ROOT, 'data', 'concerts.json')
@@ -53,7 +54,7 @@ DEDUPE_MINUTES = 20
 GRACE_SECONDS = 60          # extra wait after a source's time limit before abandoning it
 SUSPICIOUS_PREVIOUS = 5     # 0 events now but at least this many last time -> treat as failure
 KEY_ORDER = ('id', 'source', 'title', 'start', 'durationMin', 'city', 'country', 'venueName', 'type', 'series',
-             'credits', 'program', 'ticketUrl', 'url', 'status')
+             'credits', 'program', 'ticketUrl', 'url', 'bookletUrl', 'status')
 
 log = logging.getLogger('feeds.build')
 
@@ -573,7 +574,7 @@ def merge(a, b, priority, sites=None):
     rank_b = (priority.get(b['source'], 0), richness(b))
     win, lose = (a, b) if rank_a >= rank_b else (b, a)
     out = dict(win)
-    for f in ('durationMin', 'city', 'venueName', 'type', 'series', 'credits', 'program', 'ticketUrl', 'url'):
+    for f in ('durationMin', 'city', 'venueName', 'type', 'series', 'credits', 'program', 'ticketUrl', 'url', 'bookletUrl'):
         if not out.get(f) and lose.get(f):
             out[f] = lose[f]
     # the richer cast, with specific roles where the other listing knows them; but only a cast
@@ -866,10 +867,24 @@ def main(argv=None):
                 fresh = 0 <= age_h <= args.fresh_hours
             except ValueError:
                 fresh = False
+        booklet_links = (previous.info(src.key) or {}).get('booklets')
+
+        def look_for_booklets():
+            nonlocal booklet_links
+            links, pages = booklets.add_booklets(src.key, res.events, today)
+            booklet_links = links
+            if pages or links:
+                res.requests += pages
+                res.note = '; '.join(x for x in (res.note, f'booklets: {links} ({pages} pages read)') if x)
+
         if fresh:
             res.events, _, _, _ = check_events(previous.events(src.key), src.key, today, last_day)
             res.reused, res.fetched_at = True, info['fetchedAt']
             res.note = f'reused, fetched {age_h:.1f} h ago'
+            # a reused source keeps its booklet links; only one that was never looked at (the source
+            # is new in booklets.RULES) is looked at now, so a push still makes no other requests
+            if src.key in booklets.RULES and booklet_links is None:
+                look_for_booklets()
         else:
             if src.error:
                 events, error, note, used, secs, trace = None, src.error, None, 0, 0.0, None
@@ -890,6 +905,8 @@ def main(argv=None):
                         error = f'returned no events (previous feed had {prev_count})'
                 if error is None:
                     res.events, res.fetched_at = kept, _now_iso()
+                    # the organiser's programme booklet, where the concert's page links one (booklets.py)
+                    look_for_booklets()
             if error is not None:
                 res.ok, res.error = False, error
                 old, _, _, _ = check_events(previous.events(src.key), src.key, today, last_day)
@@ -911,6 +928,8 @@ def main(argv=None):
         }
         if src.country != 'switzerland':
             entry['country'] = src.country
+        if src.key in booklets.RULES and booklet_links is not None:
+            entry['booklets'] = booklet_links    # concerts with a programme booklet link (booklets.py)
         status = 'ok' if res.ok and not res.reused else ('fresh' if res.ok else ('REUSED' if res.reused else 'FAILED'))
         lines = [f'  {src.key:<24} {status:<7} {len(res.events):>5} events  {res.requests:>3} req  {res.seconds:6.1f}s'
                  + (f'  {res.error}' if res.error else '') + (f'  [{res.note}]' if res.note else '')]
