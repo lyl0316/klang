@@ -50,6 +50,11 @@ from common import (BudgetExceeded, FetchError, ZURICH, clean, get, guess_type, 
 from ._berlin import (CLASSICAL_RE, abroad, berlin_local, credit, german_town, is_interval, is_pop,
                       skip_title, venue_name)
 
+# Off since 13 Nov 2026: the site answers every request, robots.txt and the sitemap included, with
+# HTTP 403 and a bot-protection challenge page ("Establishing a secure connection", Bunny Shield), from
+# GitHub's servers (daily runs of 12 and 13 Nov 2026) and from a home connection alike. Klang does not
+# work around bot protection. Turn on again if robots.txt and the sitemap can be read normally.
+ENABLED = False
 KEY = 'berliner_philharmoniker'
 NAME = 'Berliner Philharmoniker / Philharmonie Berlin'
 SITE = 'https://www.berliner-philharmoniker.de/'

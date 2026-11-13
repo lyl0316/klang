@@ -5,8 +5,8 @@ made, and how to keep the daily concert feed healthy. The user-facing overview i
 the feed collectors are documented in `tools/feeds/README.md`; the original screen-by-screen
 spec is in `../spec/` (outside this repo).
 
-State as of 9 Nov 2026: last commit `45c993d`, all CI runs green, the live feed has about 8,500
-upcoming concerts from 121/121 active sources.
+State as of 13 Nov 2026: all CI runs green, the live feed has about 8,100 upcoming concerts from
+120/120 active sources (Berliner Philharmoniker was switched off that day, see section 5).
 
 ## 1. What Klang is
 
@@ -156,12 +156,14 @@ Recent example (5 Nov 2026, commit `bdb75b6`):
 - **Incremental readers** cap their detail-page requests (`MAX_REQUESTS`, up to
   `common.MAX_REQUESTS_CAP` = 150) and reuse the previous feed's details. After a reader change,
   the details fill in over a few daily runs.
-  - Examples: Tonhalle, Opernhaus, Volksoper, Musikverein, Konzerthaus Wien, Berliner Philharmoniker.
+  - Examples: Tonhalle, Opernhaus, Volksoper, Musikverein, Konzerthaus Wien.
 - **robots.txt handling** is in `common._load_robots`:
   - An HTML "robots.txt" that is a bot-challenge page counts as blocked.
   - Any other HTML page means there are no rules.
 - **Turned off** (`ENABLED = False`): concerts_romainmotier, wiener_staatsoper and
-  teatro_comunale_bologna (AI blocks), and gaertnerplatztheater (no answer to GitHub's servers).
+  teatro_comunale_bologna (AI blocks), gaertnerplatztheater (no answer to GitHub's servers), and
+  berliner_philharmoniker (since 13 Nov 2026: every request, robots.txt included, gets a
+  bot-protection challenge; turn it on again if that goes away).
 - **No reader at all**:
   - robots.txt AI blocks: Elbphilharmonie, BR/SWR, Salzburger Landestheater.
   - Terms: Theater an der Wien, Innsbruck Alte Musik.

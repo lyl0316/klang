@@ -310,7 +310,7 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 
 - **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`).
 - **Terms forbid storing or republishing the programme:** Theater an der Wien, Innsbrucker Festwochen der Alten Musik.
-- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz does not answer GitHub's servers at all (reader kept, `ENABLED = False`).
+- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz does not answer GitHub's servers at all (reader kept, `ENABLED = False`). Berliner Philharmoniker has answered every request with a bot-protection challenge since 12 Nov 2026 (reader kept, `ENABLED = False`).
 - **Calendar only behind robots-forbidden addresses or a login:** Kölner Philharmonie, Salzburger Festspiele.
 
 | Reader key | Country | Source | Site | Note |
@@ -346,7 +346,7 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 | `seine_musicale` | France | La Seine Musicale | https://www.laseinemusicale.com/ |  |
 | `theatre_champs_elysees` | France | Théâtre des Champs-Élysées | https://www.theatrechampselysees.fr/ |  |
 | `alte_oper_frankfurt` | Germany | Alte Oper Frankfurt | https://www.alteoper.de/ |  |
-| `berliner_philharmoniker` | Germany | Berliner Philharmoniker / Philharmonie Berlin | https://www.berliner-philharmoniker.de/ |  |
+| `berliner_philharmoniker` | Germany | Berliner Philharmoniker / Philharmonie Berlin | https://www.berliner-philharmoniker.de/ | off: bot-protection challenge since 12 Nov 2026 |
 | `boulez_saal` | Germany | Pierre Boulez Saal | https://www.boulezsaal.de/ |  |
 | `deutsche_oper_berlin` | Germany | Deutsche Oper Berlin | https://deutscheoperberlin.de/ |  |
 | `dresdner_philharmonie` | Germany | Dresdner Philharmonie | https://www.dresdnerphilharmonie.de/ |  |
