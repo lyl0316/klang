@@ -1424,6 +1424,90 @@ class Booklets(unittest.TestCase):
             common.get = saved
             common.set_previous(None)
 
+    def test_one_page_for_all_booklets(self):
+        days = booklets._label_days
+        self.assertEqual(days('06-07/11/2026 | Programmheft'), {'2026-11-06', '2026-11-07'})
+        self.assertEqual(days('10/02/26 | Programmheft'), {'2026-02-10'})
+        self.assertEqual(days('5.2.2023 | Programmheft'), {'2023-02-05'})
+        self.assertEqual(days('29.-30./08/2025'), {'2025-08-29', '2025-08-30'})
+        self.assertEqual(days('13-15/06/2025'), {'2025-06-13', '2025-06-14', '2025-06-15'})     # a range
+        self.assertEqual(days('21./24.12.25'), {'2025-12-21', '2025-12-24'})                    # a list
+        self.assertEqual(days('21/22/23/12/23 Programmheft'), {'2023-12-21', '2023-12-22', '2023-12-23'})
+        self.assertEqual(days('31/10 & 01/11/2026'), {'2026-10-31', '2026-11-01'})
+        self.assertEqual(days('28/02/26 - 01/03/26'), {'2026-02-28', '2026-03-01'})
+        self.assertEqual(days('31.01-01.02/2026'), {'2026-01-31', '2026-02-01'})
+        for bad in ('Programmheft', '31/02/26', '30/21/8/24', '', None):
+            self.assertEqual(days(bad), set(), bad)
+
+        index = 'https://d.example.org/api/media/?page=1'
+        item = lambda kind, label, title, url: {'teaser': {'title': title, 'link': {'url': url}},
+                                                'extension': {'type': kind, 'label': label}}
+        entries = booklets._dresden_entries(json.dumps({'teaser': [
+            item('VIDEO', '06/11/2026 | Video', 'Mahler 4', '/de/mediathek/detail/video/'),
+            item('PROGRAM', '06-07/11/2026 | Programmheft', 'Mahler 4 | Programmheft', '/de/mediathek/detail/mahler-4/'),
+            item('PROGRAM', '07/11/2026 | Programmheft', 'Orgel um drei', '/de/mediathek/detail/orgel/'),
+            item('PROGRAM', 'ohne Datum', 'Bolero', '/de/mediathek/detail/bolero/'),
+        ]}), index)
+        self.assertEqual(entries, [({'2026-11-06', '2026-11-07'}, 'Mahler 4', 'https://d.example.org/de/mediathek/detail/mahler-4/'),
+                                   ({'2026-11-07'}, 'Orgel um drei', 'https://d.example.org/de/mediathek/detail/orgel/')])
+        at = lambda start, title: {'start': start, 'title': title}
+        match = booklets.match_index
+        self.assertEqual(match(at('2026-11-07T19:00:00+01:00', 'Mahler 4'), entries), entries[0][2])
+        self.assertEqual(match(at('2026-11-07T15:00:00+01:00', 'Orgel um Drei'), entries), entries[1][2])
+        self.assertIsNone(match(at('2026-11-07T19:00:00+01:00', 'Mahler 5'), entries))      # another concert that day
+        self.assertIsNone(match(at('2026-11-08T19:00:00+01:00', 'Mahler 4'), entries))      # another day
+        self.assertIsNone(match(at('2026-11-07T19:00:00+01:00', ''), entries))
+
+        page = ('<a href="/static/95/04_Saison_26_27_Programmheft_2026-11-17_Meisterkonzert-Gautier-Capucon_WEB.pdf" '
+                'target="_blank">Programmheft Gautier Capuçon</a>'
+                '<a href="/static/52/Saison_26_27_LatinoMozart_Programmheft_WEB.pdf">Programmheft LatinoMozart 2026</a>'   # no day
+                '<a href="/static/f5/MoWo_26_Almanach_2026-01-22_WEB.pdf">Almanach Mozartwoche 2026</a>'
+                '<a href="/konzerte/2026-11-17/">Programmheft bestellen</a>')
+        entries = booklets._mozarteum_entries(page, 'https://m.example.org/konzerte/digitale-programmhefte/')
+        self.assertEqual([(d, u) for d, _, u in entries], [({'2026-11-17'},
+                         'https://m.example.org/static/95/04_Saison_26_27_Programmheft_2026-11-17_Meisterkonzert-Gautier-Capucon_WEB.pdf')])
+        self.assertEqual(match(at('2026-11-17T19:00:00+01:00', 'Meisterkonzert: Gautier Capuçon'), entries), entries[0][2])
+        self.assertIsNone(match(at('2026-11-17T12:30:00+01:00', 'Orgel zu Mittag'), entries))
+
+    def test_add_booklets_from_one_page(self):
+        today = common.today_zurich()
+        day = lambda n: (today + timedelta(days=n)).isoformat() + 'T19:00:00+01:00'
+        label = lambda n: (today + timedelta(days=n)).strftime('%d/%m/%Y') + ' | Programmheft'
+        mk = lambda sid, title, n: common.make_event('dresdner_philharmonie', sid, title, day(n), url='https://d.example.org/k/x/')
+        a, b, c, far = mk(1, 'Bolero', 1), mk(2, 'Scheherazade', 1), mk(3, 'Mahler 4', 5), mk(4, 'Bolero', 60)
+        listing = json.dumps({'teaser': [
+            {'teaser': {'title': 'Bolero', 'link': {'url': '/de/mediathek/detail/bolero/'}}, 'extension': {'type': 'PROGRAM', 'label': label(1)}},
+            {'teaser': {'title': 'Bolero', 'link': {'url': '/de/mediathek/detail/bolero-alt/'}}, 'extension': {'type': 'PROGRAM', 'label': label(60)}},
+        ]})
+        asked = []
+
+        def fake_get(url, **kw):
+            asked.append(url)
+            return listing
+
+        saved = common.get
+        common.get = fake_get
+        try:
+            rule = booklets.RULES['dresdner_philharmonie']
+            self.assertEqual(booklets.add_booklets('dresdner_philharmonie', [far, c, b, a], today), (1, 1))
+            self.assertEqual(asked, [rule['index']])                           # one request, whatever the number of concerts
+            self.assertTrue(a['bookletUrl'].endswith('/de/mediathek/detail/bolero/'))
+            for e in (b, c, far):
+                self.assertNotIn('bookletUrl', e)
+            self.assertEqual(booklets.add_booklets('dresdner_philharmonie', [far], today), (0, 0))
+            self.assertEqual(len(asked), 1)                                    # no near concert: nothing is read
+            # the page can't be read: the links of the previous feed stay
+            common.set_previous([dict(c, bookletUrl='https://d.example.org/de/mediathek/detail/mahler-4/')])
+            common.get = lambda url, **kw: (_ for _ in ()).throw(common.FetchError(url, 'HTTP 500', 500))
+            self.assertEqual(booklets.add_booklets('dresdner_philharmonie', [a, c], today), (1, 0))
+            self.assertEqual(c['bookletUrl'], 'https://d.example.org/de/mediathek/detail/mahler-4/')
+            self.assertNotIn('bookletUrl', a)
+            common.get = lambda url, **kw: 'not json'
+            self.assertEqual(booklets.add_booklets('dresdner_philharmonie', [c], today), (1, 1))
+        finally:
+            common.get = saved
+            common.set_previous(None)
+
     def test_merge_keeps_the_booklet(self):
         a = ev('tonhalle', 1, '2026-11-20T19:30:00+01:00', url='https://a.example.org/1')
         b = dict(ev('zko', 2, '2026-11-20T19:30:00+01:00', url='https://b.example.org/2'), bookletUrl='https://b.example.org/heft.pdf')
