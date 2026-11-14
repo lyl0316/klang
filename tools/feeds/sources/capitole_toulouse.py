@@ -129,6 +129,9 @@ def _paragraphs(content):
     return out
 
 
+_PRODUCTION_NOTE = re.compile(r'(?i)^(?:nouvelle\s+)?(?:co)?production\b|^reprise\b|^cr[ée]ation\b')
+
+
 def parse_content(content):
     """-> {'people': [(label, name)], 'works': [(composer, title)]}"""
     paras = _paragraphs(content)
@@ -151,6 +154,8 @@ def parse_content(content):
         for k, t in toks:
             if k == 'E':
                 label = t
+            elif k == 'S' and _PRODUCTION_NOTE.search(t):  # 'Coproduction Opéra national du Capitole / … (2021)'
+                label = ''
             elif k == 'S':                                  # names are bold; plain text is a note
                 for n in _split_names(t):
                     people.append((label, n))

@@ -79,10 +79,22 @@ class Previous:
         self.origin = None
         self.error = None
 
+    RETRY_PAUSES = (45, 90)      # seconds before a second and third try of an unreachable feed address
+
+    def online(self):
+        """Whether the previous feed is asked for from a web address (the published feed)."""
+        return any(re.match(r'https?://', c, re.I) for c in self.candidates)
+
     def data(self):
         if not self._loaded:
             self._loaded = True
             self._data = self._load()
+            for pause in self.RETRY_PAUSES if self.online() else ():
+                if self._data is not None:
+                    break
+                log.warning('previous feed not loaded (%s); trying again in %d s', self.error, pause)
+                time.sleep(pause)
+                self._data = self._load()
         return self._data
 
     def _load(self):
@@ -305,11 +317,34 @@ def venue_tokens(ev):
     return _tokens(ev.get('venueName'), _STOP | _CITY_WORDS)
 
 
+# a town's name in its own language, for readers abroad that give the English one
+_NATIVE_CITY = {'vienna': 'wien', 'munich': 'munchen muenchen', 'cologne': 'koln koeln', 'nuremberg': 'nurnberg nuernberg',
+                'milan': 'milano', 'rome': 'roma', 'naples': 'napoli', 'turin': 'torino', 'genoa': 'genova',
+                'venice': 'venezia', 'florence': 'firenze', 'padua': 'padova', 'mantua': 'mantova',
+                'hanover': 'hannover', 'frankfurt': 'main'}
+# "Alte Oper Frankfurt" is not "Oper Frankfurt", "Neues Schloss" not "Schloss"
+_OLD_NEW = {'alte', 'alter', 'altes', 'alten', 'neue', 'neuer', 'neues', 'neuen', 'old', 'new', 'ancien', 'ancienne',
+            'nouveau', 'nouvelle', 'vecchio', 'vecchia', 'nuovo', 'nuova'}
+
+
+def city_words(*events):
+    """The words of these events' own town names ("Berlin"; "Vienna" and "Wien"). Two venue names
+    that share only the town ("Philharmonie Berlin" / "Deutsche Oper Berlin") have nothing in common."""
+    out = set()
+    for ev in events:
+        for w in re.findall(r'[a-z0-9]+', common._fold(ev.get('city') or '')):
+            if len(w) > 2:
+                out.add(w)
+                out.update(_NATIVE_CITY.get(w, '').split())
+    return out - _GENERIC - _HALL_QUALIFIERS
+
+
 def _jaccard(a, b):
     return len(a & b) / len(a | b) if a and b else 0.0
 
 
-def venue_similar(va, vb, same_city=True):
+def venue_similar(va, vb, same_city=True, city=frozenset()):
+    """``city``: the words of the town's own name (``city_words``), which are no evidence."""
     qa, qb = va & _HALL_QUALIFIERS, vb & _HALL_QUALIFIERS
     if qa and qb and qa != qb:
         return False        # Grosser Saal vs Kleiner Saal
@@ -320,9 +355,9 @@ def venue_similar(va, vb, same_city=True):
     if vague:
         return False        # just "Kirche" or "Theater": too vague to call it the same place
     if small <= big:
-        return True         # "Tonhalle" vs "Tonhalle, Grosser Saal"
-    shared = (va & vb) - _GENERIC - _HALL_QUALIFIERS
-    return bool(shared) and _jaccard(va - _HALL_QUALIFIERS, vb - _HALL_QUALIFIERS) >= 0.5
+        return not (big - small) & _OLD_NEW     # "Tonhalle" vs "Tonhalle, Grosser Saal"; not "Oper" vs "Alte Oper"
+    shared = (va & vb) - _GENERIC - _HALL_QUALIFIERS - city
+    return bool(shared) and _jaccard(va - _HALL_QUALIFIERS - city, vb - _HALL_QUALIFIERS - city) >= 0.5
 
 
 def title_similar(a, b):
@@ -370,6 +405,8 @@ def venue_contains(a, b):
     short, long_ = (ka, kb) if len(ka) <= len(kb) else (kb, ka)
     if not re.search(rf'(?<![a-z0-9]){re.escape(short)}(?![a-z0-9])', long_):
         return False
+    if (set(long_.split()) - set(short.split())) & _OLD_NEW:
+        return False                      # "Oper Frankfurt" inside "Alte Oper Frankfurt"
     words = _tokens(short, _STOP | _CITY_WORDS)
     distinctive = words - _GENERIC - _HALL_QUALIFIERS
     return bool(distinctive) or len(words & _GENERIC) >= 2
@@ -408,7 +445,8 @@ def _base_strength(a, b):
         qa, qb = va & _HALL_QUALIFIERS, vb & _HALL_QUALIFIERS
         if qa and qb and qa != qb:
             return 0                      # Grosser Saal vs Kleiner Saal
-        if venue_similar(va, vb, same_city):
+        city = city_words(a, b)
+        if venue_similar(va, vb, same_city, city):
             return 3
         if not same_city:
             return 0
@@ -419,7 +457,7 @@ def _base_strength(a, b):
             return 2
         # one performer in common in a building named alike ("Concorde espace culture" /
         # "Concorde, Grande Salle"): nobody plays in two halls at once
-        if shared and (va & vb) - _GENERIC - _HALL_QUALIFIERS:
+        if shared and (va & vb) - _GENERIC - _HALL_QUALIFIERS - city:
             return 2
         if venue_contains(a, b) or title_very_similar(a.get('title'), b.get('title')):
             return 1
@@ -455,9 +493,13 @@ def match_strength(a, b):
     fa, fb = ha - _HALL_FILLER, hb - _HALL_FILLER
     if fa and fb and not fa & fb and shared < 2:
         return 0                          # two named halls: Konzertsaal vs Luzerner Saal
+    if ha and hb and bool(fa) != bool(fb) and (hb if fa else ha) & _MAIN_HALL and shared < 2 \
+            and not title_similar(a.get('title'), b.get('title')):
+        return 0                          # the main hall vs a named one: Großer Saal vs Brahms-Saal
     if s == 1 and not shared and not venue_contains(a, b):
-        da = venue_tokens(a) - _GENERIC - _HALL_QUALIFIERS
-        db = venue_tokens(b) - _GENERIC - _HALL_QUALIFIERS
+        city = city_words(a, b)
+        da = venue_tokens(a) - _GENERIC - _HALL_QUALIFIERS - city
+        db = venue_tokens(b) - _GENERIC - _HALL_QUALIFIERS - city
         if da and db and not da & db:
             return 0                      # a similar title in two places: Fraumünster vs Grossmünster
     return s
@@ -560,18 +602,22 @@ def ordered(ev):
     return out
 
 
+STABLE_IDS = set()          # the ids of the previous feed's concerts (set in main)
+
+
 def merge(a, b, priority, sites=None):
     """One record for two listings of the same performance.
 
-    The record of the source with the higher priority is kept (then the richer one), so the
-    id, title and link of a performance stay the same from day to day. It takes the richer
+    The record of the source with the higher priority is kept, then the one whose id the previous
+    feed had (``STABLE_IDS``), then the richer one, so the id, title and link of a performance stay
+    the same from day to day and a concert someone saved in the app keeps its mark. It takes the richer
     facts of the two: the longer cast (a bare 'Performer' role is replaced by the other
     listing's instrument), the programme with more work titles, the more specific venue
     ("Casino Bern, Grosser Saal" over "Casino Bern"), and the ticket link on the venue's or
     the organiser's own domain rather than an unrelated foreign site. Empty fields are filled
     from the other record. ``sites`` maps source key -> the source's SITE URL."""
-    rank_a = (priority.get(a['source'], 0), richness(a))
-    rank_b = (priority.get(b['source'], 0), richness(b))
+    rank_a = (priority.get(a['source'], 0), a['id'] in STABLE_IDS, richness(a))
+    rank_b = (priority.get(b['source'], 0), b['id'] in STABLE_IDS, richness(b))
     win, lose = (a, b) if rank_a >= rank_b else (b, a)
     out = dict(win)
     for f in ('durationMin', 'city', 'venueName', 'type', 'series', 'credits', 'program', 'ticketUrl', 'url', 'bookletUrl'):
@@ -624,6 +670,43 @@ def _tidy_text(s, *, words=False):
     return _BROKEN_COMPOUND_RE.sub('-', _BROKEN_WORD_RE.sub('', s)) if words else s
 
 
+# A title all in capitals ("KAMMERMUSIK-MATINÉE 2", "LA BOHÈME") is written as a headline instead.
+_SMALL_WORDS = set('der die das den dem des und oder von vom im in am an auf aus bei mit für zum zur ein eine wie op '
+                   'de du la le les et en au aux à un une di da del della dei il lo con per '
+                   'the of and an for to at on with vs'.split())
+_KEPT_CAPITALS = set('LSO RSO SWR NDR WDR MDR ORF SRF ZKO MKO OSR OCL KKL BBC DSO RSB CSS USA UA DJ TV '
+                     'II III IV VI VII VIII IX XI XII XIII XIV XV'.split())
+_VOWELS = set('aeiouyäöüàáâèéêëìíîòóôùúû')
+_CAPS_WORD_RE = re.compile(r"[^\W_]+(?:[’'][^\W_]+)*")
+
+
+def calm_capitals(text):
+    """'KAMMERMUSIK-MATINÉE 2' -> 'Kammermusik-Matinée 2', 'BEETHOVENS PASTORALE UND C-DUR-MESSE' ->
+    'Beethovens Pastorale und C-Dur-Messe'. Only a text of 8 or more letters with no small letter
+    at all is changed (so 'STOMP' and 'CAMERATA Salzburg' stay). Kept in capitals: words with a
+    digit ('B2'), single letters ('C-Dur'), words without a vowel ('MKO') and a few known ones."""
+    letters = [ch for ch in text if ch.isalpha()]
+    if len(letters) < 8 or any(ch.islower() and ch != 'ß' for ch in letters):
+        return text
+
+    def word(m):
+        w, low = m.group(0), m.group(0).lower()
+        if low == 'à' or low == 'nr':
+            return 'à' if low == 'à' else 'Nr'
+        if len(w) == 1 or any(ch.isdigit() for ch in w) or w in _KEPT_CAPITALS:
+            return w
+        start = not re.search(r'[^\W_]', text[:m.start()]) or bool(re.search(r'[–—:|!?.«„“(]\s*$', text[:m.start()]))
+        if low in _SMALL_WORDS and not start:
+            return low
+        if not _VOWELS & set(low):
+            return w
+        parts = re.split(r"([’'])", low)                 # L’ELISIR D’AMORE -> L’Elisir d’Amore
+        return ''.join(x if len(x) == 1 and i + 1 < len(parts) and not (start and i == 0)
+                       else x[:1].upper() + x[1:] for i, x in enumerate(parts))
+
+    return _CAPS_WORD_RE.sub(word, text)
+
+
 def _tidy_program(program):
     """Each line tidied; the interval and end-time lines dropped (also from reused events)."""
     out = []
@@ -642,11 +725,14 @@ def _tidy_program(program):
 
 def tidy_event(ev):
     """Text as one line, with composed accents (some sites send "u" + U+0308): titles, venue,
-    credits and programme. A line break inside a role ("Tito Vespasiano\\n") is a space."""
+    credits and programme. A line break inside a role ("Tito Vespasiano\\n") is a space. A title,
+    series or venue written all in capitals becomes a headline (``calm_capitals``)."""
     out = dict(ev)
     for f in ('title', 'series', 'venueName', 'city'):
         if isinstance(out.get(f), str):
             out[f] = _tidy_text(out[f], words=f == 'title')
+            if f != 'city':
+                out[f] = calm_capitals(out[f])
     if out.get('credits'):
         out['credits'] = [{k: (_tidy_text(v) if isinstance(v, str) else v) for k, v in c.items()}
                           if isinstance(c, dict) else c for c in out['credits']]
@@ -677,7 +763,7 @@ def dedupe(events, priority, sites=None, merges=None):
     kept, times, absorbed = [], [], []      # absorbed[i]: the sources already merged into kept[i]
     for ev in pending:
         t = _ts(ev)
-        best = None                          # (strength, -abs(dt), index)
+        best = None                          # (strength, shared performers, -abs(dt), index)
         for i in range(len(kept) - 1, -1, -1):
             dt = t - times[i]
             if dt > 2 * window:
@@ -685,22 +771,23 @@ def dedupe(events, priority, sites=None, merges=None):
             if abs(dt) > window or ev['source'] in absorbed[i]:
                 continue
             strength = match_strength(kept[i], ev)
-            if strength and (best is None or (strength, -abs(dt)) > best[:2]):
-                best = (strength, -abs(dt), i)
+            rank = (strength, min(shared_performers(kept[i], ev), 3), -abs(dt)) if strength else None
+            if rank and (best is None or rank > best[:3]):
+                best = rank + (i,)
         if best is None:
             kept.append(ordered(ev))
             times.append(t)
             absorbed.append({ev['source']})
         else:
-            i = best[2]
+            i = best[3]
             other = kept[i]
             kept[i] = merge(other, ev, priority, sites)
             gone = ev if kept[i]['id'] == other['id'] else other     # merge() keeps the higher-priority record
             log.info('merged %s into %s (%s, %d min apart)', gone['id'], kept[i]['id'],
-                     {3: 'similar venue', 2: 'same performers', 1: 'venue/title'}[best[0]], round(-best[1] / 60))
+                     {3: 'similar venue', 2: 'same performers', 1: 'venue/title'}[best[0]], round(-best[2] / 60))
             if merges is not None:
                 merges.append({'id': kept[i]['id'], 'absorbed': gone['id'], 'source': gone['source'],
-                               'strength': best[0], 'minutes': round(-best[1] / 60)})
+                               'strength': best[0], 'minutes': round(-best[2] / 60)})
             absorbed[i].add(ev['source'])
             merged += 1
     kept.sort(key=lambda e: (_ts(e), e['title'], e['id']))
@@ -844,6 +931,15 @@ def main(argv=None):
     # readers reuse details they read on earlier runs (common.previous_event); after a change
     # to a reader's code all of its reused details are due for a re-read (common.refresh_due)
     feed = previous.data() if sources else None
+    if sources and feed is None and previous.online() and previous.origin is None:
+        # Without the published feed a failing site would lose its concerts, and every booklet link
+        # and reused detail page would start from nothing. Better no update than a poorer one: the
+        # site keeps yesterday's feed, and the next run tries again. (--previous none builds without.)
+        print(f'The previous feed could not be loaded ({previous.error}); nothing was written. '
+              'Use --previous none to build without it.', file=sys.stderr)
+        return 2
+    STABLE_IDS.clear()
+    STABLE_IDS.update(e['id'] for e in (feed or {}).get('concerts', []) if isinstance(e, dict) and e.get('id'))
     for src in sources:
         old = (previous.info(src.key) or {}).get('codeHash') if feed else None
         if old and src.key in codes and old != codes[src.key]:
@@ -899,10 +995,13 @@ def main(argv=None):
                     log.warning('%s: dropped %d invalid event(s), e.g. %s', src.key, invalid, '; '.join(problems))
                 if events and invalid == len(events):
                     error = f'all {invalid} events invalid ({problems[0]})'
-                elif not events:
-                    prev_count = len(previous.events(src.key))
+                elif not kept:
+                    # nothing usable (also: every date outside the window, e.g. a wrong year), while the
+                    # previous feed still has concerts of this source from today on: the reader is broken
+                    prev_count = len(check_events(previous.events(src.key), src.key, today, last_day)[0])
                     if prev_count >= SUSPICIOUS_PREVIOUS:
-                        error = f'returned no events (previous feed had {prev_count})'
+                        error = (f'returned no events (previous feed had {prev_count})' if not events else
+                                 f'all {len(events)} events outside the date window (previous feed had {prev_count})')
                 if error is None:
                     res.events, res.fetched_at = kept, _now_iso()
                     # the organiser's programme booklet, where the concert's page links one (booklets.py)
@@ -930,6 +1029,12 @@ def main(argv=None):
             entry['country'] = src.country
         if src.key in booklets.RULES and booklet_links is not None:
             entry['booklets'] = booklet_links    # concerts with a programme booklet link (booklets.py)
+        if not res.ok:
+            # since when it fails, so check.py can tell a second failure on the same day (a push
+            # after the daily run) from a site that is still down the next day
+            was = previous.info(src.key) or {}
+            entry['failedSince'] = was.get('failedSince') or (
+                (previous.data() or {}).get('generatedAt') if was and not was.get('ok') else None) or _now_iso()
         status = 'ok' if res.ok and not res.reused else ('fresh' if res.ok else ('REUSED' if res.reused else 'FAILED'))
         lines = [f'  {src.key:<24} {status:<7} {len(res.events):>5} events  {res.requests:>3} req  {res.seconds:6.1f}s'
                  + (f'  {res.error}' if res.error else '') + (f'  [{res.note}]' if res.note else '')]

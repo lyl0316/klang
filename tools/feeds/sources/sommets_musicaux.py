@@ -9,8 +9,8 @@ time and church ("19:30 – Église de Saanen"), the artists ("<b>Name</b>, role
 composers and the ticket link. The concert page adds the works ("<b>R. Schumann</b>
 Concerto pour violoncelle ..."). Only these facts are taken.
 
-robots.txt names a list of AI crawlers and SEO bots it blocks; the "*" group, which
-applies to this reader, only disallows technical paths. No terms of use about reuse.
+robots.txt names a list of AI crawlers (ClaudeBot among them) and SEO bots it blocks, which is
+why this reader is off (see ENABLED); the "*" group only disallows technical paths. No terms of use about reuse.
 
 Skipped: the dinners with the artists and the children's illustrated concert (an
 illustrator drawing live to piano music).
@@ -23,6 +23,10 @@ from common import FetchError, clean, get, log, looks_cancelled, make_event, req
     today_zurich
 from ._westsouth import find_date, fold, group_role, infer_type, local_iso, role_for
 
+# Off since 14 Nov 2026: the site's robots.txt blocks ClaudeBot by name (and GPTBot and other AI crawlers).
+# Klang's bot is not one of them, but we respect the owners' clear wish (owner's rule 5; the same block for
+# which concerts_romainmotier and wiener_staatsoper are off). Turn on only with the festival's consent.
+ENABLED = False
 KEY = 'sommets_musicaux'
 NAME = 'Sommets Musicaux de Gstaad'
 SITE = 'https://www.sommets-musicaux.com/'

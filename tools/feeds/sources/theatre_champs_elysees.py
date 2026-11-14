@@ -190,6 +190,12 @@ def _clean_works(works):
     return out
 
 
+# lines of the cast box that are notes, not people: "AVANT-PREMIÈRE RÉSERVÉE AUX JEUNES -30 ANS : 20€",
+# "Jeudi 3 décembre", "Samedi 20 février 19h30", "Marina Viotti est remplacée par …"
+_NOTE_LINE_RE = re.compile(r'(?i)avant-premi[èe]re|r[ée]serv[ée]|€|\bremplac|\b\d{1,2}\s?h\s?\d{0,2}\b|'
+                           r'\b(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b')
+
+
 def credits_for(prod, genre, title):
     """Credits and works from a production page."""
     credits, program = [], _clean_works(prod['works'])
@@ -198,7 +204,7 @@ def credits_for(prod, genre, title):
         program = [(head[0][1], prod['title'] or title)]          # an opera: the heading's second line is the composer
         head = []
     for name, role in head + prod['cast']:
-        if not name:
+        if not name or _NOTE_LINE_RE.search(name):
             continue
         m = re.match(r'(?i)^direction\s+(.+)$', role)
         if m and group_role(name):                                # 'accentus | direction Christophe Grapperon'

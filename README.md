@@ -89,7 +89,7 @@ The sources (`python3 tools/feeds/build.py --list`), by region. ★ = the organi
 |---|---|
 | Zurich | Tonhalle Zürich (Tonhalle-Gesellschaft), Opernhaus Zürich ★, Zürcher Kammerorchester, Collegium Novum Zürich, Reformierte Kirche Zürich ★, Musikkollegium Winterthur, KulturDietikon |
 | Basel, Aargau, Solothurn | Sinfonieorchester Basel, Kammerorchester Basel ★, Stadtcasino Basel, argovia philharmonic, Stadttheater Olten |
-| Bern | Bühnen Bern (Berner Symphonieorchester), Casino Bern ★, Berner Kammerorchester, CAMERATA BERN, Gstaad Menuhin Festival, Sommets Musicaux de Gstaad |
+| Bern | Bühnen Bern (Berner Symphonieorchester), Casino Bern ★, Berner Kammerorchester, CAMERATA BERN, Gstaad Menuhin Festival |
 | Central Switzerland | Luzerner Sinfonieorchester, Luzerner Theater, Lucerne Festival, Theater Casino Zug, Zuger Sinfonietta, Kloster Einsiedeln |
 | Eastern Switzerland | Konzert und Theater St.Gallen, J. S. Bach-Stiftung St. Gallen, DomMusik St.Gallen, Casino-Gesellschaft Herisau, Konzertgemeinde Frauenfeld, Schaffhausen Klassik, Kammerphilharmonie Graubünden, Theater Chur |
 | Geneva | Victoria Hall and Grand Théâtre de Genève (Ville de Genève open data, via OpenAgenda; licence: open use, source must be given), Orchestre de la Suisse Romande, L'Orchestre de Chambre de Genève, La Cité Bleue, Geneva Camerata, Concorde Vernier |

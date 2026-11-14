@@ -427,6 +427,11 @@ def ev(source, sid, start, title='Konzert', **kw):
     return common.make_event(source, sid, title, start, **kw)
 
 
+def evc(*a, country=None, **kw):
+    """An event abroad: build.py stamps the reader's country on it."""
+    return dict(ev(*a, **kw), country=country) if country else ev(*a, **kw)
+
+
 class Build(unittest.TestCase):
     def test_check_events(self):
         today = date(2026, 11, 1)
@@ -976,6 +981,71 @@ class MatchRules(unittest.TestCase):
         self.assertFalse(build.venue_similar({'kirche'}, {'kirche'}, same_city=False))    # no town: too vague
         self.assertTrue(build.venue_similar({'kirche'}, {'kirche'}))
 
+    def test_the_towns_name_is_no_evidence(self):
+        t = '2027-03-25T19:00:00+01:00'
+        de = dict(city='Berlin', country='germany')
+        a = evc('roc_berlin', 1, t, 'Matthäus-Passion', venueName='Philharmonie Berlin', credits=[('Choir', 'RIAS Kammerchor')], **de)
+        b = evc('deutsche_oper_berlin', 2, t, 'Matthäus-Passion', venueName='Deutsche Oper Berlin', **de)
+        self.assertFalse(build.same_concert(a, b))                 # two houses, the same work, the same evening
+        c = evc('konzerthaus_berlin', 3, t, 'Matthäus-Passion', venueName='Berliner Philharmonie, Großer Saal', **de)
+        self.assertTrue(build.same_concert(a, c))
+        # "Wien" is Vienna's own name
+        at = dict(city='Vienna', country='austria')
+        d = evc('x', 4, t, 'Liederabend', venueName='Konzerthaus Wien', **at)
+        e = evc('y', 5, t, 'Klavierabend', venueName='Musikverein Wien', **at)
+        self.assertFalse(build.same_concert(d, e))
+        ffm = dict(city='Frankfurt', country='germany')
+        f = evc('oper_frankfurt', 6, t, 'Oper to go', venueName='Oper Frankfurt, Holzfoyer', **ffm)
+        g = evc('alte_oper_frankfurt', 7, t, 'Bach Matthäuspassion', venueName='Alte Oper Frankfurt, Großer Saal', **ffm)
+        self.assertFalse(build.same_concert(f, g))
+        self.assertFalse(build.same_concert(dict(f, venueName='Oper Frankfurt'), g))        # not "Oper" inside "Alte Oper"
+        h = evc('oper_frankfurt', 8, t, 'Museumskonzert', venueName='Alte Oper Frankfurt', **ffm)
+        self.assertTrue(build.same_concert(h, g))
+        hh = dict(city='Hamburg', country='germany')
+        self.assertFalse(build.same_concert(evc('x', 9, t, 'Abend', venueName='Elbphilharmonie Hamburg', **hh),
+                                            evc('y', 10, t, 'Nacht', venueName='Kuppel Hamburg', **hh)))
+        ly = dict(city='Lyon', country='france')
+        self.assertFalse(build.same_concert(evc('auditorium_lyon', 11, t, 'Concert', venueName='Auditorium de Lyon', **ly),
+                                            evc('opera_lyon', 12, t, 'Opéra', venueName='Opéra de Lyon', **ly)))
+        # one performer in common is not enough when the two names share only the town
+        lz = dict(city='Leipzig', country='germany')
+        i = evc('oper_leipzig', 13, t, 'Tosca', venueName='Oper Leipzig, Opernhaus', credits=[('Orchestra', 'Gewandhausorchester')], **lz)
+        j = evc('gewandhaus_leipzig', 14, t, 'Grosses Concert', venueName='Gewandhaus zu Leipzig, Großer Saal',
+               credits=[('Orchestra', 'Gewandhausorchester')], **lz)
+        self.assertFalse(build.same_concert(i, j))
+
+    def test_main_hall_vs_a_named_hall(self):
+        t = '2026-12-10T19:30:00+01:00'
+        at = dict(city='Vienna', country='austria')
+        a = evc('x', 1, t, 'Wiener Symphoniker', venueName='Musikverein Wien, Großer Saal', credits=[('Conductor', 'A B')], **at)
+        b = evc('y', 2, t, 'Liederabend', venueName='Musikverein Wien, Brahms-Saal', credits=[('Soprano', 'C D')], **at)
+        self.assertFalse(build.same_concert(a, b))
+        c = evc('y', 3, t, 'Wiener Symphoniker', venueName='Musikverein Wien, Goldener Saal', **at)   # the same hall by another name
+        self.assertTrue(build.same_concert(a, c))
+        # a concert listed by its hall and by a touring orchestra goes to the listing with the same cast
+        cast = [('Orchestra', 'Münchner Philharmoniker'), ('Conductor', 'Lahav Shani')]
+        ffm = dict(city='Frankfurt', country='germany')
+        hall = evc('alte_oper_frankfurt', 'gs', t, 'Münchner Philharmoniker', venueName='Alte Oper Frankfurt, Großer Saal', credits=cast, **ffm)
+        recital = evc('alte_oper_frankfurt', 'ms', t, 'Klavierabend', venueName='Alte Oper Frankfurt, Mozart Saal', **ffm)
+        tour = evc('muenchner_philharmoniker', 'ffm', t, 'Gastspiel Frankfurt', venueName='Alte Oper Frankfurt', credits=cast, **ffm)
+        out, merged = build.dedupe([hall, recital, tour], {'alte_oper_frankfurt': 20, 'muenchner_philharmoniker': 30})
+        self.assertEqual((merged, sorted(e['id'] for e in out)), (1, ['alte_oper_frankfurt-ms', 'muenchner_philharmoniker-ffm']))
+
+    def test_a_merged_concert_keeps_yesterdays_id(self):
+        t = '2026-12-10T19:30:00+01:00'
+        a = ev('oper_leipzig', 1, t, 'Tosca', city='Leipzig', venueName='Oper Leipzig, Opernhaus')
+        b = ev('gewandhaus_leipzig', 2, t, 'Tosca', city='Leipzig', venueName='Oper Leipzig, Opernhaus',
+               credits=[('Conductor', 'A B'), ('Soprano', 'C D')])
+        prio = {'oper_leipzig': 20, 'gewandhaus_leipzig': 20}
+        try:
+            self.assertEqual(build.merge(a, b, prio)['id'], b['id'])       # equal priority: the richer listing
+            build.STABLE_IDS.add(a['id'])
+            out = build.merge(a, b, prio)
+            self.assertEqual((out['id'], len(out['credits'])), (a['id'], 2))   # ... unless the other id is the known one
+            self.assertEqual(build.merge(a, b, dict(prio, gewandhaus_leipzig=30))['id'], b['id'])   # priority still wins
+        finally:
+            build.STABLE_IDS.clear()
+
     def test_merge_log_names_the_kept_record(self):
         ocg = ev('ocg', 'semi', '2026-11-07T14:30:00+01:00', '80e Concours de Genève – Demi-Finale 1', city='Vernier',
                  venueName='Concorde espace culture', credits=[('Orchestra', "L'Orchestre de Chambre de Genève")])
@@ -1289,6 +1359,59 @@ class Check(unittest.TestCase):
         self.assertTrue(any('new source' in x for x in w))
 
 
+    def test_a_second_failure_on_the_same_day_is_a_warning(self):
+        import check as chk
+        now = datetime.now(timezone.utc)
+        iso = lambda hours_ago: (now - timedelta(hours=hours_ago)).isoformat()
+        def feed(**src):
+            return {'generatedAt': iso(0), 'concerts': [], 'sources': [dict({'key': 'gstaad', 'name': 'Gstaad'}, **src)]}
+        down = dict(ok=False, count=17, reused=True, error='robots.txt unreachable (timed out)')
+        p, w, _, _ = chk.check(feed(failedSince=iso(3), **down), feed(**down), 30)
+        self.assertEqual(p, [])                                     # the daily run failed, a push 3 h later too
+        self.assertTrue(any('earlier today' in x for x in w))
+        p, _, _, _ = chk.check(feed(failedSince=iso(23), **down), feed(**down), 30)
+        self.assertEqual(len(p), 1)                                 # still down on the next day's run
+        p, _, _, _ = chk.check(feed(failedSince=iso(3), ok=False, count=0, error='x'), feed(ok=False, count=17, reused=True), 30)
+        self.assertEqual(len(p), 1)                                 # the kept events are gone: always a problem
+
+    def test_concerts_that_are_over_are_not_lost(self):
+        import check as chk
+        today = common.today_zurich()
+        gen = datetime.now(common.ZURICH).isoformat()
+        day = lambda n: (today + timedelta(days=n)).isoformat() + 'T19:30:00+01:00'
+        def prev(days):
+            return {'generatedAt': gen, 'concerts': [{'source': 'fest', 'start': day(n)} for n in days],
+                    'sources': [{'key': 'fest', 'name': 'Festival', 'ok': True, 'count': len(days)}]}
+        now_feed = lambda n: {'generatedAt': gen, 'concerts': [], 'sources': [{'key': 'fest', 'name': 'Festival', 'ok': True, 'count': n}]}
+        p, w, _, _ = chk.check(now_feed(0), prev([-1] * 8), 30)
+        self.assertEqual(p, [])                                     # its last 8 concerts were yesterday
+        p, _, _, _ = chk.check(now_feed(3), prev([-1] * 9 + [0, 1, 2]), 30)
+        self.assertEqual(p, [])                                     # 12 -> 3, but 9 of them are over
+        p, _, _, _ = chk.check(now_feed(0), prev([-1, 1, 2, 3, 4, 5, 6]), 30)
+        self.assertEqual(len(p), 1)                                 # 6 still to come, none returned
+        p, _, _, _ = chk.check(now_feed(3), prev(range(1, 13)), 30)
+        self.assertEqual(len(p), 1)                                 # 12 to come, 3 returned
+
+
+class NoPreviousFeed(unittest.TestCase):
+    def test_the_build_stops_when_the_published_feed_cannot_be_loaded(self):
+        saved, pauses = common.get_json, build.Previous.RETRY_PAUSES
+        asked = []
+
+        def down(url, **kw):
+            asked.append(url)
+            raise common.FetchError(url, 'HTTP 503', 503)
+
+        common.get_json, build.Previous.RETRY_PAUSES = down, (0, 0)
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                out = os.path.join(tmp, 'concerts.json')
+                code = build.main(['--only', 'zko', '--previous', 'https://feed.example.org/concerts.json', '--out', out])
+                self.assertEqual((code, len(asked), os.path.exists(out)), (2, 3, False))    # three tries, nothing written
+        finally:
+            common.get_json, build.Previous.RETRY_PAUSES = saved, pauses
+
+
 class CodeHash(unittest.TestCase):
     def test_helpers_count(self):
         names = lambda key: [os.path.basename(p) for p in build.code_files(registry.discover([key])[0])]
@@ -1313,6 +1436,57 @@ class CodeHash(unittest.TestCase):
                 self.assertNotEqual(build._code_hash(src), before)              # a helper edit invalidates reuse
             finally:
                 build.HERE = saved
+
+
+class ChampsElysees(unittest.TestCase):
+    def test_notes_in_the_cast_box_are_not_people(self):
+        from sources import theatre_champs_elysees as tce
+        prod = {'title': 'Les Pêcheurs de perles', 'head': [], 'works': [], 'cast': [
+            ('Marc Minkowski', 'direction'), ('Pretty Yende', ''), ('Les Musiciens du Louvre', ''),
+            ('AVANT-PREMIÈRE RÉSERVÉE AUX JEUNES -30 ANS : 20€', ''), ('Jeudi 3 décembre', ''), ('Samedi 20 février 19h30', ''),
+            ('Marina Viotti est remplacée par la soprano italienne Anastasia Bartoli.', '')]}
+        credits, _ = tce.credits_for(prod, 'opera-mis-en-scene', 'Les Pêcheurs de perles')
+        self.assertEqual([n for _, n in credits], ['Marc Minkowski', 'Pretty Yende', 'Les Musiciens du Louvre'])
+
+
+class Capitole(unittest.TestCase):
+    def test_a_production_note_is_not_a_person(self):
+        from sources import capitole_toulouse as ct
+        page = ('<p>Distribution</p><p><em>Direction musicale</em></p><p><strong>Tarmo Peltokoski</strong></p>'
+                '<p><em>Chef du Chœur</em></p><p><strong>Gabriel Bourgoin</strong></p>'
+                '<p><strong>Coproduction Opéra national du Capitole / Staatstheater am Gärtnerplatz de Munich (2021)</strong></p><hr>')
+        self.assertEqual(ct.parse_content(page)['people'],
+                         [('Direction musicale', 'Tarmo Peltokoski'), ('Chef du Chœur', 'Gabriel Bourgoin')])
+
+
+class CalmCapitals(unittest.TestCase):
+    """build.calm_capitals: a title all in capitals becomes a headline."""
+
+    def test_headline(self):
+        for shout, calm in (
+            ('KAMMERMUSIK-MATINÉE 2', 'Kammermusik-Matinée 2'),
+            ('NATUR & GLAUBE – BEETHOVENS PASTORALE UND C-DUR-MESSE', 'Natur & Glaube – Beethovens Pastorale und C-Dur-Messe'),
+            ('KONZERT FÜR FAMILIEN «DIE KLEINE HEXE»', 'Konzert für Familien «Die Kleine Hexe»'),    # an article that starts a quote
+            ('L’ELISIR D’AMORE', 'L’Elisir d’Amore'),
+            ('KULTURMITTAG: HOMMAGE À BEETHOVEN', 'Kulturmittag: Hommage à Beethoven'),
+            ('B2 MESSIAH - AN ORATORIO', 'B2 Messiah - an Oratorio'),
+            ('MKO SONGBOOK', 'MKO Songbook'),
+            ('JSB:48 – AUS ALLEN FUGEN', 'JSB:48 – Aus Allen Fugen'),
+            ('SINFONIE NR. 5 E-MOLL OP. 64', 'Sinfonie Nr. 5 E-Moll op. 64'),
+            ('STRADIVARI VS. GUARNERI', 'Stradivari vs. Guarneri'),
+            ('GROßE FUGE IN B', 'Große Fuge in B'),
+        ):
+            self.assertEqual(build.calm_capitals(shout), calm)
+
+    def test_left_alone(self):
+        for text in ('STOMP', 'SJSO', 'VIS À VIS', 'CAMERATA Salzburg | Saisonkonzert', 'Mahler 4', 'LISZT MEETS QUEEN – Virtuosität', '', '2027'):
+            self.assertEqual(build.calm_capitals(text), text)
+
+    def test_tidy_event(self):
+        e = build.tidy_event({'title': 'CANDLELIGHT  KONZERT', 'series': 'DAS SONNTAGSKONZERT', 'venueName': 'HOTEL SCHWEIZERHOF LUZERN',
+                              'city': 'Luzern', 'credits': [{'name': 'CAMERATA BERN', 'role': 'Ensemble'}]})
+        self.assertEqual((e['title'], e['series'], e['venueName']), ('Candlelight Konzert', 'Das Sonntagskonzert', 'Hotel Schweizerhof Luzern'))
+        self.assertEqual(e['credits'][0]['name'], 'CAMERATA BERN')       # an ensemble's own spelling stays
 
 
 class Booklets(unittest.TestCase):

@@ -259,12 +259,26 @@ def _origin(url):
     return f'{p.scheme.lower()}://{p.netloc.lower()}'
 
 
+_robots_loading = {}   # origin -> lock held while its robots.txt is being fetched
+
+
 def _robots_for(url):
+    """The robots.txt rules of this URL's site, fetched once per run. Only requests to the same
+    site wait while it is being fetched (an unreachable robots.txt takes over a minute of
+    retries, which must not hold up the readers of every other site)."""
     origin = _origin(url)
     with _robots_lock:
         r = _robots_cache.get(origin)
+        if r is not None:
+            return r
+        loading = _robots_loading.setdefault(origin, threading.Lock())
+    with loading:
+        with _robots_lock:
+            r = _robots_cache.get(origin)
         if r is None:
-            r = _robots_cache[origin] = _load_robots(origin)
+            r = _load_robots(origin)
+            with _robots_lock:
+                _robots_cache[origin] = r
     return r
 
 
@@ -299,11 +313,11 @@ def _load_robots(origin):
         except urllib.error.HTTPError as e:
             if e.code in (401, 403):
                 return _Robots(disallow_all=True, note=f'robots.txt answered HTTP {e.code}')
-            if 400 <= e.code < 500:
+            if 400 <= e.code < 500 and e.code not in (408, 429):
                 return _Robots(allow_all=True, note=f'no robots.txt (HTTP {e.code})')
-            last = f'HTTP {e.code}'
+            last = f'HTTP {e.code}'           # 5xx, or "slow down" (429) / timeout (408): not an answer
         except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError,
-                http.client.HTTPException, OSError) as e:
+                http.client.HTTPException, OSError, EOFError, zlib.error) as e:
             last = str(getattr(e, 'reason', e))
         if attempt < RETRIES:
             time.sleep(BACKOFF[min(attempt, len(BACKOFF) - 1)])
@@ -439,9 +453,13 @@ def _fetch(url, accept, timeout, headers):
                 return raw, resp.headers.get('Content-Type', '')
         except urllib.error.HTTPError as e:
             e.close()
-            if e.code in (429, 500, 502, 503, 504) and attempt < RETRIES:
-                retry_wait = min(_retry_after(e.headers) or BACKOFF[min(attempt, len(BACKOFF) - 1)], MAX_RETRY_AFTER)
+            asked = _retry_after(e.headers)
+            if e.code in (429, 500, 502, 503, 504) and attempt < RETRIES and not (asked and asked > MAX_RETRY_AFTER):
+                retry_wait = asked or BACKOFF[min(attempt, len(BACKOFF) - 1)]
                 reason = f'HTTP {e.code}'
+                if e.code == 429:             # "slow down" is for every reader of this site, not just this request
+                    with _host_lock:
+                        _next_slot[host] = max(_next_slot.get(host, 0.0), time.monotonic() + retry_wait)
             else:
                 raise FetchError(url, f'HTTP {e.code}', e.code) from None
         except (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError,

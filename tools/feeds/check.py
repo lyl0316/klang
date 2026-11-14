@@ -75,6 +75,18 @@ def parse_time(s):
         return None
 
 
+SAME_DAY_HOURS = 18     # a second failure sooner than this is the same day's (a push after the daily run)
+
+
+def _failing_for_hours(source, now):
+    """Hours since this source's first failure in a row (``failedSince``, written by build.py). A feed
+    without it (written before 14 Nov 2026) counts as failing since long ago."""
+    since = parse_time(source.get('failedSince'))
+    if since is None:
+        return float('inf')
+    return (now - since).total_seconds() / 3600
+
+
 def check(feed, previous, max_age_hours):
     problems, warnings, info = [], [], []
     if not feed or '_error' in feed or not isinstance(feed.get('concerts'), list):
@@ -91,10 +103,19 @@ def check(feed, previous, max_age_hours):
             problems.append(f'Feed is {age:.0f} h old (limit {max_age_hours} h): the daily update did not run or did not deploy.')
 
     prev = {s.get('key'): s for s in ((previous or {}).get('sources') or []) if isinstance(s, dict)}
+    # how many of a source's previous concerts are still to come: a festival whose last concerts
+    # were yesterday has not "lost" them
+    first_day = str(feed.get('generatedAt') or '')[:10] if gen else now.date().isoformat()   # the feed's own (Zurich) day
+    still, listed = {}, bool(isinstance((previous or {}).get('concerts'), list) and previous['concerts'])
+    for c in (previous or {}).get('concerts') or [] if listed else []:
+        if isinstance(c, dict) and str(c.get('start', ''))[:10] >= first_day:
+            still[c.get('source')] = still.get(c.get('source'), 0) + 1
     for s in feed.get('sources') or []:
         key, name, n = s.get('key'), s.get('name') or s.get('key'), s.get('count') or 0
         p = prev.get(key)
         pn = (p or {}).get('count') or 0
+        if listed and p is not None:
+            pn = min(pn, still.get(key, 0))
         if not s.get('ok'):
             how = f'kept {n} events from the previous day' if s.get('reused') and n else 'no events kept'
             msg = f'{name}: website could not be read ({s.get("error") or "error"}); {how}'
@@ -104,8 +125,10 @@ def check(feed, previous, max_age_hours):
                 warnings.append(msg + '; a new source, it will try again on the next update.')
             elif p is None:
                 problems.append(msg + '.')
-            elif not p.get('ok'):
+            elif not p.get('ok') and _failing_for_hours(s, gen or now) >= SAME_DAY_HOURS:
                 problems.append(msg + '; it could not be read the day before either.')
+            elif not p.get('ok') and not (pn and not (s.get('reused') and n)):
+                warnings.append(msg + '; it failed earlier today too, and will be tried again on the next update.')
             elif pn and not (s.get('reused') and n):
                 problems.append(msg + f' (had {pn}).')
             else:
