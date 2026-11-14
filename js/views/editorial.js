@@ -9,7 +9,7 @@
 // recording — or, in the header, the first one with the rest queued — in full there. Ratings, saves
 // and the article playlist stay on this device. No community features: no comments, reactions or
 // public reviews.
-// "Live in Switzerland" embeds list REAL upcoming concerts (repo.js); an embedded concert that is no
+// "Live on stage" embeds list REAL upcoming concerts (repo.js); an embedded concert that is no
 // longer listed gives way to the real upcoming performances of the article's works, or to nothing.
 // Language: the interface follows i18n.t(); the articles themselves stay English for now (a short
 // note says so in Chinese); composer and city names follow the interface language.
@@ -588,7 +588,7 @@ function recordingEmbed(block, ctx) {
   return el;
 }
 
-// "Live in Switzerland": the next three REAL performances, as compact rows with a date badge.
+// "Live on stage": the next three REAL performances (of a work or composer: in every country Klang reads), as compact rows with a date badge.
 // A block may name concerts ({ concertIds }) — those still listed and upcoming are shown; else the
 // block's work (or composer); else, so an embed never points at nothing, the article's own works.
 // With nothing announced, the block keeps a one-line note and its link chip (or disappears).
@@ -609,7 +609,7 @@ function concertsEmbed(block, article) {
   }
   if (!work && !comp && !list.length) return null;
   const name = work ? work.title : comp ? composerShort(comp) : null;
-  const label = name ? t('{name} · live in Switzerland', { name }) : t('Live in Switzerland');
+  const label = name ? t('{name} · live on stage', { name }) : t('Live on stage');
   const to = work ? href.work(work.id) : comp ? href.composer(comp.id) : null;
   // Sheng embeds the concert rows straight into the text, followed by a centred link chip.
   const more = to ? h('a', { class: 'ed-workchip', href: to },
@@ -620,7 +620,7 @@ function concertsEmbed(block, article) {
     alt ? h('p', { class: 'ed-live-alt' }, t('The works in this article, on stage in Switzerland:')) : null,
     list.length
       ? h('div', { class: 'ed-live-list' }, list.slice(0, 3).map(concertRow))
-      : h('p', { class: 'ed-live-none' }, t('No Swiss dates announced yet.')),
+      : h('p', { class: 'ed-live-none' }, t('No dates announced yet.')),
     more);
 }
 

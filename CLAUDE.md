@@ -59,7 +59,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
-- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 61 tests passed".
+- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 62 tests passed".
 - **Feed tests:** `python3 tools/feeds/selftest.py` (88 tests, offline).
 - **One reader against the live site:**
 
@@ -207,7 +207,7 @@ Rules and gotchas:
   - English and Chinese aliases for those cities are in `repo.js` (`ABROAD_ALIASES`) and in
     `assistant-engine.js`.
 - **Service worker.** When you add a JS or CSS file, add it to the list in `sw.js`. When you change
-  shell files, bump `CACHE` (currently `klang-shell-v15`). Otherwise installed Home Screen apps
+  shell files, bump `CACHE` (currently `klang-shell-v16`). Otherwise installed Home Screen apps
   keep the old version.
 - **Translations.**
   - Put new Chinese strings inside the file's **`export default { … }`** object.
@@ -234,6 +234,12 @@ Rules and gotchas:
   - **App: storage.** The Apple lookup cache (`klang.itunes.v1`) is capped at 700 K characters and
     purged; `store.persist()` drops both caches before it gives up on saving the user's data.
   - **App: New Year mode** exports Strauss concerts of the user's place only, not of all five countries.
+  - **App: composer, work and performer pages said "in Switzerland"** but list the concerts of all
+    five countries (on purpose: `repo.query` with a composer, work or performer has no place). The
+    owner chose to fix it; the lists stay as they are and the texts were reworded (`entity.js`,
+    Discover's work card, the articles' "Live on stage" block, the assistant's answers, and their
+    Chinese). `placesText()` writes "54 cities in 5 countries"; performer cards show the flag of the
+    venue's country (`FLAGS`), and the counts line adds the number of countries.
   - **Feed: wrong merges abroad.** Two venue names that share only the town ("Philharmonie Berlin" /
     "Deutsche Oper Berlin") merged, because only Swiss town names were ignored. Now `city_words()`
     takes the events' own town (also "Wien" for Vienna) out of the evidence; "Oper" is not "Alte
@@ -316,9 +322,6 @@ Rules and gotchas:
   Don't hammer sites while testing: use `--only` and `--previous` with the live feed.
 - **Before a public launch**, add Apple's "Listen on Apple Music" badge and trademark credit.
 - **Left from the review of 14 Nov 2026** (not fixed, in order of use to the owner):
-  - Composer, work and artist pages say "in Switzerland" but count the concerts of all five
-    countries (`js/views/entity.js`, about 15 strings and their Chinese). Decide: count the user's
-    place only, or reword.
   - Going Back to a long Concerts list lands near card 40, because the list renders in chunks of 40
     (`concerts.js`, `CHUNK`).
   - **Radio France:** its robots.txt blocks GPTBot, ChatGPT-User and Amazonbot by name, not ClaudeBot.

@@ -19,7 +19,7 @@ export default {
   Classical: '古典乐',
   'Widely Loved': '广受喜爱', 'Good for newcomers': '适合入门',
   Solo: '独奏', Symphonic: '交响', Chamber: '室内乐', Vocal: '声乐',
-  '{n} upcoming performances': '近期 {n} 场演出', 'Not on stage in Switzerland right now': '近期没有在瑞士上演',
+  '{n} upcoming performances': '近期 {n} 场演出', 'Not on stage right now': '近期没有上演',
   'New on Record': '新唱片', 'New classical albums': '古典新专辑',
   'Tap a cover for 30-second previews; ↗ plays the album in full in {app}.': '轻点封面试听 30 秒片段；轻点 ↗ 在 {app} 中完整播放专辑。',
   'Couldn’t reach the Apple Music chart.': '无法连接 Apple Music 排行榜。', Retry: '重试',
@@ -62,10 +62,10 @@ export default {
   'Explore Works': '探索作品', 'Explore {name}': '探索 {name}',
   'Latest releases': '最新发行', 'Popular among listeners': '听众喜爱',
   'Latest releases of music by {name}': '{name} 作品的最新发行', 'Popular recordings of music by {name}': '{name} 作品的热门录音',
-  'No {name} on Swiss stages right now': '{name} 的作品近期没有在瑞士上演',
-  'Nothing by {name} is announced in Switzerland at the moment. Add {name} to your favourites and new dates show up under Following in Concerts.':
-    '目前瑞士没有公布 {name} 作品的演出。把 {name} 加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
-  '{name} — on stage in Switzerland': '{name} · 瑞士演出',
+  'No {name} on stage right now': '{name} 的作品近期没有上演',
+  'Nothing by {name} is announced at the moment. Add {name} to your favourites and new dates show up under Following in Concerts.':
+    '目前没有公布 {name} 作品的演出。把 {name} 加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
+  '{name} — upcoming concerts': '{name} · 近期演出',
   'Born {year}': '{year} 年生',
   'Czech lands': '捷克地区', England: '英格兰', USA: '美国',
   Bio: '简介',
@@ -76,16 +76,17 @@ export default {
   'Klang’s repertoire includes one work by {name}: {title}{year}.': 'Klang 的曲库收录了 {name} 的一部作品：{title}{year}。',
   'Klang’s repertoire includes {n} works by {name}{span}: {titles}.': 'Klang 的曲库收录了 {name} 的 {n} 部作品{span}：{titles}。',
   ', all from {year}': '，均作于 {year} 年', ', written between {a} and {b}': '，创作于 {a} 至 {b} 年间',
-  'On stage in Switzerland: {n} upcoming performances of music by {name} in {cities}; the next is {when} in {city}.':
-    '瑞士近期将上演 {name} 的作品 {n} 场，分布在 {cities}；下一场：{when}，{city}。',
+  '{cities} in {countries}': '{countries}的 {cities}', '{n} country': '{n} 个国家', '{n} countries': '{n} 个国家',
+  'On stage: {n} upcoming performances of music by {name} in {cities}; the next is {when} in {city}.':
+    '近期将上演 {name} 的作品 {n} 场，分布在 {cities}；下一场：{when}，{city}。',
   'Most programmed: {title} ({n} concerts).': '上演最多的是 {title}（{n} 场）。',
-  'No performances of music by {name} are announced in Switzerland right now.': '目前瑞士没有公布 {name} 作品的演出。',
+  'No performances of music by {name} are announced right now.': '目前没有公布 {name} 作品的演出。',
   // explore
   'By period': '按时期', 'By genre': '按体裁', Related: '相关',
   'No shared programmes yet': '暂无同场节目',
-  'No other composer shares an announced Swiss programme with {name} this season.': '本季瑞士已公布的节目中，还没有其他作曲家与 {name} 同场。',
-  'Shares {n} programme with {name} in Switzerland this season': '本季在瑞士与{name}同场 {n} 次',
-  'Shares {n} programmes with {name} in Switzerland this season': '本季在瑞士与{name}同场 {n} 次',
+  'No other composer shares an announced programme with {name} this season.': '本季已公布的节目中，还没有其他作曲家与 {name} 同场。',
+  'Shares {n} programme with {name} this season': '本季与{name}同场 {n} 次',
+  'Shares {n} programmes with {name} this season': '本季与{name}同场 {n} 次',
   'No works in Klang yet': 'Klang 中暂无作品', 'Klang’s repertoire doesn’t list works by {name} yet.': 'Klang 的曲库尚未收录 {name} 的作品。',
   '{n} work': '{n} 部作品', '{n} works': '{n} 部作品',
   // genres
@@ -145,9 +146,9 @@ export default {
   '~{n} min': '约 {n} 分钟', Recordings: '录音', 'More recordings': '更多录音',
   'Tap a cover for a 30-second preview; ↗ plays the recording in full in {app}.': '轻点封面试听 30 秒；轻点 ↗ 在 {app} 中完整播放录音。',
   'No upcoming performances': '暂无近期演出',
-  'This work isn’t on any announced Swiss programme right now. Add it to your favourites to catch new dates.':
-    '目前瑞士已公布的节目中没有这部作品。把它加入喜欢，就不会错过新的场次。',
-  '{title} — recordings and concerts in Switzerland': '{title} · 录音与瑞士演出',
+  'This work isn’t on any announced programme right now. Add it to your favourites to catch new dates.':
+    '目前已公布的节目中没有这部作品。把它加入喜欢，就不会错过新的场次。',
+  '{title} — recordings and concerts': '{title} · 录音与演出',
   'A full listening guide for this work hasn’t been written yet.': '这部作品的完整聆听指南尚未撰写。',
   '{what} dates from {year}, when {name} was about {age}.': '{what} 作于 {year} 年，当时 {name} 约 {age} 岁。',
   '{what} dates from {year}.': '{what} 作于 {year} 年。',
@@ -159,12 +160,12 @@ export default {
   'Found on Apple Music by composer and title — tap a cover for a 30-second preview; ↗ plays the recording in full in {app}.':
     '按作曲家和作品名在 Apple Music 上找到。轻点封面试听 30 秒；轻点 ↗ 在 {app} 中完整播放录音。',
   'At {n} hall': '共 {n} 个场馆', 'At {n} halls': '共 {n} 个场馆',
-  'No announced Swiss programme has this work right now.': '目前瑞士已公布的节目中没有这部作品。',
+  'No announced programme has this work right now.': '目前已公布的节目中没有这部作品。',
   'A performance lasts about {time}.': '演出时长约 {time}。',
-  'On stage in Switzerland: {n} upcoming performances in {cities}; the next is {when} in {city}.':
-    '瑞士近期将上演 {n} 场，分布在 {cities}；下一场：{when}，{city}。',
-  'No Swiss performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.':
-    '目前瑞士没有公布这部作品的演出。把它加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
+  'On stage: {n} upcoming performances in {cities}; the next is {when} in {city}.':
+    '近期将上演 {n} 场，分布在 {cities}；下一场：{when}，{city}。',
+  'No performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.':
+    '目前没有公布这部作品的演出。把它加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
 
   // ---------- artist ----------
   'This performer isn’t in the current listings.': '当前演出信息中没有这位演出者。',
@@ -173,19 +174,19 @@ export default {
   'All times shown in Swiss local time.': '所有时间均为瑞士当地时间。',
   '{city}, {dates} — show the first one': '{city}，{dates}，显示第一场',
   'No upcoming dates': '暂无近期演出',
-  '{name} has no announced concerts in Switzerland right now.': '{name} 目前在瑞士没有已公布的演出。',
-  '{name} has no announced concerts in Switzerland right now. Add the ensemble to your favourites to catch new dates under Following in Concerts.':
-    '{name} 目前在瑞士没有已公布的演出。把这个团体加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
-  '{name} has no announced concerts in Switzerland right now. Add this performer to your favourites to catch new dates under Following in Concerts.':
-    '{name} 目前在瑞士没有已公布的演出。把这位演出者加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
+  '{name} has no announced concerts right now.': '{name} 目前没有已公布的演出。',
+  '{name} has no announced concerts right now. Add the ensemble to your favourites to catch new dates under Following in Concerts.':
+    '{name} 目前没有已公布的演出。把这个团体加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
+  '{name} has no announced concerts right now. Add this performer to your favourites to catch new dates under Following in Concerts.':
+    '{name} 目前没有已公布的演出。把这位演出者加入喜欢，新的场次就会出现在“音乐会”的“关注”里。',
   'Related artists': '相关艺术家', '— {n} concert together': '· 同台 {n} 场', '— {n} concerts together': '· 同台 {n} 场', ', e.g. {title}': '，如 {title}',
   'Albums by {name}': '{name} 的专辑', 'Featured albums': '精选专辑',
   'Upcoming Events': '近期演出', 'Upcoming events': '近期演出',
-  'Dates in Switzerland from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.':
-    '这里按日期列出 Klang 收录的瑞士演出。路线按巡演到达的先后，每座城市只列一次并标出场次；轻点城市即可跳到它的第一场。',
-  'All times are Swiss local time (Europe/Zurich). Cancelled dates stay in the list but are left out of the route and the counts.':
-    '所有时间均为瑞士当地时间（欧洲/苏黎世）。已取消的场次仍留在列表中，但不计入路线和场次。',
-  '{name} — upcoming dates in Switzerland': '{name} · 瑞士近期演出',
+  'Dates from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.':
+    '这里按日期列出 Klang 收录的演出。路线按巡演到达的先后，每座城市只列一次并标出场次；轻点城市即可跳到它的第一场。',
+  'All times are Swiss local time (Europe/Zurich), which is also the local time in Austria, Germany, France and Italy. Cancelled dates stay in the list but are left out of the route and the counts.':
+    '所有时间均为瑞士当地时间（欧洲/苏黎世），与奥地利、德国、法国和意大利的当地时间相同。已取消的场次仍留在列表中，但不计入路线和场次。',
+  '{name} — upcoming dates': '{name} · 近期演出',
   'Past performances': '过往演出',
   // roles the shared name list doesn't have (opera characters stay as published)
   'Tänzerinnen und Tänzer': '舞者', Dancer: '舞者', Dance: '舞蹈', 'Music Director': '音乐总监',
@@ -230,9 +231,9 @@ export default {
   '{state}: {title} — Save to Library': '{state}：{title} · 收藏到资料库',
   'Finding a recording…': '正在查找录音…', 'Not found on Apple Music': '在 Apple Music 上未找到',
   'Apple Music is not reachable right now': '暂时无法连接 Apple Music',
-  'Live in Switzerland': '瑞士现场', '{name} · live in Switzerland': '{name} · 瑞士现场',
+  'Live on stage': '现场演出', '{name} · live on stage': '{name} · 现场演出',
   'The works in this article, on stage in Switzerland:': '本文提到的作品在瑞士的演出：',
-  'No Swiss dates announced yet.': '瑞士暂未公布演出日期。',
+  'No dates announced yet.': '暂未公布演出日期。',
   END: '全文完', 'Wish for a topic': '许愿话题', 'Recent editorials': '近期专栏',
   'How Klang’s editorials use AI': 'Klang 专栏如何使用 AI', 'Sources:': '资料来源：', '{type} · Published {date}': '{type} · 发表于 {date}',
   'A work, a composer, a city, a form…': '一部作品、一位作曲家、一座城市、一种体裁……', 'Your topic': '你的话题',

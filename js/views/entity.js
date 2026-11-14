@@ -1,5 +1,5 @@
 // Entity pages (#/composer, #/work, #/artist, #/venue, #/city), modelled on Sheng's
-// knowledge pages — Switzerland only, personal only (no other users, no public reviews).
+// knowledge pages — personal only (no other users, no public reviews).
 // Every concert listed here is a REAL listing (repo.js: the venues' and orchestras' own websites,
 // plus the user's own imports); performers, venues and towns come from those listings.
 //
@@ -14,7 +14,7 @@
 //             every hall. Nothing is written about it that the listings don't say.
 //   Composer: back · share; portrait, serif name, Read Bio / Explore Works / Editorials N,
 //             centred ♡, caps life line; Latest releases, Popular among listeners,
-//             "Explore <name>" (By period · By genre · Related), then Swiss Concerts N.
+//             "Explore <name>" (By period · By genre · Related), then Concerts N.
 //   Artist:   a performer or ensemble from the listings: portrait + serif name + gold ON TOUR, caps
 //             line of their roles in the listings, Artist bio (only when Klang has one) + ♡;
 //             Upcoming Events (route of cities, Swiss local time, first dates, "Full Itinerary ›" =
@@ -149,6 +149,17 @@ function mentionsComposer(a, id) {
 // ---------- small helpers ----------
 const live = (list) => list.filter((c) => c.status !== 'cancelled');
 const cityCount = (list) => new Set(list.map((c) => c.cityId).filter(Boolean)).size;
+// Composer, work and performer pages list the concerts of every country Klang reads (repo.query), so
+// their texts name where the concerts are instead of saying "in Switzerland".
+const countryCount = (list) => new Set(list.map((c) => c.country || 'switzerland')).size;
+// "12 cities in Switzerland" / "62 cities in 5 countries"
+export function placesText(list) {
+  const cities = tn(cityCount(list), '{n} city', '{n} cities');
+  const n = countryCount(list);
+  if (n > 1) return t('{cities} in {countries}', { cities, countries: tn(n, '{n} country', '{n} countries') });
+  const country = list.length ? countryOf(list[0].country || 'switzerland')?.name : null;
+  return country ? t('{cities} in {countries}', { cities, countries: countryName(country) }) : cities;
+}
 const same = (a, b) => a != null && b != null && String(a) === String(b);
 const byYear = (a, b) => (a.year || 9999) - (b.year || 9999) || a.title.localeCompare(b.title);
 
@@ -365,16 +376,25 @@ const glyph = (name, size = 15) => h('span', {
   html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${GLYPHS[name]}</svg>`,
 });
 
-// Round country flag before a city (Sheng shows the venue's country flag; Klang is Swiss-only).
-const FLAG_CH = '<svg viewBox="0 0 20 20" width="14" height="14"><circle cx="10" cy="10" r="10" fill="#d52b1e"/><path d="M8.4 4.6h3.2v3.8h3.8v3.2h-3.8v3.8H8.4v-3.8H4.6V8.4h3.8z" fill="#fff"/></svg>';
-const flagCH = () => h('span', { class: 'ep-flag', 'aria-hidden': 'true', html: FLAG_CH });
+// Round flag of the venue's country before a city, like Sheng (the span clips the stripes to a circle).
+const FLAGS = {
+  switzerland: '<rect width="20" height="20" fill="#d52b1e"/><path d="M8.4 4.6h3.2v3.8h3.8v3.2h-3.8v3.8H8.4v-3.8H4.6V8.4h3.8z" fill="#fff"/>',
+  austria: '<rect width="20" height="20" fill="#c8102e"/><rect y="6.67" width="20" height="6.66" fill="#fff"/>',
+  germany: '<rect width="20" height="20" fill="#d00"/><rect width="20" height="6.67" fill="#000"/><rect y="13.33" width="20" height="6.67" fill="#ffce00"/>',
+  france: '<rect width="20" height="20" fill="#fff"/><rect width="6.67" height="20" fill="#0055a4"/><rect x="13.33" width="6.67" height="20" fill="#ef4135"/>',
+  italy: '<rect width="20" height="20" fill="#fff"/><rect width="6.67" height="20" fill="#009246"/><rect x="13.33" width="6.67" height="20" fill="#ce2b37"/>',
+};
+const countryIdOf = (c) => c.country || 'switzerland';
+const flagOf = (c) => (FLAGS[countryIdOf(c)]
+  ? h('span', { class: 'ep-flag', 'aria-hidden': 'true', html: `<svg viewBox="0 0 20 20" width="14" height="14">${FLAGS[countryIdOf(c)]}</svg>` })
+  : null);
 
 // ---------- concerts: date-block rows with live personal marks ----------
 const SUB = {
   city: (c) => [cityText(c), venueText(c)].filter(Boolean).join(' · '),
   cityOnly: (c) => cityText(c) || venueText(c),
   // Sheng's artist cards: flag · city (brighter) · venue
-  flagCity: (c) => [flagCH(), cityText(c) ? h('span', { class: 'cty' }, cityText(c)) : null,
+  flagCity: (c) => [flagOf(c), cityText(c) ? h('span', { class: 'cty' }, cityText(c)) : null,
     cityText(c) ? h('span', { class: 'sep' }, '·') : null, venueText(c)],
   venue: (c) => [venueText(c), c.room].filter(Boolean).join(' · '),
   // work pages: where each performance is — "Tonhalle Zürich · Zurich"
@@ -881,7 +901,7 @@ function openRecordingsSheet(w, title, term, onChoose, load = () => searchAlbums
 
 // ---------- work cards (accent bar coloured per genre) ----------
 // Sheng's cards carry only the bar, the serif title and "BWV 244 · 1727 · 97 MIN"; the number of
-// upcoming Swiss performances goes into the accessible name instead of a visible line.
+// upcoming performances goes into the accessible name instead of a visible line.
 function workCard(w, n = 0) {
   const g = genreOf(w);
   const meta = [w.catalog, w.year, w.minutes ? t('{n} min', { n: w.minutes }) : null].filter(Boolean).join(' · ');
@@ -940,7 +960,7 @@ function genresOf(works) {
   return out;
 }
 
-// Composers most often on the same Swiss programme as `id` (upcoming, not cancelled).
+// Composers most often on the same programme as `id` (upcoming, not cancelled).
 function relatedComposers(id) {
   const counts = new Map();
   for (const c of live(repo.upcoming({ composerId: id }))) {
@@ -994,11 +1014,11 @@ function composerFacts(c, works, up) {
     const next = act[0];
     const top = [...workCounts(act)].sort((a, b) => b[1] - a[1])[0];
     const topWork = top ? repo.work(top[0]) : null;
-    ps.push(tRaw('On stage in Switzerland: {n} upcoming performances of music by {name} in {cities}; the next is {when} in {city}.', {
-      n: fmtN(act.length), name, cities: tn(cityCount(act), '{n} city', '{n} cities'), city: cityText(next) || venueText(next),
+    ps.push(tRaw('On stage: {n} upcoming performances of music by {name} in {cities}; the next is {when} in {city}.', {
+      n: fmtN(act.length), name, cities: placesText(act), city: cityText(next) || venueText(next),
     }, { when: whenPhrase(next.day) }) + (topWork && top[1] > 1 ? ` ${t('Most programmed: {title} ({n} concerts).', { title: topWork.title, n: fmtN(top[1]) })}` : ''));
   } else {
-    ps.push(t('No performances of music by {name} are announced in Switzerland right now.', { name }));
+    ps.push(t('No performances of music by {name} are announced right now.', { name }));
   }
   return ps;
 }
@@ -1056,7 +1076,7 @@ export async function renderComposer({ id }) {
   });
 
   // Sheng: head · Latest releases · Popular among listeners · Explore <name>. Klang adds the
-  // Swiss concerts after Explore (styled like the work page's "Concerts N" list).
+  // concerts after Explore (styled like the work page's "Concerts N" list).
   const body = h('div', { class: 'ep-page ep-composer' },
     head,
     h('section', { class: 'ep-sec' }, epHead(t('Latest releases'), { serif: true }), latest.el),
@@ -1066,8 +1086,8 @@ export async function renderComposer({ id }) {
       epHead(t('Concerts'), { bar: true, count: up.length }),
       up.length
         ? eventList(up, (x) => eventItem(x, mark, { sub: SUB.cityOnly }), { initial: 10 }).el
-        : softEmpty('calendar', t('No {name} on Swiss stages right now', { name: short }),
-          t('Nothing by {name} is announced in Switzerland at the moment. Add {name} to your favourites and new dates show up under Following in Concerts.', { name: short })),
+        : softEmpty('calendar', t('No {name} on stage right now', { name: short }),
+          t('Nothing by {name} is announced at the moment. Add {name} to your favourites and new dates show up under Following in Concerts.', { name: short })),
       up.length ? sourcesLine(up) : null),
     reportPill({ kind: 'composer', name: c.name, label: name, path: href.composer(id) }),
     popular.credit);
@@ -1075,7 +1095,7 @@ export async function renderComposer({ id }) {
   return {
     title: name,
     back: true,
-    actions: topActions(shareButton(name, t('{name} — on stage in Switzerland', { name }), href.composer(id))),
+    actions: topActions(shareButton(name, t('{name} — upcoming concerts', { name }), href.composer(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1098,11 +1118,11 @@ function exploreSection(c, works, perWork) {
       const rel = relatedComposers(c.id);
       if (!rel.length) {
         return [softEmpty('person', t('No shared programmes yet'),
-          t('No other composer shares an announced Swiss programme with {name} this season.', { name: short }))];
+          t('No other composer shares an announced programme with {name} this season.', { name: short }))];
       }
       return [h('div', { class: 'ep-rel-grid' }, rel.map(({ comp, n }) => h('a', { class: 'ep-rel', href: href.composer(comp.id) },
         h('span', { class: 'ep-rel-av', 'aria-hidden': 'true' }, icon('person', 18)),
-        h('p', {}, tNodes(n === 1 ? 'Shares {n} programme with {name} in Switzerland this season' : 'Shares {n} programmes with {name} in Switzerland this season',
+        h('p', {}, tNodes(n === 1 ? 'Shares {n} programme with {name} this season' : 'Shares {n} programmes with {name} this season',
           { n: fmtN(n), name: h('b', {}, composerName(comp)) })))))];
     }
     if (!works.length) {
@@ -1148,11 +1168,11 @@ function workFacts(w, comp, up) {
   const act = live(up);
   if (act.length) {
     const next = act[0];
-    ps.push(tRaw('On stage in Switzerland: {n} upcoming performances in {cities}; the next is {when} in {city}.', {
-      n: fmtN(act.length), cities: tn(cityCount(act), '{n} city', '{n} cities'), city: cityText(next) || venueText(next),
+    ps.push(tRaw('On stage: {n} upcoming performances in {cities}; the next is {when} in {city}.', {
+      n: fmtN(act.length), cities: placesText(act), city: cityText(next) || venueText(next),
     }, { when: whenPhrase(next.day) }));
   } else {
-    ps.push(t('No Swiss performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.'));
+    ps.push(t('No performances are announced right now. Add the work to your favourites to spot new dates under Following in Concerts.'));
   }
   return ps;
 }
@@ -1215,7 +1235,7 @@ export async function renderWork({ id }) {
       up.length
         ? eventList(up, workEvent(up, mark), { initial: 40 }).el
         : softEmpty('calendar', t('No upcoming performances'),
-          t('This work isn’t on any announced Swiss programme right now. Add it to your favourites to catch new dates.')),
+          t('This work isn’t on any announced programme right now. Add it to your favourites to catch new dates.')),
       up.length ? sourcesLine(up) : null),
     rail.credit);
 
@@ -1224,7 +1244,7 @@ export async function renderWork({ id }) {
     back: true,
     actions: topActions(
       favButton('work', id, w.title, bag),
-      shareButton(label, t('{title} — recordings and concerts in Switzerland', { title: label }), href.work(id))),
+      shareButton(label, t('{title} — recordings and concerts', { title: label }), href.work(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1343,14 +1363,14 @@ function renderListedWork(id) {
       up.length > 1 && halls > 1 ? h('p', { class: 'ep-listen-note' }, tn(halls, 'At {n} hall', 'At {n} halls')) : null,
       up.length
         ? eventList(up, workEvent(up, mark), { initial: 40 }).el
-        : softEmpty('calendar', t('No upcoming performances'), t('No announced Swiss programme has this work right now.')),
+        : softEmpty('calendar', t('No upcoming performances'), t('No announced programme has this work right now.')),
       up.length ? sourcesLine(up) : null),
     rail.credit);
 
   return {
     title: d.title,
     back: true,
-    actions: topActions(shareButton(label, t('{title} — recordings and concerts in Switzerland', { title: label }), href.work(id))),
+    actions: topActions(shareButton(label, t('{title} — recordings and concerts', { title: label }), href.work(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1378,7 +1398,7 @@ function relatedArtists(id, all) {
 }
 
 // Tour route (Sheng: one flag chip per country with its number of dates, in tour order).
-// Klang is Swiss-only, so the stops are cities, in order of their first date, with totals.
+// Klang's stops are cities (most dates are in one country), in order of their first date, with totals.
 function routeLegs(up) {
   const legs = [];
   const byKey = new Map();
@@ -1413,7 +1433,8 @@ function routeEl(legs, onStop) {
 const itinNote = () => t('All times shown in Swiss local time.');
 const artistCard = (mark) => (c, i) => eventItem(c, mark, { time: true, idx: i, sub: SUB.flagCity, chev: false });
 const itineraryHref = (id, idx = null) => `${href.artist(id)}/itinerary${idx != null ? `/${idx}` : ''}`;
-const countsLine = (active, up) => [tn(cityCount(active), '{n} city', '{n} cities'), tn(active.length, '{n} date', '{n} dates'),
+const countsLine = (active, up) => [tn(cityCount(active), '{n} city', '{n} cities'),
+  countryCount(active) > 1 ? tn(countryCount(active), '{n} country', '{n} countries') : null, tn(active.length, '{n} date', '{n} dates'),
   up.length > active.length ? t('{n} cancelled', { n: fmtN(up.length - active.length) }) : null].filter(Boolean).join(' · ');
 
 export async function renderArtist({ id }) {
@@ -1451,7 +1472,7 @@ export async function renderArtist({ id }) {
       }, glyph('book'), t('Artist bio')) : null,
       favButton('artist', id, a.name, bag, 'ep-heart ring')));
 
-  // Upcoming events: caps counts, route of cities, Swiss-time note, first dates, Full Itinerary ›
+  // Upcoming events: caps counts, route of cities, time note, first dates, Full Itinerary ›
   let events;
   if (up.length) {
     const INITIAL = 5;
@@ -1472,8 +1493,8 @@ export async function renderArtist({ id }) {
   } else {
     events = softEmpty('calendar', t('No upcoming dates'),
       t(a.kind === 'ensemble'
-        ? '{name} has no announced concerts in Switzerland right now. Add the ensemble to your favourites to catch new dates under Following in Concerts.'
-        : '{name} has no announced concerts in Switzerland right now. Add this performer to your favourites to catch new dates under Following in Concerts.', { name: a.name }));
+        ? '{name} has no announced concerts right now. Add the ensemble to your favourites to catch new dates under Following in Concerts.'
+        : '{name} has no announced concerts right now. Add this performer to your favourites to catch new dates under Following in Concerts.', { name: a.name }));
   }
 
   const related = relatedArtists(id, all);
@@ -1500,8 +1521,8 @@ export async function renderArtist({ id }) {
       epHead(t('Upcoming Events'), {
         serif: true,
         info: () => textSheet(t('Upcoming events'), [
-          h('p', {}, t('Dates in Switzerland from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.')),
-          h('p', {}, t('All times are Swiss local time (Europe/Zurich). Cancelled dates stay in the list but are left out of the route and the counts.')),
+          h('p', {}, t('Dates from Klang’s listings, in date order. The route shows each city once, in the order the tour reaches it, with its number of dates; tap a city to jump to its first date.')),
+          h('p', {}, t('All times are Swiss local time (Europe/Zurich), which is also the local time in Austria, Germany, France and Italy. Cancelled dates stay in the list but are left out of the route and the counts.')),
           h('p', { class: 'fine' }, t('Real listings from the venues’ and orchestras’ own websites, updated daily.')),
         ]),
       }),
@@ -1515,7 +1536,7 @@ export async function renderArtist({ id }) {
   return {
     title: a.name,
     back: true,
-    actions: topActions(shareButton(a.name, t('{name} — upcoming dates in Switzerland', { name: a.name }), href.artist(id))),
+    actions: topActions(shareButton(a.name, t('{name} — upcoming dates', { name: a.name }), href.artist(id))),
     body,
     cleanup: () => bag.forEach((fn) => fn()),
   };
@@ -1539,7 +1560,7 @@ function renderItinerary(id, focusIdx) {
     active.length ? h('div', { class: 'ep-caps left' }, countsLine(active, up)) : null,
     legs.length ? routeEl(legs, (leg) => flash(box.querySelector(`[data-idx="${leg.idx}"]`))) : null,
     h('p', { class: 'ep-note' }, itinNote()),
-    up.length ? box : softEmpty('calendar', t('No upcoming dates'), t('{name} has no announced concerts in Switzerland right now.', { name: a.name })),
+    up.length ? box : softEmpty('calendar', t('No upcoming dates'), t('{name} has no announced concerts right now.', { name: a.name })),
     past.length
       ? h('section', { class: 'ep-sec' }, epHead(t('Past performances'), { serif: true, count: past.length }),
         eventList(past, (c, i) => eventItem(c, mark, { time: true, idx: i, sub: SUB.flagCity, chev: false }), { initial: 5, cards: true }).el)

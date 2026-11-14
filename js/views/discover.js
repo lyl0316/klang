@@ -667,7 +667,7 @@ function widelyLoved(loved, counts, today, listen) {
         hook ? h('div', { class: 'dc-wl-hook' }, h('span', { class: 'q', 'aria-hidden': 'true' }, '“'), h('p', {}, hook)) : null,
         h('div', { class: 'dc-wl-count' }, n
           ? (isZh() ? t('{n} upcoming performances', { n: fmtN(n) }) : [h('b', {}, fmtN(n)), n === 1 ? ' upcoming performance' : ' upcoming performances'])
-          : t('Not on stage in Switzerland right now'))),
+          : t('Not on stage right now'))),
       listen.acts([w], w.minutes ? t('{n} min', { n: w.minutes }) : t('Preview'), [compShort(comp), w.title].filter(Boolean).join(' — '), 'red'));
   };
   const cards = picks.map(card);

@@ -457,6 +457,22 @@
       store.setPref('lang', 'zh');
       try { eq(i18n.cityName(city), '维也纳'); } finally { store.setPref('lang', 'en'); }
     });
+    test('composer, work and performer pages say where their concerts are', () => {
+      const from = '2026-10-26';
+      const mahler = repo.query({ from, composerId: 'mahler' });
+      const swiss = mahler.filter((c) => !c.country);
+      const vienna = mahler.filter((c) => c.country === 'austria');
+      ok(swiss.length && vienna.length, 'Mahler in Switzerland and in Vienna');
+      const cities = (list) => new Set(list.map((c) => c.cityId)).size;
+      eq(ent.placesText(mahler), `${cities(mahler)} cities in 2 countries`);
+      eq(ent.placesText(vienna), '1 city in Austria');
+      ok(/^\d+ cit(y|ies) in Switzerland$/.test(ent.placesText(swiss)), ent.placesText(swiss));
+      store.setPref('lang', 'zh');
+      try {
+        eq(ent.placesText(vienna), '奥地利的 1 座城市');
+        eq(ent.placesText(mahler), `2 个国家的 ${cities(mahler)} 座城市`);
+      } finally { store.setPref('lang', 'en'); }
+    });
     test('featured = names a performer or a piece', () => {
       ok(repo.concert('feed-opernhaus_zurich-200322').featured);
       ok(!repo.concert('feed-test-unknown-town').featured, 'bare listing');

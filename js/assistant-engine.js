@@ -1728,10 +1728,10 @@ function answerComposers(p) {
     const reply = ZHO
       ? zfix(p.ambiguousComposer
         ? `你是指${namesZh}吗？${list.length ? `他们共有 ${fmtN(list.length)} 场即将上演的音乐会。` : ''}`
-        : `${namesZh}：${list.length ? `有 ${fmtN(list.length)} 场即将上演的音乐会演出他们的作品。` : '目前瑞士的日程中没有他们的作品。'}`)
+        : `${namesZh}：${list.length ? `有 ${fmtN(list.length)} 场即将上演的音乐会演出他们的作品。` : '目前的日程中没有他们的作品。'}`)
       : p.ambiguousComposer
         ? `Did you mean ${names}? ${list.length ? `Between them there are ${plural(list.length, 'upcoming concert')}.` : ''}`.trim()
-        : `${names}: ${list.length ? `${plural(list.length, 'upcoming concert')} feature their music.` : 'nothing of theirs is on the Swiss calendar right now.'}`;
+        : `${names}: ${list.length ? `${plural(list.length, 'upcoming concert')} feature their music.` : 'nothing of theirs is on the calendar right now.'}`;
     return {
       intent: 'composer', reply,
       items: [...rows, ...concertItems(list, MAX_ITEMS - rows.length)],
@@ -1749,11 +1749,11 @@ function answerComposers(p) {
   const often = topWorks.length ? ` ${listJoin(topWorks.map((id) => shortTitle(repo.work(id))))} ${topWorks.length > 1 ? 'are' : 'is'} programmed most.` : '';
   const reply = ZHO
     ? zfix(`${introNoteZh(p)}${cName(c)}（${lifeZh(c)}），${countryZh(c.country)}。${ups.length
-      ? `瑞士有 ${fmtN(ups.length)} 场即将上演的音乐会演出${cShort(c)}的作品，最近一场是${whenWhereZh(ups[0], T)}。${topWorks.length ? `最常上演的是${topWorks.map((id) => workZh(repo.work(id))).join('和')}。` : ''}`
-      : `目前 Klang 的瑞士日程中没有${cShort(c)}的作品。`}`)
+      ? `有 ${fmtN(ups.length)} 场即将上演的音乐会演出${cShort(c)}的作品，最近一场是${whenWhereZh(ups[0], T)}。${topWorks.length ? `最常上演的是${topWorks.map((id) => workZh(repo.work(id))).join('和')}。` : ''}`
+      : `目前 Klang 的日程中没有${cShort(c)}的作品。`}`)
     : `${introNote(p)}${c.name} (${life(c)}), ${c.country}.${bio ? ` ${bio}` : ''} ${ups.length
-      ? `${plural(ups.length, 'upcoming concert')} in Switzerland feature${ups.length === 1 ? 's' : ''} ${c.short}'s music — the next is ${whenWhere(ups[0], T)}.${often}`
-      : `Nothing by ${c.short} is on the Swiss calendar in Klang right now.`}`;
+      ? `${plural(ups.length, 'upcoming concert')} feature${ups.length === 1 ? 's' : ''} ${c.short}'s music — the next is ${whenWhere(ups[0], T)}.${often}`
+      : `Nothing by ${c.short} is on the calendar in Klang right now.`}`;
   const rows = [{ kind: 'composer', id: c.id }, ...topWorks.map((id) => ({ kind: 'work', id }))];
   const followUps = [];
   const city = topCityOf(ups);
@@ -1792,11 +1792,11 @@ function answerWorks(p) {
   const meta = [comp?.short, w.catalog, w.year].filter(Boolean).join(', ');
   const reply = ZHO
     ? zfix(`${introNoteZh(p)}《${w.title}》，${[comp ? cShort(comp) : null, w.catalog, w.year ? `${w.year} 年` : null].filter(Boolean).join('，')}。${ups.length
-      ? `瑞士有 ${fmtN(ups.length)} 场即将上演的演出，最近一场是${whenWhereZh(ups[0], T)}。`
-      : '目前 Klang 的瑞士节目单上没有这部作品。'}`)
+      ? `有 ${fmtN(ups.length)} 场即将上演的演出，最近一场是${whenWhereZh(ups[0], T)}。`
+      : '目前 Klang 的节目单上没有这部作品。'}`)
     : `${introNote(p)}${w.title} — ${meta}. ${w.blurb || ''} ${ups.length
-      ? `${plural(ups.length, 'upcoming performance')} in Switzerland — the next is ${whenWhere(ups[0], T)}.`
-      : `It isn't on any Swiss programme in Klang right now.`}`.replace(/\s+/g, ' ').trim();
+      ? `${plural(ups.length, 'upcoming performance')} — the next is ${whenWhere(ups[0], T)}.`
+      : `It isn't on any programme in Klang right now.`}`.replace(/\s+/g, ' ').trim();
   const followUps = [];
   addFollow(followUps, ZHO ? `${workZh(w)} 录音` : `Recordings of ${shortTitle(w)}`);
   if (comp) addFollow(followUps, ZHO ? `更多${cShort(comp)}作品` : `More by ${comp.short}`);
