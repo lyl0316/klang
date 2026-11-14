@@ -309,7 +309,7 @@ After merging, `build.py` checks each concert's `type` against its facts (`commo
 
 Added on 30 October 2026: the main venues of Austria, Germany, France and Italy (`COUNTRY` in each reader). Each reader's docstring says how its site is read, what is skipped and when it was checked. Sites left out on purpose:
 
-- **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`). In Switzerland: Les Concerts de Romainmôtier, and since 14 Nov 2026 Sommets Musicaux de Gstaad (both readers kept, `ENABLED = False`).
+- **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`). Radio France blocks GPTBot, ChatGPT-User and Amazonbot by name but not ClaudeBot; the owner switched its reader off on 14 Nov 2026 all the same (reader kept, `ENABLED = False`). In Switzerland: Les Concerts de Romainmôtier, and since 14 Nov 2026 Sommets Musicaux de Gstaad (both readers kept, `ENABLED = False`).
 - **Terms forbid storing or republishing the programme:** Theater an der Wien, Innsbrucker Festwochen der Alten Musik.
 - **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz does not answer GitHub's servers at all (reader kept, `ENABLED = False`). Berliner Philharmoniker has answered every request with a bot-protection challenge since 12 Nov 2026 (reader kept, `ENABLED = False`).
 - **Calendar only behind robots-forbidden addresses or a login:** Kölner Philharmonie, Salzburger Festspiele.
@@ -342,7 +342,7 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 | `opera_marseille` | France | Opéra de Marseille – Théâtre de l’Odéon | https://opera-odeon.marseille.fr/ |  |
 | `ops_strasbourg` | France | Orchestre philharmonique de Strasbourg | https://philharmonique.strasbourg.eu/ |  |
 | `philharmonie_paris` | France | Philharmonie de Paris | https://philharmoniedeparis.fr/ |  |
-| `radio_france` | France | Radio France | https://www.maisondelaradioetdelamusique.fr/ |  |
+| `radio_france` | France | Radio France | https://www.maisondelaradioetdelamusique.fr/ | off: owner's decision of 14 Nov 2026 (robots.txt blocks other AI crawlers by name) |
 | `salle_gaveau` | France | Salle Gaveau | https://www.sallegaveau.com/ |  |
 | `seine_musicale` | France | La Seine Musicale | https://www.laseinemusicale.com/ |  |
 | `theatre_champs_elysees` | France | Théâtre des Champs-Élysées | https://www.theatrechampselysees.fr/ |  |

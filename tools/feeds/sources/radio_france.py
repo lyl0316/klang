@@ -14,8 +14,9 @@ weekday and time ("Mercredi 20h00"), the type ("Concert", "Concert-fiction"), ti
 conductor ("Jaap Van Zweden direction") and the place ("Maison de la Radio et de la
 Musique - Auditorium", "Théâtre des Champs-Élysées", "Stadtcasino, Bâle").
 
-robots.txt asks for a Crawl-delay of 10 seconds (and shuts out a few AI crawlers by name,
-not this reader), so a run is slow: the agenda alone takes about 4 minutes. The event
+robots.txt asks for a Crawl-delay of 10 seconds, so a run is slow. It also shuts out a few AI
+crawlers by name (GPTBot, ChatGPT-User, Amazonbot; not ClaudeBot), which is why this reader is
+off (see ENABLED). When it ran: the agenda alone takes about 4 minutes. The event
 page adds the works ("Le programme": composer, works), the soloists with their
 instruments, the ensembles ("Formation") and the conductor, plus one schema.org MusicEvent
 (start with offset, address, eventStatus). Event pages are read incrementally: a
@@ -44,6 +45,10 @@ from common import BudgetExceeded, FetchError, clean, event_id, get, guess_type,
 
 from ._paris import PARIS_TZ, abroad, credit, fold, group_role, is_not_a_concert, paris_iso, town_in
 
+# Off since 14 Nov 2026, by the owner's decision: the site's robots.txt blocks AI crawlers by name
+# (GPTBot, ChatGPT-User, Amazonbot). ClaudeBot is not on the list, so rule 5 did not force this; the
+# owner chose to respect the wish behind the list. Turn on only with Radio France's consent.
+ENABLED = False
 KEY = 'radio_france'
 NAME = 'Radio France'
 SITE = 'https://www.maisondelaradioetdelamusique.fr/'

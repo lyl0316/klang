@@ -5,9 +5,9 @@ made, and how to keep the daily concert feed healthy. The user-facing overview i
 the feed collectors are documented in `tools/feeds/README.md`; the original screen-by-screen
 spec is in `../spec/` (outside this repo).
 
-State as of 14 Nov 2026: all CI runs green, the live feed has about 8,100 upcoming concerts from
-119 active sources (Berliner Philharmoniker was switched off on 13 Nov, Sommets Musicaux de Gstaad on
-14 Nov, see section 5). On 14 Nov the owner handed the repo over for a general review; what was
+State as of 14 Nov 2026: all CI runs green, the live feed has about 7,900 upcoming concerts from
+118 active sources (Berliner Philharmoniker was switched off on 13 Nov, Sommets Musicaux de Gstaad and
+Radio France on 14 Nov, see section 5). On 14 Nov the owner handed the repo over for a general review; what was
 fixed and what was left is in section 7 ("Review of 14 Nov 2026") and section 8.
 
 ## 1. What Klang is
@@ -164,7 +164,10 @@ Recent example (5 Nov 2026, commit `bdb75b6`):
   - Any other HTML page means there are no rules.
 - **Turned off** (`ENABLED = False`): concerts_romainmotier, wiener_staatsoper and
   teatro_comunale_bologna (AI blocks), sommets_musicaux (since 14 Nov 2026: its robots.txt names
-  ClaudeBot), gaertnerplatztheater (no answer to GitHub's servers), and
+  ClaudeBot), radio_france (since 14 Nov 2026, the owner's decision: its robots.txt names GPTBot,
+  ChatGPT-User and Amazonbot but not ClaudeBot; this is how the owner reads rule 5, so treat a site
+  that blocks other AI crawlers by name the same way: ask the owner, and expect "off"),
+  gaertnerplatztheater (no answer to GitHub's servers), and
   berliner_philharmoniker (since 13 Nov 2026: every request, robots.txt included, gets a
   bot-protection challenge; turn it on again if that goes away).
 - **No reader at all**:
@@ -324,8 +327,6 @@ Rules and gotchas:
 - **Left from the review of 14 Nov 2026** (not fixed, in order of use to the owner):
   - Going Back to a long Concerts list lands near card 40, because the list renders in chunks of 40
     (`concerts.js`, `CHUNK`).
-  - **Radio France:** its robots.txt blocks GPTBot, ChatGPT-User and Amazonbot by name, not ClaudeBot.
-    Rule 5 can be read either way; the reader is still on. Ask the owner.
   - The previous feed holds only merged records, so a reader cannot reuse the details of a listing
     that another source absorbed (it re-reads those pages daily), and disabling a winning reader on a
     push drops the absorbed concerts until the next full run.
