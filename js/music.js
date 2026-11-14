@@ -17,9 +17,13 @@ const COUNTRY = 'CH';
 const CACHE_KEY = 'klang.itunes.v1';
 const TTL = 7 * 24 * 3600 * 1000;
 const MAX_ENTRIES = 300;
+// Apple's answers are big (an album with its tracks is ~50 K characters) and this cache shares
+// localStorage's few megabytes with the user's own marks and library, so it is also capped by size.
+const MAX_CACHE_CHARS = 700_000;
 const MAX_PER_MINUTE = 18;
 
 let cache = storage.get(CACHE_KEY, {});
+if (!cache || typeof cache !== 'object' || Array.isArray(cache)) cache = {};
 const inflight = new Map();
 const recent = [];
 
@@ -29,13 +33,27 @@ function cacheGet(key) {
   return undefined;
 }
 
-function cachePut(key, v) {
-  cache[key] = { t: Date.now(), v };
-  const keys = Object.keys(cache);
-  if (keys.length > MAX_ENTRIES) {
-    keys.sort((a, b) => cache[a].t - cache[b].t).slice(0, keys.length - MAX_ENTRIES).forEach((k) => delete cache[k]);
+// Drop what is out of date, then the oldest answers until the cache is within its limits.
+function trimCache() {
+  const now = Date.now();
+  let total = 0;
+  for (const [k, e] of Object.entries(cache)) {
+    if (!e || !(now - e.t < TTL)) { delete cache[k]; continue; }
+    if (!e.n) e.n = JSON.stringify(e.v ?? null).length;
+    total += e.n;
   }
-  storage.set(CACHE_KEY, cache);
+  const oldestFirst = Object.keys(cache).sort((a, b) => cache[a].t - cache[b].t);
+  while (oldestFirst.length > 1 && (oldestFirst.length > MAX_ENTRIES || total > MAX_CACHE_CHARS)) {
+    const k = oldestFirst.shift();
+    total -= cache[k].n;
+    delete cache[k];
+  }
+}
+
+function cachePut(key, v) {
+  cache[key] = { t: Date.now(), v, n: JSON.stringify(v ?? null).length };
+  trimCache();
+  if (!storage.set(CACHE_KEY, cache)) storage.remove(CACHE_KEY); // full: the answers stay in memory for this visit
 }
 
 async function throttle() {

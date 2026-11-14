@@ -90,10 +90,12 @@ function migrate(s) {
 }
 
 function persist() {
-  // The listings copy (feed.js) shares the quota; the user's own data always wins.
-  if (!storage.set(KEY, state)) {
-    storage.remove('klang.feed.v1');
-    storage.set(KEY, state);
+  // Two caches share the quota (Apple lookups, music.js; the listings copy, feed.js). The user's own
+  // data always wins: when it does not fit, they go, one after the other.
+  if (storage.set(KEY, state)) return;
+  for (const cacheKey of ['klang.itunes.v1', 'klang.feed.v1']) {
+    storage.remove(cacheKey);
+    if (storage.set(KEY, state)) return;
   }
 }
 
@@ -158,6 +160,9 @@ function setMarkRecord(concertId, m) {
   else delete state.marks[concertId];
   persist();
 }
+
+// every concert with a mark or a review ('feed-<id>'), whatever its date
+export const markedConcertIds = () => Object.keys(state.marks);
 
 export function markedIds(kind) {
   return Object.entries(state.marks).filter(([, m]) => m[kind]).map(([id]) => id);

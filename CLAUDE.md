@@ -5,8 +5,10 @@ made, and how to keep the daily concert feed healthy. The user-facing overview i
 the feed collectors are documented in `tools/feeds/README.md`; the original screen-by-screen
 spec is in `../spec/` (outside this repo).
 
-State as of 13 Nov 2026: all CI runs green, the live feed has about 8,100 upcoming concerts from
-120/120 active sources (Berliner Philharmoniker was switched off that day, see section 5).
+State as of 14 Nov 2026: all CI runs green, the live feed has about 8,100 upcoming concerts from
+119 active sources (Berliner Philharmoniker was switched off on 13 Nov, Sommets Musicaux de Gstaad on
+14 Nov, see section 5). On 14 Nov the owner handed the repo over for a general review; what was
+fixed and what was left is in section 7 ("Review of 14 Nov 2026") and section 8.
 
 ## 1. What Klang is
 
@@ -57,8 +59,8 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
-- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 60 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (77 tests, offline).
+- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 61 tests passed".
+- **Feed tests:** `python3 tools/feeds/selftest.py` (88 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -161,7 +163,8 @@ Recent example (5 Nov 2026, commit `bdb75b6`):
   - An HTML "robots.txt" that is a bot-challenge page counts as blocked.
   - Any other HTML page means there are no rules.
 - **Turned off** (`ENABLED = False`): concerts_romainmotier, wiener_staatsoper and
-  teatro_comunale_bologna (AI blocks), gaertnerplatztheater (no answer to GitHub's servers), and
+  teatro_comunale_bologna (AI blocks), sommets_musicaux (since 14 Nov 2026: its robots.txt names
+  ClaudeBot), gaertnerplatztheater (no answer to GitHub's servers), and
   berliner_philharmoniker (since 13 Nov 2026: every request, robots.txt included, gets a
   bot-protection challenge; turn it on again if that goes away).
 - **No reader at all**:
@@ -181,7 +184,7 @@ Recent example (5 Nov 2026, commit `bdb75b6`):
 | File | Role |
 |---|---|
 | `js/main.js` | Router (hash routes), tab bar, dock, mini player |
-| `js/feed.js` | Loads `data/concerts.json`. Keeps a compact localStorage copy for instant starts, in size tiers `[null, 240, 120, 60, 30, 14]` days. |
+| `js/feed.js` | Loads `data/concerts.json`. Keeps a compact localStorage copy (`klang.feed.v1`, format `v: 3`) for instant starts: the marked concerts, as many coming days as fit (`TIERS`), and the past days in the countries of the user's place. The copy is read at the END of the module (see section 7). |
 | `js/repo.js` | Concerts, cities, venues, works; `query()`; `programItems(c)` |
 | `js/store.js` | All personal data (localStorage `klang.v1`), preferences, library, playlists |
 | `js/i18n.js` + `js/i18n/zh-*.js` | `t('English text')` looks up the Chinese by the English key; untranslated strings stay English |
@@ -204,7 +207,7 @@ Rules and gotchas:
   - English and Chinese aliases for those cities are in `repo.js` (`ABROAD_ALIASES`) and in
     `assistant-engine.js`.
 - **Service worker.** When you add a JS or CSS file, add it to the list in `sw.js`. When you change
-  shell files, bump `CACHE` (currently `klang-shell-v14`). Otherwise installed Home Screen apps
+  shell files, bump `CACHE` (currently `klang-shell-v15`). Otherwise installed Home Screen apps
   keep the old version.
 - **Translations.**
   - Put new Chinese strings inside the file's **`export default { … }`** object.
@@ -220,6 +223,32 @@ Rules and gotchas:
 - **iTunes API.** Never send `media=music`: from an iPhone user agent it answers with a 301 to `musics://`.
 
 ## 7. Recent features (Nov 2026)
+
+- **Review of 14 Nov 2026** (the owner: "the code repo is now yours, see what you can improve").
+  Two read-only reviews (app code, feed pipeline) plus a scan of the live feed. Fixed:
+  - **App: the saved copy of the listings was never read.** `let feed = readCache()` ran at the top
+    of `js/feed.js`, before the helpers it calls existed; the error was swallowed. So every start
+    waited for the 2 MB download, and past concerts (Look back, marks on past concerts) were lost the
+    next day. Now read at the end of the module. The copy also stores `country` (without it concerts
+    abroad counted as Swiss) and is trimmed by `TIERS`.
+  - **App: storage.** The Apple lookup cache (`klang.itunes.v1`) is capped at 700 K characters and
+    purged; `store.persist()` drops both caches before it gives up on saving the user's data.
+  - **App: New Year mode** exports Strauss concerts of the user's place only, not of all five countries.
+  - **Feed: wrong merges abroad.** Two venue names that share only the town ("Philharmonie Berlin" /
+    "Deutsche Oper Berlin") merged, because only Swiss town names were ignored. Now `city_words()`
+    takes the events' own town (also "Wien" for Vienna) out of the evidence; "Oper" is not "Alte
+    Oper"; a main hall is not a named hall of the same building; ties go to the listing with the
+    same performers. Tests: `MatchRules` in `selftest.py`.
+  - **Feed: stable ids.** At equal priority a merge keeps the id the previous feed had
+    (`build.STABLE_IDS`), so a saved concert does not lose its mark when the richer listing changes.
+  - **Feed: titles all in capitals** become headlines (`build.calm_capitals`, also series and venue).
+  - **Feed: notes as performers** fixed in `theatre_champs_elysees` and `capitole_toulouse`.
+  - **Feed: robots.txt.** Loading one site's robots.txt no longer blocks every other site; a 429 on
+    robots.txt is "unreachable", not "no rules"; a 429 on a page slows the whole host down.
+  - **check.py:** a second failure on the same day (a push after the daily run) is a warning
+    (`failedSince` in the feed's source entry); concerts that are over do not count as lost.
+  - **build.py** stops (exit 2, nothing deployed) when the published feed cannot be loaded after
+    three tries, instead of publishing a feed without yesterday's details.
 
 - **Programme booklets** (owner's request, 13 Nov 2026): the concert page shows a "Programme booklet"
   row under the programme when the organiser's own concert page links one (Programmheft, programme
@@ -286,3 +315,18 @@ Rules and gotchas:
 - **Tiroler Landestheater** once blocked the Mac's IP after heavy local testing; CI still reads it.
   Don't hammer sites while testing: use `--only` and `--previous` with the live feed.
 - **Before a public launch**, add Apple's "Listen on Apple Music" badge and trademark credit.
+- **Left from the review of 14 Nov 2026** (not fixed, in order of use to the owner):
+  - Composer, work and artist pages say "in Switzerland" but count the concerts of all five
+    countries (`js/views/entity.js`, about 15 strings and their Chinese). Decide: count the user's
+    place only, or reword.
+  - Going Back to a long Concerts list lands near card 40, because the list renders in chunks of 40
+    (`concerts.js`, `CHUNK`).
+  - **Radio France:** its robots.txt blocks GPTBot, ChatGPT-User and Amazonbot by name, not ClaudeBot.
+    Rule 5 can be read either way; the reader is still on. Ask the owner.
+  - The previous feed holds only merged records, so a reader cannot reuse the details of a listing
+    that another source absorbed (it re-reads those pages daily), and disabling a winning reader on a
+    push drops the absorbed concerts until the next full run.
+  - `check.py` compares counts after merging, so a source's count can fall when another reader starts
+    listing the same concerts.
+  - A listings refresh repaints the open page (a sheet open on a concert page closes).
+  - An offline start counts as a fresh fetch (`fetchedAt`), so stale listings can show for up to 6 h.

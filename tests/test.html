@@ -566,6 +566,36 @@
       eq(repo.concert('feed-test-unknown-town').sourceName, null, 'unknown source: no attribution invented');
     });
 
+    test('the saved copy of the listings is read back: country kept; past days only at home or marked', () => {
+      const today = dayKeyOf(new Date().toISOString());
+      const at = (n) => `${addDays(today, n)}T19:30:00+01:00`;
+      const f = { generatedAt: 'g', fetchedAt: 'f', window: null, sources: [{ key: 's' }], concerts: [
+        { id: 'ch-past', source: 's', title: 'Past in Basel', start: at(-10), city: 'Basel' },
+        { id: 'at-past', source: 's', title: 'Past in Vienna', start: at(-10), city: 'Vienna', country: 'austria' },
+        { id: 'at-mine', source: 's', title: 'Past in Vienna, marked', start: at(-9), city: 'Vienna', country: 'austria' },
+        { id: 'at-next', source: 's', title: 'Next in Vienna', start: at(3), city: 'Vienna', country: 'austria', credits: [{ role: 'Conductor', name: 'A B' }], bookletUrl: 'https://example.org/h.pdf' },
+      ] };
+      const place = store.pref('placeCityIds');
+      const copy = localStorage.getItem('klang.feed.v1');
+      store.setPref('placeCityIds', ['zurich']);
+      store.toggleMark('feed-at-mine', 'attended');
+      try {
+        ok(feed.saveCopy(f), 'saved');
+        const back = feed.savedCopy();
+        ok(back, 'the copy is read (it never was before 14 Nov 2026)');
+        eq(back.concerts.map((c) => c.id), ['ch-past', 'at-mine', 'at-next']);
+        const next = back.concerts[2];
+        eq([next.country, next.bookletUrl, next.credits[0].name, back.concerts[0].country], ['austria', 'https://example.org/h.pdf', 'A B', undefined]);
+        store.setPref('placeCityIds', ['country:austria|Vienna']);
+        feed.saveCopy(f);
+        eq(feed.savedCopy().concerts.map((c) => c.id), ['at-past', 'at-mine', 'at-next'], 'a place abroad keeps its own past days');
+      } finally {
+        store.toggleMark('feed-at-mine', 'attended');
+        store.setPref('placeCityIds', place);
+        if (copy == null) localStorage.removeItem('klang.feed.v1'); else localStorage.setItem('klang.feed.v1', copy);
+      }
+    });
+
     // ---------- Sheng's countries ----------
     test('countries: Sheng\'s 47, in its order, with regions and cities', () => {
       eq(COUNTRIES.length, 47);

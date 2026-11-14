@@ -156,7 +156,10 @@ function newYearConcerts() {
   const from = `${season}-12-20` > today ? `${season}-12-20` : today;
   const to = `${season + 1}-01-10`;
   if (from > to) return [];
-  return repo.query({ from, to, composerId: 'johann-strauss' }).filter((c) => c.status !== 'cancelled');
+  // in the place Klang opens with (Switzerland when none is set), not in all five countries
+  const place = store.homePlace();
+  return repo.query({ from, to, composerId: 'johann-strauss', cityIds: place })
+    .filter((c) => c.status !== 'cancelled' && (place.length || !c.country));
 }
 
 function exportCalendar() {
