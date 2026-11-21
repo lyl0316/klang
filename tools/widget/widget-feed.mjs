@@ -20,6 +20,11 @@
 // next 14 days, only concerts that name a composer, work or performer Klang knows, with the same row
 // fields plus m (composer ids), w (work ids, repertoire and 'x-…'), a (artist ids). The widget matches
 // them against the favourites Klang sent it (Me › iPhone widget) and posts a notification on the phone.
+//
+// The owner's first picks (21 Nov 2026), in both files as p: 1 = a performance at Opernhaus Zürich or
+// KKL Luzern, 2 = Martha Argerich in Switzerland (with f, her name as listed). Both notifications put
+// them first; the alerts file also holds every p 2 concert however far ahead, and the widget announces
+// those even without a ♥.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -68,8 +73,14 @@ const wanted = Array.from({ length: days }, (_, i) => time.addDays(today, i));
 const want = new Set(wanted);
 const raw = new Map((data.concerts || []).map((c) => [c.id, c]));
 
+const FIRST_VENUES = new Set(['opernhaus-zurich', 'kkl-luzern']);
+const FIRST_ARTISTS = new Set(['artist-martha-argerich']);
+const firstArtists = (c) => (c.country ? [] : c.credits.filter((cr) => FIRST_ARTISTS.has(cr.artistId)));
+const firstOf = (c) => (firstArtists(c).length ? 2 : FIRST_VENUES.has(c.venueId) ? 1 : 0);
+
 const row = (c) => {
   const r = raw.get(c.feedId) || {};
+  const p = firstOf(c);
   return {
     i: c.id,
     d: c.day,
@@ -79,6 +90,8 @@ const row = (c) => {
     c: repo.city(c.cityId)?.name || r.city || '',
     y: c.cityId || '',
     k: c.country || 'switzerland',
+    ...(p ? { p } : {}),
+    ...(p === 2 ? { f: [...new Set(firstArtists(c).map((cr) => cr.name))] } : {}),
   };
 };
 const byTime = (a, b) => a.d.localeCompare(b.d) || a.t.localeCompare(b.t) || a.n.localeCompare(b.n);
@@ -102,14 +115,14 @@ console.log(`widget.json: ${rows.length} concerts for ${wanted[0]} to ${wanted[w
 const uniq = (list) => [...new Set(list.filter(Boolean))];
 const alertEnd = time.addDays(today, alertDays - 1);
 const alerts = repo.allConcerts()
-  .filter((c) => live(c) && c.day >= today && c.day <= alertEnd)
+  .filter((c) => live(c) && c.day >= today && (c.day <= alertEnd || firstOf(c) === 2))
   .map((c) => ({
     ...row(c),
     m: uniq(c.program.map((p) => p.composerId || repo.work(p.workId)?.composerId)),
     w: uniq(c.program.flatMap((p) => [p.workId, p.wkey])),
     a: uniq(c.credits.map((cr) => cr.artistId)),
   }))
-  .filter((r) => r.m.length || r.w.length || r.a.length)
+  .filter((r) => r.m.length || r.w.length || r.a.length || r.p)
   .sort(byTime);
 fs.writeFileSync(alertsPath, JSON.stringify({
   generatedAt: out.generatedAt,

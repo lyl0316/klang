@@ -1,4 +1,4 @@
-// KLANG-WIDGET 7: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
+// KLANG-WIDGET 8: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
 // when a favourite composer, work or performer is on stage in your cities.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
@@ -23,6 +23,11 @@
 // composer, work and artist ids), finds concerts in the saved place that name a favourite, and posts
 // one local notification for the new ones. Each concert is announced once (klang-widget-alerted.json).
 // No notifications at night: between 22:00 and 08:00 it waits for a later run.
+//
+// The owner's first picks (rows with p, written by widget-feed.mjs): Opernhaus Zürich and KKL Luzern
+// (p 1) and Martha Argerich in Switzerland (p 2) always come first in both notifications, and are
+// listed even when outside the saved cities. A p 2 concert is announced like a favourite (once, as far
+// ahead as it is listed) even without a ♥. Then favourites, then the rest by time.
 //
 // Tomorrow at 8 pm (owner's request, 21 Nov 2026): each run before 20:00 schedules (or replaces, same
 // identifier) a notification for 20:00 with tomorrow's concerts in the saved place, favourites first
@@ -50,7 +55,7 @@ function labels() {
     ? { tomorrow: "明天", short: "明天", more: (n) => `还有 ${n} 场`, count: (n) => `${n} 场音乐会`, inline: (n) => `明天 ${n} 场音乐会`, none: "明天没有音乐会", old: "节目单还没更新",
         fail: "无法加载音乐会", locale: "zh-CN", saved: (p) => `小组件现在显示${p}明天的音乐会。回到 Klang 即可。`, ok: "好",
         alertsOn: (names, p) => `${names}在${p}有演出时，Klang 会通知你。`, list: (a) => a.join("、"), some: (a, rest) => `${a.join("、")}等 ${a.length + rest} 个`,
-        favOne: (names) => `${names}上演`, favMany: (n) => `你喜欢的音乐人和作品有 ${n} 场演出`, andMore: (n) => `还有 ${n} 场`,
+        favOne: (names) => `${names}上演`, favMany: (n) => `你喜欢的音乐人和作品有 ${n} 场演出`, oneMany: (name, n) => `${name}：${n} 场演出`, andMore: (n) => `还有 ${n} 场`,
         eveTitle: (n, p) => `明天${p}有 ${n} 场音乐会`,
         testSent: (n) => n ? `${n} 条测试通知会在几秒后到达。现在回到主屏幕或锁定 iPhone。` : "没有可以发送的内容：请先在 Klang 里标几个 ♥。",
         alertsReady: "提醒已开启", alertsReadyBody: (p) => `你喜欢的作曲家、作品或演奏家在${p}有演出时，Klang 会通知你。`,
@@ -61,7 +66,7 @@ function labels() {
         saved: (p) => `The widget now shows tomorrow's concerts in ${p}. You can go back to Klang.`, ok: "OK", names: COUNTRIES,
         alertsOn: (names, p) => `You'll get a notification when ${names} ${names.includes(",") || names.includes(" and ") ? "are" : "is"} on stage in ${p}.`,
         list: (a) => (a.length < 3 ? a.join(" and ") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`), some: (a, rest) => `${a.join(", ")} and ${rest} more`,
-        favOne: (names) => `${names} on stage`, favMany: (n) => `${n} concerts with your favourites`, andMore: (n) => `and ${n} more`,
+        favOne: (names) => `${names} on stage`, favMany: (n) => `${n} concerts with your favourites`, oneMany: (name, n) => `${name}: ${n} concerts`, andMore: (n) => `and ${n} more`,
         eveTitle: (n, p) => `Tomorrow in ${p}: ${n === 1 ? "1 concert" : `${n} concerts`}`,
         testSent: (n) => n ? `${n === 1 ? "A test notification arrives" : `${n} test notifications arrive`} in a few seconds. Go to the Home Screen or lock your iPhone now.` : "Nothing to send yet.",
         alertsReady: "Klang alerts are on", alertsReadyBody: (p) => `You'll hear here when a favourite composer, work or performer is on stage in ${p}.` };
@@ -217,21 +222,34 @@ function saveAlerted(map) {
 function hitsOf(c, favs) {
   const names = [];
   const add = (n) => { if (n && !names.includes(n)) names.push(n); };
-  (c.w || []).forEach((id) => add(favs.w[id]));
-  (c.m || []).forEach((id) => add(favs.m[id]));
-  (c.a || []).forEach((id) => add(favs.a[id]));
+  (c.f || []).forEach(add); // Martha Argerich in Switzerland: always
+  if (favs) {
+    (c.w || []).forEach((id) => add(favs.w[id]));
+    (c.m || []).forEach((id) => add(favs.m[id]));
+    (c.a || []).forEach((id) => add(favs.a[id]));
+  }
   return names;
 }
 
 const startOf = (c) => new Date(`${c.d}T${/^\d\d:\d\d$/.test(c.t || "") ? c.t : "23:59"}:00`);
 
-// New concerts with a favourite in the place, in time order: [{ c, names }]
+// The owner's first picks first (Argerich, then Opernhaus / KKL), keeping the order within each.
+const firstPicks = (list, rowOf = (x) => x) => list
+  .map((x, n) => ({ x, n }))
+  .sort((a, b) => (rowOf(b.x).p || 0) - (rowOf(a.x).p || 0) || a.n - b.n)
+  .map(({ x }) => x);
+
+// In the place, or a first pick anywhere in Switzerland.
+const shown = (c, place) => inPlace(c, place) || (!!c.p && c.k === "switzerland");
+
+// New concerts with a favourite (or Martha Argerich in Switzerland), first picks first, then by time:
+// [{ c, names }]. Favourites must be in the place; Argerich anywhere in Switzerland.
 function newMatches(data, favs, place, done, now) {
   if (!data || !Array.isArray(data.concerts)) return [];
-  return data.concerts
-    .filter((c) => !done[c.i] && inPlace(c, place) && startOf(c) > now)
+  return firstPicks(data.concerts
+    .filter((c) => !done[c.i] && startOf(c) > now && (inPlace(c, place) || (c.p === 2 && c.k === "switzerland")))
     .map((c) => ({ c, names: hitsOf(c, favs) }))
-    .filter((x) => x.names.length);
+    .filter((x) => x.names.length), (x) => x.c);
 }
 
 function shortNames(L, names, max = 2) {
@@ -249,7 +267,7 @@ function venueOf(c) {
 // seconds later so there is time to leave Scriptable; what it shows counts as announced).
 async function alertFavourites(L, { foreground = false, confirm = false, test = false } = {}) {
   const favs = savedFavs();
-  if (!favs || (!favs.on && !test) || !favCount(favs)) return 0;
+  if (favs && !favs.on && !test) return 0; // Me › Reminders › Favorite work on stage is off
   const now = new Date();
   if (!foreground && (now.getHours() < 8 || now.getHours() >= 22)) return 0;
   const place = savedPlace() || { ids: [], label: L.names.switzerland };
@@ -270,7 +288,8 @@ async function alertFavourites(L, { foreground = false, confirm = false, test = 
     const max = 5;
     const lines = found.slice(0, max).map(({ c, names }) => `${day(c)} ${c.t} · ${shortNames(L, names, 1)} · ${c.c || c.v}`);
     if (found.length > max) lines.push(L.andMore(found.length - max));
-    n.title = L.favMany(found.length);
+    const first = found[0].names[0];
+    n.title = found.every((x) => x.names.includes(first)) ? L.oneMany(first, found.length) : L.favMany(found.length);
     n.body = lines.join("\n");
     n.openURL = concertURL(found[0].c);
   } else if (confirm || test) {
@@ -317,14 +336,15 @@ async function eveningNotice(L, { test = false } = {}) {
   if (!data || !(data.days || []).includes(tomorrow)) return false; // listings not updated yet: try next run
   const place = savedPlace() || { ids: [], label: L.names.switzerland };
   const where = place.label || L.names.switzerland;
-  const list = data.concerts.filter((c) => c.d === tomorrow && inPlace(c, place));
+  const list = data.concerts.filter((c) => c.d === tomorrow && shown(c, place));
   // favourites first (♥), then by time
   let loved = new Set();
   if (favs && favCount(favs)) {
     const alerts = await loadAlerts();
     for (const c of (alerts && alerts.concerts) || []) if (c.d === tomorrow && hitsOf(c, favs).length) loved.add(c.i);
   }
-  const sorted = [...list].sort((a, b) => (loved.has(b.i) - loved.has(a.i)) || a.t.localeCompare(b.t));
+  // first picks, then favourites (♥), then by time
+  const sorted = [...list].sort((a, b) => (b.p || 0) - (a.p || 0) || (loved.has(b.i) - loved.has(a.i)) || a.t.localeCompare(b.t));
   const id = (test ? "klang-test-tomorrow-" : "klang-tomorrow-") + today; // a later run before 20:00 replaces it
   if (!list.length && test) return false;
   if (!list.length) { // nothing tomorrow: no notification (and none left from an earlier place)
@@ -334,7 +354,7 @@ async function eveningNotice(L, { test = false } = {}) {
   }
   const oneCity = place.ids.length === 1 && !place.ids[0].startsWith("country:");
   const max = 5;
-  const lines = sorted.slice(0, max).map((c) => `${loved.has(c.i) ? "♥ " : ""}${c.t} ${c.n}${oneCity ? "" : ` · ${c.c}`}`);
+  const lines = sorted.slice(0, max).map((c) => `${loved.has(c.i) ? "♥ " : ""}${c.t} ${c.n}${oneCity && c.y === place.ids[0] ? "" : ` · ${c.c}`}`);
   if (list.length > max) lines.push(L.andMore(list.length - max));
   const n = new Notification();
   n.identifier = id;
@@ -516,4 +536,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 7 };
+module.exports = { main, version: 8 };
