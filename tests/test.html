@@ -717,7 +717,14 @@
           store.setReminderPref('favoriteWorkOnStage', false);
           ok(w.widgetOutOfDate(), 'alerts switched off');
           eq(JSON.parse(decodeURIComponent(/&favs=([^&]+)/.exec(w.widgetLink())[1])).on, 0);
+          store.setReminderPref('favoriteWorkOnStage', true);
+          w.markWidgetSent();
+          eq(JSON.parse(decodeURIComponent(/&favs=([^&]+)/.exec(w.widgetLink())[1])).eve, 1, 'tomorrow at 8 pm: on by default');
+          store.setReminderPref('tomorrowEvening', false);
+          ok(w.widgetOutOfDate(), 'tomorrow at 8 pm switched off');
+          eq(JSON.parse(decodeURIComponent(/&favs=([^&]+)/.exec(w.widgetLink())[1])).eve, 0);
         } finally {
+          store.setReminderPref('tomorrowEvening', true);
           store.setReminderPref('favoriteWorkOnStage', true);
           store.toggleFollow('composer', 'mahler');
           store.toggleFollow('work', 'beethoven-symphony-5');

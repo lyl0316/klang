@@ -24,6 +24,7 @@ export const REMINDER_DEFAULTS = {
   dailyContent: true, // a work or a page of music history each morning
   eveningLive: true, // a major work being performed live tonight
   postEventReview: true, // invitation to review a concert you attended
+  tomorrowEvening: true, // iPhone widget: tomorrow's concerts in your cities at 8 pm (ui/widget.js)
 };
 
 const DEFAULTS = () => ({

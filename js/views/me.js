@@ -42,6 +42,7 @@ const EXTRA_ICONS = {
   wave: '<path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 10.5v3"/>',
   shield: '<path d="M12 3l8 3v6c0 4.6-3.4 8-8 9-4.6-1-8-4.4-8-9V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>',
   review: '<path d="M4 5h16v11H9.5L5 20z"/><path d="M12 7.4l1.1 2.2 2.4.35-1.75 1.7.4 2.4L12 12.9l-2.15 1.15.4-2.4L8.5 9.95l2.4-.35z" fill="currentColor" stroke="none"/>',
+  calnext: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15.5h6M12.5 13l2.5 2.5-2.5 2.5"/>',
   calx: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M10 13.5l4 4M14 13.5l-4 4"/>',
   framed: '<rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/>',
   joystick: '<circle cx="12" cy="6.5" r="3"/><path d="M12 9.5v6"/><path d="M5 16.5c0-1.1 3.1-2 7-2s7 .9 7 2-3.1 2-7 2-7-.9-7-2z"/><path d="M5 16.5v2c0 1.1 3.1 2 7 2s7-.9 7-2v-2"/>',
@@ -425,6 +426,7 @@ const PUSH_GROUPS = [
       { key: 'castChanges', ic: 'people', t: 'Cast & programme changes', s: 'When a saved concert’s performers or programme change' },
       { key: 'reschedule', ic: 'calx', t: 'Reschedule & cancellation', s: 'Time or venue changes and cancellations for saved concerts' },
       { key: 'goingPreview', ic: 'ticket', t: 'Going-event preview', s: 'A listening guide the day before a concert you’re going to' },
+      { key: 'tomorrowEvening', ic: 'calnext', t: 'Tomorrow’s concerts', s: 'At 8 pm, tomorrow’s concerts in your cities (iPhone widget)' },
     ],
   },
   {

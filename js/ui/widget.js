@@ -28,11 +28,13 @@ export function placeSummary(ids = store.homePlace()) {
 }
 
 // Composers, works and performers marked ♥, with the names the notification shows:
-// { on: 1|0, m: { composerId: name }, w: { workId: title }, a: { artistId: name } }
+// { on: 1|0, eve: 1|0, m: { composerId: name }, w: { workId: title }, a: { artistId: name } }
+// eve = Me › Reminders › Tomorrow's concerts (the widget's 8 pm notification).
 export function widgetFavs() {
   const names = (kind, nameOf) => Object.fromEntries(store.followed(kind).map((id) => [id, nameOf(id)]).filter(([, n]) => n));
   return {
     on: store.reminderPref('favoriteWorkOnStage') === false ? 0 : 1,
+    eve: store.reminderPref('tomorrowEvening') === false ? 0 : 1,
     m: names('composer', (id) => composerShort(repo.composer(id))),
     w: names('work', (id) => (repo.work(id) || repo.dynamicWork(id))?.title || ''),
     a: names('artist', (id) => repo.artist(id)?.name || ''),
@@ -42,7 +44,8 @@ export function widgetFavs() {
 const sentKey = () => {
   const favs = ['composer', 'work', 'artist'].flatMap((kind) => store.followed(kind).map((id) => `${kind}:${id}`));
   const on = store.reminderPref('favoriteWorkOnStage') === false ? 0 : 1;
-  return [[...store.homePlace()].sort().join(','), on, favs.sort().join(',')].join('|');
+  const eve = store.reminderPref('tomorrowEvening') === false ? 0 : 1;
+  return [[...store.homePlace()].sort().join(','), on, favs.sort().join(',')].join('|') + (eve ? '' : '|eve0');
 };
 
 export function widgetLink({ auto = false } = {}) {

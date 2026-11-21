@@ -1,4 +1,4 @@
-// KLANG-WIDGET 5: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
+// KLANG-WIDGET 6: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
 // when a favourite composer, work or performer is on stage in your cities.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
@@ -23,6 +23,12 @@
 // composer, work and artist ids), finds concerts in the saved place that name a favourite, and posts
 // one local notification for the new ones. Each concert is announced once (klang-widget-alerted.json).
 // No notifications at night: between 22:00 and 08:00 it waits for a later run.
+//
+// Tomorrow at 8 pm (owner's request, 21 Nov 2026): each run before 20:00 schedules (or replaces, same
+// identifier) a notification for 20:00 with tomorrow's concerts in the saved place, favourites first
+// (♥). iOS decides when widgets run, so if no run happened before 20:00 it is posted at the first run
+// between 20:00 and 22:00, else skipped that day. "eve": 0 in &favs (Me › Reminders › Tomorrow's
+// concerts) turns it off; without it the notification is on.
 
 const SITE = "https://lyl0316.github.io/klang/";
 const FEED = SITE + "data/widget.json";
@@ -33,6 +39,8 @@ const FAVS_KEY = "klang.widget.favs";
 const FAVS_FILE = "klang-widget-favs.json";
 const ALERTED_FILE = "klang-widget-alerted.json";
 const ALERTS_MAX_AGE = 4 * 3600 * 1000; // read widget-alerts.json again after 4 hours
+const EVENING_FILE = "klang-widget-evening.json"; // { day: "YYYY-MM-DD", at: ms } of the last evening notification
+const EVENING_HOUR = 20;
 const COUNTRIES = { switzerland: "Switzerland", austria: "Austria", germany: "Germany", france: "France", italy: "Italy", all: "" };
 const SHORT = { ch: "switzerland", at: "austria", de: "germany", fr: "france", it: "italy", "瑞士": "switzerland", "奥地利": "austria", "德国": "germany", "法国": "france", "意大利": "italy", "全部": "all" };
 
@@ -42,6 +50,7 @@ function labels() {
         fail: "无法加载音乐会", locale: "zh-CN", saved: (p) => `小组件现在显示${p}明天的音乐会。回到 Klang 即可。`, ok: "好",
         alertsOn: (names, p) => `${names}在${p}有演出时，Klang 会通知你。`, list: (a) => a.join("、"), some: (a, rest) => `${a.join("、")}等 ${a.length + rest} 个`,
         favOne: (names) => `${names}上演`, favMany: (n) => `你喜欢的音乐人和作品有 ${n} 场演出`, andMore: (n) => `还有 ${n} 场`,
+        eveTitle: (n, p) => `明天${p}有 ${n} 场音乐会`,
         alertsReady: "提醒已开启", alertsReadyBody: (p) => `你喜欢的作曲家、作品或演奏家在${p}有演出时，Klang 会通知你。`,
         names: { switzerland: "瑞士", austria: "奥地利", germany: "德国", france: "法国", italy: "意大利", all: "全部" } }
     : { tomorrow: "Tomorrow", short: "tomorrow", more: (n) => `${n} more`, count: (n) => (n === 1 ? "1 concert" : `${n} concerts`),
@@ -51,6 +60,7 @@ function labels() {
         alertsOn: (names, p) => `You'll get a notification when ${names} ${names.includes(",") || names.includes(" and ") ? "are" : "is"} on stage in ${p}.`,
         list: (a) => (a.length < 3 ? a.join(" and ") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`), some: (a, rest) => `${a.join(", ")} and ${rest} more`,
         favOne: (names) => `${names} on stage`, favMany: (n) => `${n} concerts with your favourites`, andMore: (n) => `and ${n} more`,
+        eveTitle: (n, p) => `Tomorrow in ${p}: ${n === 1 ? "1 concert" : `${n} concerts`}`,
         alertsReady: "Klang alerts are on", alertsReadyBody: (p) => `You'll hear here when a favourite composer, work or performer is on stage in ${p}.` };
 }
 
@@ -86,7 +96,7 @@ function cleanFavs(f) {
     if (x && typeof x === "object") for (const [k, v] of Object.entries(x)) if (k) out[String(k)] = String(v || k);
     return out;
   };
-  return { on: f.on !== 0 && f.on !== false, m: map(f.m), w: map(f.w), a: map(f.a) };
+  return { on: f.on !== 0 && f.on !== false, eve: f.eve !== 0 && f.eve !== false, m: map(f.m), w: map(f.w), a: map(f.a) };
 }
 const saveFavs = (favs) => saveKept(FAVS_KEY, FAVS_FILE, favs);
 const savedFavs = () => kept(FAVS_KEY, FAVS_FILE, cleanFavs);
@@ -275,6 +285,64 @@ async function alertFavourites(L, { foreground = false, confirm = false } = {}) 
   return found.length;
 }
 
+// ----- tomorrow's concerts at 8 pm -----
+function eveningState() {
+  const fm = FileManager.local();
+  const path = fm.joinPath(fm.documentsDirectory(), EVENING_FILE);
+  let last = null;
+  try { last = fm.fileExists(path) ? JSON.parse(fm.readString(path)) : null; } catch (e) { /* none */ }
+  return { last, save: (v) => { try { fm.writeString(path, JSON.stringify(v)); } catch (e) { /* once more at worst */ } } };
+}
+
+async function eveningNotice(L) {
+  const favs = savedFavs();
+  if (favs && !favs.eve) return false;
+  const now = new Date();
+  const today = ymd(now);
+  const at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), EVENING_HOUR, 0, 0);
+  const { last, save } = eveningState();
+  const before = now < at;
+  // after 20:00: only if nothing was scheduled for today yet, and not at night
+  if (!before && ((last && last.day === today) || now.getHours() >= 22)) return false;
+  const data = await loadData();
+  const tomorrow = ymd(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+  if (!data || !(data.days || []).includes(tomorrow)) return false; // listings not updated yet: try next run
+  const place = savedPlace() || { ids: [], label: L.names.switzerland };
+  const where = place.label || L.names.switzerland;
+  const list = data.concerts.filter((c) => c.d === tomorrow && inPlace(c, place));
+  // favourites first (♥), then by time
+  let loved = new Set();
+  if (favs && favCount(favs)) {
+    const alerts = await loadAlerts();
+    for (const c of (alerts && alerts.concerts) || []) if (c.d === tomorrow && hitsOf(c, favs).length) loved.add(c.i);
+  }
+  const sorted = [...list].sort((a, b) => (loved.has(b.i) - loved.has(a.i)) || a.t.localeCompare(b.t));
+  const id = "klang-tomorrow-" + today; // a later run before 20:00 replaces it with fresher listings
+  if (!list.length) { // nothing tomorrow: no notification (and none left from an earlier place)
+    try { await Notification.removePending([id]); } catch (e) { /* none pending */ }
+    save({ day: today, at: 0 });
+    return false;
+  }
+  const oneCity = place.ids.length === 1 && !place.ids[0].startsWith("country:");
+  const max = 5;
+  const lines = sorted.slice(0, max).map((c) => `${loved.has(c.i) ? "♥ " : ""}${c.t} ${c.n}${oneCity ? "" : ` · ${c.c}`}`);
+  if (list.length > max) lines.push(L.andMore(list.length - max));
+  const n = new Notification();
+  n.identifier = id;
+  n.threadIdentifier = "klang-tomorrow";
+  n.title = L.eveTitle(list.length, where);
+  n.body = lines.join("\n");
+  n.openURL = list.length === 1 ? concertURL(list[0]) : SITE + "#/concerts";
+  if (before) n.setTriggerDate(at);
+  try {
+    await n.schedule();
+  } catch (e) {
+    return false;
+  }
+  save({ day: today, at: (before ? at : now).getTime() });
+  return true;
+}
+
 // Lock Screen: the system tints these, so they use plain white text and no colours.
 function lockWidget(family, s) {
   const { L, list, message } = s;
@@ -412,6 +480,9 @@ async function main() {
   try {
     await alertFavourites(L, { foreground: !config.runsInWidget, confirm: !!(sentFavs && !q.auto) });
   } catch (e) { /* the widget below matters more */ }
+  try {
+    await eveningNotice(L);
+  } catch (e) { /* the widget below matters more */ }
   if (q.place && q.auto && !config.runsInWidget) { Script.complete(); return; } // sent automatically: nothing to show
   const family = config.widgetFamily || "medium";
   const s = await state();
@@ -421,4 +492,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 5 };
+module.exports = { main, version: 6 };

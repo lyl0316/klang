@@ -129,6 +129,7 @@ export default {
   'Cast & programme changes': '演出阵容与曲目变更', 'When a saved concert’s performers or programme change': '收藏的音乐会更换演出者或曲目时',
   'Reschedule & cancellation': '改期与取消', 'Time or venue changes and cancellations for saved concerts': '收藏的音乐会更改时间、场馆或取消时',
   'Going-event preview': '“想去”演出预告', 'A listening guide the day before a concert you’re going to': '在你想去的音乐会前一天，推送聆听指南',
+  'Tomorrow’s concerts': '明天的音乐会', 'At 8 pm, tomorrow’s concerts in your cities (iPhone widget)': '每晚 8 点推送你所在城市明天的音乐会（iPhone 小组件）',
   'Favorite work on stage': '喜欢的作品上演', 'A work you like gets a new performance, anywhere': '你喜欢的作品有新的演出时',
   'New recording match': '新录音匹配', 'A new recording of a work you like': '你喜欢的作品发行了新录音',
   'Daily content': '每日内容', 'A work or a page of music history each morning': '每天早上推送一部作品或一段音乐史',

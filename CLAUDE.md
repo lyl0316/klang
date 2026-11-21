@@ -314,6 +314,12 @@ Rules and gotchas:
     manual send with no match posts "Klang alerts are on", so iOS asks for permission while the
     app is in front. Hearts don't open Scriptable; Me shows "Changed since you last sent them" when
     the widget's copy is out of date (`widgetSentKey` covers place, favourites and `on`).
+  - **Tomorrow at 8 pm** (owner's request, 21 Nov 2026): each widget run before 20:00 schedules a
+    notification for 20:00 (`setTriggerDate`, identifier `klang-tomorrow-<day>`, so later runs replace
+    it with fresher listings) with tomorrow's concerts in the saved place, favourites first with ♥, at
+    most 5 lines. If no run came before 20:00, the first run until 22:00 posts it; then the day is
+    skipped (`klang-widget-evening.json`). Nothing when there are no concerts. Switch: Me › Reminders ›
+    Tomorrow's concerts (`tomorrowEvening`, sent as `eve` in `&favs`; on when never sent).
   - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
   - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
     Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.
