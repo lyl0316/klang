@@ -1369,8 +1369,28 @@ class Check(unittest.TestCase):
         p, w, _, _ = chk.check(feed(failedSince=iso(3), **down), feed(**down), 30)
         self.assertEqual(p, [])                                     # the daily run failed, a push 3 h later too
         self.assertTrue(any('earlier today' in x for x in w))
-        p, _, _, _ = chk.check(feed(failedSince=iso(23), **down), feed(**down), 30)
-        self.assertEqual(len(p), 1)                                 # still down on the next day's run
+        broken = dict(down, error='no events found in the page')
+        p, _, _, _ = chk.check(feed(failedSince=iso(23), **broken), feed(**broken), 30)
+        self.assertEqual(len(p), 1)                                 # still broken on the next day's run
+
+    def test_a_site_that_does_not_answer_warns_for_some_days(self):
+        import check as chk
+        now = datetime.now(timezone.utc)
+        iso = lambda hours_ago: (now - timedelta(hours=hours_ago)).isoformat()
+        def feed(**src):
+            return {'generatedAt': iso(0), 'concerts': [], 'sources': [dict({'key': 'bh', 'name': 'Brucknerhaus'}, **src)]}
+        for error in ('disallowed by robots.txt (robots.txt unreachable (timed out))',
+                      'robots.txt unreachable ([SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed)', 'HTTP 503'):
+            down = dict(ok=False, count=50, reused=True, error=error)
+            p, w, _, _ = chk.check(feed(failedSince=iso(47), **down), feed(**down), 30)
+            self.assertEqual(p, [], error)                          # day 3 of an outage, events kept
+            self.assertTrue(any('not answered for 3 day(s)' in x for x in w), w)
+            p, _, _, _ = chk.check(feed(failedSince=iso(24 * 5 + 1), **down), feed(**down), 30)
+            self.assertEqual(len(p), 1)                             # after 5 days: the owner decides
+            self.assertIn('consider switching it off', p[0])
+        lost = dict(ok=False, count=0, error='timed out')
+        p, _, _, _ = chk.check(feed(failedSince=iso(47), **lost), feed(ok=False, count=50, reused=True, error='timed out'), 30)
+        self.assertEqual(len(p), 1)                                 # events lost: a problem at once
         p, _, _, _ = chk.check(feed(failedSince=iso(3), ok=False, count=0, error='x'), feed(ok=False, count=17, reused=True), 30)
         self.assertEqual(len(p), 1)                                 # the kept events are gone: always a problem
 

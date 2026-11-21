@@ -8,7 +8,9 @@ Fails (exit 1) when:
   - the feed is missing or unreadable, or older than --max-age-hours;
   - a source's website could not be read two updates in a row, or could not be read and its
     events were lost (a one-day outage whose events were kept, or that had none, is a warning,
-    and so is a new source's first failed run);
+    and so is a new source's first failed run). A network outage (time-out, no answer, broken
+    certificate, server error) whose events were kept stays a warning for OUTAGE_DAYS, since Klang
+    can't fix it; after that it fails, so the owner can decide whether to switch the source off;
   - a source that had events before now returns none (the site has probably changed);
   - a source's count collapsed to under 30% of the previous feed (likely a parsing break), and on
     each of the next days (up to LOW_DAYS) while it has not recovered (``low`` in the source entry,
@@ -79,6 +81,11 @@ def parse_time(s):
 
 LOW_DAYS = 7            # a collapsed source fails the check this many days in a row, then warns
 SAME_DAY_HOURS = 18     # a second failure sooner than this is the same day's (a push after the daily run)
+OUTAGE_DAYS = 5         # a site that doesn't answer (events kept) is a warning this many days, then a problem
+# The site didn't answer, or answered with a server error: nothing in Klang's reader to fix.
+NETWORK = re.compile(r'timed out|unreachable|CERTIFICATE_VERIFY_FAILED|SSL|Connection (?:reset|refused|aborted)|'
+                     r'Name or service not known|name resolution|nodename nor servname|Remote end closed|'
+                     r'EOF occurred|HTTP 5\d\d|Network is unreachable', re.I)
 
 
 def _failing_for_hours(source, now):
@@ -128,8 +135,15 @@ def check(feed, previous, max_age_hours):
                 warnings.append(msg + '; a new source, it will try again on the next update.')
             elif p is None:
                 problems.append(msg + '.')
+            elif (not p.get('ok') and s.get('reused') and n and NETWORK.search(str(s.get('error') or ''))
+                  and SAME_DAY_HOURS <= _failing_for_hours(s, gen or now) < OUTAGE_DAYS * 24):
+                days = max(1, round(_failing_for_hours(s, gen or now) / 24) + 1)
+                warnings.append(msg + f'; the site has not answered for {days} day(s), an outage on its side'
+                                f' (a problem after {OUTAGE_DAYS} days).')
             elif not p.get('ok') and _failing_for_hours(s, gen or now) >= SAME_DAY_HOURS:
-                problems.append(msg + '; it could not be read the day before either.')
+                extra = (f' It has not answered for {OUTAGE_DAYS}+ days: consider switching it off.'
+                         if NETWORK.search(str(s.get('error') or '')) and _failing_for_hours(s, gen or now) != float('inf') else '')
+                problems.append(msg + '; it could not be read the day before either.' + extra)
             elif not p.get('ok') and not (pn and not (s.get('reused') and n)):
                 warnings.append(msg + '; it failed earlier today too, and will be tried again on the next update.')
             elif pn and not (s.get('reused') and n):

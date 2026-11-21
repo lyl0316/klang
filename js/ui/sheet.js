@@ -5,6 +5,14 @@ import { h, icon, clear } from '../util.js';
 import { t } from '../i18n.js';
 
 let openCount = 0;
+const whenClosed = [];
+
+// A listings refresh waits while a sheet is open (main.js): repainting the page under it would close it
+// or leave it pointing at old cards. fn runs once the last sheet has closed (now, if none is open).
+export function afterSheets(fn) {
+  if (!openCount) fn();
+  else if (!whenClosed.includes(fn)) whenClosed.push(fn);
+}
 
 export function openSheet({ title, subtitle = null, body, footer = null, onClose = null, closeLabel = null }) {
   const backdrop = h('div', { class: 'sheet-backdrop' });
@@ -31,7 +39,11 @@ export function openSheet({ title, subtitle = null, body, footer = null, onClose
     document.removeEventListener('keydown', onKey);
     window.removeEventListener('hashchange', close);
     openCount -= 1;
-    if (!openCount) document.body.style.overflow = '';
+    if (!openCount) {
+      document.body.style.overflow = '';
+      // after the closing sheet's own onClose and its slide-out
+      setTimeout(() => { if (!openCount) whenClosed.splice(0).forEach((fn) => fn()); }, 280);
+    }
     setTimeout(() => {
       sheet.remove();
       backdrop.remove();

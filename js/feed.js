@@ -131,8 +131,9 @@ export function sourceInfo(key) {
 
 export const hasFeed = () => !!feed;
 
-// Validate a downloaded feed and merge in the past concerts of the previous copy.
-export function mergeFeed(data, previous = feed, today = todayKey()) {
+// Validate a downloaded feed and merge in the past concerts of the previous copy. fetchedAt: when these
+// listings came from the server (an offline copy keeps the old time, so it is fetched again once online).
+export function mergeFeed(data, previous = feed, today = todayKey(), fetchedAt = new Date().toISOString()) {
   if (!data || typeof data !== 'object' || !Array.isArray(data.concerts)) throw new Error('Not a Klang feed');
   const fresh = data.concerts.map(clean).filter(Boolean);
   const ids = new Set(fresh.map((c) => c.id));
@@ -146,7 +147,7 @@ export function mergeFeed(data, previous = feed, today = todayKey()) {
   }
   return {
     generatedAt: data.generatedAt || null,
-    fetchedAt: new Date().toISOString(),
+    fetchedAt,
     window: data.window || null,
     sources,
     concerts: [...past, ...fresh].sort((a, b) => a.start.localeCompare(b.start)),
@@ -172,7 +173,9 @@ export function loadFeed() {
     try {
       const res = await fetch(FEED_URL, { cache: 'no-cache' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const merged = mergeFeed(await res.json());
+      // the service worker's cached copy (no network): not a fresh fetch
+      const stale = res.headers.get('X-Klang-Offline') === '1';
+      const merged = mergeFeed(await res.json(), feed, todayKey(), stale ? feed?.fetchedAt || null : new Date().toISOString());
       lastError = null;
       // "new concerts" only counts against a full feed, not against nothing or the shortened saved copy
       const countable = !!feed && !fromCopy;
@@ -212,6 +215,7 @@ export function startFeed() {
     if (Date.now() - at > STALE_MS) loadFeed();
   };
   document.addEventListener('visibilitychange', maybeRefresh);
+  window.addEventListener('online', maybeRefresh); // back from offline: fetch if the copy is old
   window.addEventListener('pageshow', (e) => { if (e.persisted) maybeRefresh(); });
 }
 

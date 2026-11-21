@@ -4,7 +4,15 @@
 // here (previews stream from Apple; full pieces open in Apple Music Classical / Apple Music). The real
 // listings (data/concerts.json) are not precached: they are fetched network-first like any own file,
 // and feed.js also keeps a copy for an instant, offline start.
-const CACHE = 'klang-shell-v19';
+const CACHE = 'klang-shell-v20';
+
+// A cached copy served because the network failed says so (X-Klang-Offline), so feed.js doesn't count
+// old listings as just downloaded.
+function offline(res) {
+  const headers = new Headers(res.headers);
+  headers.set('X-Klang-Offline', '1');
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
 // Every file the app needs, so the installed app opens offline after the first visit.
 const SHELL = [
   './',
@@ -114,5 +122,5 @@ self.addEventListener('fetch', (e) => {
       caches.open(CACHE).then((c) => c.put(req, copy));
     }
     return res;
-  }).catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html'))));
+  }).catch(() => caches.match(req).then((hit) => (hit ? offline(hit) : caches.match('./index.html')))));
 });

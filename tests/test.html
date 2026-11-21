@@ -581,6 +581,12 @@
       ok(feed.feedInfo().sources.length === FIXTURE.sources.length && feed.feedInfo().generatedAt === FIXTURE.generatedAt, 'feedInfo');
       eq(repo.concert('feed-test-unknown-town').sourceName, null, 'unknown source: no attribution invented');
     });
+    test('an offline copy of the listings keeps the old download time', () => {
+      const data = { generatedAt: 'x', sources: [], concerts: [] };
+      ok(Date.now() - Date.parse(feed.mergeFeed(data, null, '2026-10-26').fetchedAt) < 60000, 'a download is fresh');
+      eq(feed.mergeFeed(data, null, '2026-10-26', '2026-11-01T08:00:00Z').fetchedAt, '2026-11-01T08:00:00Z');
+      eq(feed.mergeFeed(data, null, '2026-10-26', null).fetchedAt, null, 'no earlier download: fetched again soon');
+    });
 
     test('the saved copy of the listings is read back: country kept; past days only at home or marked', () => {
       const today = dayKeyOf(new Date().toISOString());

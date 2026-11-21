@@ -26,6 +26,7 @@ import * as store from './store.js';
 import './repo.js'; // first, so the listings are rebuilt before the page repaints on 'feed' / 'data'
 import * as feed from './feed.js';
 import { t, lang, applyLang } from './i18n.js';
+import { afterSheets } from './ui/sheet.js';
 import { listening, onListening, listenLink, playAppName } from './applemusic.js';
 import { preview, previewState } from './music.js';
 
@@ -184,6 +185,8 @@ async function renderHash(hash, scrollY) {
   setCollapsed(false);
 }
 
+const refreshNow = () => refresh();
+
 // Re-render the current page in place (keeps scroll), e.g. after data changes.
 export function refresh() {
   const hash = stack[stack.length - 1] || location.hash.replace(/^#\/?/, '') || 'discover';
@@ -192,7 +195,7 @@ export function refresh() {
 
 window.addEventListener('hashchange', route);
 store.subscribe((topic) => {
-  if (topic === 'data' || topic === 'feed') refresh();
+  if (topic === 'data' || topic === 'feed') afterSheets(refreshNow); // not under an open sheet
   if (topic === 'prefs' && lang() !== lastLang) languageChanged();
 });
 

@@ -59,8 +59,8 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
-- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 63 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (90 tests, offline).
+- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 64 tests passed".
+- **Feed tests:** `python3 tools/feeds/selftest.py` (91 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -98,7 +98,10 @@ python3 tools/serve.py            # http://localhost:8765, caching off
      the owner; that is what "I receive some emails" means.
 - **check.py:**
   - **Fails** when:
-    - a site can't be read two runs in a row, or it fails and its events are lost;
+    - a site can't be read two runs in a row, or it fails and its events are lost. Exception (21 Nov
+      2026, after Brucknerhaus Linz stopped answering GitHub's servers): a network outage (time-out,
+      no answer, bad certificate, HTTP 5xx; `NETWORK` in check.py) with events kept is a warning for
+      `OUTAGE_DAYS` = 5 days, then a problem that says "consider switching it off" (step 3 below);
     - a source that had events now returns none;
     - a source's count drops below 30% of the previous feed, and on each of the next 7 days while it
       has not recovered (build.py keeps `low: {since, had}` in the source entry; added 21 Nov 2026
@@ -351,12 +354,8 @@ Rules and gotchas:
   Don't hammer sites while testing: use `--only` and `--previous` with the live feed.
 - **Before a public launch**, add Apple's "Listen on Apple Music" badge and trademark credit.
 - **Left from the review of 14 Nov 2026** (not fixed, in order of use to the owner):
-  - Going Back to a long Concerts list lands near card 40, because the list renders in chunks of 40
-    (`concerts.js`, `CHUNK`).
   - The previous feed holds only merged records, so a reader cannot reuse the details of a listing
     that another source absorbed (it re-reads those pages daily), and disabling a winning reader on a
     push drops the absorbed concerts until the next full run.
   - `check.py` compares counts after merging, so a source's count can fall when another reader starts
     listing the same concerts.
-  - A listings refresh repaints the open page (a sheet open on a concert page closes).
-  - An offline start counts as a fresh fetch (`fetchedAt`), so stale listings can show for up to 6 h.

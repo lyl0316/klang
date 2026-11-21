@@ -21,6 +21,10 @@ import { COUNTRIES, country as countryOf, countryCities } from '../data/countrie
 import { ZH_REGIONS, ZH_PLACES } from '../i18n/zh-concerts.js';
 
 const CHUNK = 40;
+// How many cards the list showed last time, per filter set: coming Back to the list (or a listings
+// refresh) renders at least as many again, so the shell's scroll restore lands on the same card
+// instead of near card 40.
+let shown = { key: null, n: 0 };
 const KEEP_PAST_DAYS = daysBetween(repo.pastStart(), todayKey()); // how long Look back keeps concerts
 const scrollMode = () => (document.visibilityState === 'visible' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto');
 const TYPES = ['recital', 'orchestral', 'chamber', 'vocal-opera', 'mixed'];
@@ -258,12 +262,15 @@ export function render() {
     let i = 0;
     const sentinel = h('div', { class: 'load-more' });
     let chunks = 0;
+    const key = JSON.stringify(f);
+    const before = shown.key === key ? shown.n : 0;
     const appendChunk = () => {
       const end = Math.min(i + CHUNK, all.length);
       if (chunks++ > 0 && end > i) toast(tn(end - i, '{n} new concert', '{n} new concerts'));
       const frag = document.createDocumentFragment();
       for (; i < end; i++) frag.append(concertCard(all[i], { hideCity }));
       sentinel.before(frag);
+      shown = { key, n: i };
       if (i >= all.length) {
         observer?.disconnect();
         sentinel.replaceChildren(endNote());
@@ -282,6 +289,13 @@ export function render() {
         sentinel.before(frag);
       }
     }
+    // Back to this list (or a refresh): as many cards as before, without the "new concerts" toast.
+    if (i < before) {
+      const frag = document.createDocumentFragment();
+      for (const end = Math.min(before, all.length); i < end; i++) frag.append(concertCard(all[i], { hideCity }));
+      sentinel.before(frag);
+    }
+    shown = { key, n: i };
     if (i < all.length) {
       sentinel.append(h('button', { class: 'btn small', onclick: appendChunk }, t('Load more')));
       observer = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && appendChunk(), { rootMargin: '800px' });
