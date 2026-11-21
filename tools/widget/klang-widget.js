@@ -1,4 +1,4 @@
-// KLANG-WIDGET 6: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
+// KLANG-WIDGET 7: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
 // when a favourite composer, work or performer is on stage in your cities.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
@@ -41,6 +41,7 @@ const ALERTED_FILE = "klang-widget-alerted.json";
 const ALERTS_MAX_AGE = 4 * 3600 * 1000; // read widget-alerts.json again after 4 hours
 const EVENING_FILE = "klang-widget-evening.json"; // { day: "YYYY-MM-DD", at: ms } of the last evening notification
 const EVENING_HOUR = 20;
+const TEST_DELAY = 8000; // a test notification comes 8 seconds later: time to go to the Home Screen
 const COUNTRIES = { switzerland: "Switzerland", austria: "Austria", germany: "Germany", france: "France", italy: "Italy", all: "" };
 const SHORT = { ch: "switzerland", at: "austria", de: "germany", fr: "france", it: "italy", "瑞士": "switzerland", "奥地利": "austria", "德国": "germany", "法国": "france", "意大利": "italy", "全部": "all" };
 
@@ -51,6 +52,7 @@ function labels() {
         alertsOn: (names, p) => `${names}在${p}有演出时，Klang 会通知你。`, list: (a) => a.join("、"), some: (a, rest) => `${a.join("、")}等 ${a.length + rest} 个`,
         favOne: (names) => `${names}上演`, favMany: (n) => `你喜欢的音乐人和作品有 ${n} 场演出`, andMore: (n) => `还有 ${n} 场`,
         eveTitle: (n, p) => `明天${p}有 ${n} 场音乐会`,
+        testSent: (n) => n ? `${n} 条测试通知会在几秒后到达。现在回到主屏幕或锁定 iPhone。` : "没有可以发送的内容：请先在 Klang 里标几个 ♥。",
         alertsReady: "提醒已开启", alertsReadyBody: (p) => `你喜欢的作曲家、作品或演奏家在${p}有演出时，Klang 会通知你。`,
         names: { switzerland: "瑞士", austria: "奥地利", germany: "德国", france: "法国", italy: "意大利", all: "全部" } }
     : { tomorrow: "Tomorrow", short: "tomorrow", more: (n) => `${n} more`, count: (n) => (n === 1 ? "1 concert" : `${n} concerts`),
@@ -61,6 +63,7 @@ function labels() {
         list: (a) => (a.length < 3 ? a.join(" and ") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`), some: (a, rest) => `${a.join(", ")} and ${rest} more`,
         favOne: (names) => `${names} on stage`, favMany: (n) => `${n} concerts with your favourites`, andMore: (n) => `and ${n} more`,
         eveTitle: (n, p) => `Tomorrow in ${p}: ${n === 1 ? "1 concert" : `${n} concerts`}`,
+        testSent: (n) => n ? `${n === 1 ? "A test notification arrives" : `${n} test notifications arrive`} in a few seconds. Go to the Home Screen or lock your iPhone now.` : "Nothing to send yet.",
         alertsReady: "Klang alerts are on", alertsReadyBody: (p) => `You'll hear here when a favourite composer, work or performer is on stage in ${p}.` };
 }
 
@@ -242,20 +245,22 @@ function venueOf(c) {
 
 // Posts one notification for the favourites newly on stage. foreground: Klang just opened the
 // script (any hour is fine, and iOS can ask for permission to notify there).
-async function alertFavourites(L, { foreground = false, confirm = false } = {}) {
+// test: Klang's "Send a test notification" (any hour, already announced concerts too, delivered a few
+// seconds later so there is time to leave Scriptable; what it shows counts as announced).
+async function alertFavourites(L, { foreground = false, confirm = false, test = false } = {}) {
   const favs = savedFavs();
-  if (!favs || !favs.on || !favCount(favs)) return 0;
+  if (!favs || (!favs.on && !test) || !favCount(favs)) return 0;
   const now = new Date();
   if (!foreground && (now.getHours() < 8 || now.getHours() >= 22)) return 0;
   const place = savedPlace() || { ids: [], label: L.names.switzerland };
   const placeName = place.label || L.names.switzerland;
   const data = await loadAlerts();
-  const done = alerted();
+  const done = test ? {} : alerted();
   const found = newMatches(data, favs, place, done, now);
   const day = (c) => startOf(c).toLocaleDateString(L.locale, { weekday: "short", day: "numeric", month: "short" });
   const n = new Notification();
   n.threadIdentifier = "klang-favourites";
-  n.identifier = "klang-favourites-" + now.getTime();
+  n.identifier = (test ? "klang-test-favourites-" : "klang-favourites-") + now.getTime();
   if (found.length === 1) {
     const { c, names } = found[0];
     n.title = L.favOne(shortNames(L, names));
@@ -268,20 +273,23 @@ async function alertFavourites(L, { foreground = false, confirm = false } = {}) 
     n.title = L.favMany(found.length);
     n.body = lines.join("\n");
     n.openURL = concertURL(found[0].c);
-  } else if (confirm) {
+  } else if (confirm || test) {
     n.title = L.alertsReady;
     n.body = L.alertsReadyBody(placeName);
     n.openURL = SITE + "#/activity";
   } else {
     return 0;
   }
+  if (test) n.setTriggerDate(new Date(now.getTime() + TEST_DELAY));
   try {
     await n.schedule();
   } catch (e) {
     return 0; // not allowed to notify: try again next time
   }
-  for (const { c } of found) done[c.i] = c.d;
-  saveAlerted(done);
+  const record = test ? alerted() : done; // a test counts as the announcement: no repeat later
+  for (const { c } of found) record[c.i] = c.d;
+  saveAlerted(record);
+  if (test) return Math.max(found.length, 1);
   return found.length;
 }
 
@@ -294,16 +302,16 @@ function eveningState() {
   return { last, save: (v) => { try { fm.writeString(path, JSON.stringify(v)); } catch (e) { /* once more at worst */ } } };
 }
 
-async function eveningNotice(L) {
+async function eveningNotice(L, { test = false } = {}) {
   const favs = savedFavs();
-  if (favs && !favs.eve) return false;
+  if (favs && !favs.eve && !test) return false;
   const now = new Date();
   const today = ymd(now);
   const at = new Date(now.getFullYear(), now.getMonth(), now.getDate(), EVENING_HOUR, 0, 0);
   const { last, save } = eveningState();
   const before = now < at;
   // after 20:00: only if nothing was scheduled for today yet, and not at night
-  if (!before && ((last && last.day === today) || now.getHours() >= 22)) return false;
+  if (!test && !before && ((last && last.day === today) || now.getHours() >= 22)) return false;
   const data = await loadData();
   const tomorrow = ymd(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
   if (!data || !(data.days || []).includes(tomorrow)) return false; // listings not updated yet: try next run
@@ -317,7 +325,8 @@ async function eveningNotice(L) {
     for (const c of (alerts && alerts.concerts) || []) if (c.d === tomorrow && hitsOf(c, favs).length) loved.add(c.i);
   }
   const sorted = [...list].sort((a, b) => (loved.has(b.i) - loved.has(a.i)) || a.t.localeCompare(b.t));
-  const id = "klang-tomorrow-" + today; // a later run before 20:00 replaces it with fresher listings
+  const id = (test ? "klang-test-tomorrow-" : "klang-tomorrow-") + today; // a later run before 20:00 replaces it
+  if (!list.length && test) return false;
   if (!list.length) { // nothing tomorrow: no notification (and none left from an earlier place)
     try { await Notification.removePending([id]); } catch (e) { /* none pending */ }
     save({ day: today, at: 0 });
@@ -333,12 +342,14 @@ async function eveningNotice(L) {
   n.title = L.eveTitle(list.length, where);
   n.body = lines.join("\n");
   n.openURL = list.length === 1 ? concertURL(list[0]) : SITE + "#/concerts";
-  if (before) n.setTriggerDate(at);
+  if (test) n.setTriggerDate(new Date(now.getTime() + TEST_DELAY));
+  else if (before) n.setTriggerDate(at);
   try {
     await n.schedule();
   } catch (e) {
     return false;
   }
+  if (test) return true;
   save({ day: today, at: (before ? at : now).getTime() });
   return true;
 }
@@ -464,7 +475,7 @@ async function main() {
           sentFavs = cleanFavs(JSON.parse(q.favs));
           if (sentFavs) saveFavs(sentFavs);
         }
-        if (!q.auto) {
+        if (!q.auto && !q.test) {
           const where = place.label || L.names.switzerland;
           const a = new Alert();
           a.title = "Klang";
@@ -475,6 +486,19 @@ async function main() {
         }
       }
     } catch (e) { /* not a place from Klang: just show the widget */ }
+  }
+  // Klang's "Send a test notification": both kinds now, nothing recorded, then say so.
+  if (q.test && !config.runsInWidget) {
+    let sent = 0;
+    try { if (await eveningNotice(L, { test: true })) sent++; } catch (e) { /* the other one */ }
+    try { if (await alertFavourites(L, { foreground: true, test: true })) sent++; } catch (e) { /* none */ }
+    const a = new Alert();
+    a.title = "Klang";
+    a.message = L.testSent(sent);
+    a.addAction(L.ok);
+    await a.present();
+    Script.complete();
+    return;
   }
   // Favourite alerts: on every run; a manual send from Klang confirms with a first notification.
   try {
@@ -492,4 +516,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 6 };
+module.exports = { main, version: 7 };

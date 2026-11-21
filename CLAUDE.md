@@ -320,6 +320,9 @@ Rules and gotchas:
     most 5 lines. If no run came before 20:00, the first run until 22:00 posts it; then the day is
     skipped (`klang-widget-evening.json`). Nothing when there are no concerts. Switch: Me › Reminders ›
     Tomorrow's concerts (`tomorrowEvening`, sent as `eve` in `&favs`; on when never sent).
+  - **Test:** Me › "Send a test notification" opens the same link with `&test=1`: the widget saves the
+    place and favourites, then posts both kinds 8 s later (any hour, announced concerts included;
+    the favourites it shows count as announced, the 8 pm one is still scheduled as usual) and shows an Alert asking to go to the Home Screen.
   - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
   - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
     Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.

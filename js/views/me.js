@@ -391,6 +391,7 @@ export function render() {
           if (!v || !syncWidget()) toast(v ? t('The widget will follow your cities') : t('Automatic widget updates off'));
         }, t('Update the widget automatically')),
       }),
+      row({ ic: 'bell', title: t('Send a test notification'), sub: t('Sends your cities and favourites too'), to: widgetLink({ test: true }), onClick: markWidgetSent }),
       row({ ic: 'info', title: t('Set up the iPhone widget'), to: './tools/widget/', external: true }),
     ], t('The widget runs in the free Scriptable app. It also sends an iPhone notification when a composer, work or performer you marked ♥ is on stage in your cities (Reminders › Favorite work on stage turns this off). With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.')),
     ...group(t('Connections'), [

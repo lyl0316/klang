@@ -48,11 +48,12 @@ const sentKey = () => {
   return [[...store.homePlace()].sort().join(','), on, favs.sort().join(',')].join('|') + (eve ? '' : '|eve0');
 };
 
-export function widgetLink({ auto = false } = {}) {
+// test: the widget posts tomorrow's concerts and the favourites coming up a few seconds later (Me row).
+export function widgetLink({ auto = false, test = false } = {}) {
   const place = { ids: store.homePlace(), label: placeSummary() };
   const favs = widgetFavs();
   return `scriptable:///run/Klang?place=${encodeURIComponent(JSON.stringify(place))}`
-    + `&favs=${encodeURIComponent(JSON.stringify(favs))}${auto ? '&auto=1' : ''}`;
+    + `&favs=${encodeURIComponent(JSON.stringify(favs))}${auto ? '&auto=1' : ''}${test ? '&test=1' : ''}`;
 }
 
 // The widget has older cities or favourites than Klang (only once something was sent).
