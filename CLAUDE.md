@@ -59,7 +59,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
-- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 62 tests passed".
+- **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 63 tests passed".
 - **Feed tests:** `python3 tools/feeds/selftest.py` (90 tests, offline).
 - **One reader against the live site:**
 
@@ -293,7 +293,7 @@ Rules and gotchas:
   - It reads `data/widget.json` (today plus 3 days, ~20 KB; the full feed is too big for a widget),
     written by `widget-feed.mjs` with Klang's own concert ids (`feed-…`) and city ids, so rows open
     `#/concert/<id>` and filter exactly like `repo.query`.
-  - **Same place as Klang:** Me › "Show my cities in the widget" opens
+  - **Same place as Klang:** Me › "Send my cities and favourites to the widget" opens
     `scriptable:///run/Klang?place={"ids":[…],"label":"…"}` (the script must be named Klang). The
     widget saves it in Scriptable's Keychain and in a file, and uses it until sent again. A widget's
     own Parameter (a country, or All) wins over it.
@@ -304,6 +304,16 @@ Rules and gotchas:
     (no message, no preview) and the owner taps ◀ Klang to come back. `prefs.widgetSentKey` stops
     re-sends of an unchanged place. Code: `js/ui/widget.js`. A silent sync with no app switch would
     need a server, and Klang has none.
+  - **Favourite alerts** (owner's request, 21 Nov 2026): real Web Push needs a server, so the widget
+    posts local notifications instead (Scriptable's `Notification`). The same link carries
+    `&favs={"on":1,"m":{…},"w":{…},"a":{…}}` (♥ composers, works, performers with names in Klang's
+    language; `on` = Me › Reminders › Favorite work on stage). On each run the widget reads
+    `data/widget-alerts.json` (next 14 days, only concerts with composer/work/artist ids, ~230 KB,
+    re-read after 4 h), matches the saved place, and posts one notification for concerts not
+    announced before (`klang-widget-alerted.json` on the phone). None between 22:00 and 08:00. A
+    manual send with no match posts "Klang alerts are on", so iOS asks for permission while the
+    app is in front. Hearts don't open Scriptable; Me shows "Changed since you last sent them" when
+    the widget's copy is out of date (`widgetSentKey` covers place, favourites and `on`).
   - Sizes: small, medium, large, and Lock Screen accessoryRectangular / Inline / Circular.
   - To test without an iPhone, run the loader under a small stand-in for Scriptable's API (ListWidget,
     Request, FileManager, importModule, Font, Color, Size, Device, config, args, Script) with bun or node.

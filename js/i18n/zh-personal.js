@@ -264,7 +264,11 @@ export default {
     'Klang 的资料库保存在这部手机上。想把专辑也加进 Apple Music，打开专辑后点“添加到 Apple Music”。',
   'To keep these in Apple Music too: open a piece with ↗ and tap ＋ there.': '想同时存进 Apple Music：用 ↗ 打开曲目，再在那里点＋。',
   // iPhone widget (Scriptable)
-  'iPhone widget': 'iPhone 小组件', 'Show my cities in the widget': '在小组件中显示我的城市', 'Set up the iPhone widget': '设置 iPhone 小组件',
+  'iPhone widget': 'iPhone 小组件', 'Set up the iPhone widget': '设置 iPhone 小组件',
+  'Send my cities and favourites to the widget': '把我的城市和喜欢的内容发送到小组件',
+  'Changed since you last sent them: tap to update the widget': '上次发送后有改动：点按更新小组件',
+  'The widget runs in the free Scriptable app. It also sends an iPhone notification when a composer, work or performer you marked ♥ is on stage in your cities (Reminders › Favorite work on stage turns this off). With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.':
+    '小组件在免费的 Scriptable App 中运行。你标了 ♥ 的作曲家、作品或演奏家在你的城市有演出时，它还会发 iPhone 通知（可在“提醒 › 喜欢的作品上演”中关闭）。开启自动更新后，每次选择其他城市时 Scriptable 会短暂打开；点左上角的 ◀ Klang 即可返回。',
   'Update the widget automatically': '自动更新小组件',
   'The widget will follow your cities': '小组件会跟随你选择的城市', 'Automatic widget updates off': '已关闭小组件自动更新',
   'The widget runs in the free Scriptable app. With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.':

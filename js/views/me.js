@@ -16,7 +16,7 @@ import { classicalChart } from '../music.js';
 import { PLAY_APPS, playApp, playAppName, albumURL } from '../applemusic.js';
 import { href, eventRow, emptyState, toggle, segmented, venueLabel, cityLabel, initials, sourceCredit } from '../ui/components.js';
 import { openSheet } from '../ui/sheet.js';
-import { placeSummary, widgetLink, markWidgetSent, syncWidget } from '../ui/widget.js';
+import { placeSummary, widgetLink, markWidgetSent, syncWidget, widgetOutOfDate } from '../ui/widget.js';
 import {
   todayKey, addDays, dayKeyOf, timeOf, zurichISO, relDayLabel, monthLong, dayNum, weekdayShort, daysBetween, yearOf,
 } from '../time.js';
@@ -378,7 +378,10 @@ export function render() {
       }),
     ], t('Show concerts featuring Johann Strauss on your calendar.')),
     ...group(t('iPhone widget'), [
-      row({ ic: 'send', title: t('Show my cities in the widget'), value: placeSummary(), to: widgetLink(), onClick: markWidgetSent }),
+      row({
+        ic: 'send', title: t('Send my cities and favourites to the widget'), value: placeSummary(), to: widgetLink(), onClick: markWidgetSent,
+        sub: widgetOutOfDate() ? t('Changed since you last sent them: tap to update the widget') : null,
+      }),
       row({
         ic: 'loop', title: t('Update the widget automatically'),
         right: toggle(store.pref('widgetAutoSync'), (v) => {
@@ -388,7 +391,7 @@ export function render() {
         }, t('Update the widget automatically')),
       }),
       row({ ic: 'info', title: t('Set up the iPhone widget'), to: './tools/widget/', external: true }),
-    ], t('The widget runs in the free Scriptable app. With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.')),
+    ], t('The widget runs in the free Scriptable app. It also sends an iPhone notification when a composer, work or performer you marked ♥ is on stage in your cities (Reminders › Favorite work on stage turns this off). With automatic updates on, Scriptable opens for a moment whenever you choose other cities; tap ◀ Klang at the top left to come back.')),
     ...group(t('Connections'), [
       // Listen / Play open the piece in this app (applemusic.js); Preview plays 30 s inside Klang.
       pickerRow({

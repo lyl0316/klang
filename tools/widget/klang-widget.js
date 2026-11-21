@@ -1,4 +1,5 @@
-// KLANG-WIDGET 4: tomorrow's concerts on the iPhone Home Screen and Lock Screen.
+// KLANG-WIDGET 5: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
+// when a favourite composer, work or performer is on stage in your cities.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
 // on the phone, and calls main(). Edits here reach every phone at its next widget refresh.
@@ -14,11 +15,24 @@
 // Switzerland, Austria, Germany, France, Italy or All. Tapping a concert opens it in Klang.
 // Sizes: small, medium, large (Home Screen); accessoryRectangular, accessoryInline and
 // accessoryCircular (Lock Screen, iOS 16+).
+//
+// Favourite alerts (21 Nov 2026): Klang can't push (it has no server), so the widget does it. The
+// same link carries &favs={"on":1,"m":{id:name},"w":{…},"a":{…}} (composers, works, performers, with
+// names in Klang's language; "on" is Me › Reminders › Favorite work on stage). Whenever the widget
+// runs (iOS refreshes it a few times a day), it reads data/widget-alerts.json (the next 14 days with
+// composer, work and artist ids), finds concerts in the saved place that name a favourite, and posts
+// one local notification for the new ones. Each concert is announced once (klang-widget-alerted.json).
+// No notifications at night: between 22:00 and 08:00 it waits for a later run.
 
 const SITE = "https://lyl0316.github.io/klang/";
 const FEED = SITE + "data/widget.json";
 const PLACE_KEY = "klang.widget.place";
 const PLACE_FILE = "klang-widget-place.json";
+const ALERTS = SITE + "data/widget-alerts.json";
+const FAVS_KEY = "klang.widget.favs";
+const FAVS_FILE = "klang-widget-favs.json";
+const ALERTED_FILE = "klang-widget-alerted.json";
+const ALERTS_MAX_AGE = 4 * 3600 * 1000; // read widget-alerts.json again after 4 hours
 const COUNTRIES = { switzerland: "Switzerland", austria: "Austria", germany: "Germany", france: "France", italy: "Italy", all: "" };
 const SHORT = { ch: "switzerland", at: "austria", de: "germany", fr: "france", it: "italy", "瑞士": "switzerland", "奥地利": "austria", "德国": "germany", "法国": "france", "意大利": "italy", "全部": "all" };
 
@@ -26,34 +40,57 @@ function labels() {
   return Device.language().startsWith("zh")
     ? { tomorrow: "明天", short: "明天", more: (n) => `还有 ${n} 场`, count: (n) => `${n} 场音乐会`, inline: (n) => `明天 ${n} 场音乐会`, none: "明天没有音乐会", old: "节目单还没更新",
         fail: "无法加载音乐会", locale: "zh-CN", saved: (p) => `小组件现在显示${p}明天的音乐会。回到 Klang 即可。`, ok: "好",
+        alertsOn: (names, p) => `${names}在${p}有演出时，Klang 会通知你。`, list: (a) => a.join("、"), some: (a, rest) => `${a.join("、")}等 ${a.length + rest} 个`,
+        favOne: (names) => `${names}上演`, favMany: (n) => `你喜欢的音乐人和作品有 ${n} 场演出`, andMore: (n) => `还有 ${n} 场`,
+        alertsReady: "提醒已开启", alertsReadyBody: (p) => `你喜欢的作曲家、作品或演奏家在${p}有演出时，Klang 会通知你。`,
         names: { switzerland: "瑞士", austria: "奥地利", germany: "德国", france: "法国", italy: "意大利", all: "全部" } }
     : { tomorrow: "Tomorrow", short: "tomorrow", more: (n) => `${n} more`, count: (n) => (n === 1 ? "1 concert" : `${n} concerts`),
         inline: (n) => `Tomorrow: ${n === 1 ? "1 concert" : `${n} concerts`}`, none: "No concerts tomorrow",
         old: "Listings not updated yet", fail: "Couldn't load concerts", locale: "en-GB",
-        saved: (p) => `The widget now shows tomorrow's concerts in ${p}. You can go back to Klang.`, ok: "OK", names: COUNTRIES };
+        saved: (p) => `The widget now shows tomorrow's concerts in ${p}. You can go back to Klang.`, ok: "OK", names: COUNTRIES,
+        alertsOn: (names, p) => `You'll get a notification when ${names} ${names.includes(",") || names.includes(" and ") ? "are" : "is"} on stage in ${p}.`,
+        list: (a) => (a.length < 3 ? a.join(" and ") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`), some: (a, rest) => `${a.join(", ")} and ${rest} more`,
+        favOne: (names) => `${names} on stage`, favMany: (n) => `${n} concerts with your favourites`, andMore: (n) => `and ${n} more`,
+        alertsReady: "Klang alerts are on", alertsReadyBody: (p) => `You'll hear here when a favourite composer, work or performer is on stage in ${p}.` };
 }
 
-// ----- the place (sent from Klang, kept on the phone) -----
-// Saved twice, in Scriptable's keychain and in a file, so the widget finds it either way.
-function savePlace(place) {
-  const json = JSON.stringify(place);
-  try { Keychain.set(PLACE_KEY, json); } catch (e) { /* the file below */ }
+// ----- the place and the favourites (sent from Klang, kept on the phone) -----
+// Saved twice, in Scriptable's keychain and in a file, so the widget finds them either way.
+function saveKept(key, file, value) {
+  const json = JSON.stringify(value);
+  try { Keychain.set(key, json); } catch (e) { /* the file below */ }
   try {
     const fm = FileManager.local();
-    fm.writeString(fm.joinPath(fm.documentsDirectory(), PLACE_FILE), json);
+    fm.writeString(fm.joinPath(fm.documentsDirectory(), file), json);
   } catch (e) { /* the keychain above */ }
 }
 
-function savedPlace() {
-  const ok = (p) => p && Array.isArray(p.ids) ? p : null;
-  try { if (Keychain.contains(PLACE_KEY)) { const p = ok(JSON.parse(Keychain.get(PLACE_KEY))); if (p) return p; } } catch (e) { /* try the file */ }
+function kept(key, file, ok) {
+  try { if (Keychain.contains(key)) { const v = ok(JSON.parse(Keychain.get(key))); if (v) return v; } } catch (e) { /* try the file */ }
   try {
     const fm = FileManager.local();
-    const file = fm.joinPath(fm.documentsDirectory(), PLACE_FILE);
-    if (fm.fileExists(file)) return ok(JSON.parse(fm.readString(file)));
+    const path = fm.joinPath(fm.documentsDirectory(), file);
+    if (fm.fileExists(path)) return ok(JSON.parse(fm.readString(path)));
   } catch (e) { /* none */ }
   return null;
 }
+
+const savePlace = (place) => saveKept(PLACE_KEY, PLACE_FILE, place);
+const savedPlace = () => kept(PLACE_KEY, PLACE_FILE, (p) => (p && Array.isArray(p.ids) ? p : null));
+
+// { on, m: { composerId: name }, w: { workId: title }, a: { artistId: name } }
+function cleanFavs(f) {
+  if (!f || typeof f !== "object") return null;
+  const map = (x) => {
+    const out = {};
+    if (x && typeof x === "object") for (const [k, v] of Object.entries(x)) if (k) out[String(k)] = String(v || k);
+    return out;
+  };
+  return { on: f.on !== 0 && f.on !== false, m: map(f.m), w: map(f.w), a: map(f.a) };
+}
+const saveFavs = (favs) => saveKept(FAVS_KEY, FAVS_FILE, favs);
+const savedFavs = () => kept(FAVS_KEY, FAVS_FILE, cleanFavs);
+const favCount = (f) => (f ? Object.keys(f.m).length + Object.keys(f.w).length + Object.keys(f.a).length : 0);
 
 // { ids, label } or { all: true, label: "" }
 function pickPlace(L) {
@@ -121,6 +158,121 @@ async function state() {
     if (!list.length) message = L.none;
   }
   return { L, place, tomorrow, list, message };
+}
+
+// ----- favourite alerts -----
+async function loadAlerts() {
+  const fm = FileManager.local();
+  const file = fm.joinPath(fm.cacheDirectory(), "klang-widget-alerts.json");
+  const cached = () => { try { return fm.fileExists(file) ? JSON.parse(fm.readString(file)) : null; } catch (e) { return null; } };
+  try {
+    const at = fm.fileExists(file) ? fm.modificationDate(file) : null;
+    if (at && Date.now() - at.getTime() < ALERTS_MAX_AGE) { const c = cached(); if (c) return c; }
+  } catch (e) { /* read it again */ }
+  try {
+    const req = new Request(ALERTS);
+    req.timeoutInterval = 20;
+    const data = await req.loadJSON();
+    if (!data || !Array.isArray(data.concerts)) throw new Error("bad data");
+    fm.writeString(file, JSON.stringify(data));
+    return data;
+  } catch (e) {
+    return cached();
+  }
+}
+
+function alertedFile() {
+  const fm = FileManager.local();
+  return { fm, path: fm.joinPath(fm.documentsDirectory(), ALERTED_FILE) };
+}
+
+// { concertId: day } for every concert already announced (kept until its day has passed)
+function alerted() {
+  const { fm, path } = alertedFile();
+  try { return fm.fileExists(path) ? JSON.parse(fm.readString(path)) || {} : {}; } catch (e) { return {}; }
+}
+
+function saveAlerted(map) {
+  const { fm, path } = alertedFile();
+  const today = ymd(new Date());
+  const keep = {};
+  for (const [id, day] of Object.entries(map)) if (String(day) >= today) keep[id] = day;
+  try { fm.writeString(path, JSON.stringify(keep)); } catch (e) { /* announced again next time at worst */ }
+}
+
+// The favourites a concert names: works first, then composers, then performers.
+function hitsOf(c, favs) {
+  const names = [];
+  const add = (n) => { if (n && !names.includes(n)) names.push(n); };
+  (c.w || []).forEach((id) => add(favs.w[id]));
+  (c.m || []).forEach((id) => add(favs.m[id]));
+  (c.a || []).forEach((id) => add(favs.a[id]));
+  return names;
+}
+
+const startOf = (c) => new Date(`${c.d}T${/^\d\d:\d\d$/.test(c.t || "") ? c.t : "23:59"}:00`);
+
+// New concerts with a favourite in the place, in time order: [{ c, names }]
+function newMatches(data, favs, place, done, now) {
+  if (!data || !Array.isArray(data.concerts)) return [];
+  return data.concerts
+    .filter((c) => !done[c.i] && inPlace(c, place) && startOf(c) > now)
+    .map((c) => ({ c, names: hitsOf(c, favs) }))
+    .filter((x) => x.names.length);
+}
+
+function shortNames(L, names, max = 2) {
+  return names.length > max ? L.some(names.slice(0, max), names.length - max) : L.list(names);
+}
+
+function venueOf(c) {
+  const plain = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return c.v && plain(c.v).includes(plain(c.c)) ? c.v : [c.v, c.c].filter(Boolean).join(", ");
+}
+
+// Posts one notification for the favourites newly on stage. foreground: Klang just opened the
+// script (any hour is fine, and iOS can ask for permission to notify there).
+async function alertFavourites(L, { foreground = false, confirm = false } = {}) {
+  const favs = savedFavs();
+  if (!favs || !favs.on || !favCount(favs)) return 0;
+  const now = new Date();
+  if (!foreground && (now.getHours() < 8 || now.getHours() >= 22)) return 0;
+  const place = savedPlace() || { ids: [], label: L.names.switzerland };
+  const placeName = place.label || L.names.switzerland;
+  const data = await loadAlerts();
+  const done = alerted();
+  const found = newMatches(data, favs, place, done, now);
+  const day = (c) => startOf(c).toLocaleDateString(L.locale, { weekday: "short", day: "numeric", month: "short" });
+  const n = new Notification();
+  n.threadIdentifier = "klang-favourites";
+  n.identifier = "klang-favourites-" + now.getTime();
+  if (found.length === 1) {
+    const { c, names } = found[0];
+    n.title = L.favOne(shortNames(L, names));
+    n.body = `${day(c)} ${c.t} · ${c.n}\n${venueOf(c)}`;
+    n.openURL = concertURL(c);
+  } else if (found.length > 1) {
+    const max = 5;
+    const lines = found.slice(0, max).map(({ c, names }) => `${day(c)} ${c.t} · ${shortNames(L, names, 1)} · ${c.c || c.v}`);
+    if (found.length > max) lines.push(L.andMore(found.length - max));
+    n.title = L.favMany(found.length);
+    n.body = lines.join("\n");
+    n.openURL = concertURL(found[0].c);
+  } else if (confirm) {
+    n.title = L.alertsReady;
+    n.body = L.alertsReadyBody(placeName);
+    n.openURL = SITE + "#/activity";
+  } else {
+    return 0;
+  }
+  try {
+    await n.schedule();
+  } catch (e) {
+    return 0; // not allowed to notify: try again next time
+  }
+  for (const { c } of found) done[c.i] = c.d;
+  saveAlerted(done);
+  return found.length;
 }
 
 // Lock Screen: the system tints these, so they use plain white text and no colours.
@@ -230,25 +382,37 @@ function homeWidget(family, s) {
 }
 
 async function main() {
-  // Sent from Klang (Me › iPhone widget): keep the place, say so, then show the preview.
+  // Sent from Klang (Me › iPhone widget): keep the place and the favourites, say so, then show the preview.
   const q = args.queryParameters || {};
-  const sent = q.place;
-  if (sent && !config.runsInWidget) {
+  const L = labels();
+  let sentFavs = null;
+  if (q.place && !config.runsInWidget) {
     try {
-      const p = JSON.parse(sent);
+      const p = JSON.parse(q.place);
       if (Array.isArray(p.ids)) {
         const place = { ids: p.ids.map(String), label: String(p.label || "") };
         savePlace(place);
-        if (q.auto) { Script.complete(); return; } // sent automatically: nothing to show
-        const L = labels();
-        const a = new Alert();
-        a.title = "Klang";
-        a.message = L.saved(place.label || L.names.switzerland);
-        a.addAction(L.ok);
-        await a.present();
+        if (q.favs) {
+          sentFavs = cleanFavs(JSON.parse(q.favs));
+          if (sentFavs) saveFavs(sentFavs);
+        }
+        if (!q.auto) {
+          const where = place.label || L.names.switzerland;
+          const a = new Alert();
+          a.title = "Klang";
+          const all = sentFavs ? [...Object.values(sentFavs.w), ...Object.values(sentFavs.m), ...Object.values(sentFavs.a)] : [];
+          a.message = L.saved(where) + (sentFavs && sentFavs.on && all.length ? "\n\n" + L.alertsOn(shortNames(L, all, 3), where) : "");
+          a.addAction(L.ok);
+          await a.present();
+        }
       }
     } catch (e) { /* not a place from Klang: just show the widget */ }
   }
+  // Favourite alerts: on every run; a manual send from Klang confirms with a first notification.
+  try {
+    await alertFavourites(L, { foreground: !config.runsInWidget, confirm: !!(sentFavs && !q.auto) });
+  } catch (e) { /* the widget below matters more */ }
+  if (q.place && q.auto && !config.runsInWidget) { Script.complete(); return; } // sent automatically: nothing to show
   const family = config.widgetFamily || "medium";
   const s = await state();
   const widget = family.startsWith("accessory") ? lockWidget(family, s) : homeWidget(family, s);
@@ -257,4 +421,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 4 };
+module.exports = { main, version: 5 };

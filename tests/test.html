@@ -688,6 +688,7 @@
 
     // ---------- personal store (runs against the sandboxed localStorage) ----------
     const am = await import('../js/applemusic.js');
+    const widgetUi = await import('../js/ui/widget.js');
     try {
       store.resetAll();
       store.setPref('lang', 'en');
@@ -696,6 +697,32 @@
         ok(store.isFollowing('composer', 'bach'));
         eq(store.timeline()[0].type, 'favorite');
         eq(store.toggleFollow('composer', 'bach'), false);
+      });
+      test('the widget link carries the favourites and notices when they change', () => {
+        const w = widgetUi;
+        store.toggleFollow('composer', 'mahler');
+        store.toggleFollow('work', 'beethoven-symphony-5');
+        try {
+          const favs = JSON.parse(decodeURIComponent(/&favs=([^&]+)/.exec(w.widgetLink())[1]));
+          eq(favs.on, 1);
+          eq(favs.m, { mahler: 'Mahler' });
+          eq(Object.keys(favs.w), ['beethoven-symphony-5']);
+          ok(!w.widgetOutOfDate(), 'nothing sent yet: no hint');
+          w.markWidgetSent();
+          ok(!w.widgetOutOfDate(), 'just sent');
+          store.toggleFollow('composer', 'mahler');
+          ok(w.widgetOutOfDate(), 'a favourite removed');
+          store.toggleFollow('composer', 'mahler');
+          ok(!w.widgetOutOfDate(), 'back as sent');
+          store.setReminderPref('favoriteWorkOnStage', false);
+          ok(w.widgetOutOfDate(), 'alerts switched off');
+          eq(JSON.parse(decodeURIComponent(/&favs=([^&]+)/.exec(w.widgetLink())[1])).on, 0);
+        } finally {
+          store.setReminderPref('favoriteWorkOnStage', true);
+          store.toggleFollow('composer', 'mahler');
+          store.toggleFollow('work', 'beethoven-symphony-5');
+          store.setPref('widgetSentKey', null);
+        }
       });
       test('library albums and concert playlists', () => {
         eq(store.toggleAlbum({ id: 123, title: 'Goldberg', artist: 'Gould' }), true);

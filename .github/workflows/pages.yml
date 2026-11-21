@@ -59,12 +59,13 @@ jobs:
             --previous https://lyl0316.github.io/klang/data/concerts.json \
             --report data/feed-report.json
 
-      # The next few days in a small file for the iPhone widget (tools/widget/). It loads the listings
-      # through Klang's own modules (Node, preinstalled on the runner), so every concert has the app's
-      # own city id. A problem here must never stop the site from deploying.
+      # The next few days in a small file for the iPhone widget (tools/widget/), and the next 14 days
+      # with composer, work and performer ids for its favourite alerts. It loads the listings through
+      # Klang's own modules (Node, preinstalled on the runner), so every concert has the app's own ids.
+      # A problem here must never stop the site from deploying.
       - name: Widget feed
         continue-on-error: true
-        run: node tools/widget/widget-feed.mjs --feed data/concerts.json --out data/widget.json
+        run: node tools/widget/widget-feed.mjs --feed data/concerts.json --out data/widget.json --alerts-out data/widget-alerts.json
 
       - uses: actions/configure-pages@v6
 

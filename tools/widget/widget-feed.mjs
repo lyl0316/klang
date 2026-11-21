@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Small feed for the iPhone widget (klang-widget.js), written by the daily build:
 //
-//   node tools/widget/widget-feed.mjs [--feed data/concerts.json] [--out data/widget.json] [--days 4] [--today YYYY-MM-DD]
+//   node tools/widget/widget-feed.mjs [--feed data/concerts.json] [--out data/widget.json] [--days 4]
+//        [--alerts-out data/widget-alerts.json] [--alert-days 14] [--today YYYY-MM-DD]
 //
 // The full feed is about 10 MB, too big for a widget to download and read. This writes today (in
 // Zurich) and the next days only. Several days are kept, not just tomorrow, so the widget still has
@@ -14,6 +15,11 @@
 //
 // Row fields: i (Klang concert id), d (day), t (HH:MM), n (title), v (venue as listed),
 // c (Klang's city name), y (Klang's city id), k (country id; 'switzerland' for Swiss concerts).
+//
+// It also writes data/widget-alerts.json for the widget's favourite alerts (added 21 Nov 2026): the
+// next 14 days, only concerts that name a composer, work or performer Klang knows, with the same row
+// fields plus m (composer ids), w (work ids, repertoire and 'x-…'), a (artist ids). The widget matches
+// them against the favourites Klang sent it (Me › iPhone widget) and posts a notification on the phone.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -26,6 +32,8 @@ const arg = (name, fallback) => {
 const feedPath = arg('--feed', path.join(ROOT, 'data', 'concerts.json'));
 const outPath = arg('--out', path.join(ROOT, 'data', 'widget.json'));
 const days = Math.max(1, Number(arg('--days', 4)) || 4);
+const alertsPath = arg('--alerts-out', path.join(ROOT, 'data', 'widget-alerts.json'));
+const alertDays = Math.max(1, Number(arg('--alert-days', 14)) || 14);
 
 // Klang keeps personal data in localStorage; its modules get an empty one that is thrown away.
 // (Newer Node versions have their own localStorage; if it can't be replaced, Klang's storage helper
@@ -60,22 +68,26 @@ const wanted = Array.from({ length: days }, (_, i) => time.addDays(today, i));
 const want = new Set(wanted);
 const raw = new Map((data.concerts || []).map((c) => [c.id, c]));
 
+const row = (c) => {
+  const r = raw.get(c.feedId) || {};
+  return {
+    i: c.id,
+    d: c.day,
+    t: String(c.start || '').slice(11, 16),
+    n: c.title || '',
+    v: r.venueName || '',
+    c: repo.city(c.cityId)?.name || r.city || '',
+    y: c.cityId || '',
+    k: c.country || 'switzerland',
+  };
+};
+const byTime = (a, b) => a.d.localeCompare(b.d) || a.t.localeCompare(b.t) || a.n.localeCompare(b.n);
+const live = (c) => c.feedId && c.status !== 'cancelled';
+
 const rows = repo.allConcerts()
-  .filter((c) => c.feedId && want.has(c.day) && c.status !== 'cancelled')
-  .map((c) => {
-    const r = raw.get(c.feedId) || {};
-    return {
-      i: c.id,
-      d: c.day,
-      t: String(c.start || '').slice(11, 16),
-      n: c.title || '',
-      v: r.venueName || '',
-      c: repo.city(c.cityId)?.name || r.city || '',
-      y: c.cityId || '',
-      k: c.country || 'switzerland',
-    };
-  })
-  .sort((a, b) => a.d.localeCompare(b.d) || a.t.localeCompare(b.t) || a.n.localeCompare(b.n));
+  .filter((c) => live(c) && want.has(c.day))
+  .map(row)
+  .sort(byTime);
 
 const out = {
   generatedAt: new Date().toISOString(),
@@ -85,3 +97,25 @@ const out = {
 };
 fs.writeFileSync(outPath, JSON.stringify(out));
 console.log(`widget.json: ${rows.length} concerts for ${wanted[0]} to ${wanted[wanted.length - 1]}`);
+
+// ----- favourite alerts: the same rule as Klang's "Following" filter (views/concerts.js) -----
+const uniq = (list) => [...new Set(list.filter(Boolean))];
+const alertEnd = time.addDays(today, alertDays - 1);
+const alerts = repo.allConcerts()
+  .filter((c) => live(c) && c.day >= today && c.day <= alertEnd)
+  .map((c) => ({
+    ...row(c),
+    m: uniq(c.program.map((p) => p.composerId || repo.work(p.workId)?.composerId)),
+    w: uniq(c.program.flatMap((p) => [p.workId, p.wkey])),
+    a: uniq(c.credits.map((cr) => cr.artistId)),
+  }))
+  .filter((r) => r.m.length || r.w.length || r.a.length)
+  .sort(byTime);
+fs.writeFileSync(alertsPath, JSON.stringify({
+  generatedAt: out.generatedAt,
+  feedGeneratedAt: out.feedGeneratedAt,
+  from: today,
+  to: alertEnd,
+  concerts: alerts,
+}));
+console.log(`widget-alerts.json: ${alerts.length} concerts for ${today} to ${alertEnd}`);
