@@ -60,7 +60,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 62 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (88 tests, offline).
+- **Feed tests:** `python3 tools/feeds/selftest.py` (90 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -100,7 +100,10 @@ python3 tools/serve.py            # http://localhost:8765, caching off
   - **Fails** when:
     - a site can't be read two runs in a row, or it fails and its events are lost;
     - a source that had events now returns none;
-    - a source's count drops below 30% of the previous feed;
+    - a source's count drops below 30% of the previous feed, and on each of the next 7 days while it
+      has not recovered (build.py keeps `low: {since, had}` in the source entry; added 21 Nov 2026
+      after Musikverein Wien lost 470 of 496 concerts on 17 Nov and the check took 33 as normal the
+      next day). After 7 days it is a warning;
     - the feed is more than 30 h old.
   - **Warns** (no failure) when a site is out for one day with its events kept, or when a new
     source fails on its first run.
@@ -138,7 +141,11 @@ python3 tools/serve.py            # http://localhost:8765, caching off
    Check that the report says `ok` and "N/N sources".
 5. Tell the owner in plain words what broke, and that it's fixed.
 
-Recent example (5 Nov 2026, commit `bdb75b6`):
+Recent examples:
+- 21 Nov 2026: Musikverein Wien replaced its month drop-down with a bar of month links, so only the
+  current month was read (496 → 27 concerts). `_months()` now reads both.
+
+5 Nov 2026, commit `bdb75b6`:
 - Quartetto di Milano started writing `data-options='…'` in single quotes.
 - Volksoper Wien replaced its schema.org dates with `<time datetime>` plus plain `HH:MM` spans.
 

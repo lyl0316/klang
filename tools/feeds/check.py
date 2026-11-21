@@ -10,7 +10,9 @@ Fails (exit 1) when:
     events were lost (a one-day outage whose events were kept, or that had none, is a warning,
     and so is a new source's first failed run);
   - a source that had events before now returns none (the site has probably changed);
-  - a source's count collapsed to under 30% of the previous feed (likely a parsing break).
+  - a source's count collapsed to under 30% of the previous feed (likely a parsing break), and on
+    each of the next days (up to LOW_DAYS) while it has not recovered (``low`` in the source entry,
+    written by build.py); after that it is a warning.
 Also lists Klang cities with no upcoming concerts (information only, not a failure).
 
 Writes a JSON report (published next to the feed, read by the Mac reminder in tools/feeds/mac/)
@@ -75,6 +77,7 @@ def parse_time(s):
         return None
 
 
+LOW_DAYS = 7            # a collapsed source fails the check this many days in a row, then warns
 SAME_DAY_HOURS = 18     # a second failure sooner than this is the same day's (a push after the daily run)
 
 
@@ -134,10 +137,19 @@ def check(feed, previous, max_age_hours):
             else:
                 warnings.append(msg + '; will try again on the next update.')
             continue
+        low = s.get('low') if isinstance(s.get('low'), dict) else None
+        since = parse_time((low or {}).get('since'))
         if n == 0 and pn >= 5:
             problems.append(f'{name}: returned 0 events (had {pn}); the website has probably changed.')
         elif pn >= 10 and n < 0.3 * pn:
             problems.append(f'{name}: only {n} events (had {pn}); the reader may be broken.')
+        elif low and since:
+            # collapsed on an earlier day and not recovered (build.remember_collapses): yesterday's
+            # count is no longer a fair comparison
+            days = (gen or now) - since
+            msg = (f"{name}: still only {n} events (had {low.get('had')} until "
+                   f"{since.date().isoformat()}); the reader may be broken.")
+            (problems if days.total_seconds() < LOW_DAYS * 86400 else warnings).append(msg)
         elif n == 0:
             warnings.append(f'{name}: no events published right now.')
 

@@ -1393,6 +1393,48 @@ class Check(unittest.TestCase):
         self.assertEqual(len(p), 1)                                 # 12 to come, 3 returned
 
 
+    def test_a_collapse_keeps_failing_until_it_recovers(self):
+        # Musikverein Wien, 17 Nov 2026: 496 -> 33 failed the check once; the next days 33 -> 27 passed
+        import check as chk
+        today = common.today_zurich()
+        day = lambda n: (today + timedelta(days=n)).isoformat() + 'T19:30:00+01:00'
+
+        class Prev:
+            def __init__(self, doc): self.doc = doc
+            def data(self): return self.doc
+            def info(self, key): return next((x for x in self.doc['sources'] if x['key'] == key), None)
+
+        def run(prev_sources, prev_concerts, now_count, ok=True):
+            entries = [{'key': 'mv', 'name': 'Musikverein', 'ok': ok, 'count': now_count}]
+            build.remember_collapses(entries, Prev({'sources': prev_sources, 'concerts': prev_concerts}), today.isoformat())
+            return entries[0]
+
+        full = [{'source': 'mv', 'start': day(n % 200)} for n in range(496)]
+        e1 = run([{'key': 'mv', 'ok': True, 'count': 496}], full, 33)
+        self.assertEqual(e1['low']['had'], 496)                     # day 1: marked
+        e2 = run([dict(e1)], full[:33], 27)
+        self.assertEqual(e2['low'], e1['low'])                      # day 2: still low against 496, not 33
+        self.assertNotIn('low', run([dict(e2)], full[:27], 500))    # recovered
+        self.assertEqual(run([dict(e2)], [], 0, ok=False)['low'], e1['low'])     # not read: the mark stays
+        over = [{'source': 'mv', 'start': day(-1)}] * 480 + full[:16]
+        self.assertNotIn('low', run([{'key': 'mv', 'ok': True, 'count': 496}], over, 15))   # most were over
+
+        gen = datetime.now(timezone.utc)
+        def feed(n, low_days_ago=None):
+            src = {'key': 'mv', 'name': 'Musikverein Wien', 'ok': True, 'count': n}
+            if low_days_ago is not None:
+                src['low'] = {'since': (gen - timedelta(days=low_days_ago)).isoformat(), 'had': 496}
+            return {'generatedAt': gen.isoformat(), 'concerts': [], 'sources': [src]}
+        p, _, _, _ = chk.check(feed(27, 1), feed(33, 2), 30)
+        self.assertEqual(len(p), 1)                                 # the day after: still a problem
+        self.assertIn('had 496', p[0])
+        p, w, _, _ = chk.check(feed(27, 8), feed(27, 9), 30)
+        self.assertEqual(p, [])                                     # after a week: a warning
+        self.assertTrue(any('still only 27' in x for x in w))
+        p, w, _, _ = chk.check(feed(500), feed(27, 3), 30)
+        self.assertEqual((p, w), ([], []))                          # recovered
+
+
 class NoPreviousFeed(unittest.TestCase):
     def test_the_build_stops_when_the_published_feed_cannot_be_loaded(self):
         saved, pauses = common.get_json, build.Previous.RETRY_PAUSES
@@ -1457,6 +1499,21 @@ class Capitole(unittest.TestCase):
                 '<p><strong>Coproduction Opéra national du Capitole / Staatstheater am Gärtnerplatz de Munich (2021)</strong></p><hr>')
         self.assertEqual(ct.parse_content(page)['people'],
                          [('Direction musicale', 'Tarmo Peltokoski'), ('Chef du Chœur', 'Gabriel Bourgoin')])
+
+
+class MusikvereinMonths(unittest.TestCase):
+    """The calendar's other months: a drop-down until mid-November 2026, since then a bar of links."""
+
+    def test_both_forms(self):
+        from sources import musikverein_wien as m
+        bar = ('<nav class="monthbar" id="monthbar"><div class="mb-months">'
+               '<a class="mb-m" href="https://spielplan.musikverein.at/spielplan?month=2026-11" aria-current="true">'
+               '<span>Nov 26</span></a><a class="mb-m" href="https://spielplan.musikverein.at/spielplan?month=2026-12">'
+               '<span>Dez 26</span></a><a class="mb-m" href="/spielplan?code=ORCH&amp;month=2027-01">Jän 27</a></div></nav>'
+               '<option value="ORCH" >Orchestermusik</option>')
+        self.assertEqual(m._months(bar), ['2026-11', '2026-12', '2027-01'])
+        self.assertEqual(m._months('<select><option value="2026-12">Dez</option><option value="2027-01">'), ['2026-12', '2027-01'])
+        self.assertEqual(m._months(''), [])
 
 
 class CalmCapitals(unittest.TestCase):

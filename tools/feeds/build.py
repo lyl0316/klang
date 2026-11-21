@@ -897,6 +897,32 @@ def parse_args(argv):
     return p.parse_args(argv)
 
 
+LOW_SHARE = 0.3          # a source down to under 30% of its concerts has collapsed (check.py: the reader may be broken)
+
+
+def remember_collapses(entries, previous, today):
+    """Mark a source whose count collapsed with ``low: {since, had}``, and keep the mark (with the count
+    from before) until it recovers, so check.py keeps reporting it: comparing with yesterday alone, a
+    reader that lost 470 of 496 concerts (Musikverein Wien, 17 Nov 2026) looked normal the next day.
+    ``had`` counts only the concerts of the day before that were still to come (a festival that ended
+    has not collapsed). A source that could not be read keeps yesterday's mark unchanged."""
+    data = previous.data() or {}
+    still = {}
+    for c in data.get('concerts') or []:
+        if isinstance(c, dict) and str(c.get('start', ''))[:10] >= today:
+            still[c.get('source')] = still.get(c.get('source'), 0) + 1
+    for entry in entries:
+        was = previous.info(entry['key']) or {}
+        if not entry.get('ok'):
+            if was.get('low'):
+                entry['low'] = was['low']
+            continue
+        low = was.get('low') or {}
+        had = low.get('had') or min(was.get('count') or 0, still.get(entry['key'], 0))
+        if had >= 10 and entry['count'] < LOW_SHARE * had:
+            entry['low'] = {'since': low.get('since') or _now_iso(), 'had': had}
+
+
 def main(argv=None):
     args = parse_args(argv)
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
@@ -1064,6 +1090,7 @@ def main(argv=None):
         log.info('type or series set from the facts for %d concert(s)', retyped)
     for entry in entries:   # counts after de-duplication
         entry['count'] = sum(1 for c in concerts if c['source'] == entry['key'])
+    remember_collapses(entries, previous, today.isoformat())
     doc = {
         'generatedAt': _now_iso(),
         'generator': 'Klang feed builder (tools/feeds/build.py)',

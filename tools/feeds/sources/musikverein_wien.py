@@ -34,7 +34,9 @@ performances, and any event whose JSON does not call it a concert. Hired-hall co
 ("Eingemietete Veranstaltung", e.g. tourist Mozart/Strauss concerts) are kept: they are
 classical concerts in the hall.
 
-Checked against the website on 29 Oct 2026 (Tonkünstler 30 Oct, Wiener Mozart Orchester,
+The other months come from the month bar of the first page (a drop-down until mid-November 2026).
+
+Checked again on 21 Nov 2026 (506 concerts, November 2026 to November 2027). First checked on 29 Oct 2026 (Tonkünstler 30 Oct, Wiener Mozart Orchester,
 Sumi Jo 10 Nov, Wiener Symphoniker 12 Nov ...).
 """
 from __future__ import annotations
@@ -120,7 +122,11 @@ def parse_month(page_html):
 
 
 def _months(page_html):
-    return re.findall(r'<option value="(\d{4}-\d{2})"', page_html or '')
+    """The months the calendar offers: a drop-down until mid-November 2026, since then a bar of links
+    (<nav class="monthbar"> ... <a class="mb-m" href="...spielplan?month=2026-12">)."""
+    found = re.findall(r'<option value="(\d{4}-\d{2})"', page_html or '')
+    found += re.findall(r'[?&](?:amp;)?month=(\d{4}-\d{2})\b', page_html or '')
+    return sorted(set(found))
 
 
 def _children(today):
