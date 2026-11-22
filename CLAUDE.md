@@ -60,7 +60,7 @@ python3 tools/serve.py            # http://localhost:8765, caching off
 - In Claude Code desktop, start it with `preview_start {name: "klang"}`
   (config: `/Users/yinistliu/Klang/.claude/launch.json`).
 - **App tests:** open <http://localhost:8765/tests/test.html>. Currently "All 64 tests passed".
-- **Feed tests:** `python3 tools/feeds/selftest.py` (91 tests, offline).
+- **Feed tests:** `python3 tools/feeds/selftest.py` (92 tests, offline).
 - **One reader against the live site:**
 
   ```bash
@@ -91,10 +91,15 @@ python3 tools/serve.py            # http://localhost:8765, caching off
      - On a push it runs with `--fresh-hours 20`, so sources read in the last 20 h with unchanged
        code are reused. A code-only push deploys in under a minute.
   2. `tools/feeds/check.py` writes `data/feed-report.json`.
-  3. `node tools/widget/widget-feed.mjs` writes `data/widget.json` for the iPhone widget
+  3. `tools/feeds/past.py` writes `data/past/` (index.json + one file per month): the archive of
+     past concerts for Look back (added 23 Nov 2026). It reads the published archive, adds the
+     previous feed's concerts that are now over, keeps 120 days. Pages replaces the whole site, so
+     it exits 2 (no deploy) rather than publish a shorter archive when the old one can't be read.
+     The archive starts on 22 Nov 2026; nothing older survived.
+  4. `node tools/widget/widget-feed.mjs` writes `data/widget.json` for the iPhone widget
      (`continue-on-error`, so it can never block a deploy). It is the only Node step: it imports the
      app's own `js/feed.js` and `js/repo.js` (`js/package.json` marks them as ES modules for Node).
-  4. The site deploys, then the run is marked **failed** if the check failed. GitHub then emails
+  5. The site deploys, then the run is marked **failed** if the check failed. GitHub then emails
      the owner; that is what "I receive some emails" means.
 - **check.py:**
   - **Fails** when:
@@ -197,7 +202,7 @@ Recent examples:
 | File | Role |
 |---|---|
 | `js/main.js` | Router (hash routes), tab bar, dock, mini player |
-| `js/feed.js` | Loads `data/concerts.json`. Keeps a compact localStorage copy (`klang.feed.v1`, format `v: 3`) for instant starts: the marked concerts, as many coming days as fit (`TIERS`), and the past days in the countries of the user's place. The copy is read at the END of the module (see section 7). |
+| `js/feed.js` | Loads `data/concerts.json`, and `loadPast()` the archive in `data/past/` when Look back or the Date sheet needs past days. Keeps a compact localStorage copy (`klang.feed.v1`, format `v: 3`) for instant starts: the marked concerts, as many coming days as fit (`TIERS`), and the past days in the countries of the user's place. The copy is read at the END of the module (see section 7). |
 | `js/repo.js` | Concerts, cities, venues, works; `query()`; `programItems(c)` |
 | `js/store.js` | All personal data (localStorage `klang.v1`), preferences, library, playlists |
 | `js/i18n.js` + `js/i18n/zh-*.js` | `t('English text')` looks up the Chinese by the English key; untranslated strings stay English |

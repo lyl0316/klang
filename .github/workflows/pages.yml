@@ -59,6 +59,16 @@ jobs:
             --previous https://lyl0316.github.io/klang/data/concerts.json \
             --report data/feed-report.json
 
+      # Past concerts for Look back (tools/feeds/past.py): the published archive plus the previous
+      # feed's concerts that are now over, the last 120 days, in data/past/. Pages replaces the whole
+      # site, so if the archive can't be read this stops the run (nothing deployed) rather than
+      # publishing a shorter one.
+      - name: Past concerts
+        run: |
+          python3 tools/feeds/past.py --feed data/concerts.json \
+            --previous https://lyl0316.github.io/klang/data/concerts.json \
+            --site https://lyl0316.github.io/klang/ --out-dir data/past
+
       # The next few days in a small file for the iPhone widget (tools/widget/), and the next 14 days
       # with composer, work and performer ids for its favourite alerts. It loads the listings through
       # Klang's own modules (Node, preinstalled on the runner), so every concert has the app's own ids.

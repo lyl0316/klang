@@ -1335,6 +1335,23 @@ class OpernhausRecovery(unittest.TestCase):
         self.assertEqual(oz.missed_performances([], set(), date(2026, 10, 26)), {})
 
 
+class PastArchive(unittest.TestCase):
+    def test_keeps_the_last_days_and_takes_the_newer_copy(self):
+        import past
+        old = {'2026-07': [{'id': 'too-old', 'start': '2026-07-01T19:30:00+02:00'}],
+               '2026-11': [{'id': 'a', 'start': '2026-11-20T19:30:00+01:00', 'status': 'scheduled'}]}
+        previous = {'concerts': [
+            {'id': 'a', 'start': '2026-11-20T19:30:00+01:00', 'status': 'cancelled'},  # newer copy
+            {'id': 'b', 'start': '2026-11-22T19:30:00+01:00'},                         # now over
+            {'id': 'c', 'start': '2026-11-23T19:30:00+01:00'},                         # today: not yet
+        ]}
+        months = past.build_archive(old, previous, '2026-11-23')
+        self.assertEqual(list(months), ['2026-11'])
+        self.assertEqual([c['id'] for c in months['2026-11']], ['a', 'b'])
+        self.assertEqual(months['2026-11'][0]['status'], 'cancelled')
+        self.assertEqual(past.months_between('2026-11-05', '2027-01-02'), ['2026-11', '2026-12', '2027-01'])
+
+
 class Check(unittest.TestCase):
     def test_one_day_outage_is_a_warning(self):
         import check as chk

@@ -9,6 +9,7 @@ import { h, icon, clear, toast, TYPE_LABELS, normalize } from '../util.js';
 import * as repo from '../repo.js';
 import * as store from '../store.js';
 import { openSheet } from '../ui/sheet.js';
+import { loadPast } from '../feed.js';
 import { syncWidget } from '../ui/widget.js';
 import { concertCard, chip, emptyState, skeletonList } from '../ui/components.js';
 import {
@@ -514,13 +515,19 @@ export function render() {
       const c = repo.concert(id);
       if (c) marksByDay.add(c.day);
     }
-    const counts = new Map();
-    for (const c of applyFollowing(repo.query(baseOpts()))) counts.set(c.day, (counts.get(c.day) || 0) + 1);
-    const allDays = [...counts.keys()].sort();
-    // Density dots are relative, like Sheng's: busiest third of days gets three, quietest third one.
-    const sortedN = [...counts.values()].sort((a, b) => a - b);
-    const q = (x) => sortedN[Math.min(sortedN.length - 1, Math.floor(sortedN.length * x))] || 0;
-    const [lowCut, highCut] = [q(1 / 3), q(2 / 3)];
+    // Past days count too (Look back), from what Klang keeps: the phone's copy plus the site's archive,
+    // which is loaded below and repaints the dots when it arrives.
+    let counts, allDays, lowCut, highCut;
+    const count = () => {
+      counts = new Map();
+      for (const c of applyFollowing(repo.query(baseOpts({ from: repo.pastStart(today) })))) counts.set(c.day, (counts.get(c.day) || 0) + 1);
+      allDays = [...counts.keys()].filter((d) => d >= today).sort();
+      // Density dots are relative, like Sheng's: busiest third of days gets three, quietest third one.
+      const sortedN = [...counts.values()].sort((a, b) => a - b);
+      const q = (x) => sortedN[Math.min(sortedN.length - 1, Math.floor(sortedN.length * x))] || 0;
+      [lowCut, highCut] = [q(1 / 3), q(2 / 3)];
+    };
+    count();
     // past months back to what Look back keeps; forward to the last listed day
     const minMonth = monthKeyOf([allDays[0], repo.pastStart(today)].filter(Boolean).sort()[0]);
     const maxMonth = monthKeyOf([allDays[allDays.length - 1], today].filter(Boolean).sort().pop());
@@ -568,6 +575,7 @@ export function render() {
         cta.textContent = tKeep('Jump to {date}', { date: dayWithWeekday(selected) });
       }
     }
+    loadPast().then((n) => { if (n && sheet.el.isConnected) { count(); paint(); } });
     cta.onclick = () => {
       const past = selected < today;
       // land on the selected day or the nearest following day with concerts
@@ -586,7 +594,8 @@ export function render() {
 
   // ---------- Look back: pick one city (Sheng) ----------
   // Past concerts are the real listings Klang has kept (feed.js keeps them for 120 days).
-  function openLookBackCitySheet(fromDay) {
+  async function openLookBackCitySheet(fromDay) {
+    await loadPast(fromDay); // the site's archive of past concerts (quick; nothing when offline)
     const today = todayKey();
     const counts = new Map();
     for (const c of repo.query({ from: fromDay, to: addDays(today, -1) })) if (c.cityId) counts.set(c.cityId, (counts.get(c.cityId) || 0) + 1);

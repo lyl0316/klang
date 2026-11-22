@@ -194,6 +194,59 @@ export function loadFeed() {
 
 export const refreshFeed = () => loadFeed();
 
+// ----- past concerts for Look back (data/past/, written daily by tools/feeds/past.py) -----
+// The feed starts today, so past days come from the site's archive: index.json lists the months, one
+// file per month. They are loaded when Look back or the Date sheet needs them, merged into the feed
+// (the saved copy then keeps them, see TIERS) and the app repaints. Concerts this phone kept itself
+// stay; the archive only adds the ones it is missing.
+export const PAST_URL = new URL('../data/past/', import.meta.url).href;
+let pastIndex = null;
+const pastMonths = new Map(); // month -> Promise of its concerts
+
+async function fetchPast(name) {
+  const res = await fetch(PAST_URL + name, { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+// Loads the archived months from `from` (a day) up to yesterday. Resolves to the number of concerts
+// added (0 when offline or already loaded); never throws.
+export async function loadPast(from = addDays(todayKey(), -KEEP_PAST_DAYS)) {
+  const today = todayKey();
+  try {
+    pastIndex ||= fetchPast('index.json').catch((err) => { pastIndex = null; throw err; });
+    const index = await pastIndex;
+    const months = Object.keys(index?.months || {}).filter((m) => m >= from.slice(0, 7) && m <= today.slice(0, 7));
+    const lists = await Promise.all(months.map((m) => {
+      if (!pastMonths.has(m)) {
+        pastMonths.set(m, fetchPast(`${m}.json`).then((d) => (Array.isArray(d?.concerts) ? d.concerts : []))
+          .catch((err) => { pastMonths.delete(m); throw err; }));
+      }
+      return pastMonths.get(m);
+    }));
+    return addPast(lists.flat(), today);
+  } catch {
+    return 0;
+  }
+}
+
+function addPast(list, today = todayKey()) {
+  if (!feed) return 0;
+  const have = new Set(feed.concerts.map((c) => c.id));
+  const from = addDays(today, -KEEP_PAST_DAYS);
+  const extra = list.map(clean).filter((c) => c && !have.has(c.id) && dayKeyOf(c.start) < today && dayKeyOf(c.start) >= from);
+  if (!extra.length) return 0;
+  const known = new Set(feed.sources.map((s) => s.key));
+  const sources = [...feed.sources];
+  for (const c of extra) {
+    if (c.source && !known.has(c.source)) { sources.push({ key: c.source, count: 0, past: true }); known.add(c.source); }
+  }
+  feed = { ...feed, sources, concerts: [...extra, ...feed.concerts].sort((a, b) => a.start.localeCompare(b.start)) };
+  writeCache(feed);
+  store.notify('feed');
+  return extra.length;
+}
+
 // Pull to refresh on the Concerts list (concerts.js): the feed and the saved import URL, in parallel.
 export async function pullToRefresh() {
   const [f, imported] = await Promise.all([
