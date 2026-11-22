@@ -21,8 +21,9 @@
 // fields plus m (composer ids), w (work ids, repertoire and 'x-…'), a (artist ids). The widget matches
 // them against the favourites Klang sent it (Me › iPhone widget) and posts a notification on the phone.
 //
-// The owner's first picks (21–22 Nov 2026), in both files: o: 1 = a performance at Opernhaus Zürich or
-// KKL Luzern (the notifications cover the chosen cities plus these two houses); p = 2 for Martha
+// The owner's first picks (21–22 Nov 2026), in both files: o: 1 = always in the notifications, whatever
+// the chosen cities: every performance at Opernhaus Zürich or KKL Luzern, and Martha Argerich in Basel
+// or Bern; p = 2 for Martha
 // Argerich in Switzerland (with f, her name as listed), 1 for the two houses, to put them first. The
 // alerts file also holds every p 2 concert however far ahead; the widget announces those even without
 // a ♥ when they are in the chosen cities or at the two houses.
@@ -76,6 +77,7 @@ const raw = new Map((data.concerts || []).map((c) => [c.id, c]));
 
 const FIRST_VENUES = new Set(['opernhaus-zurich', 'kkl-luzern']);
 const FIRST_ARTISTS = new Set(['artist-martha-argerich']);
+const FIRST_ARTIST_CITIES = new Set(['basel', 'bern']); // Argerich here is in range whatever the cities
 const firstArtists = (c) => (c.country ? [] : c.credits.filter((cr) => FIRST_ARTISTS.has(cr.artistId)));
 const firstOf = (c) => (firstArtists(c).length ? 2 : FIRST_VENUES.has(c.venueId) ? 1 : 0);
 
@@ -92,7 +94,7 @@ const row = (c) => {
     y: c.cityId || '',
     k: c.country || 'switzerland',
     ...(p ? { p } : {}),
-    ...(FIRST_VENUES.has(c.venueId) ? { o: 1 } : {}),
+    ...(FIRST_VENUES.has(c.venueId) || (p === 2 && FIRST_ARTIST_CITIES.has(c.cityId)) ? { o: 1 } : {}),
     ...(p === 2 ? { f: [...new Set(firstArtists(c).map((cr) => cr.name))] } : {}),
   };
 };

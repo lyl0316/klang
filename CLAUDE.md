@@ -318,8 +318,8 @@ Rules and gotchas:
     app is in front. Hearts don't open Scriptable; Me shows "Changed since you last sent them" when
     the widget's copy is out of date (`widgetSentKey` covers place, favourites and `on`).
   - **Owner's first picks** (21–22 Nov 2026): both notifications cover the saved cities plus every
-    Opernhaus Zürich and KKL Luzern performance (rows `o: 1`, `FIRST_VENUES` in `widget-feed.mjs`),
-    whatever the cities. Order: Martha Argerich in Switzerland (`p: 2`, `FIRST_ARTISTS`, with `f` =
+    Opernhaus Zürich and KKL Luzern performance and Martha Argerich in Basel or Bern (rows `o: 1`,
+    `FIRST_VENUES` / `FIRST_ARTIST_CITIES` in `widget-feed.mjs`), whatever the cities. Order: Martha Argerich in Switzerland (`p: 2`, `FIRST_ARTISTS`, with `f` =
     her name), then the two houses (`p: 1`), then ♥ favourites, then by time. Every Swiss `p: 2`
     concert goes into widget-alerts.json however far ahead; the widget announces it once, even
     without a ♥, when it is in that range. Opernhaus and KKL are not announced on their own (about
