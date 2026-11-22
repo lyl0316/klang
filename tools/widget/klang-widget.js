@@ -1,4 +1,4 @@
-// KLANG-WIDGET 8: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
+// KLANG-WIDGET 9: tomorrow's concerts on the iPhone Home Screen and Lock Screen, and a notification
 // when a favourite composer, work or performer is on stage in your cities.
 // Runs in the free Scriptable app (scriptable.app). This file is a module: the small loader
 // (klang-loader.js, the script people paste) downloads it on every run, keeps the last working copy
@@ -24,10 +24,10 @@
 // one local notification for the new ones. Each concert is announced once (klang-widget-alerted.json).
 // No notifications at night: between 22:00 and 08:00 it waits for a later run.
 //
-// The owner's first picks (rows with p, written by widget-feed.mjs): Opernhaus Zürich and KKL Luzern
-// (p 1) and Martha Argerich in Switzerland (p 2) always come first in both notifications, and are
-// listed even when outside the saved cities. A p 2 concert is announced like a favourite (once, as far
-// ahead as it is listed) even without a ♥. Then favourites, then the rest by time.
+// Which concerts (owner, 22 Nov 2026): the saved cities plus every performance at Opernhaus Zürich and
+// KKL Luzern (rows with o: 1), whatever the cities. Order: Martha Argerich in Switzerland (p 2), then
+// the two houses (p 1), then favourites, then the rest by time. A p 2 concert in that range is
+// announced like a favourite (once, as far ahead as it is listed) even without a ♥.
 //
 // Tomorrow at 8 pm (owner's request, 21 Nov 2026): each run before 20:00 schedules (or replaces, same
 // identifier) a notification for 20:00 with tomorrow's concerts in the saved place, favourites first
@@ -239,15 +239,15 @@ const firstPicks = (list, rowOf = (x) => x) => list
   .sort((a, b) => (rowOf(b.x).p || 0) - (rowOf(a.x).p || 0) || a.n - b.n)
   .map(({ x }) => x);
 
-// In the place, or a first pick anywhere in Switzerland.
-const shown = (c, place) => inPlace(c, place) || (!!c.p && c.k === "switzerland");
+// The saved cities, plus Opernhaus Zürich and KKL Luzern wherever the cities are.
+const shown = (c, place) => inPlace(c, place) || c.o === 1;
 
-// New concerts with a favourite (or Martha Argerich in Switzerland), first picks first, then by time:
-// [{ c, names }]. Favourites must be in the place; Argerich anywhere in Switzerland.
+// New concerts with a favourite (or Martha Argerich) in the cities or at the two houses, first picks
+// first, then by time: [{ c, names }].
 function newMatches(data, favs, place, done, now) {
   if (!data || !Array.isArray(data.concerts)) return [];
   return firstPicks(data.concerts
-    .filter((c) => !done[c.i] && startOf(c) > now && (inPlace(c, place) || (c.p === 2 && c.k === "switzerland")))
+    .filter((c) => !done[c.i] && startOf(c) > now && shown(c, place))
     .map((c) => ({ c, names: hitsOf(c, favs) }))
     .filter((x) => x.names.length), (x) => x.c);
 }
@@ -536,4 +536,4 @@ async function main() {
   else await widget.presentMedium();
 }
 
-module.exports = { main, version: 8 };
+module.exports = { main, version: 9 };

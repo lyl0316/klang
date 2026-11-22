@@ -21,10 +21,11 @@
 // fields plus m (composer ids), w (work ids, repertoire and 'x-…'), a (artist ids). The widget matches
 // them against the favourites Klang sent it (Me › iPhone widget) and posts a notification on the phone.
 //
-// The owner's first picks (21 Nov 2026), in both files as p: 1 = a performance at Opernhaus Zürich or
-// KKL Luzern, 2 = Martha Argerich in Switzerland (with f, her name as listed). Both notifications put
-// them first; the alerts file also holds every p 2 concert however far ahead, and the widget announces
-// those even without a ♥.
+// The owner's first picks (21–22 Nov 2026), in both files: o: 1 = a performance at Opernhaus Zürich or
+// KKL Luzern (the notifications cover the chosen cities plus these two houses); p = 2 for Martha
+// Argerich in Switzerland (with f, her name as listed), 1 for the two houses, to put them first. The
+// alerts file also holds every p 2 concert however far ahead; the widget announces those even without
+// a ♥ when they are in the chosen cities or at the two houses.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -91,6 +92,7 @@ const row = (c) => {
     y: c.cityId || '',
     k: c.country || 'switzerland',
     ...(p ? { p } : {}),
+    ...(FIRST_VENUES.has(c.venueId) ? { o: 1 } : {}),
     ...(p === 2 ? { f: [...new Set(firstArtists(c).map((cr) => cr.name))] } : {}),
   };
 };

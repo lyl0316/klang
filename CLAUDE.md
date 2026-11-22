@@ -317,12 +317,13 @@ Rules and gotchas:
     manual send with no match posts "Klang alerts are on", so iOS asks for permission while the
     app is in front. Hearts don't open Scriptable; Me shows "Changed since you last sent them" when
     the widget's copy is out of date (`widgetSentKey` covers place, favourites and `on`).
-  - **Owner's first picks** (21 Nov 2026): Opernhaus Zürich and KKL Luzern performances, and Martha
-    Argerich in Switzerland, always come first in both notifications, even outside the saved cities.
-    `widget-feed.mjs` marks rows `p: 1` (`FIRST_VENUES`) or `p: 2` (`FIRST_ARTISTS`, Swiss only,
-    with `f` = her name); every `p: 2` concert goes into widget-alerts.json however far ahead, and
-    the widget announces it once even without a ♥. Opernhaus and KKL are not announced on their own
-    (about one a day): they lead the 8 pm list. Owner confirmed on 21 Nov 2026 that the test
+  - **Owner's first picks** (21–22 Nov 2026): both notifications cover the saved cities plus every
+    Opernhaus Zürich and KKL Luzern performance (rows `o: 1`, `FIRST_VENUES` in `widget-feed.mjs`),
+    whatever the cities. Order: Martha Argerich in Switzerland (`p: 2`, `FIRST_ARTISTS`, with `f` =
+    her name), then the two houses (`p: 1`), then ♥ favourites, then by time. Every Swiss `p: 2`
+    concert goes into widget-alerts.json however far ahead; the widget announces it once, even
+    without a ♥, when it is in that range. Opernhaus and KKL are not announced on their own (about
+    one a day): they lead the 8 pm list. The owner confirmed on 21 Nov 2026 that the test
     notification arrives on the iPhone.
   - **Tomorrow at 8 pm** (owner's request, 21 Nov 2026): each widget run before 20:00 schedules a
     notification for 20:00 (`setTriggerDate`, identifier `klang-tomorrow-<day>`, so later runs replace
