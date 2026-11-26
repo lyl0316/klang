@@ -182,7 +182,8 @@ Recent examples:
   ClaudeBot), radio_france (since 14 Nov 2026, the owner's decision: its robots.txt names GPTBot,
   ChatGPT-User and Amazonbot but not ClaudeBot; this is how the owner reads rule 5, so treat a site
   that blocks other AI crawlers by name the same way: ask the owner, and expect "off"),
-  gaertnerplatztheater (no answer to GitHub's servers), and
+  gaertnerplatztheater and brucknerhaus_linz (since 26 Nov 2026, owner's decision; no answer to
+  GitHub's servers), and
   berliner_philharmoniker (since 13 Nov 2026: every request, robots.txt included, gets a
   bot-protection challenge; turn it on again if that goes away).
 - **No reader at all**:

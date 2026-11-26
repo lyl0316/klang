@@ -311,13 +311,13 @@ Added on 30 October 2026: the main venues of Austria, Germany, France and Italy 
 
 - **robots.txt blocks ClaudeBot or AI crawlers:** Elbphilharmonie Hamburg, BR Symphonieorchester (brso.de) and SWR (ARD robots.txt), Salzburger Landestheater, Wiener Staatsoper and Teatro Comunale di Bologna (readers kept, `ENABLED = False`). Radio France blocks GPTBot, ChatGPT-User and Amazonbot by name but not ClaudeBot; the owner switched its reader off on 14 Nov 2026 all the same (reader kept, `ENABLED = False`). In Switzerland: Les Concerts de Romainmôtier, and since 14 Nov 2026 Sommets Musicaux de Gstaad (both readers kept, `ENABLED = False`).
 - **Terms forbid storing or republishing the programme:** Theater an der Wien, Innsbrucker Festwochen der Alten Musik.
-- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz does not answer GitHub's servers at all (reader kept, `ENABLED = False`). Berliner Philharmoniker has answered every request with a bot-protection challenge since 12 Nov 2026 (reader kept, `ENABLED = False`).
+- **Bot protection or captcha:** Bayerische Staatsoper, Teatro di San Carlo, Orchestre national de Lille. Staatstheater am Gärtnerplatz and, since 26 Nov 2026, Brucknerhaus Linz do not answer GitHub's servers at all (readers kept, `ENABLED = False`). Berliner Philharmoniker has answered every request with a bot-protection challenge since 12 Nov 2026 (reader kept, `ENABLED = False`).
 - **Calendar only behind robots-forbidden addresses or a login:** Kölner Philharmonie, Salzburger Festspiele.
 
 | Reader key | Country | Source | Site | Note |
 |---|---|---|---|---|
 | `bregenzer_festspiele` | Austria | Bregenzer Festspiele | https://bregenzerfestspiele.com/de |  |
-| `brucknerhaus_linz` | Austria | Brucknerhaus Linz | https://www.brucknerhaus.at/ |  |
+| `brucknerhaus_linz` | Austria | Brucknerhaus Linz | https://www.brucknerhaus.at/ | off: no answer to GitHub's servers |
 | `esterhazy_eisenstadt` | Austria | Esterházy – Haydn in Eisenstadt | https://esterhazy.at/veranstaltungen |  |
 | `grafenegg` | Austria | Grafenegg | https://www.grafenegg.com/ |  |
 | `landestheater_linz` | Austria | Landestheater Linz | https://www.landestheater-linz.at/ |  |

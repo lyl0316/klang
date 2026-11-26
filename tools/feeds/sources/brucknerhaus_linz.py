@@ -45,6 +45,11 @@ SITE = 'https://www.brucknerhaus.at/'
 ATTRIBUTION = 'Source: Brucknerhaus Linz – LIVA (brucknerhaus.at)'
 KIND = 'venue'
 COUNTRY = 'austria'
+# Off since 26 Nov 2026 (owner's decision): from GitHub's servers every request, robots.txt included,
+# has timed out since about 20 Nov, while the site answers at once from a home connection; it
+# apparently does not serve data-centre addresses, and that is not worked around. Turn on again if
+# the daily build can reach it.
+ENABLED = False
 MAX_REQUESTS = 130             # 2–3 listing pages, the rest for event pages
 TIME_LIMIT = 900
 
