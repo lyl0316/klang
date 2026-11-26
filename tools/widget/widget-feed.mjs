@@ -21,12 +21,12 @@
 // fields plus m (composer ids), w (work ids, repertoire and 'x-…'), a (artist ids). The widget matches
 // them against the favourites Klang sent it (Me › iPhone widget) and posts a notification on the phone.
 //
-// The owner's first picks (21–22 Nov 2026), in both files: o: 1 = always in the notifications, whatever
-// the chosen cities: every performance at Opernhaus Zürich or KKL Luzern, and Martha Argerich in Basel
-// or Bern; p = 2 for Martha
-// Argerich in Switzerland (with f, her name as listed), 1 for the two houses, to put them first. The
-// alerts file also holds every p 2 concert however far ahead; the widget announces those even without
-// a ♥ when they are in the chosen cities or at the two houses.
+// The owner's first picks (21–22 Nov 2026; Luzerner Theater added 26 Nov), in both files: o: 1 = always
+// in the notifications, whatever the chosen cities: every performance at Opernhaus Zürich, KKL Luzern or
+// Luzerner Theater, and Martha Argerich in Basel or Bern; p = 2 for Martha Argerich in Switzerland (with
+// f, her name as listed), 1 for the three houses, to put them first. The alerts file also holds every
+// p 2 concert however far ahead; the widget announces those even without a ♥ when they are in the
+// chosen cities or at the three houses.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -75,7 +75,7 @@ const wanted = Array.from({ length: days }, (_, i) => time.addDays(today, i));
 const want = new Set(wanted);
 const raw = new Map((data.concerts || []).map((c) => [c.id, c]));
 
-const FIRST_VENUES = new Set(['opernhaus-zurich', 'kkl-luzern']);
+const FIRST_VENUES = new Set(['opernhaus-zurich', 'kkl-luzern', 'luzerner-theater']); // Luzerner Theater: 26 Nov 2026
 const FIRST_ARTISTS = new Set(['artist-martha-argerich']);
 const FIRST_ARTIST_CITIES = new Set(['basel', 'bern']); // Argerich here is in range whatever the cities
 const firstArtists = (c) => (c.country ? [] : c.credits.filter((cr) => FIRST_ARTISTS.has(cr.artistId)));

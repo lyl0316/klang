@@ -25,8 +25,8 @@
 // No notifications at night: between 22:00 and 08:00 it waits for a later run.
 //
 // Which concerts (owner, 22 Nov 2026): the saved cities plus the rows marked o: 1 (every performance at
-// Opernhaus Zürich and KKL Luzern, and Martha Argerich in Basel or Bern), whatever the cities. Order: Martha Argerich in Switzerland (p 2), then
-// the two houses (p 1), then favourites, then the rest by time. A p 2 concert in that range is
+// Opernhaus Zürich, KKL Luzern and Luzerner Theater, and Martha Argerich in Basel or Bern), whatever the cities. Order: Martha Argerich in Switzerland (p 2), then
+// the three houses (p 1), then favourites, then the rest by time. A p 2 concert in that range is
 // announced like a favourite (once, as far ahead as it is listed) even without a ♥.
 //
 // Tomorrow at 8 pm (owner's request, 21 Nov 2026): each run before 20:00 schedules (or replaces, same
@@ -233,7 +233,7 @@ function hitsOf(c, favs) {
 
 const startOf = (c) => new Date(`${c.d}T${/^\d\d:\d\d$/.test(c.t || "") ? c.t : "23:59"}:00`);
 
-// The owner's first picks first (Argerich, then Opernhaus / KKL), keeping the order within each.
+// The owner's first picks first (Argerich, then Opernhaus / KKL / Luzerner Theater), keeping the order within each.
 const firstPicks = (list, rowOf = (x) => x) => list
   .map((x, n) => ({ x, n }))
   .sort((a, b) => (rowOf(b.x).p || 0) - (rowOf(a.x).p || 0) || a.n - b.n)
@@ -242,7 +242,7 @@ const firstPicks = (list, rowOf = (x) => x) => list
 // The saved cities, plus the rows widget-feed.mjs marks as always in range (o: 1).
 const shown = (c, place) => inPlace(c, place) || c.o === 1;
 
-// New concerts with a favourite (or Martha Argerich) in the cities or at the two houses, first picks
+// New concerts with a favourite (or Martha Argerich) in the cities or at the three houses, first picks
 // first, then by time: [{ c, names }].
 function newMatches(data, favs, place, done, now) {
   if (!data || !Array.isArray(data.concerts)) return [];
